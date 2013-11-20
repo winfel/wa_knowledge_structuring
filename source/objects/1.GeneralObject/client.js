@@ -90,37 +90,6 @@ GeneralObject.fetchContent=function(worker, forced){
 	this.serverCall('getContent', functionLoadedCallback);
 }
 
-GeneralObject.utf8={};
-
-GeneralObject.utf8.toByteArray = function(str) {
-    var byteArray = [];
-    for (var i = 0; i < str.length; i++)
-        if (str.charCodeAt(i) <= 0x7F)
-            byteArray.push(str.charCodeAt(i));
-        else {
-            var h = encodeURIComponent(str.charAt(i)).substr(1).split('%');
-            for (var j = 0; j < h.length; j++)
-                byteArray.push(parseInt(h[j], 16));
-        }
-    return byteArray;
-};
-
-GeneralObject.utf8.parse = function(byteArray) {
-    var str = '';
-    for (var i = 0; i < byteArray.length; i++)
-        str +=  byteArray[i] <= 0x7F?
-                byteArray[i] === 0x25 ? "%25" : // %
-                String.fromCharCode(byteArray[i]) :
-                "%" + byteArray[i].toString(16).toUpperCase();
-    try {
-    	return decodeURIComponent(str);
-    } catch (e) {
-    }
-    return '';
-};
-
-
-
 GeneralObject.getContentAsString=function(callback){
 	if (callback === undefined) {
 		return GeneralObject.utf8.parse(this.content);
@@ -134,9 +103,8 @@ GeneralObject.hasContent=function(){
 }
 
 GeneralObject.contentUpdated=function(){
-
 	this.fetchContent(false, true);
-	
+
 	this.draw();
 }
 
@@ -197,6 +165,7 @@ GeneralObject.getRoom=function(){
 *	determine if the current object intersects with the square x,y,width,height
 */
 GeneralObject.boxIntersectsWith=function(otherx,othery,otherwidth,otherheight){
+	if (!this.isGraphical) return false;
 
 	var thisx = this.getViewBoundingBoxX();
 	var thisy = this.getViewBoundingBoxY();

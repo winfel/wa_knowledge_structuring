@@ -343,8 +343,6 @@ theObject.copyContentFromFile=function(filename,callback) {
 *	get the object's content
 */
 theObject.getContent=function(callback){
-
-	
 	if (!this.context) throw new Error('Missing context in GeneralObject.getContent');
 	
 	var content=Modules.Connector.getContent(this.inRoom, this.id, this.context);
@@ -358,6 +356,15 @@ theObject.getContent.neededRights = {
     read : true
 }
 
+theObject.getContentAsString=function(callback){
+	if (callback === undefined) {
+		return GeneralObject.utf8.parse(this.getContent());
+	} else {
+		this.getContent(function(content){
+			callback(GeneralObject.utf8.parse(this.content));
+		});
+	}
+}
 
 
 /**
@@ -441,7 +448,10 @@ theObject.getBoundingBox=function(){
 
 theObject.fireEvent=function(name,data){
 	
-	console.log(this+' fireing '+name+' ('+data+')');
-	console.log('###Note: Event fireing not implemented yet (GeneralObject)');
+	//console.log(this+' fireing '+name+' ('+data+')');
+	//console.log('###Note: Event fireing not implemented yet (GeneralObject)');
+
+	//TODO reactive!
+	Modules.EventBus.emit(name, data);
 	
 }
