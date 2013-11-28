@@ -56,7 +56,7 @@ function updateLog(object){
 
 function chooseText(){
 	var texts = ["No chance", "Not with me", "PUT IT OUT", "Oh no! No, no no, no.", "Go away, leave me empty."]
-	return texts[Math.floor(Math.random() * texts.length)];
+	return [Math.floor(Math.random() * texts.length)];
 }
 
 function sleep(ms)
