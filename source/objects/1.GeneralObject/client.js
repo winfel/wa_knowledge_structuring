@@ -92,9 +92,15 @@ GeneralObject.fetchContent=function(worker, forced){
 
 GeneralObject.getContentAsString=function(callback){
 	if (callback === undefined) {
+		if (!this.contentFetched) {
+			alert('Synchronous content access before it has been fetched! Inform the programmer about this issue!');
+			return false;
+		}
 		return GeneralObject.utf8.parse(this.content);
 	} else {
-		callback(GeneralObject.utf8.parse(this.content));
+		this.fetchContent(function(content){
+			callback(GeneralObject.utf8.parse(content));
+		});
 	}
 }
 
@@ -104,6 +110,7 @@ GeneralObject.hasContent=function(){
 
 GeneralObject.contentUpdated=function(){
 	var that=this;
+	this.contentFetched=false;
 	this.fetchContent(function(){
 		that.draw();
 	}, true);
