@@ -24,3 +24,4 @@ UselessBox.category = 'Active';
 
 
 module.exports=UselessBox;
+
