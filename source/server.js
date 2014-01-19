@@ -5,6 +5,7 @@
 *
 */
 
+
 var printLogo = function(){
    var logo = ['##########################################',
 	'#    W E B A R E N A   S E R V E R       #',
@@ -28,13 +29,7 @@ var printLogo = function(){
 
 "use strict";
 
-//General error handling. Let the server try to continue
-//if an error occured and log the error
 
-process.on('uncaughtException', function (err) {
-	console.log('##### UNCAUGHT EXCEPTION');
-	console.log(err);
-});
 
 //Loading the configuration. Entires in config.local.js overlap those in config.default.js
 
@@ -50,6 +45,17 @@ try {
 	console.log('Attention: No local config');
 }
 
+//General error handling. Let the server try to continue
+//if an error occured and log the error
+if (!config.debugMode){
+	process.on('uncaughtException', function (err) {
+		console.log('##### UNCAUGHT EXCEPTION');
+		console.log(err.stack);
+	});
+}
+
+
+
 var Modules = {};
 
 Modules.Log = require('./Common/Log.js');
@@ -64,8 +70,9 @@ Modules.WebServer = require('./Server/WebServer.js');
 Modules.SocketServer = require('./Server/SocketServer.js');
 Modules.UserManager = require('./Server/UserManager.js');
 Modules.Helper = require('./Server/Helper.js');
-Modules.EventBus =  require("./Server/Eventbus.js");
+Modules.EventBus =  require("./Server/EventBus.js");
 /*Modules.TokenChecker = require("./Server/TokenChecker");*/
+Modules.BuildTool = require('./Server/BuildTool.js');
 
 	// These object exist for every object type or every single object. They shall not be
 	// modified directly but inherited (e.g. this.attributeManager=Object.create(AttributeManager));
@@ -76,10 +83,17 @@ Modules.ActionManager = require('./Common/ActionManager.js');
 
 
 if(Modules.config.tcpApiServer){
-	Modules['TcpEventServer'] = 	require("./Server/TCPSocketServer.js").create();
+	Modules['TcpEventServer'] = 	require("./Server/TcpSocketServer.js").create();
 }
 
 Modules.Connector=Modules.config.connector; //shortcut
+
+//Controllers
+Modules.RoomController = require('./Server/controllers/RoomController.js');
+Modules.ObjectController = require('./Server/controllers/ObjectController.js');
+Modules.ServerController = require('./Server/controllers/ServerController.js');
+
+Modules.InternalDispatcher = require('./Server/apihandler/InternalDispatcher.js');
 
 // Objects can gain access to the Modules (on the server side) by requireing this file
 module.exports=Modules;
@@ -92,11 +106,7 @@ for (var name in Modules){
 	}
 }
 
-//create temp. directory
-var fs = require('fs');
-if (!fs.existsSync("./Server/tmp")) {
-	fs.mkdirSync("./Server/tmp", 0777);
-}
+
 
 //load plugins
 if(Modules.config.plugins){

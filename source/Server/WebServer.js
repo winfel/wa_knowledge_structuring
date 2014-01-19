@@ -10,7 +10,7 @@
 var Modules = false;
 
 var WebServer = {};
-var _ = require('underscore');
+var _ = require('lodash');
 var mime = require('mime');
 mime.default_type = 'text/plain';
 var Q = require('q');
@@ -61,6 +61,7 @@ WebServer.init = function (theModules) {
 
 
 		if (url == '/') url = Modules.config.homepage;
+
 
 		if (url.substr(0, 6) == '/room/') {
 			/* open room */
@@ -226,7 +227,7 @@ WebServer.init = function (theModules) {
 							object.persist();
 
 							/* get dimensions */
-							Modules.Connector.getInlinePreviewDimensions(roomID, objectID, function (width, height) {
+							Modules.Connector.getInlinePreviewDimensions(roomID, objectID, files.file.type, true, function (width, height) {
 
 								if (width != false)    object.setAttribute("width", width);
 								if (height != false) object.setAttribute("height", height);
@@ -238,7 +239,7 @@ WebServer.init = function (theModules) {
 								res.writeHead(200);
 								res.end();
 
-							}, files.file.type, true);
+							});
 
 						} else {
 							object.set('preview', false);
@@ -264,6 +265,47 @@ WebServer.init = function (theModules) {
 			}
 
 			return;
+		}
+
+		//paintings
+
+		else  if (url.substr(0,10) == '/paintings'){
+			
+			try {
+				var ids = url.substr(11).split('/');
+				var roomID = ids[0];
+				var user = ids[1];
+				
+				var mimeType = 'image/png';
+				
+				if(Modules.Connector.getPaintingStream !== undefined){
+					var objStream = Modules.Connector.getPaintingStream(roomID, user, context);
+					objStream.pipe(res);
+					objStream.on("end", function(){
+						res.writeHead(200, {
+							'Content-Type': mimeType,
+							'Content-Disposition': 'inline; filename="' + user + '.png"'
+						});
+						res.end();
+					})
+				} else {
+					res.writeHead(200, {
+							'Content-Type':'text/plain'
+					});
+					var data = 'Connector does not support PaintingStreams';
+					res.end(new Buffer(data));
+				}				
+				
+			} catch (err) {
+
+				res.writeHead(500, {"Content-Type": "text/plain"});
+				res.write("500 Internal Server Error");
+				res.end();
+				Modules.Log.error(err);
+			}
+
+			return;
+			
 		}
 
 		// getContent
@@ -403,35 +445,8 @@ WebServer.init = function (theModules) {
 			});
 
 		}
-		else if (url == '/javascriptDependencies') {
-			if(process.env.NODE_ENV === "production"){
-				//TODO: cache combined file - don't recalculate each time
-			} else {
 
-				var jsDeps = require("../Client/javascriptDependencies.js")
-				var readFileQ = Q.denodeify(fs.readFile);
-
-				var promises = jsDeps.map(function(filename){
-					return readFileQ("Client/" + filename);
-				})
-
-				var combinedJS = "";
-
-				//Go on if all files are loaded
-				Q.allSettled(promises).then(function(results){
-					results.forEach(function(result){
-						combinedJS += result.value + "\n";
-					})
-
-					var mimeType = 'text/javascript';
-					res.writeHead(200, {'Content-Type': mimeType});
-
-					res.end(combinedJS);
-				})
-			}
-
-		}
-
+        //TODO: only cache if in production mode
 		else if (url == '/defaultJavascripts') {
 
 			//combine all javascript files in guis.common/javascript
@@ -487,7 +502,7 @@ WebServer.init = function (theModules) {
 
 			try {
 
-				var code = Modules.ObjectManager.getClientCode();
+				var code = Modules.BuildTool.getClientCode();
 
 				var mimeType = 'application/javascript';
 

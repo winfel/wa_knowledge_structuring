@@ -34,7 +34,7 @@ fileConnector.info=function(){
 *	response function.
 *
 */
-fileConnector.login=function(username,password,externalSession,rp,context){
+fileConnector.login=function(username,password,externalSession,context, rp){
 	
 	this.Modules.Log.debug("Login request for user '"+username+"'");
 	
@@ -72,7 +72,7 @@ fileConnector.getTrashRoom = function(context, callback){
 
 
 fileConnector.listRooms = function(callback){
-	var filebase = this.Modules.Config.filebase;
+	var filebase = fileConnector.Modules.Config.filebase;
 	fs.readdir(filebase, function(err, files){
 		if(err){
 			//TODO
@@ -80,21 +80,19 @@ fileConnector.listRooms = function(callback){
 
 		var isRoom = function(file, callback){
 			if(/^\./.exec(file)){
-				callback(false);
-				return;
+				return callback(false);
 			}
 			file = filebase + file;
 			fs.stat(file, function(err, result){
 				if(err){
-					callback(err, null);
-					return;
+					return callback(err, null);
 				}
 				callback(result.isDirectory());
 			});
 		}
 
 		async.filter(files,isRoom, function( directories){
-			callback(directories);
+			callback(null, directories);
 		});
 	});
 
@@ -110,23 +108,29 @@ fileConnector.isLoggedIn=function(context) {
 /* RIGHTS */
 
 fileConnector.mayWrite=function(roomID,objectID,connection,callback) {
-	callback(true);
+	callback(null, true);
 }
 
 fileConnector.mayRead=function(roomID,objectID,connection,callback) {
-	callback(true);
+	callback(null, true);
 }
 
 fileConnector.mayDelete=function(roomID,objectID,connection,callback) {
-	callback(true);
+	callback(null, true);
 }
 
 fileConnector.mayEnter=function(roomID,connection,callback) {
-	callback(true);
+	callback(null, true);
 }
 
+/**
+ *
+ * @param roomID
+ * @param connection
+ * @param {Function} callback
+ */
 fileConnector.mayInsert=function(roomID,connection,callback) {
-	callback(true);
+	callback(null, true);
 }
 
 
@@ -154,7 +158,7 @@ fileConnector.getInventory=function(roomID,context,callback){
 
 	var files=fs.readdirSync(filebase+'/'+roomID);
 
-    files=(files)?files:[];
+    files= files || [];
 
 	files.forEach(function(value,index){
 		var position=value.indexOf('.object.txt');
@@ -237,45 +241,51 @@ fileConnector.getRoomData=function(roomID,context,callback,oldRoomId){
 *
 */
 fileConnector.getRoomHierarchy=function(roomID,context,callback){
+	var self=this;
 	var result = {
 		'rooms' : {},
 		'relation' : {},
 		'roots' : []
 	};
 
-	var files = fs.readdirSync(this.Modules.Config.filebase);
-    files = (files) ? files : [];
+	//filter only "accessible" rooms
+	var filter = function(folders, cb){
+		async.filter(folders,
+			//Filter function
+			function(folder, cb1){
+				self.mayEnter(folder, context, function(err, res){
+					if(err) cb1(false);
+					else cb1(res);
+				});
+			},
+			//Response function
+			function(results){
+				cb(null, results);
+			}
+		);
+	}
 
-    var resultCounter = 0;
-    var returnResults = function() {
-    	resultCounter++;
-    	if (resultCounter === files.length) {
-	    	callback(result);
-		}
-    }
-
-    var self=this;
-	files.forEach(function(value,index) {
-		var obj=self.getObjectDataByFile(value,value);
-			
-		if (obj) {
-			self.mayEnter(obj.id, context, function(mayEnter) {
-				if (mayEnter) {
-					result.rooms[value] = ''+obj.attributes.name;
+	var buildTree = function(files, cb){
+		files.forEach(function(file){
+			var obj = self.getObjectDataByFile(file,file);
+			result.rooms[file] = '' + obj.attributes.name;
 					if (obj.attributes.parent !== undefined) {
 						if (result.relation[obj.attributes.parent] === undefined) {
-							result.relation[obj.attributes.parent] = new Array(''+value);
+					result.relation[obj.attributes.parent] = new Array(''+file);
 						} else {
-							result.relation[obj.attributes.parent].push(''+value);
+					result.relation[obj.attributes.parent].push(''+file);
 						}
 					} else {
-						result.roots.push(''+value);
+				result.roots.push(''+file);
 					}
-				}
-				returnResults();
 			});
-		} else returnResults();
+		cb(null, result);
+	}
+
+	async.waterfall([self.listRooms, filter, buildTree], function(err, res){
+		callback(res);
 	});
+
 }
 
 /**
@@ -283,7 +293,9 @@ fileConnector.getRoomHierarchy=function(roomID,context,callback){
 *
 *	if an "after" function is specified, it is called after saving
 *
+*
 */
+//TODO: async
 fileConnector.saveObjectData=function(roomID,objectID,data,after,context,createIfNotExists){
 	this.Modules.Log.debug("Save object data (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
 
@@ -345,9 +357,7 @@ fileConnector.saveContent=function(roomID,objectID,content,after,context, inputI
             var contentBuffer = new Buffer(content);
 
             for (var j = 0; j < contentBuffer.length; j++) {
-
                 byteArray.push(contentBuffer.readUInt8(j));
-
             }
 
             content = byteArray;
@@ -362,9 +372,120 @@ fileConnector.saveContent=function(roomID,objectID,content,after,context, inputI
 		if (after) after(objectID);
     
     }
+}
 
+/**
+*	save a users painting
+*
+*	if an "after" function is specified, it is called after saving
+*
+*/
+fileConnector.savePainting=function(roomID,content,after,context){
+	if (!context) this.Modules.Log.error("Missing context");
+	
+	this.Modules.Log.debug("Save painting (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+	var that = this;
+	var username=this.Modules.Log.getUserFromContext(context);
 
+    var filebase=this.Modules.Config.filebase;
+    var foldername=filebase+'/'+roomID;
+    try {fs.mkdirSync(foldername)} catch(e){};
+    var filename=filebase+'/'+roomID+'/'+username+'.painting';
 
+	if (({}).toString.call(content).match(/\s([a-zA-Z]+)/)[1].toLowerCase() == "string") {
+	    /* create byte array */
+	
+	    var byteArray = [];
+	    var contentBuffer = new Buffer(content);
+	
+	    for (var j = 0; j < contentBuffer.length; j++) {
+	
+	        byteArray.push(contentBuffer.readUInt8(j));
+	
+	    }
+	
+	    content = byteArray;
+	
+	}
+	
+	try {
+		fs.writeFileSync(filename, new Buffer(content));
+	} catch (err) {
+	    this.Modules.Log.error("Could not write painting to file (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+	}
+	if (after) after();
+	
+}
+
+/**
+*	deletePainting
+*
+*	delete a users Painting
+*/
+fileConnector.deletePainting=function(roomID,callback,context){
+	
+	if (!context) this.Modules.Log.error("Missing context");
+	var username=this.Modules.Log.getUserFromContext(context);
+	
+	this.Modules.Log.debug("Delete painting (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+
+	try {
+	
+		var filebase=this.Modules.Config.filebase;
+
+		var filename=filebase+'/'+roomID+'/'+username+'.painting';
+
+		fs.unlink(filename, function (err) {});
+	
+	} catch (e) {
+		this.Modules.Log.error("Could not delete painting (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+	}
+	
+	if (callback) callback();
+	
+}
+
+/**
+*	getPaintings
+*
+*	returns all paintings in a room (no actual objects, just a number of users with paintings)
+*
+*/
+fileConnector.getPaintings=function(roomID,context,callback){
+
+	var self = this;
+
+	this.Modules.Log.debug("Request paintings (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+	
+	if (!context) throw new Error('Missing context in getInventory');
+	
+	if (!this.isLoggedIn(context)) this.Modules.Log.error("User is not logged in (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+	
+	var filebase=this.Modules.Config.filebase;
+
+	var paintings=[];
+
+	try {fs.mkdirSync(filebase+'/'+roomID)} catch(e){};
+
+	var files=fs.readdirSync(filebase+'/'+roomID);
+
+    files=(files)?files:[];
+
+	files.forEach(function(value,index){
+		var position=value.indexOf('.painting');
+		if(position == -1) return; //not an object file
+		var filename=value;
+		var user=filename.substr(0,position);
+		paintings.push(user);
+    });
+
+	if (callback === undefined) {
+		/* sync */
+		return paintings;
+	} else {
+		/* async */
+		callback(paintings);
+	}
 	
 }
 
@@ -375,7 +496,7 @@ fileConnector.saveContent=function(roomID,objectID,content,after,context, inputI
 *	if a callback function is specified, it is called after saving
 *
 */
-fileConnector.copyContentFromFile=function(roomID, objectID, sourceFilename, callback,context) {
+fileConnector.copyContentFromFile=function(roomID, objectID, sourceFilename, context, callback) {
 	var that = this
 	this.Modules.Log.debug("Copy content from file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"', source: '"+sourceFilename+"')");
 	
@@ -453,38 +574,45 @@ fileConnector.getContentStream = function(roomID,objectID,context){
 }
 
 
+fileConnector.getPaintingStream = function(roomID,user,context){
+		
+    this.Modules.Log.debug("Get painting stream (roomID: '"+roomID+"', user: '"+user+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+    var filebase=this.Modules.Config.filebase;
+    var filename=filebase+'/'+roomID+'/'+user+'.painting';
+
+    var rds = fs.createReadStream(filename);
+	var that=this;
+    rds.on("error", function(err) {
+        that.Modules.Log.error("Error reading file: " + filename);
+    });
+
+    return rds;
+}
+
+
 
 /**
 *	remove
 *
 *	remove an object from the persistence layer
 */
-fileConnector.remove=function(roomID,objectID,context){
+fileConnector.remove=function(roomID,objectID,context, callback){
+	var that = this;
 	
 	this.Modules.Log.debug("Remove object (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
 	
 	if (!context) this.Modules.Log.error("Missing context");
 
-	try {
+	var objectBase = this.Modules.Config.filebase + '/' + roomID + "/" + objectID;
+	var files = ['.object.txt', '.content', '.preview'].map(function( ending ){
+		return objectBase + ending;
+	});
 	
-		var filebase=this.Modules.Config.filebase;
-
-		var filename=filebase+'/'+roomID+'/'+objectID+'.object.txt';
-
-		fs.unlink(filename, function (err) {});
-
-		var filename=filebase+'/'+roomID+'/'+objectID+'.content';
-
-		fs.unlink(filename, function (err) {});
-
-		var filename=filebase+'/'+roomID+'/'+objectID+'.preview';
-
-		fs.unlink(filename, function (err) {});
-	
-	} catch (e) {
-		this.Modules.Log.error("Could not remove file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
-	}
-	
+	async.each(files, fs.unlink, function(err, resp){
+		if(callback){
+		callback();
+		}
+	});
 }
 
 /**
@@ -497,7 +625,7 @@ fileConnector.remove=function(roomID,objectID,context){
 *	after(objectID)
 *
 */
-fileConnector.createObject=function(roomID,type,data,callback,context){
+fileConnector.createObject=function(roomID,type,data, context, callback){
 
 	this.Modules.Log.debug("Create object (roomID: '"+roomID+"', type: '"+type+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
 	
@@ -520,8 +648,6 @@ fileConnector.createObject=function(roomID,type,data,callback,context){
 }
 
 
-
-
 /**
 *	duplicateObject
 *
@@ -532,7 +658,7 @@ fileConnector.createObject=function(roomID,type,data,callback,context){
 *	after(objectID)
 *
 */
-fileConnector.duplicateObject=function(roomID,objectID,callback,context,toRoom){
+fileConnector.duplicateObject=function(roomID,toRoom, objectID, context,  callback){
 
 	this.Modules.Log.debug("Duplicate object (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"', toRoom: '"+toRoom+"')");
 	
@@ -558,21 +684,16 @@ fileConnector.duplicateObject=function(roomID,objectID,callback,context,toRoom){
 	var fs = require("fs");
 	
 	var copyFunc = function(source, dest, callback) {
-		
 		var read = fs.createReadStream(source);
 		var write = fs.createWriteStream(dest);
 
 		read.on("end", callback);
 		read.pipe(write);
-
-		
 	}
 	
 	/* callback function after duplicating files */
 	var cb = function() {
-
-		if (callback) callback(newObjectID, objectID);
-		
+		if (callback) callback(null, newObjectID, objectID);
 	}
 	
 	/* copy object data */
@@ -590,38 +711,24 @@ fileConnector.duplicateObject=function(roomID,objectID,callback,context,toRoom){
 
 				/* check if preview exists */
 				if (path.existsSync(previewFilename)) {
-
 					/* copy preview */
 					copyFunc(previewFilename, previewFilenameNew, function() {
 						/* object preview copied */
-
 						cb();
 						return true;
-
 					});
-
 				} else {
-
 					cb();
 					return true;
 				}
-				
 			});
-
 		} else {
-
 			cb();
 			return true;
 		}
-		
 	});
 
 }
-
-
-
-
-
 
 
 /**
@@ -696,7 +803,7 @@ fileConnector.getObjectDataByFile=function(roomID,objectID){
 }
 
 
-fileConnector.trimImage=function(roomID, objectID, callback, context) {
+fileConnector.trimImage=function(roomID, objectID, context, callback) {
 
 	var self = this;
 	
@@ -738,37 +845,27 @@ fileConnector.trimImage=function(roomID, objectID, callback, context) {
 						if (!err) {
 
 							//save new content:
-							self.copyContentFromFile(roomID, objectID, filename, function() {
+							self.copyContentFromFile(roomID, objectID, filename, context, function() {
 							
 								//delete temp. file
 								fs.unlink(filename);
 							
 								callback(dX, dY, newWidth, newHeight);
 								
-							},context);
+							});
 							
 						} else {
 							//TODO: delete temp. file
 							self.Modules.Log.error("Error while trimming "+roomID+"/"+objectID);
 						}
-
 					});
-
 				} else {
 					console.log(err);
 					self.Modules.Log.error("Error getting trim information of "+roomID+"/"+objectID);
 				}
-
 			});
-
-
-
 		});
-		
 	});
-	
-	
-	
 };
 
 
@@ -834,7 +931,7 @@ fileConnector.getInlinePreviewProviders=function() {
 	}
 }
 
-fileConnector.getInlinePreviewDimensions=function(roomID, objectID, callback, mimeType,context) {
+fileConnector.getInlinePreviewDimensions=function(roomID, objectID, mimeType,context, callback) {
 	
 	var self = this;
 	
@@ -849,7 +946,7 @@ fileConnector.getInlinePreviewDimensions=function(roomID, objectID, callback, mi
 			self.Modules.Log.warn("no generator name for mime type '"+mimeType+"' found!");
 			callback(false, false); //do not set width and height (just send update to clients)
 		} else {
-			self.inlinePreviewProviders[generatorName].dimensions(roomID, objectID, callback, context);
+			self.inlinePreviewProviders[generatorName].dimensions(roomID, objectID, context, callback);
 		}
 		
 	}
@@ -866,7 +963,7 @@ fileConnector.getInlinePreviewDimensions=function(roomID, objectID, callback, mi
 	
 }
 
-fileConnector.getInlinePreview=function(roomID, objectID, callback, mimeType,context) {
+fileConnector.getInlinePreview=function(roomID, objectID, mimeType,context, callback) {
 
 	var self = this;
 
@@ -885,7 +982,7 @@ fileConnector.getInlinePreview=function(roomID, objectID, callback, mimeType,con
 				self.Modules.Log.warn("no generator name for mime type '"+mimeType+"' found!");
 				callback(false); //do not set width and height (just send update to clients)
 			} else {
-				self.inlinePreviewProviders[generatorName].preview(roomID, objectID, callback, context);
+				self.inlinePreviewProviders[generatorName].preview(roomID, objectID, context, callback);
 			}
 		
 		}
@@ -941,7 +1038,7 @@ fileConnector.inlinePreviewProviders = {
 			
 			return mimeType;
 		},
-		'dimensions' : function(roomID, objectID, callback, context) {
+		'dimensions' : function(roomID, objectID, context, callback) {
 			
 			if (!context) throw new Error('Missing context in dimensions for image');
 
@@ -985,7 +1082,7 @@ fileConnector.inlinePreviewProviders = {
 			
 
 		},
-		'preview' : function(roomID, objectID, callback, context) {
+		'preview' : function(roomID, objectID, context, callback) {
 			
 			if (!context) throw new Error('Missing context in preview for image');
 //TODO: change image orientation
@@ -994,114 +1091,8 @@ fileConnector.inlinePreviewProviders = {
 				callback(content);
 				
 			});
-
-		}
-	},
-	
-	
-	'pdf_TODO': {
-		'mimeType' : function(roomID, objectID, mimeType, context) {
-			
-			if (!context) throw new Error('Missing context in mimeType for pdf');
-			
-			return 'image/jpeg';
-		},
-		'generatePreviewFile' : function(roomID, objectID, callback, context) {
-			
-			throw new Error("TODO!");
-			
-			if (!context) throw new Error('Missing context in generatePreviewFile for pdf');
-
-			var filebase=fileConnector.Modules.Config.filebase;
-
-			var filename = filebase+'/'+roomID+'/'+objectID+'.content';
-			var filenamePreview = filebase+'/'+roomID+'/'+objectID+'.preview';
-			
-
-			var im = require('imagemagick');
-			
-			im.convert(['-density', '200x200', 'pdf:'+filename+'[0]', '-quality', '100', 'jpg:'+filenamePreview], 
-			function(err, metadata){
-			  	if (err) {
-					fileConnector.Modules.Log.error("unable to create preview for pdf");
-				} else {
-
-					try {
-						var content = fs.readFileSync(filenamePreview);
-						callback(content);
-					} catch (e) {
-						fileConnector.Modules.Log.error("not able to read preview file");
 					}
-					
 				}
-			});
-	
-		},
-		'dimensions' : function(roomID, objectID, callback, context) {
-			
-			throw new Error("TODO!");
-			
-			if (!context) throw new Error('Missing context in dimensions for pdf');
-
-			var filebase=fileConnector.Modules.Config.filebase;
-
-			var filename=filebase+'/'+roomID+'/'+objectID+'.content';
-			
-
-			var im = require('imagemagick');
-
-			im.identify(filename, function(err, features) {
-
-				if (err) throw err;
-				
-				var width = features.width;
-				var height = features.height;
-
-				if (width > fileConnector.Modules.config.imageUpload.maxDimensions) {
-					height = height*(fileConnector.Modules.config.imageUpload.maxDimensions/width);
-					width = fileConnector.Modules.config.imageUpload.maxDimensions;
-				}
-
-				if (height > fileConnector.Modules.config.imageUpload.maxDimensions) {
-					width = width*(fileConnector.Modules.config.imageUpload.maxDimensions/height);
-					height = fileConnector.Modules.config.imageUpload.maxDimensions;
-				}
-
-				callback(width, height);
-			
-			});
-
-		},
-		'preview' : function(roomID, objectID, webserverResponse, context) {
-			
-			throw new Error("TODO!");
-			
-			if (!context) throw new Error('Missing context in preview for pdf');
-
-			var filebase=fileConnector.Modules.Config.filebase;
-
-			var filename=filebase+'/'+roomID+'/'+objectID+'.preview';
-
-			var path = require('path');
-
-			if (!path.existsSync(filename)) {
-				this.generatePreviewFile(roomID, objectID, function(data) {
-					/* preview file is generated */
-					callback(data);
-				});
-			} else {
-				/* preview file exists */
-				try {
-					var content = fs.readFileSync(filename);
-					callback(content);
-				} catch (e) {
-					callback(false);
-				}
-			}
-
-		}
-	}
-	
 }
 
 

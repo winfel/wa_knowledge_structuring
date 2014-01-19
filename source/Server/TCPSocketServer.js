@@ -1,70 +1,66 @@
+/**
+ * The Tcp Socket Server provides the possibility to create a tcp connection
+ * to the WebArena server.
+ * The main feature is to provide a possibility to connect to the WebArena server
+ * using other programming languages.
+ *
+ * The "coupling" is done by the TcpDispatcher module.
+ *
+ * Tcp Client can subscribe for certain server events.
+ */
+
 "use strict";
 
 
 var util = require("util");
 var net = require('net');
-var _ = require("underscore");
+var _ = require("lodash");
 
 var DEFAULT_PORT = 8125;
-var TCPSocketServer = {};
-var theModules = false;
-
-var JsonSocket = require('json-socket');
-
-
-var onConnectionEnd = function () {
-	console.log("Ended connection");
-}
-
-
-
-var subscriptionHandle = function(connection, parsedRequest){
-	var toSubscribe = parsedRequest.eventlist;
-	if(!parsedRequest.eventlist){
-		connection.sendMessage( {error: "Missing eventlist"});
-		return;
-	}
-	if(!_.isArray(toSubscribe))toSubscribe = [toSubscribe];
-
-	toSubscribe.forEach(function (eventParam) {
-		theModules.EventBus.on(eventParam, function (eventData) {
-
-			var eventEnvelope = {
-				eventName: this.event,
-				eventData: eventData
-			};
-
-			connection.sendMessage(eventEnvelope);
-		})
-	});
-	connection.sendMessage({"status": "ok"});
-}
-
+var TcpSocketServer = {};
 
 /**
- * Handles incoming data
+ * Json socket is an light-weight wrapper around a socket. Providing
+ * the needed abstraction to communicate directly using JSON messages.
  *
- * @param connection - the tcp connection
- * @param data - incoming Data
+ * @type {JsonSocket|exports}
  */
-var dataHandle = function(connection, parsedRequest){
-	if (!parsedRequest.requestType){
-		connection.sendMessage({"error": "missing argument: requestType."});
-		return;
+var JsonSocket = require('json-socket');
+
+TcpSocketServer.tcpDispatcher = require('./apihandler/TcpDispatcher.js');
+
+TcpSocketServer.modules = false;
+
+/**
+ * Converts an incoming request to a server-event.
+ *
+ * @param request
+ * @param connection
+ */
+TcpSocketServer.requestToEvent = function(request, connection){
+	if (!request.requestType) {
+		return connection.sendMessage({"error": "missing argument: requestType."});
 	}
-	else if (parsedRequest.requestType === "subscribeEvents") {
-		subscriptionHandle(connection, parsedRequest);
+
+	var eventData = {
+		connection : connection
 	}
+
+	eventData = _.extend(eventData, request);
+	this.tcpDispatcher.emit(request.requestType, eventData);
 }
 
-TCPSocketServer.init = function (modules) {
+
+TcpSocketServer.init = function (modules) {
 	var that = this;
-	theModules = modules;
+	this.modules = modules;
+
+	this.tcpDispatcher.init(modules);
 
 	var server = net.createServer(function (connection) {
 		var jsonconnection = new JsonSocket(connection);
 		jsonconnection.on('message', function (data) {
-			dataHandle(jsonconnection, data);
+			that.requestToEvent(data, jsonconnection);
 		});
 
 		jsonconnection.on('end', onConnectionEnd);
@@ -75,8 +71,12 @@ TCPSocketServer.init = function (modules) {
 	});
 }
 
+var onConnectionEnd = function () {
+	console.log("Ended connection");
+}
+
 var createServer = function () {
-	return Object.create(TCPSocketServer);
+	return Object.create(TcpSocketServer);
 }
 
 module.exports = {

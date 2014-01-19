@@ -17,7 +17,7 @@ var theObject=Object.create(require('./common.js'));
 // Module.ObjectManager
 
 var Modules=require('../../server.js');
-var _ = require('underscore');
+var _ = require('lodash');
 
 // Make the object public
 module.exports=theObject;
@@ -58,8 +58,8 @@ theObject.makeSensitive=function(){
 			
 			//determine intersections
 		
-			var oldIntersects=this.bBoxEncloses(oldData.x,oldData.y,oldData.width,oldData.height,bbox.x,bbox.y,bbox.width,bbox.height);
-			var newIntersects=this.bBoxEncloses(newData.x,newData.y,newData.width,newData.height,bbox.x,bbox.y,bbox.width,bbox.height);
+			var oldIntersects=this.bBoxIntersects(oldData.x,oldData.y,oldData.width,oldData.height,bbox.x,bbox.y,bbox.width,bbox.height);
+			var newIntersects=this.bBoxIntersects(newData.x,newData.y,newData.width,newData.height,bbox.x,bbox.y,bbox.width,bbox.height);
 			
 			//handle move
 			
@@ -72,21 +72,21 @@ theObject.makeSensitive=function(){
 	}
 	
 	
-	theObject.bBoxEncloses=function(thisX,thisY,thisWidth,thisHeight,otherX,otherY,otherWidth,otherHeight){
+	theObject.bBoxIntersects=function(thisX,thisY,thisWidth,thisHeight,otherX,otherY,otherWidth,otherHeight){
 		
-		if (otherX<thisX-20) {
+		if ((otherX+otherWidth)<thisX) {
 			//console.log('too far left');
 			return false;
 		}
-		if (otherY<thisY-20) {
+		if ((otherY+otherHeight)<thisY) {
 			//console.log('too far up');
 			return false;
 		}
-		if ((otherX+otherWidth)>(thisX+thisWidth+20)) {
+		if (otherX>(thisX+thisWidth)) {
 			//console.log('too far right');
 			return false;
 		}
-		if ((otherY+otherHeight)>(thisY+thisHeight+20)) {
+		if (otherY>(thisY+thisHeight)) {
 			//console.log('too far bottom');
 			return false;
 		}
@@ -97,12 +97,12 @@ theObject.makeSensitive=function(){
 	}
 	
 	/**
-	*	encloses
+	*	intersects
 	*
-	*	determines, if this Active object fully encloses another object.
+	*	determines, if this Active object intersects another object.
 	*	In this simple implementation, this is done by bounding box comparison.
 	**/
-	theObject.encloses=function(otherX,otherY,otherWidth,otherHeight){
+	theObject.intersects=function(otherX,otherY,otherWidth,otherHeight){
 		
 		if (typeof otherX == 'object'){
 			var other=otherX.getBoundingBox();
@@ -114,7 +114,7 @@ theObject.makeSensitive=function(){
 		
 		var bbox=this.getBoundingBox();
 		
-		return this.bBoxEncloses(bbox.x,bbox.y,bbox.width,bbox.height,otherX,otherY,otherWidth,otherHeight);
+		return this.bBoxIntersects(bbox.x,bbox.y,bbox.width,bbox.height,otherX,otherY,otherWidth,otherHeight);
 		
 	}
 	/**
@@ -130,7 +130,7 @@ theObject.makeSensitive=function(){
 		for (var i in inventory){
 			 var test=inventory[i];
 			 if (test.id==this.id) continue;
-			 if (this.encloses(test)){
+			 if (this.intersects(test)){
 			 	result.push(test);
 			 }
 		}
@@ -161,8 +161,8 @@ theObject.makeSensitive=function(){
 		
 		//determine intersections
 		
-		var oldIntersects=this.encloses(oldData.x,oldData.y,oldData.width,oldData.height);
-		var newIntersects=this.encloses(newData.x,newData.y,newData.width,newData.height);
+		var oldIntersects=this.intersects(oldData.x,oldData.y,oldData.width,oldData.height);
+		var newIntersects=this.intersects(newData.x,newData.y,newData.width,newData.height);
 		
 		//handle move
 		
@@ -303,6 +303,8 @@ theObject.hasContent=function(){
 */
 theObject.setContent=function(content,callback){
 	
+	console.log(content);
+	
 	if ((typeof content) != "object" && content.substr(0,22)=='data:image/png;base64,'){
 		
 		var base64Data = content.replace(/^data:image\/png;base64,/,""),
@@ -326,7 +328,7 @@ theObject.setContent.neededRights = {
 
 theObject.copyContentFromFile=function(filename,callback) {
 
-	Modules.Connector.copyContentFromFile(this.inRoom, this.id, filename, callback, this.context);
+	Modules.Connector.copyContentFromFile(this.inRoom, this.id, filename, this.context, callback);
 	
 	this.set('hasContent',true);
 	this.set('contentAge',new Date().getTime());
@@ -335,6 +337,11 @@ theObject.copyContentFromFile=function(filename,callback) {
 	this.persist();
 	this.updateClients('contentUpdate');
 	
+}
+
+theObject.getCurrentUserName=function(){
+	if (!this.context) return 'root';
+	return this.context.user.username;
 }
 
 /**
@@ -366,6 +373,14 @@ theObject.getContentAsString=function(callback){
 	}
 }
 
+theObject.getContentFromApplication = function(applicationName, callback){
+    var eventName = "applicationevent::" + applicationName + "::getContent"
+    var event = {
+        objectID : this.getID(),
+        callback : callback
+    }
+    Modules.EventBus.emit(eventName, event);
+}
 
 /**
 *	getInlinePreview
@@ -373,7 +388,7 @@ theObject.getContentAsString=function(callback){
 *	get the object's inline preview
 */
 theObject.getInlinePreview=function(callback,mimeType){
-	return Modules.Connector.getInlinePreview(this.inRoom, this.id, callback, mimeType, this.context);
+	return Modules.Connector.getInlinePreview(this.inRoom, this.id, mimeType, this.context, callback);
 }
 
 theObject.getInlinePreviewMimeType=function(callback) {
@@ -433,10 +448,18 @@ theObject.evaluatePositionInt=function(data){
 
 theObject.getRoom=function(callback){
 	
-	//save the room differenty. This is a hack 
-	
 	if (!this.context) return;
-	return this.context.rooms['left'];
+	
+	//search the room in the context and return the room this object is in
+	
+	for (var index in this.context.rooms){
+		var test=this.context.rooms[index];
+		if (test && test.hasObject && test.hasObject(this)) {
+			return test;
+		}
+	}
+	
+	return false;
 }
 
 theObject.getBoundingBox=function(){
@@ -450,11 +473,9 @@ theObject.getBoundingBox=function(){
 }
 
 theObject.fireEvent=function(name,data){
-	
-	//console.log(this+' fireing '+name+' ('+data+')');
-	//console.log('###Note: Event fireing not implemented yet (GeneralObject)');
+    data.context = this.context;
 
-	//TODO reactive!
 	Modules.EventBus.emit(name, data);
-	
 }
+
+theObject.fireEvent.public=true; //Function can be accessed by customObjectFunctionCall
