@@ -3,9 +3,37 @@
 *
 *    @author Felix Winkelnkemper, University of Paderborn, 2012
 *
+* @class Server
+* @classdesc This is the description of the main server file and the required modules
+* @requires ./Server/config.default
+* @requires ./Server/config.local
+* @requires ./Common/Log
+* @requires ./Server/ObjectManager
+* @requires ./Server/Dispatcher
+* @requires ./Server/WebServer
+* @requires ./Server/SocketServer
+* @requires ./Server/UserManager
+* @requires ./Server/Helper
+* @requires ./Server/EventBus
+* @requires ./Server/BuildTool
+* @requires ./Common/DataSet
+* @requires ./Common/AttributeManager
+* @requires ./Common/TranslationManager
+* @requires ./Common/ActionManager
+* @requires ./Server/TcpSocketServer
+* @requires ./Server/controllers/RoomController
+* @requires ./Server/controllers/ObjectController
+* @requires ./Server/controllers/ServerController
+* @requires ./Server/apihandler/InternalDispatcher
+* @requires ./Server/PluginManager
+*
 */
 
-
+/**
+* Prints the logo of the WebArena Server
+* @function printLogo 
+*
+*/
 var printLogo = function(){
    var logo = ['##########################################',
 	'#    W E B A R E N A   S E R V E R       #',
@@ -28,7 +56,6 @@ var printLogo = function(){
 }();
 
 "use strict";
-
 
 
 //Loading the configuration. Entires in config.local.js overlap those in config.default.js
