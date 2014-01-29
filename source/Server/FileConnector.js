@@ -1,6 +1,6 @@
 /**
 *    Webarena - A web application for responsive graphical knowledge work
-*
+*	 @class FileConnector
 *    @author Felix Winkelnkemper, University of Paderborn, 2012
 *
 */
@@ -13,18 +13,21 @@ var fs = require('fs');
 var async = require('async');
 
 var Q = require('q');
-
+/**
+* @function init
+* @param theModules
+*/
 fileConnector.init=function(theModules){
 	this.Modules=theModules;
 }
-
+/**
+* @function info
+*/
 fileConnector.info=function(){
 	return "FileConnector 1.0";
 }
 
 /**
-*	login
-*
 *	logs the user in on the backend. The main purpose of this function is not
 *	necessary a persistent connections but verifying the user's credentials
 *	and in case of a success, return a user object with username, password and
@@ -32,6 +35,12 @@ fileConnector.info=function(){
 *
 *	If the login was successful, the newly created user object is sent to a
 *	response function.
+* @function login
+* @param username
+* @param password
+* @param externalSession
+* @param context
+* @param rp
 *
 */
 fileConnector.login=function(username,password,externalSession,context, rp){
@@ -61,7 +70,7 @@ fileConnector.login=function(username,password,externalSession,context, rp){
 }
 
 /**
- *
+ * @function getTrashRoom
  * @param context
  * @param callback
  * @returns {*}
@@ -70,7 +79,10 @@ fileConnector.getTrashRoom = function(context, callback){
     return this.getRoomData("trash", context, callback);
 }
 
-
+/**
+ * @function listRooms
+ * @param callback
+ */
 fileConnector.listRooms = function(callback){
 	var filebase = fileConnector.Modules.Config.filebase;
 	fs.readdir(filebase, function(err, files){
@@ -99,35 +111,65 @@ fileConnector.listRooms = function(callback){
 }
 
 
-
+/**
+ * @function isLoggedIn
+ * @param context
+ */
 fileConnector.isLoggedIn=function(context) {
 	return true;
 }
 
 
 /* RIGHTS */
-
+/**
+* About rights
+* @function mayWrite
+* @param roomID
+* @param objectID
+* @param connection
+* @param callback
+*/
 fileConnector.mayWrite=function(roomID,objectID,connection,callback) {
 	callback(null, true);
 }
-
+/**
+* About rights
+* @function mayRead
+* @param roomID
+* @param objectID
+* @param connection
+* @param callback
+*/
 fileConnector.mayRead=function(roomID,objectID,connection,callback) {
 	callback(null, true);
 }
-
+/**
+* About rights
+* @function mayDelete
+* @param roomID
+* @param objectID
+* @param connection
+* @param callback
+*/
 fileConnector.mayDelete=function(roomID,objectID,connection,callback) {
 	callback(null, true);
 }
-
+/**
+* About rights
+* @function mayEnter
+* @param roomID
+* @param connection
+* @param callback
+*/
 fileConnector.mayEnter=function(roomID,connection,callback) {
 	callback(null, true);
 }
 
 /**
- *
+* @function mayInsert
  * @param roomID
  * @param connection
- * @param {Function} callback
+ * @param callback
  */
 fileConnector.mayInsert=function(roomID,connection,callback) {
 	callback(null, true);
@@ -135,9 +177,12 @@ fileConnector.mayInsert=function(roomID,connection,callback) {
 
 
 /**
-*	getInventory
-*
-*	returns all objects in a room (no actual objects, just their attributeset)
+* returns all objects in a room (no actual objects, just their attributeset)
+* @function getInventory
+* @param roomID
+* @param context
+* @param callback
+*	
 *
 */
 fileConnector.getInventory=function(roomID,context,callback){
@@ -191,9 +236,8 @@ fileConnector.getInventory=function(roomID,context,callback){
 
 
 /**
- *	getRoomData
- *
- *	Get room data or create room, if doesn't exist yet.
+ *  Get room data or create room, if doesn't exist yet.
+ *	@function getRoomData
  *
  * @param roomID
  * @param context
@@ -235,9 +279,11 @@ fileConnector.getRoomData=function(roomID,context,callback,oldRoomId){
 }
 
 /**
-*	getRoomHierarchy
-*
-*	returns the room hierarchy starting by given roomID as root
+* returns the room hierarchy starting by given roomID as root
+*	@function getRoomHierarchy
+*	@param roomID
+*	@param context
+*	@param callback
 *
 */
 fileConnector.getRoomHierarchy=function(roomID,context,callback){
@@ -289,10 +335,16 @@ fileConnector.getRoomHierarchy=function(roomID,context,callback){
 }
 
 /**
+*	
 *	save the object (by given data)
-*
 *	if an "after" function is specified, it is called after saving
-*
+* @function saveObjectData
+*	@param roomID
+*	@param objectID
+*	@param data
+*	@param after
+*	@param context
+*	@param {boolean} createIfNotExists
 *
 */
 //TODO: async
@@ -325,9 +377,16 @@ fileConnector.saveObjectData=function(roomID,objectID,data,after,context,createI
 }
 
 /**
+*	
 *	save the object's content
-*
-*	if an "after" function is specified, it is called after saving
+*   if an "after" function is specified, it is called after saving
+*	@function saveContent
+*	@param roomID
+*	@param objectID
+*	@param content
+*	@param after
+*	@param context
+*	@param inputIsStream
 *
 */
 fileConnector.saveContent=function(roomID,objectID,content,after,context, inputIsStream){
@@ -376,9 +435,12 @@ fileConnector.saveContent=function(roomID,objectID,content,after,context, inputI
 
 /**
 *	save a users painting
-*
 *	if an "after" function is specified, it is called after saving
-*
+*	@function savePainting
+*	@param roomID
+*	@param content
+*	@param after
+*	@param context
 */
 fileConnector.savePainting=function(roomID,content,after,context){
 	if (!context) this.Modules.Log.error("Missing context");
@@ -419,8 +481,11 @@ fileConnector.savePainting=function(roomID,content,after,context){
 
 /**
 *	deletePainting
-*
 *	delete a users Painting
+*	@function deletePainting
+*	@param roomID
+*	@param callback
+*	@param context
 */
 fileConnector.deletePainting=function(roomID,callback,context){
 	
@@ -447,8 +512,11 @@ fileConnector.deletePainting=function(roomID,callback,context){
 
 /**
 *	getPaintings
-*
 *	returns all paintings in a room (no actual objects, just a number of users with paintings)
+* @function getPaintings
+*	@param roomID
+*	@param context
+*	@param callback
 *
 */
 fileConnector.getPaintings=function(roomID,context,callback){
@@ -492,9 +560,13 @@ fileConnector.getPaintings=function(roomID,context,callback){
 
 /**
 *	get the the object's content from a file and save it
-*
 *	if a callback function is specified, it is called after saving
-*
+*	@function copyContentFromFile
+*	@param roomID
+*	@param objectID
+*	@param sourceFilename
+*	@param context
+*	@param callback
 */
 fileConnector.copyContentFromFile=function(roomID, objectID, sourceFilename, context, callback) {
 	var that = this
@@ -514,9 +586,12 @@ fileConnector.copyContentFromFile=function(roomID, objectID, sourceFilename, con
 }
 
 /**
-*	getContent
-*
-*	get an object's content as an array of bytes
+* get an object's content as an array of bytes
+*	@function getContent
+*	@param roomID
+*	@param objectID
+*	@param context
+*	@param callback
 *	
 */
 fileConnector.getContent=function(roomID,objectID,context,callback){
@@ -560,6 +635,14 @@ fileConnector.getContent=function(roomID,objectID,context,callback){
 	
 }
 
+
+/**
+*	@function getContentStream
+*	@param roomID
+*	@param objectID
+*	@param context
+*	
+*/
 fileConnector.getContentStream = function(roomID,objectID,context){
     this.Modules.Log.debug("Get content stream (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
     var filebase=this.Modules.Config.filebase;
@@ -573,7 +656,13 @@ fileConnector.getContentStream = function(roomID,objectID,context){
     return rds;
 }
 
-
+/**
+*	@function getPaintingStream
+*	@param roomID
+*	@param users
+*	@param context
+*	
+*/
 fileConnector.getPaintingStream = function(roomID,user,context){
 		
     this.Modules.Log.debug("Get painting stream (roomID: '"+roomID+"', user: '"+user+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
@@ -592,9 +681,13 @@ fileConnector.getPaintingStream = function(roomID,user,context){
 
 
 /**
-*	remove
-*
 *	remove an object from the persistence layer
+*	@function remove
+*	@param roomID
+*	@param objectID
+*	@param context
+*	@param callback
+*	
 */
 fileConnector.remove=function(roomID,objectID,context, callback){
 	var that = this;
@@ -616,13 +709,15 @@ fileConnector.remove=function(roomID,objectID,context, callback){
 }
 
 /**
-*	createObject
-*
 *	create a new object on the persistence layer
-*
 *	to direcly work on the new object, specify a callback function
-*
 *	after(objectID)
+*	@function createObject
+*	@param roomID
+*	@param type
+*	@param data
+*	@param context
+*	@param callback
 *
 */
 fileConnector.createObject=function(roomID,type,data, context, callback){
@@ -649,13 +744,15 @@ fileConnector.createObject=function(roomID,type,data, context, callback){
 
 
 /**
-*	duplicateObject
-*
 *	duplicate an object on the persistence layer
-*
 *	to direcly work on the new object, specify an after function
-*
 *	after(objectID)
+* 	@function duplicateObject
+*	@param roomID
+*	@param toRoom
+*	@param objectID
+*	@param context
+*	@param callback
 *
 */
 fileConnector.duplicateObject=function(roomID,toRoom, objectID, context,  callback){
@@ -732,10 +829,11 @@ fileConnector.duplicateObject=function(roomID,toRoom, objectID, context,  callba
 
 
 /**
-*	getObjectData
-*
 *	returns the attribute set of an object
-*
+* 	@function getObjectData
+*	@param roomID
+*	@param objectID
+*	@param context
 */
 fileConnector.getObjectData=function(roomID,objectID,context){
 	
@@ -753,8 +851,10 @@ fileConnector.getObjectData=function(roomID,objectID,context){
 
 /**
 *	internal
-*
 *	read an object file and return the attribute set
+*	@function getObjectDataByFile
+*	@param roomID
+*	@param objectID
 */
 fileConnector.getObjectDataByFile=function(roomID,objectID){
 	var filebase = this.Modules.Config.filebase;
@@ -802,7 +902,13 @@ fileConnector.getObjectDataByFile=function(roomID,objectID){
 	return data;
 }
 
-
+/**
+*	@function trimImage
+*	@param roomID
+*	@param objectID
+*	@param context
+*	@param callback
+*/
 fileConnector.trimImage=function(roomID, objectID, context, callback) {
 
 	var self = this;
@@ -868,7 +974,10 @@ fileConnector.trimImage=function(roomID, objectID, context, callback) {
 	});
 };
 
-
+/**
+*	@function isInlineDisplayable
+*	@param mimeType
+*/
 fileConnector.isInlineDisplayable=function(mimeType) {
 	
 	if (this.getInlinePreviewProviderName(mimeType) == false) {
@@ -878,7 +987,13 @@ fileConnector.isInlineDisplayable=function(mimeType) {
 	}
 	
 }
-
+/**
+*	@function getMimeTyp
+*	@param roomID
+*	@param objectID
+*	@param context
+*	@param callback
+*/
 fileConnector.getMimeType=function(roomID,objectID,context,callback) {
 	
 	if (!context) throw new Error('Missing context in getMimeType');
@@ -890,7 +1005,12 @@ fileConnector.getMimeType=function(roomID,objectID,context,callback) {
 	
 }
 
-//SYNC
+
+/**
+* SYNC
+*	@function getInlinePreviewProviderName
+*	@param mimeType
+*/
 fileConnector.getInlinePreviewProviderName=function(mimeType) {
 
 	if (!mimeType) return false;
@@ -903,7 +1023,10 @@ fileConnector.getInlinePreviewProviderName=function(mimeType) {
 	
 }
 
-//SYNC
+/**
+* SYNC
+*	@function getInlinePreviewMimeTypes
+*/
 fileConnector.getInlinePreviewMimeTypes=function() {
 	
 	var mimeTypes = this.getInlinePreviewProviders();
@@ -917,7 +1040,10 @@ fileConnector.getInlinePreviewMimeTypes=function() {
 	
 }
 
-//SYNC
+/**
+* SYNC
+*	@function getInlinePreviewProviders
+*/
 fileConnector.getInlinePreviewProviders=function() {
 	return {
 		//"application/pdf" : "pdf",
@@ -930,7 +1056,14 @@ fileConnector.getInlinePreviewProviders=function() {
 		"image/x-ms-bmp" : "image"
 	}
 }
-
+/**
+*	@function getInlinePreviewDimensions
+*	@param roomID
+*	@param objectID
+*	@param mimeType
+*	@param context
+*	@param callback
+*/
 fileConnector.getInlinePreviewDimensions=function(roomID, objectID, mimeType,context, callback) {
 	
 	var self = this;
@@ -962,7 +1095,14 @@ fileConnector.getInlinePreviewDimensions=function(roomID, objectID, mimeType,con
 	}
 	
 }
-
+/**
+*	@function getInlinePreview
+*	@param roomID
+*	@param objectID
+*	@param mimeType
+*	@param context
+*	@param callback
+*/
 fileConnector.getInlinePreview=function(roomID, objectID, mimeType,context, callback) {
 
 	var self = this;
@@ -1000,7 +1140,13 @@ fileConnector.getInlinePreview=function(roomID, objectID, mimeType,context, call
 	}
 	
 }
-
+/**
+*	@function getInlinePreviewMimeType
+*	@param roomID
+*	@param objectID
+*	@param context
+*	@param callback
+*/
 fileConnector.getInlinePreviewMimeType=function(roomID, objectID,context,callback) {
 	
 	var self = this;
@@ -1028,7 +1174,10 @@ fileConnector.getInlinePreviewMimeType=function(roomID, objectID,context,callbac
 }
 
 
-
+/**
+* Head function and some subfunctions included, TODO JSDoc
+*	@function inlinePreviewProviders
+*/
 fileConnector.inlinePreviewProviders = {
 	
 	'image': {
