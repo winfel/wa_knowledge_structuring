@@ -2,7 +2,17 @@
  *    Webarena - A web application for responsive graphical knowledge work
  *
  *    @author Felix Winkelnkemper, University of Paderborn, 2012
- *
+ *    
+ *    @class WebServer
+ *    @classdesc Web Server that manages http requests 
+ *    
+ *    @requires lodash
+ *    @requires mime
+ *    @requires q
+ *    @requires http
+ *    @requires fs
+ *    @requires formidable
+ *    @requires querystring
  */
 
 "use strict";
@@ -11,25 +21,21 @@ var Modules = false;
 
 var WebServer = {};
 var _ = require('lodash');
-var mime = require('mime');
-mime.default_type = 'text/plain';
+var mime = require('mime'); mime.default_type = 'text/plain';
 var Q = require('q');
 
-/*
- *	init
- *
- *	starts the webserver
+/**
+ * Init function called in server.js to initialize this module
+ * 
+ * @param {Object} theModules variable to access the other modules.
  */
 WebServer.init = function (theModules) {
-
 	Modules = theModules;
 
 	var app = require('http').createServer(handler),
-			fs = require('fs');
+		fs = require('fs');
 
 	WebServer.server = app;
-
-
 
 	app.listen(global.config.port);  // start server (port set in config)
 
@@ -53,15 +59,12 @@ WebServer.init = function (theModules) {
 			url = url.slice(0, userHashIndex);
 
 			var context = Modules.UserManager.getConnectionByUserHash(userHash);
-
 		} else {
 			var userHash = false;
 			var context = false;
 		}
 
-
 		if (url == '/') url = Modules.config.homepage;
-
 
 		if (url.substr(0, 6) == '/room/') {
 			/* open room */
@@ -81,9 +84,7 @@ WebServer.init = function (theModules) {
 					}
 
 					res.writeHead(200, {'Content-Type': 'text/html', 'Content-Disposition': 'inline'});
-
 					data = data.replace("##START_ROOM##", roomId);
-
 					res.end(data);
 				});
 
@@ -133,7 +134,6 @@ WebServer.init = function (theModules) {
 
             return;
         }
-
 
 		// Object Icons
 		if (url.substr(0, 12) == '/objectIcons') {
@@ -208,7 +208,7 @@ WebServer.init = function (theModules) {
 
 
 				var formidable = require('formidable');
-				var util = require('util');
+				var util = require('util'); // <--- Is this still in used?
 
 				var form = new formidable.IncomingForm();
 
@@ -267,8 +267,7 @@ WebServer.init = function (theModules) {
 			return;
 		}
 
-		//paintings
-
+		// paintings
 		else  if (url.substr(0,10) == '/paintings'){
 			
 			try {
@@ -309,11 +308,9 @@ WebServer.init = function (theModules) {
 		}
 
 		// getContent
-
 		else if (url.substr(0, 11) == '/getContent') {
 
 			try {
-
 				var ids = url.substr(12).split('/');
 				var roomID = ids[0];
 				var objectID = ids[1];
@@ -355,11 +352,9 @@ WebServer.init = function (theModules) {
 
 
 		// getPreviewContent
-
 		else if (url.substr(0, 18) == '/getPreviewContent') {
 
 			try {
-
 				var ids = url.substr(19).split('/');
 				var roomID = ids[0];
 				var objectID = ids[1];
@@ -417,8 +412,7 @@ WebServer.init = function (theModules) {
 			return;
 		}
 
-		//get external session data
-
+		// get external session data
 		else if (url == '/pushSession' && req.method.toLowerCase() == 'post') {
 
 			var qs = require('querystring');
@@ -497,13 +491,10 @@ WebServer.init = function (theModules) {
 		}
 
 		// objects
-
 		else if (url == '/objects') {
 
 			try {
-
 				var code = Modules.BuildTool.getClientCode();
-
 				var mimeType = 'application/javascript';
 
 				res.writeHead(200, {'Content-Type': mimeType});
@@ -519,7 +510,6 @@ WebServer.init = function (theModules) {
 		} else if (url.substr(0, 10) !== "/socket.io") {
 
 			// plain files
-
 			try {
 
 				var urlParts = url.split('/');
@@ -625,7 +615,6 @@ WebServer.init = function (theModules) {
 
 
 	}  // handler
-
 
 };
 
