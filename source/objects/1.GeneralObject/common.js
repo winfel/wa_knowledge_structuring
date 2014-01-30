@@ -26,20 +26,48 @@ GeneralObject.isGraphical=true;
 GeneralObject.selected=false;
 GeneralObject.category = 'Graphical Elements';
 GeneralObject.ObjectManager=Modules.ObjectManager;
+
+/**
+ * Returns always false.
+ *
+ * @return {boolean} false 
+ */
 GeneralObject.alwaysOnTop = function() {return false;};
 
+/**
+ * Sets the object property 'isSensitiveFlag' to true.
+ *
+ * @this {GeneralObject}
+ */
 GeneralObject.makeSensitive=function(){
 	this.isSensitiveFlag=true;
 }
 
+/**
+ * Sets the object property 'isStructuringFlag' to true.
+ *
+ * @this {GeneralObject}
+ */
 GeneralObject.makeStructuring=function(){
 	this.isStructuringFlag=true;
 }
 
+/**
+ * Returns the value of the property 'isSensitiveFlag'.
+ *
+ * @this {GeneralObject}
+ * @return {boolean} True if 'isSensitiveFlag' is true, otherwise false.
+ */
 GeneralObject.isSensitive=function(){
 	return this.isSensitiveFlag||false;
 }
 
+/**
+ * Returns the value of the property 'isStructuringFlag'.
+ *
+ * @this {GeneralObject}
+ * @return {boolean} True if 'isStructuringFlag' is true, otherwise false.
+ */
 GeneralObject.isStructuring=function(){
 	return this.isStructuringFlag||false;
 }
@@ -47,6 +75,12 @@ GeneralObject.isStructuring=function(){
 
 GeneralObject.utf8={};
 
+/**
+ *  Decomposes a string/URI into unicode.
+ *
+ * @param {string} str The string which should be converted into unicode.
+ * @return {array} The Array which contains the unicodes of the string.
+ */ 
 GeneralObject.utf8.toByteArray = function(str) {
     var byteArray = [];
     for (var i = 0; i < str.length; i++)
@@ -60,6 +94,12 @@ GeneralObject.utf8.toByteArray = function(str) {
     return byteArray;
 };
 
+/**
+ *  Converts an unicode array into a string/URI.
+ *
+ * @param {array} byteArray The unicode array which should be converted.
+ * @return {string} Contains the decoded URI or an empty string (exception).
+ */ 
 GeneralObject.utf8.parse = function(byteArray) {
     var str = '';
     for (var i = 0; i < byteArray.length; i++)
@@ -75,9 +115,9 @@ GeneralObject.utf8.parse = function(byteArray) {
 };
 
 /**
- * Checks if an objects is moved by transform
- * @returns {bool} True if moved by transform
- * TODO: client only??
+ * Returns always false.
+ *
+ * @return {boolean} false 
  */
 GeneralObject.moveByTransform = function(){return false;}
 
@@ -102,12 +142,14 @@ GeneralObject.duplicateLinkedObjects = false;
 GeneralObject.contentURLOnly = true;
 
 /**
- * The currrent language
+ * The current language
  */
 GeneralObject.currentLanguage = Modules.Config.language;
 
 /**
- * Registers the object
+ * Registers the object (attributes, actions).
+ *
+ * @this {GeneralObject}
  * @param {ObjectType} type The type of the object
  */
 GeneralObject.register=function(type){
@@ -424,23 +466,43 @@ GeneralObject.register=function(type){
 
 }
 
-
+/**
+ * Returns the result of the function 'attributeManager.get' (Common, AttributeManager) with the help of the object-id and the forwarded key parameter.
+ *
+ * @this {GeneralObject}
+ * @param {string} key 
+ * @return {?} desired value
+ */
 GeneralObject.get=function(key){
 	return this.attributeManager.get(this.id,key);
 }
 
+/**
+ * Sets a given value with the help of the forwarded object-id/key by calling the function 'attributeManager.set' (Common, AttributeManager).
+ *
+ * @this {GeneralObject}
+ * @param {string} key 
+ * @param {?} value
+ */
 GeneralObject.set=function(key,value){
 	return this.attributeManager.set(this.id,key,value);
 }
 
+/**
+ * Sets given data with the help of the object-id by calling the function 'attributeManager.setAll' (Common, AttributeManager).
+ *
+ * @this {GeneralObject}
+ * @param {?} data 
+ */
 GeneralObject.setAll=function(data){
 	return this.attributeManager.setAll(this.id,data);
 }
 
 /**
-* Call this on actual objects! (should be done by the object manager)
+* Sets the object-id and the type of the object.
 *
-* @param {int} id the id of the actual object
+* @this {GeneralObject}
+* @param {number} id 
 */	
 GeneralObject.init=function(id){
 	if (!id) return;
@@ -451,6 +513,12 @@ GeneralObject.init=function(id){
 	this.set('type',this.type);
 }
 
+/**
+* Returns a string with the type and the object-id.
+*
+* @this {GeneralObject}
+* @return {string}
+*/	
 GeneralObject.toString=function(){
 	    if (!this.get('id')) {
 	    	return 'type '+this.type;
@@ -458,14 +526,41 @@ GeneralObject.toString=function(){
 		return this.type+' #'+this.get('id');
 }
 
+/**
+* Returns the category of the object.
+*
+* @this {GeneralObject}
+* @return {string}
+*/
 GeneralObject.getCategory=function(){
 	return this.category;
 }
 
+/**
+* Calls the function 'attributeManager.registerAttribute' (Common, AttributeManager) by forwarding the parameters.
+*
+* @param {string} attribute
+* @param {function} setter
+* @param {string} type
+* @param {number} min
+* @param {number} max
+* @this {GeneralObject}
+* @return {object} 
+*/
 GeneralObject.registerAttribute=function(attribute,setter,type,min,max){
 	return this.attributeManager.registerAttribute(attribute, setter,type, min, max);
 }
 
+/**
+* Call the function 'attributeManager.setAttribute' (Common, AttributeManager) by forwarding the parameters.
+*
+* @param {string} attribute
+* @param {?} value
+* @param {boolean} forced
+* @param {number} transactionId
+* @this {GeneralObject}
+* @return {boolean} 
+*/
 GeneralObject.setAttribute=function(attribute,value,forced, transactionId){
 	
 	
@@ -490,16 +585,35 @@ GeneralObject.setAttribute.neededRights = {
     write : true
 }
 
+/**
+* Call the function 'attributeManager.getAttribute' (Common, AttributeManager) by forwarding the parameters.
+*
+* @param {string} attribute
+* @param {number} noevaluation
+* @this {GeneralObject}
+* @return {?} value of the desired attribute
+*/
 GeneralObject.getAttribute=function(attribute,noevaluation){
 	return this.attributeManager.getAttribute(this,attribute,noevaluation);
 }
 
-
-
+/**
+* Call the function 'attributeManager.hasAttribute' (Common, AttributeManager) by forwarding the parameters.
+*
+* @param {string} attribute
+* @this {GeneralObject}
+* @return {boolean} True, if the attribute is set, otherwise false.
+*/
 GeneralObject.hasAttribute=function(attribute){
 	return this.attributeManager.hasAttribute(this,attribute);
 }
 
+/**
+* Call the function 'attributeManager.getAttributes' (Common, AttributeManager) by forwarding the parameters.
+*
+* @this {GeneralObject}
+* @return {object} object which contains all values.
+*/
 GeneralObject.getAttributes=function(){
 	
 	var attInfo=this.attributeManager.getAttributes();
@@ -517,50 +631,126 @@ GeneralObject.getAttributes=function(){
 	return attInfo;
 }
 
+/**
+* Call the function 'actionManager.registerAction' (Common, ActionManager) by forwarding the parameters.
+*
+* @param {string} name
+* @param {function} func
+* @param {boolean} single
+* @param {boolean} visibilityFunc
+* @this {GeneralObject}
+* @return {object} object which won the new action
+*/
 GeneralObject.registerAction=function(name, func, single, visibilityFunc){
 	return this.actionManager.registerAction(name,func, single, visibilityFunc);
 }
 
+/**
+* Call the function 'actionManager.unregisterAction' (Common, ActionManager) by forwarding the parameter.
+*
+* @param {string} name
+* @this {GeneralObject}
+* @return {object} object which lost the action
+*/
 GeneralObject.unregisterAction=function(name){
 	return this.actionManager.unregisterAction(name);
 }
 
+/**
+* Call the function 'actionManager.performAction' (Common, ActionManager) by forwarding the parameter.
+*
+* @param {string} name
+* @param {object} clickedObject
+* @this {GeneralObject}
+* @return {object} object which performed the action
+*/
 GeneralObject.performAction=function(name, clickedObject){
 	return this.actionManager.performAction(name,clickedObject);
 }
 
+/**
+* Call the function 'actionManager.getAction' (Common, ActionManager).
+*
+* @this {GeneralObject}
+* @return {object} object which contains the actions.
+*/
 GeneralObject.getActions=function(){
 	return this.actionManager.getActions();
 }
 
+/**
+* Call the function 'translationManager.get' (Common, translationManager).
+*
+* @param {string} language
+* @param {string} text
+* @this {GeneralObject}
+* @return {string} translated text in the desired language.
+*/
 GeneralObject.translate=function(language, text){
 	if (!this.translationManager) return text;
 	return this.translationManager.get(language, text);
 }
 
+/**
+* Set a new current language.
+*
+* @param {string} currentLanguage
+* @this {GeneralObject}
+*/
 GeneralObject.setLanguage=function(currentLanguage) {
 	this.currentLanguage = currentLanguage;
 }
 
+/**
+* Call the function 'translationManager.addTranslations' (Common, translationManager).
+*
+* @param {string} language
+* @param {object} data
+* @this {GeneralObject}
+* @return {object} object which receives the new translations.
+*/
 GeneralObject.setTranslations=function(language,data){
 	return this.translationManager.addTranslations(language, data);
 }
 
 GeneralObject.setTranslation=GeneralObject.setTranslations;
 	
-
+/**
+* Returns the type of the object by calling the function 'get.Attribute'.
+*
+* @this {GeneralObject}
+* @return {string} 
+*/
 GeneralObject.getType=function(){
 	return this.getAttribute('type');
 }
 
+/**
+* Returns the name of the object by calling the function 'get.Attribute'.
+*
+* @this {GeneralObject}
+* @return {string} 
+*/
 GeneralObject.getName=function(){
 	return this.getAttribute('name');
 }
 
+/**
+* Returns the id of the object by calling the function 'get.Attribute'.
+*
+* @this {GeneralObject}
+* @return {number} 
+*/
 GeneralObject.getId=function(){
 	return this.getAttribute('id');
 }
 
+/**
+* Returns the id of the current room of the object by calling the function 'get.Attribute'.
+*
+* @this {GeneralObject}
+* @return {number} 
+*/
 GeneralObject.getCurrentRoom=function(){
 	return this.getAttribute("inRoom");
 }
@@ -572,23 +762,47 @@ GeneralObject.stopOperation=function(){
 * rights
 */
 
-
+/**
+* Returns always true.
+*
+* @return {boolean} true
+*/
 GeneralObject.mayReadContent=function() {
 	return true; //TODO
 }
 
+/**
+* Returns always true.
+*
+* @return {boolean} true
+*/
 GeneralObject.mayChangeAttributes=function(){
 	return true; //TODO
 }
 
+/**
+* Returns always true.
+*
+* @return {boolean} true
+*/
 GeneralObject.mayChangeContent=function(){
 	return true; //TODO
 }
 
+/**
+* Hides an object by calling 'setAttribute'.
+*
+* @this {GeneralObject} 
+*/
 GeneralObject.hide=function(){
 	this.setAttribute('visible',true);
 }
 
+/**
+* Unhides an object by calling 'setAttribute'.
+*
+* @this {GeneralObject} 
+*/
 GeneralObject.unHide=function(){
 	this.setAttribute('visible',false);
 }
@@ -596,7 +810,10 @@ GeneralObject.unHide=function(){
 GeneralObject.unhide=GeneralObject.unHide;	
 	
 /**
-*	put the top left edge of the bounding box to x,y
+* Puts the top left edge of the bounding box to x,y by calling 'setAttribute'.
+* @param {number} x
+* @param {number} y
+* @this {GeneralObject}
 */
 GeneralObject.setPosition=function(x,y){
 
@@ -604,7 +821,10 @@ GeneralObject.setPosition=function(x,y){
 }
 		
 /**
-*	update the object's width and height
+* Updates the object's width and height by calling 'setAttribute'.
+* @param {number} width
+* @param {number} height
+* @this {GeneralObject}
 */
 GeneralObject.setDimensions=function(width,height){
 	if (height===undefined) height=width;
@@ -612,30 +832,58 @@ GeneralObject.setDimensions=function(width,height){
 	this.setAttribute('height',height);
 }
 
-
+/**
+* Moves the object to the front by calling 'ObjectManager.performAction' (Client, ObjectManager).
+*
+*/
 GeneralObject.toFront=function(){
 	ObjectManager.performAction("toFront");
 }
 
+/**
+* Moves the object to the back by calling 'ObjectManager.performAction' (Client, ObjectManager).
+*
+*/
 GeneralObject.toBack=function(){
 	ObjectManager.performAction("toBack");
 }
 
-
+/**
+* Checks if the object is movable by calling 'mayChangeAttributes'.
+*
+* @return {boolean}
+*/
 GeneralObject.isMovable=function(){
 	return this.mayChangeAttributes();
 }
 
+/**
+* Checks if the object is resizeable by calling 'isMovable'.
+*
+* @return {boolean}
+*/
 GeneralObject.isResizable=function(){
 	return this.isMovable();
 }
 
+/**
+* Returns always false.
+*
+* @return {boolean} false
+*/
 GeneralObject.resizeProportional=function(){
 	return false;
 }
 
 
 /* following functions are used by the GUI. (because the three functions above will be overwritten) */
+
+/**
+* Checks if the object can be moved by calling 'get.Attribute'.
+*
+* @this {GeneralObject}
+* @return {boolean} 
+*/
 GeneralObject.mayMove=function() {
 	if (this.getAttribute('locked')) {
 		return false;
@@ -644,6 +892,12 @@ GeneralObject.mayMove=function() {
 	}
 }
 
+/**
+* Checks if the object can be resized by calling 'get.Attribute'.
+*
+* @this {GeneralObject}
+* @return {boolean} 
+*/
 GeneralObject.mayResize=function() {
 	if (this.getAttribute('locked')) {
 		return false;
@@ -652,6 +906,12 @@ GeneralObject.mayResize=function() {
 	}
 }
 
+/**
+* Checks if the object can be resized proportional by calling 'get.Attribute'.
+*
+* @this {GeneralObject}
+* @return {boolean} 
+*/
 GeneralObject.mayResizeProportional=function() {
 	if (this.getAttribute('locked')) {
 		return false;
@@ -660,12 +920,22 @@ GeneralObject.mayResizeProportional=function() {
 	}
 }
 
-
+/**
+* If the object was clicked it is selected by calling 'select' (GeneralObject, View). The click itself is handled by calling 'selectedClickHandler' (GeneralObject, View).
+*
+* @this {GeneralObject}
+*/
 GeneralObject.execute=function(){
 	this.select();
 	this.selectedClickHandler();
 }
 
+/**
+* Checks if the object is selected.
+*
+* @this {GeneralObject}
+* @return {boolean}
+*/
 GeneralObject.isSelected = function() {
 	return this.selected;
 }
@@ -674,6 +944,11 @@ GeneralObject.refresh=function(){
 	//This should be overwritten for GUI updates and object repainting
 }
 
+/**
+* Refreshed the GUI delayed by using a timeout and calling 'refresh' (GeneralObject, Client).
+*
+* @this {GeneralObject}
+*/
 GeneralObject.refreshDelayed=function(){
 	if (this.refreshDelay){
 		clearTimeout(this.refreshDelay);
@@ -700,20 +975,41 @@ GeneralObject.refreshDelayed=function(){
 	},theTimer);
 }
 
+/**
+* Returns the roomId of the room which contains the object.
+*
+* @this {GeneralObject}
+* @return {number}
+*/
 GeneralObject.getRoomID=function(){
 	return this.get('inRoom');
 }
 
-
-
+/**
+* Returns the Id of the object. 
+*
+* @this {GeneralObject}
+* @return {number}
+*/
 GeneralObject.getID=function(){
 	return this.id;
 }
 
+/**
+* Removes the object by calling 'Modules.ObjectManager.remove' (Client, ObjectManager).
+*
+* @this {GeneralObject}
+*/
 GeneralObject.remove=function(){
 	Modules.ObjectManager.remove(this);
 }
 
+/**
+* Removes linked objects by calling 'set.Attribute'.
+*
+* @param {number} removeId
+* @this {GeneralObject}
+*/
 GeneralObject.removeLinkedObjectById = function(removeId){
     var filteredIds = _.filter(this.get('link'), function(elem){return elem != removeId})
 
@@ -721,6 +1017,12 @@ GeneralObject.removeLinkedObjectById = function(removeId){
 
 }
 
+/**
+* Checks if the objects has linked objects by calling 'getLinkedObjects'.
+*
+* @this {GeneralObject}
+* @return {boolean} 
+*/
 GeneralObject.hasLinkedObjects=function() {
 	
 	var counter = 0;
@@ -742,6 +1044,12 @@ GeneralObject.hasLinkedObjects=function() {
 	
 }
 
+/**
+* Returns the linked objects associated with the invoking object.
+*
+* @this {GeneralObject}
+* @return {object} object which contains the linked objects.
+*/
 GeneralObject.getLinkedObjects=function() {
 	var self = this;
 	
@@ -848,6 +1156,12 @@ GeneralObject.getLinkedObjects=function() {
 	return links;
 }
 
+/**
+* Returns the group members associated with the invoking object.
+*
+* @this {GeneralObject}
+* @return {array} array which contains the group members.
+*/
 GeneralObject.getGroupMembers = function() {
 	
 	var list = [];
@@ -867,7 +1181,13 @@ GeneralObject.getGroupMembers = function() {
 	
 }
 
-
+/**
+* Duplicates the objects which are on the list.
+*
+* @param {object} list
+* @this {GeneralObject}
+* @return {array} array which contains the ids of the duplicated objects.
+*/
 GeneralObject.getObjectsToDuplicate = function(list) {
 	
 	var self = this;
@@ -907,6 +1227,12 @@ GeneralObject.getObjectsToDuplicate = function(list) {
 	
 }
 
+/**
+* Updates the links between objects with the help of idTranslationList and by calling 'setAttribute'.
+*
+* @param {object} idTranslationList
+* @this {GeneralObject}
+*/
 GeneralObject.updateLinkIds = function(idTranslationList) {
 
 	if (!this.get('link') || this.get('link') == "") {
