@@ -150,6 +150,14 @@ GeneralObject.currentLanguage = Modules.Config.language;
  * Registers the object (attributes, actions).
  *
  * @this {GeneralObject}
+ * @requires Client/ObjectManager.js
+ * @requires Common/AttributeManager.js
+ * @requires Common/ActionManager.js
+ * @requires Common/DataSet.js
+ * @requires Common/TranslationManager.js
+ * @requires Client/Helper.js
+ * @requires Client/guis.common/javascript/1.svg.js
+ * @requires objects/1.GeneralObject/view.js
  * @param {ObjectType} type The type of the object
  */
 GeneralObject.register=function(type){
@@ -471,6 +479,7 @@ GeneralObject.register=function(type){
  *
  * @this {GeneralObject}
  * @param {string} key 
+ * @requires Common/AttributeManager.js
  * @return {?} desired value
  */
 GeneralObject.get=function(key){
@@ -483,6 +492,7 @@ GeneralObject.get=function(key){
  * @this {GeneralObject}
  * @param {string} key 
  * @param {?} value
+ * @requires Common/AttributeManager.js
  */
 GeneralObject.set=function(key,value){
 	return this.attributeManager.set(this.id,key,value);
@@ -493,6 +503,7 @@ GeneralObject.set=function(key,value){
  *
  * @this {GeneralObject}
  * @param {?} data 
+ * @requires Common/AttributeManager.js
  */
 GeneralObject.setAll=function(data){
 	return this.attributeManager.setAll(this.id,data);
@@ -545,6 +556,7 @@ GeneralObject.getCategory=function(){
 * @param {number} min
 * @param {number} max
 * @this {GeneralObject}
+* @requires Common/AttributeManager.js
 * @return {object} 
 */
 GeneralObject.registerAttribute=function(attribute,setter,type,min,max){
@@ -559,6 +571,8 @@ GeneralObject.registerAttribute=function(attribute,setter,type,min,max){
 * @param {boolean} forced
 * @param {number} transactionId
 * @this {GeneralObject}
+* @requires Common/AttributeManager.js
+* @requires Client/guis.common/javascript/0.GUI.js
 * @return {boolean} 
 */
 GeneralObject.setAttribute=function(attribute,value,forced, transactionId){
@@ -591,6 +605,7 @@ GeneralObject.setAttribute.neededRights = {
 * @param {string} attribute
 * @param {number} noevaluation
 * @this {GeneralObject}
+* @requires Common/AttributeManager.js
 * @return {?} value of the desired attribute
 */
 GeneralObject.getAttribute=function(attribute,noevaluation){
@@ -602,6 +617,7 @@ GeneralObject.getAttribute=function(attribute,noevaluation){
 *
 * @param {string} attribute
 * @this {GeneralObject}
+* @requires Common/AttributeManager.js
 * @return {boolean} True, if the attribute is set, otherwise false.
 */
 GeneralObject.hasAttribute=function(attribute){
@@ -612,6 +628,8 @@ GeneralObject.hasAttribute=function(attribute){
 * Call the function 'attributeManager.getAttributes' (Common, AttributeManager) by forwarding the parameters.
 *
 * @this {GeneralObject}
+* @requires Common/AttributeManager.js
+* @requires Client/Helper.js
 * @return {object} object which contains all values.
 */
 GeneralObject.getAttributes=function(){
@@ -639,6 +657,7 @@ GeneralObject.getAttributes=function(){
 * @param {boolean} single
 * @param {boolean} visibilityFunc
 * @this {GeneralObject}
+* @require Common/ActionManager.js
 * @return {object} object which won the new action
 */
 GeneralObject.registerAction=function(name, func, single, visibilityFunc){
@@ -650,6 +669,7 @@ GeneralObject.registerAction=function(name, func, single, visibilityFunc){
 *
 * @param {string} name
 * @this {GeneralObject}
+* @require Common/ActionManager.js
 * @return {object} object which lost the action
 */
 GeneralObject.unregisterAction=function(name){
@@ -662,6 +682,7 @@ GeneralObject.unregisterAction=function(name){
 * @param {string} name
 * @param {object} clickedObject
 * @this {GeneralObject}
+* @require Common/ActionManager.js
 * @return {object} object which performed the action
 */
 GeneralObject.performAction=function(name, clickedObject){
@@ -672,6 +693,7 @@ GeneralObject.performAction=function(name, clickedObject){
 * Call the function 'actionManager.getAction' (Common, ActionManager).
 *
 * @this {GeneralObject}
+* @require Common/ActionManager.js
 * @return {object} object which contains the actions.
 */
 GeneralObject.getActions=function(){
@@ -684,6 +706,7 @@ GeneralObject.getActions=function(){
 * @param {string} language
 * @param {string} text
 * @this {GeneralObject}
+* @require Common/TranslationManager.js
 * @return {string} translated text in the desired language.
 */
 GeneralObject.translate=function(language, text){
@@ -707,6 +730,7 @@ GeneralObject.setLanguage=function(currentLanguage) {
 * @param {string} language
 * @param {object} data
 * @this {GeneralObject}
+* @require Common/TranslationManager.js
 * @return {object} object which receives the new translations.
 */
 GeneralObject.setTranslations=function(language,data){
@@ -835,6 +859,7 @@ GeneralObject.setDimensions=function(width,height){
 /**
 * Moves the object to the front by calling 'ObjectManager.performAction' (Client, ObjectManager).
 *
+* @requires Client/ObjectManager.js
 */
 GeneralObject.toFront=function(){
 	ObjectManager.performAction("toFront");
@@ -843,6 +868,7 @@ GeneralObject.toFront=function(){
 /**
 * Moves the object to the back by calling 'ObjectManager.performAction' (Client, ObjectManager).
 *
+* @requires Client/ObjectManager.js
 */
 GeneralObject.toBack=function(){
 	ObjectManager.performAction("toBack");
@@ -924,6 +950,7 @@ GeneralObject.mayResizeProportional=function() {
 * If the object was clicked it is selected by calling 'select' (GeneralObject, View). The click itself is handled by calling 'selectedClickHandler' (GeneralObject, View).
 *
 * @this {GeneralObject}
+* @requires objects/1.GeneralObject/view.js
 */
 GeneralObject.execute=function(){
 	this.select();
@@ -948,6 +975,7 @@ GeneralObject.refresh=function(){
 * Refreshed the GUI delayed by using a timeout and calling 'refresh' (GeneralObject, Client).
 *
 * @this {GeneralObject}
+* @require Client/ObjectManager.js
 */
 GeneralObject.refreshDelayed=function(){
 	if (this.refreshDelay){
@@ -999,6 +1027,7 @@ GeneralObject.getID=function(){
 * Removes the object by calling 'Modules.ObjectManager.remove' (Client, ObjectManager).
 *
 * @this {GeneralObject}
+* @require Client/ObjectManager.js
 */
 GeneralObject.remove=function(){
 	Modules.ObjectManager.remove(this);
@@ -1048,6 +1077,7 @@ GeneralObject.hasLinkedObjects=function() {
 * Returns the linked objects associated with the invoking object.
 *
 * @this {GeneralObject}
+* @require Client/ObjectManager.js
 * @return {object} object which contains the linked objects.
 */
 GeneralObject.getLinkedObjects=function() {
@@ -1160,6 +1190,7 @@ GeneralObject.getLinkedObjects=function() {
 * Returns the group members associated with the invoking object.
 *
 * @this {GeneralObject}
+* @require Client/ObjectManager.js
 * @return {array} array which contains the group members.
 */
 GeneralObject.getGroupMembers = function() {
