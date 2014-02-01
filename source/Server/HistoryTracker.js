@@ -2,6 +2,15 @@
 
 var _ = require("lodash");
 
+/**
+ *  Handles a history that include actions, which are grouped together
+ *  to transactions
+ *
+ *  @requires lodash
+ *
+ *  @param  maxStackSize    the maximal size of the used stack
+ *  @return                 the object of the tracker
+ */
 var HistoryTracker = function(maxStackSize){
     var that = { };
 
@@ -33,6 +42,15 @@ var HistoryTracker = function(maxStackSize){
         }
     }
 
+    /**
+     *  add
+     *
+     *  adds an entry to the history object
+     *
+     *  @param  transactionId   the key for the history entry
+     *  @param  userId          the userId of the history object
+     *  @param  historyEntry    the entry that should be added
+     */
     that.add = function(transactionId, userId, historyEntry){
         if(!historyEntries[transactionId]){
             historyEntries[transactionId] = {
@@ -46,6 +64,15 @@ var HistoryTracker = function(maxStackSize){
         shorten();
     }
 
+    /**
+     *  getLastChangeForUser
+     *
+     *  returns the last change of a given user
+     *
+     *  @param  userId   the chosen userID of the user that is selected
+     *  @return          the fitting entry within the history
+     *
+     */
     that.getLastChangeForUser = function(userId){
         var i = historyTransactionIds.length;
         var found = false;
@@ -88,6 +115,13 @@ var HistoryTracker = function(maxStackSize){
         }
     }
 
+    /**
+     *  removeHistoryEntry
+     *
+     *  removes the last entry within the history
+     *
+     *  @param  transactionId   the Id of the transaction that should be deleted
+     */
     that.removeHistoryEntry = function(transactionId){
         delete historyEntries[transactionId];
         historyTransactionIds = _.filter(historyTransactionIds, function(e){return e != transactionId})

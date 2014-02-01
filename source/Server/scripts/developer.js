@@ -3,6 +3,8 @@
 *
 *    @author Felix Winkelnkemper, University of Paderborn, 2012
 *
+*   @requires   fs
+*   @requires   ../../server.js
 */
 
 var Modules=require('../../server.js');
@@ -17,6 +19,14 @@ var thisScript={}
 
 thisScript.export='';
 
+/**
+ *  run
+ *
+ *  runs this script and creates a log file
+ *
+ *  @param url  not used?
+ *
+ */
 thisScript.run=function(url){
 	
 	if (!Modules.Config.debugMode){
@@ -70,6 +80,13 @@ thisScript.run=function(url){
 
 module.exports=thisScript;
 
+/**
+ *  traverse
+ *
+ *  traverses a given folder and stores all JS files that include an TODO in an internal variable
+ *
+ *  @param  folder the chosen root folder
+ */
 function traverse(folder){
 	try{
 		files=fs.readdirSync(folder);
@@ -111,6 +128,13 @@ function traverse(folder){
 	} catch (e) {}
 }
 
+/**
+ *  traverseLog
+ *
+ *  traverses a given folder and stores all JS files that include an console.log in an internal variable
+ *
+ *  @param  folder the chosen root folder
+ */
 function traverseLog(folder){
 	try{
 		files=fs.readdirSync(folder);

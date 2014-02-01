@@ -1,8 +1,18 @@
+/**
+ *    Webarena - A web application for responsive graphical knowledge work
+ *
+ *    @author Felix Winkelnkemper, University of Paderborn, 2012
+ *
+ * @class PluginManager
+ * @classdesc Imports all chosen Plugins. However, at the present point in time, no plugins are used within the WebArena.
+ */
 "use strict";
 
 var PluginManager = {};
 
 /**
+ *  This functinn gets a list of Plugins and loads them
+ *
  * @param moduleRegistry - server modules
  * @param {Object} modulesToLoad - a list of module-names of module locations that should be loaded
  *        {
@@ -10,6 +20,7 @@ var PluginManager = {};
  *          ......OR......
  *          "pluginName" : "moduleLocation"
  *        }
+ * @return {object} An instance of the PluginManager
  */
 PluginManager.init = function (moduleRegistry, modulesToLoad) {
 	this.loadedPlugins = {};
@@ -30,7 +41,7 @@ PluginManager.init = function (moduleRegistry, modulesToLoad) {
 /**
  * Create a PluginManager instance. Normally there should be only one.
  *
- * @returns {PluginManager|*}
+ * @return {PluginManager|*}
  */
 function create() {
 	return Object.create(PluginManager);

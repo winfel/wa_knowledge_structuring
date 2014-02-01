@@ -3,15 +3,28 @@
  *
  *    @author Felix Winkelnkemper, University of Paderborn, 2012
  *
+ *  @requires lodash
  */
 
 "use strict";
 var _ = require("lodash");
 
+/**
+ * A bunch of helper methods
+ *
+ * @requires lodash
+ */
 var Helper = new function () {
 
 
-	//public method
+	/**
+     *  getCloneOfObject - public method
+     *
+     *  returns a clone of the given object
+     *
+     *  @param  oldObject   the object that should be cloned
+     *  @return {object}    the clone of the object
+     */
 	this.getCloneOfObject = function (oldObject) {
 		var tempClone = {};
 
@@ -31,7 +44,14 @@ var Helper = new function () {
 		return tempClone;
 	}
 
-	//private method (to copy array of objects) - getCloneOfObject will use this internally
+    /**
+     *  getCloneOfObject - private method (to copy array of objects) - getCloneOfObject will use this internally
+     *
+     *  returns a clone of the given array
+     *
+     *  @param  oldArray    the array that should be cloned
+     *  @return {array}    the clone of the array
+     */
 	this.getCloneOfArray = function (oldArray) {
 		var tempClone = [];
 
@@ -54,6 +74,10 @@ var Helper = new function () {
 	 * that type, forcing an exception in case of a wrong type.
 	 *
 	 * Name is used for debugging purposes
+     *
+     *  @param  variable    the variable that should be checked
+     *  @param  name        the name of the variable
+     *  @param  datatype    the datatype of the variable (the datatype it should have ;-))
 	 **/
 	this.assure = function (variable, name, datatype) {
 

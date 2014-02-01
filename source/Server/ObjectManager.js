@@ -3,6 +3,14 @@
  *
  *    @author Felix Winkelnkemper, University of Paderborn, 2012
  *
+ * @class ObjectManager
+ * @classdesc The ObjectManager handles the object creation and keeps track of them
+ * @requires fs
+ * @requires q
+ * @requires lodash
+ * @requires ./TokenChecker.js
+ * @requires async
+ * @requires ./HistoryTracker.js
  */
 
 
@@ -42,6 +50,8 @@ ObjectManager.registerType = function (type, constr) {
  *  remove
  *
  *  deletes an object and informs clients about the deletion
+ *
+ *  @param obj the object that should be removed
  */
 ObjectManager.remove = function (obj) {
 
@@ -58,6 +68,9 @@ ObjectManager.remove = function (obj) {
  *  getPrototype / getPrototypeFor
  *
  *  gets the prototype (the class) of an object.
+ *
+ *  @param  the chosen object
+ *  @return the prototype (the class) of an object.
  */
 ObjectManager.getPrototype = function (objType) {
 	if (prototypes[objType]) return prototypes[objType];
@@ -78,6 +91,12 @@ ObjectManager.getPrototypeFor = ObjectManager.getPrototype;
  *  get by getObject is a different one on every call. The consequence
  *  of this is, that you cannot add properties to the object! If you
  *  want to save runtime data, use the runtimeData property.
+ *
+ *  @param objectData
+ *  @param roomID
+ *  @param type
+ *
+ *  @return the created object
  *
  */
 function buildObjectFromObjectData(objectData, roomID, type) {
@@ -124,6 +143,12 @@ function buildObjectFromObjectData(objectData, roomID, type) {
  *  Attention. EVERY call of getObject returns a different object on every call.
  *   The consequence of this is, that you cannot add properties to the object!
  *   If you want to save runtime data, use the runtimeData property.
+ *
+ *  @param  roomID  the roomID of the chosen room
+ *  @param  objectID    the objectID of the chosen object
+ *  @param  context user credentials
+ *
+ *  @return object the now created object
  */
 ObjectManager.getObject = function (roomID, objectID, context) {
 
@@ -149,9 +174,10 @@ ObjectManager.getObject = function (roomID, objectID, context) {
  *
  *  This function can either be called synchronous or asyncronous.
  *
- * @param roomID
- * @param context
- * @param {Function}[callback]
+ * @param roomID    The roomID of the room that should be used to gather the inventory
+ * @param context   The user credentials
+ * @param {Function}[callback]  What should be done with the inventory? By default, it will return a list
+ *                              that contains all objects
  *
  */
 ObjectManager.getObjects = function (roomID, context, callback) {
@@ -202,16 +228,25 @@ ObjectManager.getObjects = function (roomID, context, callback) {
 }
 
 /**
+ *  getInventory
  *
- *
- * @see ObjectManager.getObjects
+ *  just another name for the getObjects function
+ *  @see ObjectManager.getObjects
  */
 ObjectManager.getInventory = ObjectManager.getObjects;
 
 /**
  *  createObject
  *
- *  creates a new object
+ *  creates a new object and calls the callback function
+ *
+ *  @param  roomID
+ *  @param  type
+ *  @param  attributes
+ *  @param  content
+ *  @param  context     user credentials
+ *  @param  callback    the callback function
+ *
  *
  **/
 ObjectManager.createObject = function (roomID, type, attributes, content, context, callback) {
@@ -310,6 +345,9 @@ ObjectManager.getEnabledObjectTypes = function () {
  *  init
  *
  *  initializes the ObjectManager
+ *
+ *  @param theModules   reference to the server modules
+ *
  **/
 ObjectManager.init = function (theModules) {
 	var that = this;
@@ -351,6 +389,16 @@ ObjectManager.init = function (theModules) {
 	});
 }
 
+/**
+ *  undo
+ *
+ *  Removes the last change
+ *
+ *  @param  data
+ *  @param  context     user credentials
+ *  @param  callback    the chosen callback function
+ *
+ **/
 ObjectManager.undo = function (data, context, callback) {
 	var that = this;
 	var userID = data.userID;
@@ -400,7 +448,12 @@ ObjectManager.undo = function (data, context, callback) {
 /**
  *  getRoom
  *
- *  returns the a room object for a given roomID
+ *  @param roomID       the roomID of the chosen room
+ *  @param context      user credentials
+ *  @param callback     what should be done with the room
+ *  @param oldRoomId
+ *
+ *  @return the room object for a given roomID
  *
  *  TODO: callback should be last parameter
  **/
@@ -416,6 +469,14 @@ ObjectManager.getRoom = function (roomID, context, callback, oldRoomId) {
 
 }
 
+/**
+ *
+ * Function counts subrooms within a given room
+ *
+ * @param   roomID  the ID of the chosen room
+ * @param   context needed user credentials
+ * @return {number} amount of subrooms
+ */
 ObjectManager.countSubrooms = function (roomID, context) {
 	var counter = 1;
 
@@ -440,7 +501,7 @@ ObjectManager.countSubrooms = function (roomID, context) {
  *
  * @param message - the error message
  * @param cb
- * @returns {Function}
+ * @return {Function}
  */
 var falseToError = function (message, cb) {
 	return function (err, res) {
