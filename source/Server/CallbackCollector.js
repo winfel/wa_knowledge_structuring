@@ -1,5 +1,11 @@
 "use strict";
-
+/**
+* @class Callbackcollector
+* @function call
+* @function checkCallback
+* @param total
+* @param callback
+*/
 var CallbackCollector = function(total, callback){
 	
 	var self = this;

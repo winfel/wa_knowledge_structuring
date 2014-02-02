@@ -1,12 +1,25 @@
 "use strict";
-
+/**
+* @class BidConnector
+* @requires FileConnector
+* @requires BidAPI
+* @requires ./Common/Log
+*
+*/
 var bidConnector=require('./FileConnector.js');
 
 bidConnector.bidConnections = {};
 bidConnector.bidRights = {};
 
 bidConnector.externalSessions = {};
-
+/**
+* @function login
+* @param {String} username The username
+* @param {String} password The password
+* @param externalSession
+* @param context
+* @param rp
+*/
 bidConnector.login=function(username,password,externalSession,context, rp){
 
 	var self = this;
@@ -47,20 +60,31 @@ bidConnector.login=function(username,password,externalSession,context, rp){
 	});
 	
 }
-
+/**
+* @function isLoggedIn
+* @param context
+*/
 bidConnector.isLoggedIn=function(context) {
 	return (this.bidConnections[context.socket.id] !== undefined);
 }
 
 
-
+/**
+* @function addExternalSession
+* @param data
+*/
 bidConnector.addExternalSession=function(data) {
 	this.externalSessions[data.id] = data;
 }
 
 
 /* RIGHTS */
-
+/**
+* @function mayAnything
+* @param roomID
+* @param connection
+* @param {Function} callback The callback function for successful requests
+*/
 bidConnector.mayAnything=function(roomID, connection, callback) {
 	
 	if (this.bidRights[connection.socket.id] == undefined) {
@@ -92,27 +116,55 @@ bidConnector.mayAnything=function(roomID, connection, callback) {
 	});
 	
 }
-
+/**
+* @function mayWrite
+* @param roomID
+* @param objectID
+* @param connection
+* @param {Function} callback The callback function for successful requests
+*/
 bidConnector.mayWrite=function(roomID,objectID,connection,callback) {
 	this.Modules.Log.debug("Check right: write (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(connection)+"')");
 	this.mayAnything(roomID, connection, callback);
 }
-
+/**
+* @function mayRead
+* @param roomID
+* @param objectID
+* @param connection
+* @param {Function} callback The callback function for successful requests
+*/
 bidConnector.mayRead=function(roomID,objectID,connection,callback) {
 	this.Modules.Log.debug("Check right: read (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(connection)+"')");
 	this.mayAnything(roomID, connection, callback);
 }
-
+/**
+* @function mayDelete
+* @param roomID
+* @param objectID
+* @param connection
+* @param {Function} callback The callback function for successful requests
+*/
 bidConnector.mayDelete=function(roomID,objectID,connection,callback) {
 	this.Modules.Log.debug("Check right: delete (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(connection)+"')");
 	this.mayAnything(roomID, connection, callback);
 }
-
+/**
+* @function mayEnter
+* @param roomID
+* @param connection
+* @param {Function} callback The callback function for successful requests
+*/
 bidConnector.mayEnter=function(roomID,connection,callback) {
 	this.Modules.Log.debug("Check right: enter (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(connection)+"')");
 	this.mayAnything(roomID, connection, callback);
 }
-
+/**
+* @function mayInsert
+* @param roomID
+* @param connection
+* @param {Function} callback The callback function for successful requests
+*/
 bidConnector.mayInsert=function(roomID,connection,callback) {
 	this.Modules.Log.debug("Check right: insert (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(connection)+"')");
 	this.mayAnything(roomID, connection, callback);

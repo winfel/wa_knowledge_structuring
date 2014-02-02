@@ -14,6 +14,8 @@
  * @param {int} port The port number of the service
  * @param {String} username The username
  * @param {String} password The password
+ * @requires Node.js/querystring
+ * @requires ./Common/Log
  */
 function BidConnection(protocol, host, port, username, password) {
 	
@@ -134,7 +136,10 @@ function BidConnection(protocol, host, port, username, password) {
 	
 	
 
-	
+	/**
+	*  @function encode
+	*  @param s
+	*/
 	this.encode = function(s) {
 		return escape(JSON.stringify(s));
 	}
@@ -187,43 +192,90 @@ function BidConnection(protocol, host, port, username, password) {
 	
 	//OBJECT
 	this.Object = {};
-	
+	/**
+	 * @function Object.getAttributes
+	 * @param id
+	 * @param {Function} callback Callback function
+	 */
 	this.Object.getAttributes = function(id, callback) {
 		self.request("Object", "getAttributes", [id], callback);
 	}
-	
+	/**
+	 * @function Object.getAttribute
+	 * @param id
+	 * @param attribute
+	 * @param {Function} callback Callback function
+	 */
 	this.Object.getAttribute = function(id, attribute, callback) {
 		self.request("Object", "getAttribute", [id, attribute], callback);
 	}
-	
+	/**
+	 * @function Object.setAttribute
+	 * @param id
+	 * @param attribute
+	 * @param value
+	 * @param {Function} callback Callback function
+	 */
 	this.Object.setAttribute = function(id, attribute, value, callback) {
 		self.request("Object", "setAttribute", [id, attribute, self.encode(value)], callback);
 	}
-	
+	/**
+	 * @function Object.setAttributes
+	 * @param id
+	 * @param attribute
+	 * @param {Function} callback Callback function
+	 */
 	this.Object.setAttributes = function(id, attributes, callback) {
 		self.request("Object", "setAttributes", [id, self.encode(attributes)], callback, true);
 	}
-	
+	/**
+	 * @function Object.move
+	 * @param id
+	 * @param destId
+	 * @param {Function} callback Callback function
+	 */
 	this.Object.move = function(id, destId, callback) {
 		self.request("Object", "move", [id, destId], callback);
 	}
-	
+	/**
+	 * @function Object.duplicate
+	 * @param id
+	 * @param destId
+	 * @param {Function} callback Callback function
+	 */
 	this.Object.duplicate = function(id, destId, callback) {
 		self.request("Object", "duplicate", [id, destId], callback);
 	}
-	
+	/**
+	 * @function Object.delete
+	 * @param id
+	 * @param {Function} callback Callback function
+	 */
 	this.Object.delete = function(id, callback) {
 		self.request("Object", "delete", [id], callback);
 	}
-	
+	/**
+	 * @function Object.getObjectById
+	 * @param id
+	 * @param {Function} callback Callback function
+	 */
 	this.Object.getObjectById = function(id, callback) {
 		self.request("Object", "getObjectById", [id], callback, false, true);
 	}
-	
+	/**
+	 * @function Object.getObjectByPath
+	 * @param path
+	 * @param {Function} callback Callback function
+	 */
 	this.Object.getObjectByPath = function(path, callback) {
 		self.request("Object", "getObjectByPath", [path], callback);
 	}
-	
+	/**
+	 * @function Object.checkRight
+	 * @param id
+	 * @param type
+	 * @param {Function} callback Callback function
+	 */
 	this.Object.checkRight = function(id, type, callback) {
 		self.request("Object", "checkRight", [id, type], callback);
 	}
@@ -232,11 +284,20 @@ function BidConnection(protocol, host, port, username, password) {
 	
 	//CONTAINER
 	this.Container = {};
-	
+	/**
+	 * @function Container.getInventory
+	 * @param id
+	 * @param {Function} callback Callback function
+	 */
 	this.Container.getInventory = function(id, callback) {
 		self.request("Container", "getInventory", [id], callback);
 	}
-	
+	/**
+	 * @function Container.create
+	 * @param id
+	 * @param destId
+	 * @param {Function} callback Callback function
+	 */
 	this.Container.create = function(name, destId, callback) {
 		self.request("Container", "create", [name, destId], callback);
 	}
@@ -244,19 +305,37 @@ function BidConnection(protocol, host, port, username, password) {
 	
 	//DOCUMENT
 	this.Document = {};
-	
+	/**
+	 * @function Document.getContent
+	 * @param id
+	 * @param {Function} callback Callback function
+	 */
 	this.Document.getContent = function(id, callback) {
 		self.request("Document", "getContent", [id], callback, true);
 	}
-
+	/**
+	 * @function Document.setContent
+	 * @param id
+	 * @param content
+	 * @param {Function} callback Callback function
+	 */
 	this.Document.setContent = function(id, content, callback) {
 		self.request("Document", "setContent", [id], callback, true, "content", content);
 	}
-	
+	/**
+	 * @function Document.create
+	 * @param id
+	 * @param destID
+	 * @param {Function} callback Callback function
+	 */
 	this.Document.create = function(name, destId, callback) {
 		self.request("Document", "create", [name, destId], callback);
 	}
-	
+	/**
+	 * @function Document.getDimensions
+	 * @param id
+	 * @param {Function} callback Callback function
+	 */
 	this.Document.getDimensions = function(id, callback) {
 		self.request("Document", "getDimensions", [id], callback);
 	}
@@ -264,7 +343,13 @@ function BidConnection(protocol, host, port, username, password) {
 	
 	//DRAWING
 	this.Drawing = {};
-	
+	/**
+	 * @function Drawing.create
+	 * @param name
+	 * @param destID
+	 * @param type
+	 * @param {Function} callback Callback function
+	 */
 	this.Drawing.create = function(name, destId, type, callback) {
 		self.request("Drawing", "create", [name, destId, type], callback);
 	}
@@ -272,27 +357,48 @@ function BidConnection(protocol, host, port, username, password) {
 	
 	//USER
 	this.User = {};
-	
+	/**
+	 * @function User.geMyUser
+	 * @param {Function} callback Callback function
+	 */
 	this.User.getMyUser = function(callback) {
 		self.request("User", "getMyUser", [], callback);
 	}
-	
+	/**
+	 * @function User.getWorkroom
+	 * @param id
+	 * @param {Function} callback Callback function
+	 */
 	this.User.getWorkroom = function(id, callback) {
 		self.request("User", "getWorkroom", [id], callback);
 	}
-	
+	/**
+	 * @function User.getMyWorkroom
+	 * @param {Function} callback Callback function
+	 */
 	this.User.getMyWorkroom = function(callback) {
 		self.request("User", "getMyWorkroom", [], callback);
 	}
-	
+	/**
+	 * @function User.getUserByName
+	 * @param name
+	 * @param {Function} callback Callback function
+	 */
 	this.User.getUserByName = function(name, callback) {
 		self.request("User", "getUserByName", [name], callback);
 	}
-	
+	/**
+	 * @function User.getAllUsers
+	 * @param {Function} callback Callback function
+	 */
 	this.User.getAllUsers = function(callback) {
 		self.request("User", "getAllUsers", [], callback);
 	}
-	
+	/**
+	 * @function User.getMemberships
+	 * @param id
+	 * @param {Function} callback Callback function
+	 */
 	this.User.getMemberships = function(id, callback) {
 		self.request("User", "getMemberships", [id], callback);
 	}
@@ -300,27 +406,52 @@ function BidConnection(protocol, host, port, username, password) {
 	
 	//GROUP
 	this.Group = {};
-	
+	/**
+	 * @function Group.getWorkroom
+	 * @param id
+	 * @param {Function} callback Callback function
+	 */
 	this.Group.getWorkroom = function(id, callback) {
 		self.request("Group", "getWorkroom", [id], callback);
 	}
-
+	/**
+	 * @function Group.getGroupByName
+	 * @param name
+	 * @param {Function} callback Callback function
+	 */
 	this.Group.getGroupByName = function(name, callback) {
 		self.request("Group", "getGroupByName", [name], callback);
 	}
-
+	/**
+	 * @function Group.getAllGroups
+	 * @param {Function} callback Callback function
+	 */
 	this.Group.getAllGroups = function(callback) {
 		self.request("Group", "getAllGroups", [], callback);
 	}
-	
+	/**
+	 * @function Group.getMembers
+	 * @param id
+	 * @param {Function} callback Callback function
+	 */
 	this.Group.getMembers = function(id, callback) {
 		self.request("Group", "getMembers", [id], callback);
 	}
-
+	/**
+	 * @function Group.addMember
+	 * @param id
+	 * @param userId
+	 * @param {Function} callback Callback function
+	 */
 	this.Group.addMember = function(id, userId, callback) {
 		self.request("Group", "addMember", [id, userId], callback);
 	}
-
+	/**
+	 * @function Group.removeMember
+	 * @param id
+	 * @param userId
+	 * @param {Function} callback Callback function
+	 */
 	this.Group.removeMember = function(id, userId, callback) {
 		self.request("Group", "removeMember", [id, userId], callback);
 	}
@@ -329,11 +460,18 @@ function BidConnection(protocol, host, port, username, password) {
 }
 
 var BidHelper = {};
-	
+	/**
+	 * @function convertId
+	 * @param id
+	 */	
 BidHelper.convertId = function(id) {
 	return id.replace('\\u2323', "").replace('\\u2323', "");
 }
-
+	/**
+	 * @function checkRight
+	 * @param rightName
+	 * @param bitRights
+	 */
 BidHelper.checkRight = function(rightName, bitRights) {
 	
 	var bitMasks = {
@@ -358,6 +496,7 @@ BidHelper.checkRight = function(rightName, bitRights) {
 
 /**
  * Convert bidowl bit types to list of human readable types
+ * @function convertType
  * @param {Byte} type Type converted as Byte
  */
 BidHelper.convertType = function(type) {
@@ -409,11 +548,17 @@ BidHelper.convertType = function(type) {
 	return result;
 	
 }
-
+	/**
+	 * @function BidHelper.getTypes
+	 * @param type
+	 */
 BidHelper.getTypes = function(type) {
 	return BidHelper.convertType(type);
 }
-
+	/**
+	 * @function BidHelper.getType
+	 * @param type
+	 */
 BidHelper.getType = function(type) {
 	var types = BidHelper.convertType(type);
 	if (types.length > 0) {
