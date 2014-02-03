@@ -3,10 +3,15 @@
 *
 *    @author Felix Winkelnkemper, University of Paderborn, 2012
 *
+*	 @class User
 */
 
 "use strict";
 
+/**
+*	@constructor
+*	@param UserManager
+*/
 var User=function(UserManager){
 	
 	this.username=false;

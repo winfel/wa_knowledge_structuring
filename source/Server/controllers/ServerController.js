@@ -1,11 +1,29 @@
+/**
+*	@class ServerController
+*	@requires util
+*	@requires emailjs/email
+*	@requires Dispatcher
+*	@requires config
+*/
+
 var ServerController = {}
 
 var Modules = false;
 
+/**
+*	@function init
+*	@param theModules
+*/
 ServerController.init = function(theModules){
 	Modules = theModules;
 }
 
+/**
+*	@function getMemoryUsage
+*	@param data
+*	@param context
+*	@param {Function} callback The callback function
+*/
 //TODO: test if it works
 ServerController.getMemoryUsage =  function (data, context, callback) {
 	var util = require('util');
@@ -18,6 +36,12 @@ ServerController.getMemoryUsage =  function (data, context, callback) {
 
 }
 
+/**
+*	@function bugreport
+*	@param data
+*	@param context
+*	@param {Function} callback The callback function
+*/
 //TODO: refactor use email template instead of ugly string concat
 ServerController.bugreport = function (data, context, callback) {
 

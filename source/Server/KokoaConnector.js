@@ -1,9 +1,27 @@
+/**
+*	@class KokoaConnector
+*	@requires FileConnector
+*	@requires bcrypt
+*	@requires lodash
+*	@requires Log 
+*	@requires config
+*/
+
+
 "use strict";
 
 var kokoaConnector = require('./FileConnector.js');
 var bcrypt = require('bcrypt');
 var _ = require('lodash');
 
+/**
+*	@function login
+*	@param username
+*	@param password
+*	@param externalSession
+*	@param context
+*	@param {Function} callback The callback function for correct and false login data
+*/
 kokoaConnector.login = function (username, password, externalSession, context, callback) {
     var self = this;
     var config = this.Modules.config;
@@ -31,6 +49,12 @@ kokoaConnector.login = function (username, password, externalSession, context, c
 }
 
 
+/**
+*	@function mayAnything
+*	@param roomID
+*	@param connection
+*	@param {Function} callback The callback function
+*/
 
 kokoaConnector.mayAnything = function (roomID, connection, callback) {
     var config = this.Modules.config;

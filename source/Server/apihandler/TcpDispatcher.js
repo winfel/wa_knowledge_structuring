@@ -1,7 +1,10 @@
 /**
- * TcpDispatcher is used to provide an API for
- * Plugins that use a TCP connection.
- *
+ *	@class TcpDispatcher 
+ *	@classdesc TcpDispatcher is used to provide an API for Plugins that use a TCP connection
+ *	@requires util
+ *	@requires events
+ *	@requires eventemitter2
+ *	@requires EventBus
  */
 'use strict';
 
@@ -16,10 +19,18 @@ var TcpDispatcher = new EventEmitter2({
     delimiter: "::"
 });
 
+/**
+*	@function init
+*	@param theModules
+*/
 TcpDispatcher.init = function (theModules) {
     Modules = theModules;
 }
 
+/**
+*	@function on
+*	@param event
+*/
 TcpDispatcher.on("subscribeEvents", function (event) {
     var toSubscribe = event.eventlist;
 
