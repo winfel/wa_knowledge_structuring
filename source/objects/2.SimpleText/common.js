@@ -7,8 +7,24 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * SimpleText
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var SimpleText=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
+/**
+ * Registers the object (attributes and actions).
+ *
+ * @this {SimpleText}
+ * @see Client/ObjectManager.js
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/2.SimpleText/view.js
+ * @see Common/AttributeManager.js
+ * @param {string} type The type of the object
+ */
 SimpleText.register=function(type){
 	
 	// Registering the object
@@ -41,16 +57,35 @@ SimpleText.register=function(type){
 	
 }
 
+/**
+ * Calls the method 'editText' in SimpleText/view.js.
+ *
+ * @this {SimpleText}
+ * @see objects/2.SimpleText/view.js
+ */
 SimpleText.execute=function(){
 	
 	this.editText();
 	
 }
 
+/**
+ * Returns always false.
+ *
+ * @return {boolean} false
+ */
 SimpleText.isResizable=function(){
 	return false;
 }
 
+/**
+ * Changes the name of the object to the given parameter newValue.
+ *
+ * @this {SimpleText}
+ * @param {string} newValue
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/1.GeneralObject/client.js
+ */
 SimpleText.intelligentRename=function(newValue){
 	var objectName = this.getAttribute("name");
 	var that = this;
@@ -72,8 +107,20 @@ SimpleText.content='Neuer Text';
 
 SimpleText.category='Texts';
 
+/**
+ * Returns always true.
+ *
+ * @return {boolean} true
+ */
 SimpleText.moveByTransform = function(){return true;};
 
+/**
+ * Sets an initial content ('No text yet!').
+ *
+ * @this {SimpleText}
+ * @see objects/1.GeneralObject/client.js
+ * @see objects/1.GeneralObject/common.js
+ */
 SimpleText.justCreated=function(){
 	this.setContent(this.translate(this.currentLanguage, 'No text yet!'));
 }

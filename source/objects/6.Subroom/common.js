@@ -7,8 +7,23 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * Subroom
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var Subroom=Object.create(Modules.ObjectManager.getPrototype('IconObject'));
 
+/**
+ * Registers the object (actions).
+ *
+ * @this {Subroom}
+ * @see Client/ObjectManager.js
+ * @see objects/2.IconObject/common.js
+ * @see objects/1.GeneralObject/common.js
+ * @param {string} type The type of the object
+ */
 Subroom.register=function(type){
 	
 	// Registering the object
@@ -32,6 +47,15 @@ Subroom.register=function(type){
 	
 }
 
+/**
+ * Opens a new room with the help of the attribute 'destination'.
+ * If the destination is not set the destination will choose randomly.
+ *
+ * @this {Subroom}
+ * @see Client/ObjectManager.js
+ * @see objects/1.GeneralObject/common.js
+ * @param {boolean} openInNewWindow
+ */
 Subroom.execute=function(openInNewWindow){
 	
 	var destination=this.getAttribute('destination');

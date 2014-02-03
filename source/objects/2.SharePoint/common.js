@@ -1,7 +1,29 @@
+/**
+*    Webarena - A web application for responsive graphical knowledge work
+*
+*    @author Felix Winkelnkemper, University of Paderborn, 2012
+*
+*/
+
 var Modules=require('../../server.js');
+
+/**
+ * SharePoint
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var SharePoint=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
-
+/**
+ * Registers the object (actions).
+ *
+ * @this {SharePoint}
+ * @see Client/ObjectManager.js
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/2.SharePoint/view.js
+ * @param {string} type The type of the object
+ */
 SharePoint.register=function(type){
 
     // Registering the object
@@ -19,6 +41,17 @@ SharePoint.register=function(type){
     },false);
 }
 
+/**
+ * Displays the SharePoint dialogue.
+ *
+ * @this {SharePoint}
+ * @see objects/1.GeneralObject/view.js 
+ * @see objects/1.GeneralObject/common.js 
+ * @see objects/1.GeneralObject/client.js 
+ * @see objects/2.SharePoint/view.js
+ * @see Client/guis.common/javascript/0.GUI.js
+ * @see Client/guis.common/libraries/jquery/plugins/jsTree/jquery.jstree.js
+ */
 SharePoint.execute=function(){
     var that=this;
     var rep=this.getRepresentation();
@@ -80,11 +113,24 @@ SharePoint.execute=function(){
 
 }
 
-
+/**
+ * Checks if the object is resizeable by using the attribute 'show_iframe'.
+ *
+ * @this {SharePoint}
+ * @see objects/1.GeneralObject/common.js 
+ * @return {boolean} 
+ */
 SharePoint.isResizable=function(){
     return (!!this.getAttribute('show_iframe'));
 }
 
+/**
+ * Initiating the object by calling the method 'init' in GeneralObject/common.js.
+ *
+ * @this {SharePoint}
+ * @see objects/1.GeneralObject/common.js 
+ * @return {} 
+ */
 SharePoint.init=function(id){
     return GeneralObject.init.call(this, id);
 }
@@ -92,6 +138,14 @@ SharePoint.init=function(id){
 SharePoint.register('SharePoint');
 SharePoint.category='Files';
 SharePoint.isCreatable=true;
+
+/**
+ * Checks if the object moves by transform by using the attribute 'show_iframe'.
+ *
+ * @this {SharePoint}
+ * @see objects/1.GeneralObject/common.js 
+ * @return {boolean} 
+ */
 SharePoint.moveByTransform = function(){
     if(this.getAttribute("show_iframe")){
         return false;

@@ -7,8 +7,23 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * Line
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var Line=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
+/**
+ * Registers the object (attributes).
+ *
+ * @this {Line}
+ * @see Client/ObjectManager.js
+ * @see objects/1.GeneralObject/common.js
+ * @see common/AttributeManager.js
+ * @param {string} type The type of the object
+ */
 Line.register=function(type){
 	
 	// Registering the object
@@ -33,9 +48,21 @@ Line.register=function(type){
 Line.register('Line');
 Line.isCreatable=true;
 
+/**
+ * Returns always true.
+ *
+ * @return {boolean} true
+ */
 Line.moveByTransform = function() { return true; }
 
-
+/**
+ * Returns if control is allowed in a specific direction.
+ *
+ * @this {Line}
+ * @see objects/1.GeneralObject/common.js
+ * @param {string} control The desired direction (xy1, xy2, xy3 or xy4)
+ * @return {boolean} 
+ */
 Line.controlIsAllowed = function(control) {
 	var list = {
 		"xy1" : (this.getAttribute("direction") == 1 || this.getAttribute("direction") == 3),

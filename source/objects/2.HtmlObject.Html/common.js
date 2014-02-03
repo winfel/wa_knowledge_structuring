@@ -7,8 +7,22 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * HtmlObject
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var HtmlObject=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
+/**
+ * Registers the object.
+ *
+ * @this {HtmlObject}
+ * @see Client/ObjectManager.js
+ * @see objects/1.GeneralObject/common.js
+ * @param {string} type The type of the object
+ */
 HtmlObject.register=function(type){
 	
 	// Registering the object

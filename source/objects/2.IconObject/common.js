@@ -7,12 +7,28 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * IconObject
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var IconObject=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
 IconObject.isCreatable=false;
 
 IconObject.category='Objects';
 
+/**
+ * Registers the object (attributes).
+ *
+ * @this {IconObject}
+ * @see Client/ObjectManager.js
+ * @see objects/1.GeneralObject/common.js
+ * @see common/AttributeManager.js 
+ * @see objects/2.IconObject/view.js
+ * @param {string} type The type of the object
+ */
 IconObject.register=function(type){
 	
 	// Registering the object
@@ -31,13 +47,27 @@ IconObject.register=function(type){
 	
 }
 
-
+/**
+ * Returns always false.
+ *
+ * @return {boolean} false
+ */
 IconObject.isResizable=function(){
 	return false;
 }
 
+/**
+ * Returns always true.
+ *
+ * @return {boolean} true
+ */
 IconObject.moveByTransform = function(){return true;};
 
+/**
+ * Returns always true.
+ *
+ * @return {boolean} true
+ */
 IconObject.alwaysOnTop = function() {return true;};
 
 IconObject.register('IconObject');

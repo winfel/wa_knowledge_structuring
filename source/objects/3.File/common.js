@@ -7,8 +7,29 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * File
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var File=Object.create(Modules.ObjectManager.getPrototype('IconObject'));
 
+/**
+ * Registers the object (attributes and actions).
+ *
+ * @this {File}
+ * @see Client/ObjectManager.js
+ * @see objects/2.IconObject/common.js
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/2.IconObject/view.js
+ * @see Client/guis.common/javascript/1.svg.js
+ * @see Client/guis.common/javascript/0.GUI.js
+ * @see objects/1.GeneralObject/view.js
+ * @see objects/3.File/client.js
+ * @see objects/1.GeneralObject/client.js
+ * @param {string} type The type of the object
+ */
 File.register=function(type){
 	
 	// Registering the object
@@ -137,6 +158,14 @@ File.register=function(type){
 	
 }
 
+/**
+ * Uploads, opens or displays a file.
+ *
+ * @this {File}
+ * @see objects/1.GeneralObject/client.js
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/3.File/client.js
+ */
 File.execute=function(){
 
 	if (this.hasContent() == true) {
@@ -151,14 +180,31 @@ File.execute=function(){
 
 }
 
+/**
+ * Returns always true.
+ *
+ * @return {boolean} true
+ */
 File.isProportional=function(){
 	return true;
 }
 
+/**
+ * Returns always true.
+ *
+ * @return {boolean} true
+ */
 File.resizeProportional=function(){
 	return true;
 }
 
+/**
+ * Checks if the object is resizeable (only possible if the object has content and a preview).
+ *
+ * @see objects/1.GeneralObject/client.js
+ * @see objects/1.GeneralObject/common.js
+ * @return {boolean} 
+ */
 File.isResizable=function(){
 	if (this.hasContent() == true && this.getAttribute("preview") == true) {
 		return GeneralObject.isResizable.call(this);
@@ -168,10 +214,22 @@ File.isResizable=function(){
 File.register('File');
 File.isCreatable=true;
 
+/**
+ * Returns always true.
+ *
+ * @return {boolean} true
+ */
 File.moveByTransform = function(){return true;};
 
 File.category='Files';
 
+/**
+ * Checks if the object is shown always on top.
+ *
+ * @see objects/1.GeneralObject/client.js
+ * @see objects/1.GeneralObject/common.js
+ * @return {boolean} false if the object has content and preview, otherwise true.
+ */
 File.alwaysOnTop = function () {
 	if (this.hasContent() == true && this.getAttribute("preview") == true) {
 		return false;

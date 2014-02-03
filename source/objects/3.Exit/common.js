@@ -7,8 +7,25 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * Exit
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var Exit=Object.create(Modules.ObjectManager.getPrototype('IconObject'));
 
+/**
+ * Registers the object (attributes and actions).
+ *
+ * @this {Exit}
+ * @see Client/ObjectManager.js
+ * @see objects/2.IconObject/common.js
+ * @see objects/2.IconObject/view.js
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/3.Exit/client.js
+ * @param {string} type The type of the object
+ */
 Exit.register=function(type){
 	
 	// Registering the object
@@ -33,6 +50,16 @@ Exit.register=function(type){
 
 }
 
+/**
+ * Enables to leave a room to a desired location using the attribute 'destination'.
+ *
+ * @this {Exit}
+ * @see objects/1.GeneralObject/
+ * @see objects/3.Exit/client.js
+ * @see Client/guis.common/libraries/jquery/plugins/jquery.scrollTo.min.js
+ * @see Client/ObjectManager.js
+ * @param {boolean} openInNewWindow
+ */
 Exit.execute=function(openInNewWindow){
 
     var destination=this.getAttribute('destination');
@@ -76,6 +103,12 @@ Exit.execute=function(openInNewWindow){
 
 Exit.register('Exit');
 Exit.isCreatable=true;
+
+/**
+ * Returns always true.
+ *
+ * @return {boolean} true
+ */
 Exit.moveByTransform = function(){return true;};
 
 Exit.category = 'Rooms';

@@ -7,6 +7,12 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * UnknownObject
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var UnknownObject=Object.create(Modules.ObjectManager.getPrototype('IconObject'));
 
 UnknownObject.execute=function(){
