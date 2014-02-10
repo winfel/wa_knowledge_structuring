@@ -168,7 +168,7 @@ GUI.setRoomWidth = function(width) {
 
   $("#content").css("width", width);
   $("#content > svg").css("width", width);
-}
+};
 
 /**
  * Set height of room / svg area
@@ -693,7 +693,7 @@ GUI.connected = function() {
 };
 
 /**
- * display a error message on disconnect
+ * Display a error message on disconnect
  */
 GUI.showDisconnected = function() {
 
@@ -702,12 +702,11 @@ GUI.showDisconnected = function() {
 
   GUI.isLoggedIn = false;
   GUI.relogin = true;
-
 };
 
 
 /**
- * timer to prevent objects "flying in" when getting a bunch of new objects (room load)
+ * Timer to prevent objects "flying in" when getting a bunch of new objects (room load)
  */
 GUI.startNoAnimationTimer = function() {
   GUI.noAnimation = window.setTimeout(function() {
