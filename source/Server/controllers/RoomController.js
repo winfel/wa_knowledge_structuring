@@ -1,17 +1,32 @@
 /**
- * Contains room related tasks
- */
+* @classdes Contains room related tasks
+* @class RoomController
+* @requires Node.js/lodash
+* @requires Node.js/Connector
+* @requires ./ObjectManager
+* @requires ./UserManager
+* @requires ./SocketServer
+*/
+
 var _ = require('lodash');
 
 var RoomController = {}
 
 var Modules = false;
 
-
+/**
+* @function init
+* @param theModules
+*/
 RoomController.init = function (theModules) {
     Modules = theModules;
 }
-
+/**
+* @function getCommunicationChannel
+* @param data
+* @param context
+* @param {Function} callback The callback function for successful requests
+*/
 RoomController.getCommunicationChannel = function(data, context, callback){
     var from = data.from;
     var to = data.to;
@@ -26,6 +41,12 @@ RoomController.getCommunicationChannel = function(data, context, callback){
 }
 
 //TODO: should be implemented on Connector lvl. because it may be different
+/**
+* @function createRoom
+* @param data
+* @param context
+* @param {Function} callback The callback function for successful requests
+*/
 RoomController.createRoom = function (data, context, callback) {
 
     var roomID = data.roomID;
@@ -43,13 +64,24 @@ RoomController.createRoom = function (data, context, callback) {
 }
 
 //TODO: should be implemented on Connector lvl. because it may be different
+/**
+* @function roomExists
+* @param data
+* @param context
+* @param {Function} callback The callback function for successful requests
+*/
 RoomController.roomExists = function (data, context, callback) {
     var roomID = data.roomID;
     var obj= Modules.Connector.getObjectDataByFile(roomID,roomID);
 
     callback(null, !!obj);
 }
-
+/**
+* @function duplicateRoom
+* @param data
+* @param context
+* @param {Function} callback The callback function for successful requests
+*/
 RoomController.duplicateRoom = function (data, context, callback) {
     var roomID = data.fromRoom;
     var newRoomID = data.toRoom;
@@ -86,11 +118,20 @@ RoomController.duplicateRoom = function (data, context, callback) {
 
 
 //TODO: remove? combine with "browse" of exit object
+/**
+* @function listRooms
+* @param {Function} callback The callback function for successful requests
+*/
 RoomController.listRooms = function (callback) {
     Modules.Connector.listRooms(callback)
 }
 
 //Information are sent to all clients in the same room
+/**
+* @function informAllInRoom
+* @param data
+* @param {Function} callback The callback function for successful requests
+*/
 RoomController.informAllInRoom = function (data, callback) {
 
     var connections = Modules.UserManager.getConnectionsForRoom(data.room);
@@ -102,15 +143,15 @@ RoomController.informAllInRoom = function (data, callback) {
 };
 
 /**
- *    sendRoom
- *
- *    sends a rooms content to a client (given by its socket)
- * TODO: there should be no socket! We are inside of a controller
- *
- */
+* sends a rooms content to a client (given by its socket)
+*    @function sendRoom
+*	 @param socket
+*    @param roomID
+* TODO: there should be no socket! We are inside of a controller
+*/
 RoomController.sendRoom = function (socket, roomID) {
     var context = Modules.UserManager.getConnectionBySocket(socket);
-
+	
     Modules.ObjectManager.getRoom(roomID, context, function (room) { //the room object
 
         room.updateClient(socket);				//and send it to the client

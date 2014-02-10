@@ -7,6 +7,12 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * Highlighter
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var Highlighter=Object.create(Modules.ObjectManager.getPrototype('Paint'));
 
 

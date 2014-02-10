@@ -7,8 +7,23 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * Discussion
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var Discussion=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
+/**
+ * Registers the object (attributes).
+ *
+ * @this {Discussion}
+ * @see Client/ObjectManager.js
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/2.Discussion/view.js 
+ * @param {string} type The type of the object
+ */
 Discussion.register=function(type){
 	var that = this;
     // Registering the object
@@ -42,12 +57,24 @@ Discussion.register=function(type){
 
 }
 
+/**
+ * Changes the size of the object depending on whether the object is embedded or not.
+ *
+ * @this {Discussion}
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/2.Discussion/view.js 
+ */
 Discussion.execute=function(){
     if(!this.getAttribute("show_embedded")){
         this.switchState();
     }
 }
 
+/**
+ * Returns always false.
+ *
+ * @return {boolean} false
+ */
 Discussion.moveByTransform = function(){
    return false
 }

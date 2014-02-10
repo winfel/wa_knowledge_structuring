@@ -7,8 +7,23 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * Arrow
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var Arrow=Object.create(Modules.ObjectManager.getPrototype('Line'));
 
+/**
+ * Registers the object (attributes).
+ *
+ * @this {Arrow}
+ * @see Client/ObjectManager.js
+ * @see objects/2.Line/common.js
+ * @see Common/AttributeManager.js
+ * @param {string} type The type of the object
+ */
 Arrow.register=function(type){
 	
 	// Registering the object

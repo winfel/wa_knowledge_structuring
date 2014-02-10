@@ -1,16 +1,13 @@
 /**
- * The Tcp Socket Server provides the possibility to create a tcp connection
- * to the WebArena server.
- * The main feature is to provide a possibility to connect to the WebArena server
- * using other programming languages.
- *
- * The "coupling" is done by the TcpDispatcher module.
- *
- * Tcp Client can subscribe for certain server events.
+ *  @ classdesc The Tcp Socket Server provides the possibility to create a tcp connection to the WebArena server. The main feature is to provide a possibility to connect to the WebArena server using other programming languages. The "coupling" is done by the TcpDispatcher module. Tcp Client can subscribe for certain server events.
+ *	 @requires Node.js/util
+*    @requires Node.js/net
+*	 @requires Node.js/lodash
+*	 @requires Node.js/json-socket
+*    @requires apihandler/TcpDispatcher
  */
 
 "use strict";
-
 
 var util = require("util");
 var net = require('net');
@@ -33,7 +30,7 @@ TcpSocketServer.modules = false;
 
 /**
  * Converts an incoming request to a server-event.
- *
+ * @function requestToEvent
  * @param request
  * @param connection
  */
@@ -50,7 +47,10 @@ TcpSocketServer.requestToEvent = function(request, connection){
 	this.tcpDispatcher.emit(request.requestType, eventData);
 }
 
-
+/**
+ * @function init
+ * @param modules
+ */
 TcpSocketServer.init = function (modules) {
 	var that = this;
 	this.modules = modules;
@@ -70,11 +70,16 @@ TcpSocketServer.init = function (modules) {
 		console.log("TCP Server startet");
 	});
 }
-
+/**
+ * Writes message to console, that connection ended
+ * @function onConnectionEnd
+ */
 var onConnectionEnd = function () {
 	console.log("Ended connection");
 }
-
+/**
+ * @function createServer
+ */
 var createServer = function () {
 	return Object.create(TcpSocketServer);
 }

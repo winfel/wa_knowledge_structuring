@@ -2,10 +2,16 @@
 *    Webarena - A web application for responsive graphical knowledge work
 *	 @class FileConnector
 *    @author Felix Winkelnkemper, University of Paderborn, 2012
+*	 @requires Node.js/fs
+*    @requires Node.js/async
+*	 @requires Node.js/q
+*	 @requires Node.js/path
+*    @requires Node.js/node-uuid
+*	 @requires Node.js/imagemagick
+*    @requires Config
+*	 @requires ./Common/Log
 *
 */
-
-
 "use strict";
 
 var fileConnector={};

@@ -7,8 +7,22 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * HtmlTest
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var HtmlTest=Object.create(Modules.ObjectManager.getPrototype('HtmlObject'));
 
+/**
+ * Registers the object.
+ *
+ * @this {HtmlTest}
+ * @see Client/ObjectManager.js
+ * @see objects/1.GeneralObject/common.js
+ * @param {string} type The type of the object
+ */
 HtmlTest.register=function(type){
 	
 	// Registering the object

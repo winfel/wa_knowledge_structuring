@@ -5,9 +5,25 @@
 *
 */
 
-var Modules=require('../../server.js')
+var Modules=require('../../server.js');
+
+/**
+ * Test
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var Test=Object.create(Modules.ObjectManager.getPrototype('Rectangle'));
 
+/**
+ * Registers the object (attributes).
+ *
+ * @this {Test}
+ * @see Client/ObjectManager.js
+ * @see objects/2.Rectangle/common.js
+ * @see objects/1.GeneralObject/common.js
+ * @param {string} type The type of the object
+ */
 Test.register=function(type){
 	
 	// Registering the object

@@ -7,8 +7,23 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * Room
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var Room=Object.create(Modules.ObjectManager.getPrototype('IconObject'));
 
+/**
+ * Registers the object (attributes).
+ *
+ * @this {Room}
+ * @see Client/ObjectManager.js
+ * @see objects/2.IconObject/common.js
+ * @see objects/1.GeneralObject/common.js
+ * @param {string} type The type of the object
+ */
 Room.register=function(type){
 	
 	var ObjectManager=this.ObjectManager;
@@ -36,11 +51,26 @@ Room.register=function(type){
     
 }
 
+/**
+ * Calls the method 'loadRoom' in Client/ObjectManager.js by using the id of the room object which called this function.
+ *
+ * @this {Room}
+ * @see Client/ObjectManager.js
+ * @see objects/1.GeneralObject/common.js
+ */
 Room.execute=function(){
 	var destination=this.getAttribute('id');	
 	ObjectManager.loadRoom(destination);
 }
 
+/**
+ * Checks if the desired object is already in the inventory of the room.
+ *
+ * @this {Room}
+ * @see objects/3.Room/client.js
+ * @param {object} obj
+ * @return {boolean} 
+ */
 Room.hasObject=function(obj){
 	var inventory=this.getInventory();
 	for (var i in inventory){
@@ -49,6 +79,16 @@ Room.hasObject=function(obj){
 	return false;
 }
 
+/**
+ * Returns a string with the room id, user name and user hash.
+ *
+ * @this {Room}
+ * @see objects/1.GeneralObject/client.js
+ * @see objects/1.GeneralObject/common.js
+ * @see Client/ObjectManager.js
+ * @param {string} user
+ * @return {string} 
+ */
 Room.getPaintingURL = function(user) {
 	if (!user) user=this.getCurrentUserName();
 	
@@ -57,6 +97,14 @@ Room.getPaintingURL = function(user) {
 	return "/paintings/"+this.getRoomID()+"/"+user+"/"+ObjectManager.userHash;
 }
 
+/**
+ * Shows or hides user paintings by calling the methods 'paintingUpdate' (in Client/ObjectManager.js) or 'remove' (in objects/1.GeneralObject/common.js).
+ *
+ * @this {Room}
+ * @see Client/ObjectManager.js
+ * @see objects/1.GeneralObject/common.js
+ * @param {boolean} value
+ */
 Room.showUserPaintings = function(value)
 {
 	if ( value )

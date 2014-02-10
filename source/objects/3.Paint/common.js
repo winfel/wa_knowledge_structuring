@@ -7,8 +7,25 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * Paint
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var Paint=Object.create(Modules.ObjectManager.getPrototype('ImageObject'));
 
+/**
+ * Registers the object (attributes and actions)
+ *
+ * @this {Paint}
+ * @see Client/ObjectManager.js
+ * @see objects/2.ImageObject/common.js
+ * @see Common/AttributeManager.js
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/3.Paint/client.js
+ * @param {string} type The type of the object
+ */
 Paint.register=function(type){
 	
 	// Registering the object
@@ -31,8 +48,11 @@ Paint.register=function(type){
 	
 }
 
-
-
+/**
+ * Returns always true.
+ *
+ * @return {boolean} true
+ */
 Paint.isResizable=function(){
 	return true;
 }

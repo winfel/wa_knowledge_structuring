@@ -2,6 +2,9 @@
 *    Webarena - A web application for responsive graphical knowledge work
 *
 *    @author Felix Winkelnkemper, University of Paderborn, 2012
+*	 @class config.default
+*	 @classdesc default settings for port, language, filebase, etc.
+*	 @requires FileConnector
 *
 */
 

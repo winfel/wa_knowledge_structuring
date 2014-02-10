@@ -7,8 +7,23 @@
 
 var Modules=require('../../server.js');
 
+/**
+ * Textarea
+ * @class
+ * @classdesc Common elements for view and server
+ */
+
 var Textarea=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
+/**
+ * Registers the object (attributes and actions).
+ *
+ * @this {Textarea}
+ * @see Client/ObjectManager.js
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/2.Textarea/view.js
+ * @param {string} type The type of the object
+ */
 Textarea.register=function(type){
 	
 	// Registering the object
@@ -40,12 +55,26 @@ Textarea.register=function(type){
 	
 }
 
+/**
+ * Calls the method 'editText' in Textarea/view.js.
+ *
+ * @this {Textarea}
+ * @see objects/2.Textarea/view.js
+ */
 Textarea.execute=function(){
 	
 	this.editText();
 	
 }
 
+/**
+ * Changes the name of the object to the given parameter newValue.
+ *
+ * @this {Textarea}
+ * @param {string} newValue
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/1.GeneralObject/client.js
+ */
 Textarea.intelligentRename=function(newValue){
 	var objectName = this.getAttribute("name");
 	var that = this;
