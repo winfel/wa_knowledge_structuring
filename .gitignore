@@ -5,6 +5,7 @@ stuff/old/
 config.local.js
 noDefaultRoom.html
 source/Server/tmp/*
+source/pgtmp/*
 data/
 node_modules/
 .svn/
