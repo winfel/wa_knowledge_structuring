@@ -1,11 +1,12 @@
 "use strict";
 
 /**
- * Split a string into parts of length L - last part can be shorter.
+ * 
+ * Splits a string into string parts of length L - last string part can be shorter than L.
  *
- * @param {String} Item that should be split
- * @param {Number} length of resulting parts
- * @returns {Array.<String>} Array with split items
+ * @param {string} str	Item that should be split
+ * @param {int} len	Length of resulting string parts
+ * @returns {Array.<String>} Array of string parts
  */
 function splitSubstr(str, len) {
     var ret = [ ];
@@ -17,10 +18,10 @@ function splitSubstr(str, len) {
 
 /**
  *
- * Convert special chars to html their representations
+ * Replaces special characters with html representations
  *
- * @param {String} String that should be escaped
- * @returns {String} escaped string
+ * @param {string} str	String that should be escaped
+ * @returns {string} Escaped string
  */
 function htmlEscape(str) {
     return String(str)
@@ -32,10 +33,10 @@ function htmlEscape(str) {
 }
 
 /**
- * Convert line breaks to html <br>-tags
+ * Replaces a newline with html <br /> tag
  *
- * @param {String} Input
- * @returns {String} Output
+ * @param {string} str
+ * @returns {string} 
  */
 function nl2br(str){
 	return str.replace(/\n/g, '<br />');
@@ -43,8 +44,10 @@ function nl2br(str){
 
 /**
  *
- * @param {String}
- * @returns {String}
+ * Replaces special characters with html representations and replaces a newline with html <br /> tag
+ *
+ * @param {string} str
+ * @returns {string} 
  */
 function htmlEncode(str){
     return nl2br(htmlEscape(str));
@@ -52,8 +55,10 @@ function htmlEncode(str){
 
 /**
  *
- * @param {String}
- * @returns {String}
+ * Converts a string that is HTML-encoded into a decoded string
+ *
+ * @param {string} str
+ * @returns {string}
  */
 function htmlDecode(str){
 	return $("<div>").html(str.replace(/<br[\s\/]*>/gi, '\n')).text()

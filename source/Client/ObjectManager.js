@@ -19,14 +19,34 @@ ObjectManager.prototypes={};
 ObjectManager.user={};
 ObjectManager.clipBoard={};
 
+/**
+ * 
+ * Registers an object type, so an object of that type can be created using the ObjectManager
+ * 
+ * @param type
+ * @param constr
+ */
 ObjectManager.registerType=function(type,constr){
     this.prototypes[type]=constr;
 };
 
+/**
+ * 
+ * Returns an array of all prototypes  
+ * 
+ * @returns {Array} array of prototypes
+ */
 ObjectManager.getTypes=function(){
     return ObjectManager.prototypes;
 };
 
+/**
+ * 
+ * Returns the prototype of an object 
+ * 
+ * @param objType
+ * @returns	The prototype of the object
+ */
 ObjectManager.getPrototype=function(objType){
     var prototypes=this.prototypes;
     if (prototypes[objType]) return prototypes[objType];
@@ -35,6 +55,13 @@ ObjectManager.getPrototype=function(objType){
     return;
 }
 
+/**
+ * 
+ * Returns the index of an object (important in coupling mode) otherwise it always returns default value 'left'
+ * 
+ * @param objectID
+ * @returns {string} 
+ */
 ObjectManager.getIndexOfObject=function(objectID) {
 	// room?
 	for (var index in this.currentRoomID) {
@@ -51,6 +78,13 @@ ObjectManager.getIndexOfObject=function(objectID) {
     return false;
 }
 
+/**
+ * 
+ *  Returns an object specified by objectID
+ *  
+ *  @param  {string} objectID    The ID of the object that should be returned  
+ *  @return {object}    The object having the specified ID
+ */
 ObjectManager.getObject=function(objectID){
 	//room?
 	for (var index in this.currentRoomID) {
@@ -66,6 +100,15 @@ ObjectManager.getObject=function(objectID){
     }
 }
 
+
+/**
+ * 
+ *  Creates an object of a type 'type' with attributes specified by 'attributes'
+ * 
+ *  @param  {string} type    
+ *  @param  {object} attributes    
+ *  @return {object}    the created object
+ */
 ObjectManager.buildObject=function(type, attributes){
 	
 	if (!type) console.trace();
@@ -106,6 +149,14 @@ ObjectManager.buildObject=function(type, attributes){
 /**
  * getObjects - get an array of all objects including the room
  */
+
+/**
+ *  Gets an array of all objects in the room
+ *
+ *  @param  {string} index  
+ *  @returns {Array}    array of objects
+ */
+
 ObjectManager.getObjects=function(index){
 	if (!index) index = 'left';
     return this.objects[index];
@@ -114,6 +165,13 @@ ObjectManager.getInventory=ObjectManager.getObjects;
 
 /**
  * getObjectsByLayer - get an array of all objects ordered by layer (highest layer first)
+ */
+
+/**
+ *  Gets an array of all objects ordered in ascending layer order (highest layer first)
+ *  
+ *  @param  {string} index  
+ *  @returns {Array}    array of objects
  */
 ObjectManager.getObjectsByLayer=function(index) {
 	
@@ -152,6 +210,15 @@ ObjectManager.getObjectsByLayer=function(index) {
 /**
  * getObjectsByLayer - get an array of all objects ordered by layer (lowest layer first)
  */
+
+
+/**
+ *  Gets an array of all objects ordered in descending layer order (lowest layer first)     
+ *  
+ *  @param  {string} index
+ *  @returns {Array}    array of objects
+ */
+
 ObjectManager.getObjectsByLayerInverted=function(index) {
 	
     var objects = ObjectManager.getObjectsByLayer(index);
@@ -165,10 +232,23 @@ ObjectManager.getObjectsByLayerInverted=function(index) {
 /**
 *	hasObject - determine, if an object is within the current inventory
 */
+/**
+ *  Checks whether an object is in the current inventory
+ *  
+ *  @param  {object} obj
+ *  @returns {Boolean}    array of objects
+ */
 ObjectManager.hasObject=function(obj){
     return !!this.getObject(obj.getAttribute('id'));
 }
 
+
+/**
+ *  Updates the old object attributes with the new ones specified in 'data'
+ * 
+ *  @param  {object} data    new attribute values of the object
+ *  
+ */
 ObjectManager.objectUpdate=function(data){
 	
     var object=ObjectManager.getObject(data.id);
