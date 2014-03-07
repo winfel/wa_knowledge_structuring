@@ -341,7 +341,7 @@ ObjectManager.remove=function(object){
         'transactionId': that.transactionId,
         'userId' : GUI.userid
     });
-}
+};
 
 ObjectManager.removeLocally=function(data){
     var object=ObjectManager.getObject(data.id);
@@ -352,7 +352,7 @@ ObjectManager.removeLocally=function(data){
     }
 	
     delete(ObjectManager.objects[ObjectManager.getIndexOfObject(data.id)][data.id]);
-}
+};
 
 ObjectManager.login=function(username, password, externalSession){
     if (!username) username='guest';
@@ -362,7 +362,7 @@ ObjectManager.login=function(username, password, externalSession){
         'password':password,
 		'externalSession' : externalSession
     });
-}
+};
 
 
 ObjectManager.goParent=function(){
@@ -370,13 +370,13 @@ ObjectManager.goParent=function(){
 	if (parent){
 		ObjectManager.loadRoom(ObjectManager.getCurrentRoom().getAttribute('parent'));
 	} else {
-		alert(GUI.translate('This room has no parent.'))
+		alert(GUI.translate('This room has no parent.'));
 	}
-}
+};
 
 ObjectManager.goHome=function(){
 	ObjectManager.loadRoom(ObjectManager.user.home);
-}
+};
 
 ObjectManager.loadRoom=function(roomid, byBrowserNav, index, callback){
 	var self = this;

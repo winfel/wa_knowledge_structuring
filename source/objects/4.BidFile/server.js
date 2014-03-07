@@ -194,7 +194,7 @@ theObject.setFile = function(bidObjectId, socket, callback) {
 					});
 
 				} else {
-					self.set('inline') = false;
+					self.set('inline', false);
 
 					//send object update to all listeners
 					self.persist();
