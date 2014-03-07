@@ -46,6 +46,30 @@ GUI.uploadFile=function(object,message){
         xhr.addEventListener("load", function() {
             //upload complete
             $(uploadDialog).dialog("close");
+
+			//opens the Dialog which enables 
+			var TagDialog = document.createElement("div");
+			$(TagDialog).attr("title", GUI.translate("Set Tag"));
+			$(TagDialog).html('<p>'+message+'</p>');
+
+			var Tagform = document.createElement("input");
+			$(Tagform).attr("type", "text");
+					
+			var dialogButtons = {};
+			dialogButtons[GUI.translate("save")] = function() {
+				object.setAttribute('mainTag', 'test');
+				$(this).dialog("close");
+			}
+
+			$(TagDialog).append(Tagform);
+	
+			$(TagDialog).dialog({
+				modal: true,
+				resizable: false,
+				buttons: dialogButtons
+			});
+			
+
         }, false);
         xhr.addEventListener("error", function() {
             //failed
