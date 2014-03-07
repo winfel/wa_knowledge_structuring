@@ -5,7 +5,9 @@
  */
 
 /**
- * hide currently visible actionsheet
+ * 
+ *  Hides the currently visible actionsheet
+ *   
  */
 GUI.hideActionsheet = function() {
 
@@ -16,11 +18,13 @@ GUI.hideActionsheet = function() {
 
 
 /**
- * show actionsheet at position x,y (opt.: bound to a webarena object)
- * @param {int} x initial x position
- * @param {int} y initial y position
- * @param {webarenaObject} webarenaObject webarena object to bind actionsheet to
- * @param {bool} isWebarenaObject ?
+ * 
+ * Shows the actionsheet at position (x,y) (opt.: bound to a webarena object)
+ * 
+ * @param {int} x	initial x position
+ * @param {int} y	initial y position
+ * @param {object} webarenaObject	webarena object to bind actionsheet to
+ * @param {bool} isWebarenaObject 
  */
 GUI.showActionsheet = function(x, y, webarenaObject, isWebarenaObject) {
 
