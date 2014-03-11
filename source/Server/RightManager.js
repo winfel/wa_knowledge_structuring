@@ -28,20 +28,26 @@ var RightManager = function() {
    *	@param {type} object    The object that should be checked	
    */
   this.hasAccess = function(command, object) {
-      /* (1) get the roles that include the current command within the context of 
-       the given object */
+      /* check if command is feasible */
+      var commandIsInPossibleAccessRights = (possibleAccessRights.indexOf(String(command)) != -1);
+      if(commandIsInPossibleAccessRights || true /*  FIXME true is for debugging purpose */){
       
-      /* (2) check if current user is inside of one of these roles */
-      
-      /* (3) if (2) is fulfilled return true */
-      
-      /* DEMO TEST */
-      var collection = db.get('users');
-      collection.findOne({username:String(command)},{},function(e,docs){
-                        console.log(docs);
-                        console.log(command+"'s password is:" + docs.password);
-                      });
-      
+          /* (1) get the roles that include the current command within the context of
+           the given object */
+          
+          /* (2) check if current user is inside of one of these roles */
+          
+          /* (3) if (2) is fulfilled return true */
+          
+          /* DEMO TEST */
+          var collection = db.get('users');
+          collection.findOne({username:String(command)},{},function(e,docs){
+                            console.log(command+"'s password is:" + docs.password);
+                          });
+      }else{
+         
+         console.log("<<DEBUG INFORMATION>> The given command was not valid");
+      }
     return true;
   };
 
