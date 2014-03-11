@@ -36,7 +36,7 @@ WebServer.init = function (theModules) {
 		fs = require('fs');
 
 	WebServer.server = app;
-    Modules.RightManager.hasAccess();
+    //Modules.RightManager.hasAccess();
 	app.listen(global.config.port);  // start server (port set in config)
 
 	function handler(req, res) {

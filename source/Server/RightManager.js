@@ -31,9 +31,9 @@ var RightManager = function() {
   this.hasAccess = function(command, object) {
       
       /* creating models */
-      var userModel     = mongoose.model('Users', Schema.userSchema);
-      var roleModel     = mongoose.model('Roles', Schema.roleSchema);
-      var rightModel    = mongoose.model('Rights',Schema.rightSchema);
+      var userModel     = mongoose.model('Users', Modules.Schema.userSchema);
+      var roleModel     = mongoose.model('Roles', Modules.Schema.roleSchema);
+      var rightModel    = mongoose.model('Rights',Modules.Schema.rightSchema);
       
       /* debug: print all users */
       userModel.find(function (err, user) {
