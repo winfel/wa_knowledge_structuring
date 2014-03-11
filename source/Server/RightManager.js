@@ -32,6 +32,14 @@ var RightManager = function() {
                   });
       */
       
+      /* (1) get the roles that include the current command within the context of 
+       the given object */
+      
+      /* (2) check if current user is inside of one of these roles */
+      
+      /* (3) if (2) is fulfilled return true */
+      
+      /* DEMO TEST */
       var collection = db.get('users');
       collection.findOne({username:String(command)},{},function(e,docs){
                         console.log(docs);
