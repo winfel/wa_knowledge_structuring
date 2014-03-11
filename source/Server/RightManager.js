@@ -28,19 +28,6 @@ var RightManager = function() {
    *	@param {type} object    The object that should be checked	
    */
   this.hasAccess = function(command, object) {
-      
-      /* mongoose stuff for creating models
-      var userModel     = mongoose.model('Users', Modules.Schema.userSchema);
-      var roleModel     = mongoose.model('Roles', Modules.Schema.roleSchema);
-      var rightModel    = mongoose.model('Rights',Modules.Schema.rightSchema);
-      
-       debug: print all users
-      userModel.find(function (err, user) {
-                  if (err) return console.error(err);
-                  console.log(user)
-                  });
-      */
-      
       /* (1) get the roles that include the current command within the context of 
        the given object */
       
