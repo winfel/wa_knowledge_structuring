@@ -6,7 +6,7 @@ var Schema = {};
 *		|	Username	|	Password		|
 *		|
 */
-schema.userSchema = mongoose.Schema({
+Schema.userSchema = mongoose.Schema({
     username: String,
   password: String
 });
@@ -17,7 +17,7 @@ schema.userSchema = mongoose.Schema({
 *		|	id			|	Name			|
 *		|
 */
-schema.rightSchema =  mongoose.Schema({
+Schema.rightSchema =  mongoose.Schema({
     id: String,
   name: String
 });	
@@ -28,7 +28,7 @@ schema.rightSchema =  mongoose.Schema({
 *		|	id	|	contextID	|	name	|	rights (array)	|	mode	|	users (array)	|
 *		|
 */
-schema.roleSchema = mongoose.Schema({
+Schema.roleSchema = mongoose.Schema({
     	id: String,
  contextID: String,
   	  name: String,

@@ -2,6 +2,8 @@ var mongoose = require('mongoose');
 
 var RightManager = function() {
   var possibleAccessRights = ["create", "read", "update", "delete", "..."];
+  
+  var db;
     
   /**
   *		The function is needed to initialize the RightManager
@@ -10,12 +12,12 @@ var RightManager = function() {
   this.init = function(){
 	  mongoose.connect('mongodb://localhost/WebArena');
 	  
-	  var db = mongoose.connection;
+	  db = mongoose.connection;
 	  db.on('error', console.error.bind(console, 'connection error:'));
 	  db.once('open', function callback () {
 	    // yay!
 	  });
-	  
+      
 	  console.log("RightManager has been initialized");
   }
   /**
@@ -27,7 +29,18 @@ var RightManager = function() {
    *	@param {type} object    The object that should be checked	
    */
   this.hasAccess = function(command, object) {
-
+      
+      /* creating models */
+      var userModel     = mongoose.model('Users', Schema.userSchema);
+      var roleModel     = mongoose.model('Roles', Schema.roleSchema);
+      var rightModel    = mongoose.model('Rights',Schema.rightSchema);
+      
+      /* debug: print all users */
+      userModel.find(function (err, user) {
+                  if (err) return console.error(err);
+                  console.log(user)
+                  });
+      
     return true;
   };
 
