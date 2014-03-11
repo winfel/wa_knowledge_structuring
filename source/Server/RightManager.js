@@ -1,24 +1,29 @@
 var mongoose = require('mongoose');
 
+var Modules = false;
+
 var RightManager = function() {
   var possibleAccessRights = ["create", "read", "update", "delete", "..."];
-  
+
   var db;
-    
+
   /**
-  *		The function is needed to initialize the RightManager
-  *
-  */	
-  this.init = function(){
-	  mongoose.connect('mongodb://localhost/WebArena');
-	  
-	  db = mongoose.connection;
-	  db.on('error', console.error.bind(console, 'connection error:'));
-	  db.once('open', function callback () {
-	    // yay!
-	  });
-      
-	  console.log("RightManager has been initialized");
+   *		The function is needed to initialize the RightManager
+   *
+   */
+  this.init = function(theModules) {
+    Modules = theModules;
+
+
+    mongoose.connect('mongodb://localhost/WebArena');
+
+    db = mongoose.connection;
+    db.on('error', console.error.bind(console, 'connection error:'));
+    db.once('open', function callback() {
+      // yay!
+    });
+
+    console.log("RightManager has been initialized");
   }
   /**
    *	The function returns a boolean value that 
@@ -29,18 +34,21 @@ var RightManager = function() {
    *	@param {type} object    The object that should be checked	
    */
   this.hasAccess = function(command, object) {
-      
-      /* creating models */
-      var userModel     = mongoose.model('Users', Modules.Schema.userSchema);
-      var roleModel     = mongoose.model('Roles', Modules.Schema.roleSchema);
-      var rightModel    = mongoose.model('Rights',Modules.Schema.rightSchema);
-      
-      /* debug: print all users */
-      userModel.find(function (err, user) {
-                  if (err) return console.error(err);
-                  console.log(user)
-                  });
-      
+
+    console.log(Modules.Schema);
+    
+    /* creating models */
+    var userModel = mongoose.model('Users', Modules.Schema.userSchema);
+    var roleModel = mongoose.model('Roles', Modules.Schema.roleSchema);
+    var rightModel = mongoose.model('Rights', Modules.Schema.rightSchema);
+
+    /* debug: print all users */
+    userModel.find(function(err, user) {
+      if (err)
+        return console.error(err);
+      console.log(user)
+    });
+
     return true;
   };
 

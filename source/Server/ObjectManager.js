@@ -381,7 +381,7 @@ ObjectManager.init = function (theModules) {
             try {
                 processFunction(filename)
             } catch (e) {
-                Modules.Log.warn('Could not register ' + objName);
+                Modules.Log.warn('Could not register ' + filename);
                 Modules.Log.warn(e.stack);
             }
         }
