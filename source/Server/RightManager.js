@@ -1,13 +1,22 @@
 var db = require('monk')('localhost/WebArena')
 
 var RightManager = function() {
-  var possibleAccessRights = ["create", "read", "update", "delete", "..."];
+  var possibleAccessRights = [];
     
   /**
   *		The function is needed to initialize the RightManager
   *
   */	
   this.init = function(){
+      /* get all exiting access rights from the database */
+      var collection = db.get('rights');
+      collection.find({},{},function(e,docs){
+                      docs.forEach(function(entry){
+                                   console.log("adding right: "+String(entry.name));
+                                   possibleAccessRights.push(docs.name);
+                                   });
+                      });
+
 	  console.log("RightManager has been initialized");
   }
   /**
