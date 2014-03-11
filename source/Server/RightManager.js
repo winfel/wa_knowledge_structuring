@@ -1,23 +1,13 @@
-var mongoose = require('mongoose');
+var db = require('monk')('localhost/WebArena')
 
 var RightManager = function() {
   var possibleAccessRights = ["create", "read", "update", "delete", "..."];
-  
-  var db;
     
   /**
   *		The function is needed to initialize the RightManager
   *
   */	
   this.init = function(){
-	  mongoose.connect('mongodb://localhost/WebArena');
-	  
-	  db = mongoose.connection;
-	  db.on('error', console.error.bind(console, 'connection error:'));
-	  db.once('open', function callback () {
-	    // yay!
-	  });
-      
 	  console.log("RightManager has been initialized");
   }
   /**
@@ -30,16 +20,23 @@ var RightManager = function() {
    */
   this.hasAccess = function(command, object) {
       
-      /* creating models */
+      /* mongoose stuff for creating models
       var userModel     = mongoose.model('Users', Modules.Schema.userSchema);
       var roleModel     = mongoose.model('Roles', Modules.Schema.roleSchema);
       var rightModel    = mongoose.model('Rights',Modules.Schema.rightSchema);
       
-      /* debug: print all users */
+       debug: print all users
       userModel.find(function (err, user) {
                   if (err) return console.error(err);
                   console.log(user)
                   });
+      */
+      
+      var collection = db.get('users');
+      collection.findOne({username:String(command)},{},function(e,docs){
+                        console.log(docs);
+                        console.log(command+"'s password is:" + docs.password);
+                      });
       
     return true;
   };
