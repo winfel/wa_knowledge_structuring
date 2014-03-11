@@ -1,7 +1,23 @@
+var mongoose = require('mongoose');
+
 var RightManager = function() {
-
   var possibleAccessRights = ["create", "read", "update", "delete", "..."];
-
+    
+  /**
+  *		The function is needed to initialize the RightManager
+  *
+  */	
+  this.init = function(){
+	  mongoose.connect('mongodb://localhost/WebArena');
+	  
+	  var db = mongoose.connection;
+	  db.on('error', console.error.bind(console, 'connection error:'));
+	  db.once('open', function callback () {
+	    // yay!
+	  });
+	  
+	  console.log("RightManager has been initialized");
+  }
   /**
    *	The function returns a boolean value that 
    *	represents if the current user has the right 
