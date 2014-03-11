@@ -11,6 +11,11 @@ var RightManager={};
 
 RightManager.hasAccess = function(command, object) {
     
+    Modules.SocketClient.serverCall('hasAccess',{
+                                    'command':command,
+                                    'object':object.toJSON()
+                                    });
+
     return true;
 };
 
