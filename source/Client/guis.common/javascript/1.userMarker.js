@@ -23,8 +23,10 @@ GUI.userMarker = {
 	"markers" : {},
 	
 	/**
-	 * set position of markers for an webarena object
-	 * @param {int} objId ID of webarena object
+	 * 
+	 * Sets position of markers for an webarena object
+	 * 
+	 * @param {int} objId ID of the webarena object
 	 * @param {bool} noAnimation True to prevent animation
 	 */
 	"setPosition" : function(objId, noAnimation) {
@@ -57,12 +59,14 @@ GUI.userMarker = {
 	},
 	
 	/**
-	 * Add new marker
-	 * @param {Object} data Object of options
+	 * 
+	 * Adds new marker
+	 * 
+	 * @param {object} data Object of options
 	 * @param {int} data.objectId The webarena object id
-	 * @param {String} data.identifier Unique use identifier for the marker
-	 * @param {String} data.color The users color
-	 * @param {String} data.title The title of the marker (e.g. the username)
+	 * @param {string} data.identifier Unique use identifier for the marker
+	 * @param {string} data.color The users color
+	 * @param {string} data.title The title of the marker (e.g. the username)
 	 */
 	"select" : function(data) {
 		
@@ -100,10 +104,12 @@ GUI.userMarker = {
 	},
 	
 	/**
-	 * Remove a marker
-	 * @param {Object} data Object of options
+	 * 
+	 * Removes a marker
+	 * 
+	 * @param {object} data Object of options
 	 * @param {int} data.objectId The webarena object id
-	 * @param {String} data.identifier Unique use identifier for the marker
+	 * @param {string} data.identifier Unique use identifier for the marker
 	 */
 	"deselect" : function(data) {
 
@@ -115,7 +121,7 @@ GUI.userMarker = {
 	},
 		
 	/**
-	 * Remove markers of offline listenres
+	 * Remove markers of offline listeners
 	 * @param {Object} an array of user objects who are online
 	 */	
 	"removeOfflineUsers": function (users){

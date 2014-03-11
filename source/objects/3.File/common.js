@@ -37,6 +37,8 @@ File.register=function(type){
 	IconObject=Modules.ObjectManager.getPrototype('IconObject');
 	IconObject.register.call(this,type);
 	
+	this.makeSensitive();
+	
 	this.registerAttribute('bigIcon',{type:'boolean',standard:true,changedFunction: function(object) { 
 		object.updateIcon(); 
 	}, checkFunction: function(object, value) {
@@ -48,7 +50,8 @@ File.register=function(type){
 	this.registerAttribute('fillcolor',{hidden: true});
 	this.registerAttribute('width',{hidden: true});
 	this.registerAttribute('height',{hidden: true});
-	
+	this.registerAttribute('mainTag',{type:'text', standard:[]});
+	this.registerAttribute('secondaryTags',{type: 'list', multiple: true});
 
 	this.registerAttribute('preview',{type:'boolean',standard:false,category:'Basic',changedFunction: function(object, value, local) {
 		if (local) {
