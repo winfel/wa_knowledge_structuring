@@ -107,8 +107,8 @@ Modules.DataSet = require('./Common/DataSet.js');
 Modules.AttributeManager = require('./Common/AttributeManager.js');
 Modules.TranslationManager = require('./Common/TranslationManager.js');
 Modules.ActionManager = require('./Common/ActionManager.js');
-Modules.RightManager = require('./Common/RightManager.js');
-Modules.UserManager2 = require('./Common/UserManager.js'); //FIXME: merge the two UserManagers
+Modules.RightManager = require('./Server/RightManager.js');
+Modules.UserManager2 = require('./Server/UserManager.js'); //FIXME: merge the two UserManagers
 
 
 if(Modules.config.tcpApiServer){
