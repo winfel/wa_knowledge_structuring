@@ -6,7 +6,7 @@
 *	@requires config
 */
 
-var ServerController = {}
+var ServerController = {};
 
 var Modules = false;
 
@@ -16,7 +16,7 @@ var Modules = false;
 */
 ServerController.init = function(theModules){
 	Modules = theModules;
-}
+};
 
 /**
 *	@function getMemoryUsage
@@ -34,7 +34,7 @@ ServerController.getMemoryUsage =  function (data, context, callback) {
 	console.log(result);
 	callback(null, result);
 
-}
+};
 
 /**
 *	@function bugreport

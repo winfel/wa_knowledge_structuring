@@ -91,6 +91,9 @@ Modules.Log = require('./Common/Log.js');
 	// They shall exist only once for the whole server
 Modules.config = config;
 Modules.Config = config;
+
+Modules.Schema = require('./Common/dbSchema.js');
+
 Modules.ObjectManager = require('./Server/ObjectManager.js');
 Modules.Dispatcher = require('./Server/Dispatcher.js');
 Modules.WebServer = require('./Server/WebServer.js');
@@ -109,7 +112,6 @@ Modules.TranslationManager = require('./Common/TranslationManager.js');
 Modules.ActionManager = require('./Common/ActionManager.js');
 Modules.RightManager = require('./Server/RightManager.js');
 Modules.UserManager2 = require('./Server/UserManager.js'); //FIXME: merge the two UserManagers
-
 
 if(Modules.config.tcpApiServer){
 	Modules['TcpEventServer'] = 	require("./Server/TcpSocketServer.js").create();

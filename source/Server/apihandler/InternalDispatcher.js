@@ -32,7 +32,7 @@ InternalDispatcher.init = function(theModules){
     Modules.EventBus.on("createObject", function(data){
         Modules.ObjectController.createObject(data, data.context, data.callback);
     });
-}
+};
 
 
 module.exports = InternalDispatcher;

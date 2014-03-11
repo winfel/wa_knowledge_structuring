@@ -25,7 +25,7 @@ var TcpDispatcher = new EventEmitter2({
 */
 TcpDispatcher.init = function (theModules) {
     Modules = theModules;
-}
+};
 
 /**
 *	@function on

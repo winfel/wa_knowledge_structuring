@@ -10,7 +10,7 @@
 
 var _ = require('lodash');
 
-var RoomController = {}
+var RoomController = {};
 
 var Modules = false;
 
@@ -20,7 +20,7 @@ var Modules = false;
 */
 RoomController.init = function (theModules) {
     Modules = theModules;
-}
+};
 /**
 * @function getCommunicationChannel
 * @param data
@@ -35,10 +35,10 @@ RoomController.getCommunicationChannel = function(data, context, callback){
 
     var cb = function(){
         callback(null, roomName)
-    }
+    };
 
     Modules.Connector.getRoomData(roomName, context, cb);
-}
+};
 
 //TODO: should be implemented on Connector lvl. because it may be different
 /**
@@ -61,7 +61,7 @@ RoomController.createRoom = function (data, context, callback) {
 
     Modules.Connector.saveObjectData(roomID, roomID, obj, cb, context, true)
 
-}
+};
 
 //TODO: should be implemented on Connector lvl. because it may be different
 /**
@@ -75,7 +75,7 @@ RoomController.roomExists = function (data, context, callback) {
     var obj= Modules.Connector.getObjectDataByFile(roomID,roomID);
 
     callback(null, !!obj);
-}
+};
 /**
 * @function duplicateRoom
 * @param data
@@ -103,7 +103,7 @@ RoomController.duplicateRoom = function (data, context, callback) {
                 name: roomName || newRoomID,
                 destination: newRoomID
             }
-        }
+        };
     } else {
         Modules.Connector.getRoomData(newRoomID, context, undefined); //TODO: set parent if necessary
     }
@@ -114,7 +114,7 @@ RoomController.duplicateRoom = function (data, context, callback) {
         toRoom: newRoomID
     };
     Modules.ObjectManager.duplicateNew(requestData, context, callback);
-}
+};
 
 
 //TODO: remove? combine with "browse" of exit object
@@ -123,8 +123,8 @@ RoomController.duplicateRoom = function (data, context, callback) {
 * @param {Function} callback The callback function for successful requests
 */
 RoomController.listRooms = function (callback) {
-    Modules.Connector.listRooms(callback)
-}
+    Modules.Connector.listRooms(callback);
+};
 
 //Information are sent to all clients in the same room
 /**
@@ -169,7 +169,7 @@ RoomController.sendRoom = function (socket, roomID) {
 
     });
 
-}
+};
 
 
 module.exports = RoomController;
