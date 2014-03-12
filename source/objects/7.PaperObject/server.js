@@ -10,6 +10,7 @@
 var theObject = Object.create(require('./common.js'));
 var Modules = require('../../server.js');
 
+
 theObject.createNew = function() {
     // TODO
     var p = new PaperEntity();
@@ -43,5 +44,7 @@ theObject.deleteChild = function() {
 theObject.publish = function() {
     // TODO
 }
+
+theObject.commonRegister = theObject.register;
 
 module.exports = theObject;

@@ -1,3 +1,10 @@
+PaperObject.filterObject = function(obj) {
+
+}
+
+PaperObject.selectFile = function(id, name) {
+
+}
 
 PaperObject.hasContent = function() {
     return true;

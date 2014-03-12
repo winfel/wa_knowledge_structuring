@@ -28,12 +28,56 @@ var PaperObject = Object.create(Modules.ObjectManager.getPrototype('IconObject')
 PaperObject.register = function(type) {
 
     // Registering the object
+
     IconObject = Modules.ObjectManager.getPrototype('IconObject');
     IconObject.register.call(this, type);
+
+    var self = this;
+
+    this.registerAction('Follow', function(object) {
+
+        object.execute();
+
+    }, true);
+
+    this.registerAction('Open in new window', function(object) {
+
+        object.execute(true);
+
+    }, true);
     
     this.registerAttribute('isMain', {type:'boolean', hidden:true});
     this.registerAttribute('contentType', {type:'text', value:"MUI"});
     this.registerAttribute('bigIcon',{hidden:true});
+}
+
+/**
+ * Opens a new room with the help of the attribute 'destination'. If the
+ * destination is not set the destination will choose randomly.
+ * 
+ * @this {PaperObject}
+ * @see Client/ObjectManager.js
+ * @see objects/1.GeneralObject/common.js
+ * @param {boolean}
+ *            openInNewWindow
+ */
+PaperObject.execute = function(openInNewWindow) {
+
+    var destination = this.getAttribute('destination');
+
+    // TODO this must be done serverside in the connector
+    if (!destination) {
+        var random = new Date().getTime() - 1296055327011;
+
+        this.setAttribute('destination', random);
+        destination = random;
+    }
+
+    if (openInNewWindow) {
+        window.open(destination);
+    } else {
+        ObjectManager.loadRoom(destination, false, ObjectManager.getIndexOfObject(this.getAttribute('id')));
+    }
 }
 
 PaperObject.register('PaperObject');
