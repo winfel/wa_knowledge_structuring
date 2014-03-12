@@ -12,7 +12,7 @@ var fillCurrentDbWithTestData = function(){
     var pushUsers   = ['joerg#12345','Vanessa#xyz'];
     var pushRoles   = ['1#1#RandomGuys#create,read#overwrite#joerg,vanessa',
                        '2#1#Boss#read#overwrite#vanessa'];
-    
+
     /* clear tables */
     db.get('rights').drop();
     db.get('users').drop();
@@ -78,14 +78,17 @@ var RightManager = function() {
       /* get all exiting access rights from the database */
       var collection = db.get('rights');
       collection.find({},{},function(e,docs){
-                      docs.forEach(function(entry){
+                      if(docs != undefined){
+                        docs.forEach(function(entry){
                                    
                                    if(DEBUG_OF_RIGHTMANAGEMENT){
-                                    console.log("adding right: "+String(entry.name));
+                                   console.log("adding right: "+String(entry.name));
                                    }
-                                
+                                   
                                    possibleAccessRights.push(entry.name);
                                    });
+                      }
+
                       });
 
 	  console.log("RightManager has been initialized");
@@ -185,7 +188,7 @@ var RightManager = function() {
                           docs.forEach(function(item){
                                        
                                        /* (2) update role */
-                                       /*var currentRights = String(item).split(",");
+                                       var currentRights = String(item).split(",");
                                        console.log(currentRights);
                                        
                                        if(grant == true){
@@ -195,7 +198,7 @@ var RightManager = function() {
                                        }
                                        
                                        collection.update({_id : obj._id},{ $set : {contextID : "42"}});
-                                              */
+                                       
                                        });
                           });
           
