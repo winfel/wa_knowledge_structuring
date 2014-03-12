@@ -1,6 +1,6 @@
 var db = require('monk')('localhost/WebArena')
 
-var DEBUG_OF_RIGHTMANAGEMENT = true;
+var DEBUG_OF_RIGHTMANAGEMENT = false;
 
 var fillCurrentDbWithTestData = function(){
     
@@ -96,8 +96,10 @@ var RightManager = function() {
    *	represents if the current user has the right 
    *	to perform a specific command.
    *	
-   *	@param {type} command   The used command (access right), e.g., read, write (CRUD)
-   *	@param {type} object    The object that should be checked	
+   *	@param {type}       command     The used command (access right), e.g., read, write (CRUD)
+   *	@param {type}       object      The object that should be checked
+   *    @param {type}       user        The username of the user
+   *    @param {function}   callback    The callback function with one boolean parameter (the answer)
    */
   this.hasAccess = function(command, object, user, callback) {
       /* check if command is feasible */
@@ -167,13 +169,39 @@ var RightManager = function() {
    *	The function can be used to modify access rights
    *	@param {type}	command   The used command (access right), e.g., read, write (CRUD)
    *	@param {type}	object    The object that should be used to change the access right
-   *	@param {type} role      The role that should be changed
-   *	@param {type} grant     The grant paramter is set to true, if the access right should be
-   *					 granted. Set false, to revoke access.
+   *	@param {type}   role      The role that should be changed
+   *	@param {type}   grant     The grant paramter is set to true, if the access right should be
+   *        granted. Set false, to revoke access.
    *	A call could look like this: modifyAccess("read","AB","reviewer", true);
    */
   this.modifyAccess = function(command, object, role, grant) {
-    // do nothing
+      /* check if command is feasible */
+      var commandIsInPossibleAccessRights = (possibleAccessRights.indexOf(String(command)) != -1);
+      if(commandIsInPossibleAccessRights){
+          
+          /* (1) get the current role */
+          var collection = db.get('roles');
+          collection.find({contextID:String(object.id),name:String(role)},{},function(e,docs){
+                          docs.forEach(function(item){
+                                       
+                                       /* (2) update role */
+                                       /*var currentRights = String(item).split(",");
+                                       console.log(currentRights);
+                                       
+                                       if(grant == true){
+                                        currentRights.push("command");
+                                       }else{
+                                        var index = array.indexOf(5);
+                                       }
+                                       
+                                       collection.update({_id : obj._id},{ $set : {contextID : "42"}});
+                                              */
+                                       });
+                          });
+          
+      }else{
+          console.log("<<DEBUG INFORMATION>> The given command was not valid");
+      }
   };
 };
 
