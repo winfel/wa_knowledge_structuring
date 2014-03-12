@@ -22,7 +22,7 @@ GUI.setTag = function(webarenaObject, width, height, passThrough) {
 	}
 	
 	
-	var dom = $('<input type="text" name="textedit" value="" placeholder="" style="'+style+'" />');
+	var dom = $('');
 	dom.bind("keyup", function(event) {
 		if (event.keyCode == 13) {
 			dom.parent().parent().find(".ui-button-text").click();
@@ -31,14 +31,122 @@ GUI.setTag = function(webarenaObject, width, height, passThrough) {
 	
 	var buttons = {};
 	
-	buttons[GUI.translate("save")] = function(domContent){
+	
+	buttons[GUI.translate("SWT")] = function(domContent,buttonsec,width,passThrough,style){
+		var buttonsec = {};
+		var tagValue;
+		var domsec = $('<input type="text" name="textedit" value="" placeholder="" style="'+style+'" />');
+
+	buttonsec[GUI.translate("save")] = function(domContent){
+
+domsec.bind("keyup", function(event) {
+		if (event.keyCode == 13) {
+			domsec.parent().parent().find(".ui-button-text").click();
+			 tagValue = $(domContent).find("input").val();
+			 }
 		
+	});
 		
-	var tagValue = $(domContent).find("input").val();
-	webarenaObject.setAttribute('mainTag', tagValue);
+	
+	webarenaObject.setAttribute('secondaryTags', tagValue);
+
+	webarenaObject.setAttribute('mainTag', 'SWT');
+		
+	};
+GUI.dialog("Set Sec Tag", domsec, buttonsec, width, passThrough);
+
+	
+
+
+		
+	};
+	buttons[GUI.translate("HCI")] = function(domContent){
+		var buttonsec = {};
+		var tagValue;
+		var domsec = $('<input type="text" name="textedit" value="" placeholder="" style="'+style+'" />');
+
+	buttonsec[GUI.translate("save")] = function(domContent){
+
+domsec.bind("keyup", function(event) {
+		if (event.keyCode == 13) {
+			domsec.parent().parent().find(".ui-button-text").click();
+			 tagValue = $(domContent).find("input").val();
+			 }
+		
+	});
+		
+	
+	webarenaObject.setAttribute('secondaryTags', tagValue);
+
+	webarenaObject.setAttribute('mainTag', 'HCI');
+		
+	};
+GUI.dialog("Set Sec Tag", domsec, buttonsec, width, passThrough);		
+	
+		
+	};
+	buttons[GUI.translate("ALG")] = function(domContent){
+		var buttonsec = {};
+		var tagValue;
+		var domsec = $('<input type="text" name="textedit" value="" placeholder="" style="'+style+'" />');
+
+	buttonsec[GUI.translate("save")] = function(domContent){
+
+domsec.bind("keyup", function(event) {
+		if (event.keyCode == 13) {
+			domsec.parent().parent().find(".ui-button-text").click();
+			 tagValue = $(domContent).find("input").val();
+			 }
+		
+	});
+		
+	
+	webarenaObject.setAttribute('secondaryTags', tagValue);
+
+	webarenaObject.setAttribute('mainTag', 'ALG');
+		
+	};
+GUI.dialog("Set Sec Tag", domsec, buttonsec, width, passThrough);
+
+	
+
+
+		
+	
 		
 	};
 	
-	GUI.dialog("Set Tag", dom, buttons, width, passThrough);
+	buttons[GUI.translate("EMB")] = function(domContent){
+		var buttonsec = {};
+		var tagValue;
+		var domsec = $('<input type="text" name="textedit" value="" placeholder="" style="'+style+'" />');
+
+	buttonsec[GUI.translate("save")] = function(domContent){
+
+domsec.bind("keyup", function(event) {
+		if (event.keyCode == 13) {
+			domsec.parent().parent().find(".ui-button-text").click();
+			 tagValue = $(domContent).find("input").val();
+			 }
+		
+	});
+		
+	
+	webarenaObject.setAttribute('secondaryTags', tagValue);
+
+	webarenaObject.setAttribute('mainTag', 'EMB');
+		
+	};
+GUI.dialog("Set Sec Tag", domsec, buttonsec, width, passThrough);
+
+	
+
+
+		
+	
+		
+	};
+	
+	GUI.dialog("Set Main Tag", dom, buttons, width, passThrough);
 	
 }
