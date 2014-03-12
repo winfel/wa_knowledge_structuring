@@ -188,8 +188,6 @@ var RightManager = function() {
                           docs.forEach(function(item){
                                        /* (2) update role */
                                        if(grant == true){
-                                        console.log("command = "+command);
-                                       
                                         /* store to database */
                                         collection.update({_id : item._id},{ $addToSet : {rights : command}});
                                        }else{

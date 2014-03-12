@@ -111,7 +111,7 @@ Modules.AttributeManager = require('./Common/AttributeManager.js');
 Modules.TranslationManager = require('./Common/TranslationManager.js');
 Modules.ActionManager = require('./Common/ActionManager.js');
 Modules.RightManager = require('./Server/RightManager.js');
-Modules.UserManager2 = require('./Server/UserManager.js'); //FIXME: merge the two UserManagers
+Modules.UserManager2 = require('./Server/UserManager2.js'); //FIXME: merge the two UserManagers
 
 if(Modules.config.tcpApiServer){
 	Modules['TcpEventServer'] = 	require("./Server/TcpSocketServer.js").create();
