@@ -10,7 +10,7 @@ var fillCurrentDbWithTestData = function(){
     
     var pushRights  = ['1#create','2#read','3#update','4#delete'];
     var pushUsers   = ['joerg#12345','Vanessa#xyz'];
-    var pushRoles   = ['1#1#RandomGuys#write,read#overwrite#joerg,vanessa',
+    var pushRoles   = ['1#1#RandomGuys#create,read#overwrite#joerg,vanessa',
                        '2#1#Boss#read#overwrite#vanessa'];
     
     /* clear tables */
@@ -84,7 +84,7 @@ var RightManager = function() {
                                     console.log("adding right: "+String(entry.name));
                                    }
                                 
-                                   possibleAccessRights.push(docs.name);
+                                   possibleAccessRights.push(entry.name);
                                    });
                       });
 
@@ -99,28 +99,46 @@ var RightManager = function() {
    *	@param {type} command   The used command (access right), e.g., read, write (CRUD)
    *	@param {type} object    The object that should be checked	
    */
-  this.hasAccess = function(command, object) {
+  this.hasAccess = function(command, object, user, callback) {
       /* check if command is feasible */
       var commandIsInPossibleAccessRights = (possibleAccessRights.indexOf(String(command)) != -1);
-      if(commandIsInPossibleAccessRights || true /*  FIXME true is for debugging purpose */){
+      if(commandIsInPossibleAccessRights){
       
           /* (1) get the roles that include the current command within the context of
            the given object */
-          
-          /* (2) check if current user is inside of one of these roles */
-          
-          /* (3) if (2) is fulfilled return true */
-          
-          /* DEMO TEST */
-          var collection = db.get('users');
-          collection.findOne({username:String(command)},{},function(e,docs){
-                            console.log(command+"'s password is:" + docs.password);
+          var collection = db.get('roles');
+          collection.find({contextID:String(object.id)},{},function(e,docs){
+                          var found = false;
+                            docs.forEach(function(item){
+                                         var commandIsInRights = (String(item.rights).split(",").indexOf(String(command)) != -1);
+                                         
+                                         if(commandIsInRights){
+                                            if(DEBUG_OF_RIGHTMANAGEMENT){
+                                                console.log("Command is used in Role "+item.name)
+                                            }
+                                         
+                                            /* (2) check if current user is inside of one of these roles */
+                                            var userIsInUserList = (String(item.users).split(",").indexOf(String(user)) != -1)
+
+                                            if(userIsInUserList){
+                                                 /* (3) if (2) is fulfilled return true */
+                                                found = true;
+                                            }
+                                         }
+                                       });
+                          
+                          if(found){
+                            callback(true);
+                          }else{
+                            callback(false);
+                          }
+                          
                           });
+          
       }else{
-         
          console.log("<<DEBUG INFORMATION>> The given command was not valid");
       }
-    return true;
+    //return true;
   };
 
   /**
