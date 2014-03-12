@@ -186,18 +186,15 @@ var RightManager = function() {
           var collection = db.get('roles');
           collection.find({contextID:String(object.id),name:String(role)},{},function(e,docs){
                           docs.forEach(function(item){
-                                       
                                        /* (2) update role */
-                                       var currentRights = String(item).split(",");
-                                       console.log(currentRights);
-                                       
                                        if(grant == true){
-                                        currentRights.push("command");
-                                       }else{
-                                        var index = array.indexOf(5);
-                                       }
+                                        console.log("command = "+command);
                                        
-                                       collection.update({_id : obj._id},{ $set : {contextID : "42"}});
+                                        /* store to database */
+                                        collection.update({_id : item._id},{ $addToSet : {rights : command}});
+                                       }else{
+                                         collection.update({_id : item._id},{ $pull : {rights : command}});
+                                        }
                                        
                                        });
                           });
