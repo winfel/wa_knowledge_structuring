@@ -53,16 +53,41 @@ var UserManager2 = function() {
      *	The function can be used to modify a role
      *	@param {type}	role    The used role passed as a RoleObject
      *	@param {type}	object  The object that should be used to change the access right
-     *	@param {type} grant   The grant paramter is set to true, if the access right should be
-     *					 granted. Set false, to revoke access.
+     *	@param {type}   add   The grant paramter is set to true, if the access right should be
+     *			granted. Set false, to revoke access.
      *	A call could look like this: modifyAccess(ReviewRole.create(),"AB", true);
      */
-    this.modifyRole = function(role, object, grant) {
+    this.modifyRole = function(role, object, add) {
         var collection = db.get('roles');
         
-        var modRole = role;
+        /* create empty arrays if the arrays are not exisiting */
+        if(role.rights == null){
+            role.rights = [];
+        }
         
-        console.log("currently not supported");
+        if(role.users == null){
+            role.users = [];
+        }
+        
+        /* default mode = overwrite */
+        if(role.mode == null){
+            role.mode = "overwrite";
+        }
+        
+        /* add resp. remove the role */
+        if(add == true){
+            collection.insert({id:role.id,
+                              contextID:object.id,
+                              mode:role.mode,
+                              name:role.name,
+                              rights:role.rights,
+                              users:role.users});
+            
+        }else{
+            console.log("trying to remove : " + object.id + " | " + role.name);
+            collection.remove({contextID:String(object.id),
+                            name:String(role.name)});
+        }
     };
     
     /**
@@ -99,9 +124,9 @@ var UserManager2 = function() {
                                      /* (2) update role */
                                      if(add == true){
                                      /* store to database */
-                                     collection.update({_id : item._id},{ $addToSet : {users : user}});
+                                        collection.update({_id : item._id},{ $addToSet : {users : user.name}});
                                      }else{
-                                     collection.update({_id : item._id},{ $pull : {users : user}});
+                                        collection.update({_id : item._id},{ $pull : {users : user.name}});
                                      }
                                      
                                      });
