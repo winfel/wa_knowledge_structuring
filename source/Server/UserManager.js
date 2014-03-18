@@ -10,11 +10,14 @@
 */
 
 "use strict";
+var db = require('monk')('localhost/WebArena');
 
 var UserManager = {};
 
 var Modules = false;
 var enter = String.fromCharCode(10);
+var possibleAccessRights = [];
+var DEBUG_OF_USERMANAGEMENT = false;
 
 UserManager.connections = {};
 
@@ -29,7 +32,27 @@ UserManager.init = function(theModules) {
 	Dispatcher.registerCall('login', UserManager.login);
 	Dispatcher.registerCall('enter', UserManager.enterRoom);
 	Dispatcher.registerCall('leave', UserManager.leaveRoom);
-}
+	
+	/* get all exiting access rights from the database */
+    var collection = db.get('rights');
+    collection.find({},{},function(e,docs){
+                    if(docs != undefined){
+                    docs.forEach(function(entry){
+                                 
+                                 if(DEBUG_OF_USERMANAGEMENT){
+                                 console.log("adding right: "+String(entry.name));
+                                 }
+                                 
+                                 possibleAccessRights.push(entry.name);
+                                 });
+                    }
+                    
+                    });
+    if(DEBUG_OF_USERMANAGEMENT){
+        console.log("UserManager has been initialized");
+    }
+};
+
 
 /**
 * In case of a new connection, a new entry is created.
@@ -355,6 +378,112 @@ function loggedInInfo() {
     }
     console.log(count + ' users: ' + userInfo);
 }
+/**
+ *	The function can be used to add a role
+ *
+ * @param {type} role   The used role passed as a RoleObject
+ * @param {type} object The object that should be used to change the access right
+ *
+ *	A call could look like this: modifyAccess(ReviewRole.create(),"AB");
+ */
+UserManager.addRole = function(role, object) {
+	UserManager.modifyRole(role, object, true);
+};
+
+/**
+ *	The function can be used to remove a role
+ *
+ * @param {type} role   The used role passed as a RoleObject
+ * @param {type} object The object that should be used to change the access right
+ * @returns {undefined}
+ */
+UserManager.removeRole = function(role, object) {
+	UserManager.modifyRole(role, object, false);
+};
+
+/**
+ *	The function can be used to modify a role
+ *	@param {type}	role    The used role passed as a RoleObject
+ *	@param {type}	object  The object that should be used to change the access right
+ *	@param {type}   add   The grant paramter is set to true, if the access right should be
+ *			granted. Set false, to revoke access.
+ *	A call could look like this: modifyAccess(ReviewRole.create(),"AB", true);
+ */
+UserManager.modifyRole = function(role, object, add) {
+    var collection = db.get('roles');
+    
+    /* create empty arrays if the arrays are not exisiting */
+    if(role.rights == null){
+        role.rights = [];
+    }
+    
+    if(role.users == null){
+        role.users = [];
+    }
+    
+    /* default mode = overwrite */
+    if(role.mode == null){
+        role.mode = "overwrite";
+    }
+    
+    /* add resp. remove the role */
+    if(add == true){
+        collection.insert({id:role.id,
+                          contextID:object.id,
+                          mode:role.mode,
+                          name:role.name,
+                          rights:role.rights,
+                          users:role.users});
+        
+    }else{
+        console.log("trying to remove : " + object.id + " | " + role.name);
+        collection.remove({contextID:String(object.id),
+                        name:String(role.name)});
+    }
+};
+
+/**
+ *	The function can be used to add a user to a specific role
+ *	@param {type}	role    The used role passed as a RoleObject
+ *	@param {type}	object  The object that should be used to get the specfic role
+ *	@param {type}   user    The user object that should be added
+ */
+UserManager.addUser = function(role, object, user) {
+	UserManager.modifyUser(role,object,user,true);
+};
+
+/**
+ *	The function can be used to remove a user to a specific role
+ *	@param {type}	role    The used role passed as a RoleObject
+ *	@param {type}	object  The object that should be used to get the specfic role
+ *	@param {type}   user    The user object that should be added
+ */
+UserManager.removeUser = function(role, object, user) {
+	UserManager.modifyUser(role,object,user,false);
+};
+
+/**
+ *	The function can be used to remove a user to a specific role
+ *	@param {type}	role    The used role passed as a RoleObject
+ *	@param {type}	object  The object that should be used to get the specfic role
+ *	@param {type}   user    The user object that should be added
+ */
+UserManager.modifyUser = function(role, object, user, add) {
+    /* (1) get the current users */
+    var collection = db.get('roles');
+    collection.find({contextID:String(object.id),name:String(role)},{},function(e,docs){
+                    docs.forEach(function(item){
+                                 /* (2) update role */
+                                 if(add == true){
+                                 /* store to database */
+                                    collection.update({_id : item._id},{ $addToSet : {users : user.name}});
+                                 }else{
+                                    collection.update({_id : item._id},{ $pull : {users : user.name}});
+                                 }
+                                 
+                                 });
+                    });
+};
 
 
 module.exports = UserManager;
