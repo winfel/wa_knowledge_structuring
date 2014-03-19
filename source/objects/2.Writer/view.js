@@ -63,8 +63,8 @@ Writer.createRepresentation = function(parent) {
 		'padding':'0',
 		'border':'0'
 	});
-	$(rep).find("iframe").attr('src', 'http://beta.etherpad.org/webArenaDemo?showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=false');
-	//$(rep).find("iframe").attr('src', this.getAttribute('paper'));
+	//$(rep).find("iframe").attr('src', 'http://localhost:9001/p/' + this.getAttribute('paper'));
+	$(rep).find("iframe").attr('src', 'http://beta.etherpad.org/webArenaDemo' + this.getAttribute('paper') + '?showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=false');
 
 	$(rep).attr("id", this.getAttribute('id'));
 

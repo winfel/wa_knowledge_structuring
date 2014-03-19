@@ -19,6 +19,8 @@ var UserManager={};
 
 var enter=String.fromCharCode(10);
 
+var PAPER_WRITER = "Writer";
+
 UserManager.connections={};
 
 UserManager.init=function(theModules){
@@ -172,13 +174,13 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
         for (var aux in inventory) {
             var obj = inventory[aux];
             
-            if (obj.type == "PaperWriter") {
+            if (obj.type == PAPER_WRITER) {
                 return;
             }
         }
         
-        var attr = {x: "10", y: "10", width:"600", height:"600", locked: true, paperId: data.roomID};
-        Modules.ObjectManager.createObject(data.roomID, "PaperWriter", attr, false, context, function(error, obj) {
+        var attr = {x: "10", y: "10", width:"600", height:"600", locked: true, paper: data.roomID};
+        Modules.ObjectManager.createObject(data.roomID, PAPER_WRITER, attr, false, context, function(error, obj) {
             //console.log(obj);
         });
     });

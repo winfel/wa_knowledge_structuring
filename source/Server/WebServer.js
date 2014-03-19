@@ -72,10 +72,6 @@ WebServer.init = function (theModules) {
 
 			    console.log("URL: " + url);
 				var roomId = url.substr(6);
-				
-				/////////////////////// Temporal ////////////////////////////////
-	            console.log("Requested room: " + roomId);
-	            /////////////////////////////////////////////////////////////////
 
 				var indexFilename = '/../Client/guis/desktop/index.html';
 
@@ -498,11 +494,6 @@ WebServer.init = function (theModules) {
 		else if (url == '/objects') {
 
 			try {
-			    
-			    //////////////////////// TEMPORAL /////////////////////////
-			    Modules.BuildTool.buildClientCode();
-			    ///////////////////////////////////////////////////////////
-			    
 				var code = Modules.BuildTool.getClientCode();
 				var mimeType = 'application/javascript';
 
