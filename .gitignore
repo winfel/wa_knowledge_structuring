@@ -21,3 +21,4 @@ source/out.log
 /nbproject/*
 .settings/
 .project
+out/

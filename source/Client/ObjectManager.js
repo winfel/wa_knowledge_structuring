@@ -421,6 +421,45 @@ ObjectManager.loadRoom=function(roomid, byBrowserNav, index, callback){
 
 }
 
+ObjectManager.loadPaperWriter = function(roomid, byBrowserNav, index, callback) {
+    var self = this;
+        
+    // in coupling mode: do not load room on both sides
+    var proceed = true;
+    if (GUI.couplingModeActive && (ObjectManager.getRoomID('left') == roomid || ObjectManager.getRoomID('right') == roomid)) {
+        proceed = false;
+    }
+
+    if (proceed) {
+        Modules.Dispatcher.query('enterPaperWriter', {'roomID':roomid, 'index':index}, function(error) {
+
+            if (error !== true) {
+                var objects = self.getObjects(index);
+                for (var i in objects) {
+                    var obj = objects[i];
+                    ObjectManager.removeLocally(obj);
+                }
+
+                if(!roomid) roomid = 'public';
+                self.currentRoomID[index] = roomid;
+                   
+                if (!byBrowserNav && index === 'left'){
+                    history.pushState({ 'room':roomid }, roomid, '/room/' + roomid);
+                }
+                    
+                if (GUI.couplingModeActive) {
+                    GUI.defaultZoomPanState(index, true);
+                }
+
+                if (callback) setTimeout(callback, 1200);    
+            }
+                
+        });
+    } else {
+        alert(GUI.translate("Room already displayed"));
+    }
+}
+
 ObjectManager.leaveRoom=function(roomid,index,serverCall) {
 	var self = this;
 
@@ -1006,3 +1045,39 @@ ObjectManager.paintingUpdate = function(data)
 		}
 	});	
 }
+
+///////////////////////////////////////// TEMPORAL /////////////////////////////////////////////////////////////////////
+
+
+ObjectManager.loadPaperWriter = function(roomid, byBrowserNav, index, callback) {
+    var self = this;
+
+    Modules.Dispatcher.query('enterPaperWriter', {
+        'roomID' : roomid,
+        'index' : index
+    }, function(error) {
+
+        if (error !== true) {
+            var objects = self.getObjects(index);
+            for ( var i in objects) {
+                var obj = objects[i];
+                ObjectManager.removeLocally(obj);
+            }
+
+            if (!roomid) roomid = 'public';
+            self.currentRoomID[index] = roomid;
+
+            if (!byBrowserNav && index === 'left') {
+                history.pushState({'room' : roomid}, roomid, '/room/' + roomid);
+            }
+
+            if (GUI.couplingModeActive) {
+                GUI.defaultZoomPanState(index, true);
+            }
+
+            if (callback) setTimeout(callback, 1200);
+        }
+    });
+}
+
+

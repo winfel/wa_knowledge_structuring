@@ -34,6 +34,11 @@ BuildTool.addToClientCode = function(filename) {
 }
 
 BuildTool.buildClientCode = function(){
+    
+    ///////////////////// Temporal ///////////////////////
+    this.clientCode = '"use strict";' + enter + '//Object Code for WebArena Client ' + enter;
+    //////////////////////////////////////////////////////
+    
 	var that = this;
 	var files = Modules.ObjectManager.getEnabledObjectTypes();
 
