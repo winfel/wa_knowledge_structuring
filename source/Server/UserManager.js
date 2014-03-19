@@ -27,6 +27,8 @@ UserManager.init=function(theModules){
 	Dispatcher.registerCall('login',UserManager.login);
     Dispatcher.registerCall('enter',UserManager.enterRoom);  
     Dispatcher.registerCall('leave',UserManager.leaveRoom);
+    
+    Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);  
 }
 
 /**
@@ -159,6 +161,29 @@ UserManager.login=function(socketOrUser,data){
 	
 }
 
+UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
+    console.log("UserManager.enterPaperWriter");
+    UserManager.enterRoom(socketOrUser, data, responseID);
+    
+    var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
+    var context = UserManager.connections[userID];
+    
+    Modules.ObjectManager.getObjects(data.roomID, context, function(inventory) {
+        for (var aux in inventory) {
+            var obj = inventory[aux];
+            
+            if (obj.type == "PaperWriter") {
+                return;
+            }
+        }
+        
+        var attr = {x: "10", y: "10", width:"600", height:"600", locked: true, paperId: data.roomID};
+        Modules.ObjectManager.createObject(data.roomID, "PaperWriter", attr, false, context, function(error, obj) {
+            //console.log(obj);
+        });
+    });
+}
+
 /**
 *	enterRoom
 *
@@ -215,9 +240,6 @@ UserManager.enterRoom=function(socketOrUser,data,responseID){
 		}
 		
 	});
-		
-		
-
 }
 
 UserManager.leaveRoom=function(socket,data,responseID) {
