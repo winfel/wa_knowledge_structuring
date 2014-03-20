@@ -179,7 +179,7 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
             }
         }
         
-        var attr = {x: "10", y: "10", width:"600", height:"600", locked: true, paper: data.roomID};
+        var attr = {x: "20", y: "45", width: "700", locked: true, paper: data.roomID};
         Modules.ObjectManager.createObject(data.roomID, PAPER_WRITER, attr, false, context, function(error, obj) {
             //console.log(obj);
         });

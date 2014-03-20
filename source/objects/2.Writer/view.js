@@ -41,32 +41,35 @@ Writer.updateContent = function() {
 
 
 Writer.createRepresentation = function(parent) {
+	var rep = GUI.svg.other(parent, "foreignObject");
+    rep.dataObject = this;
+    
+	var div = document.createElement("div");
+	var $rep = $(rep);
+	$rep.attr({ id: this.getAttribute('id') });
+	$rep.append(div);
 	
-	var rep = GUI.svg.other(parent,"foreignObject");
-
-	rep.dataObject=this;
-	
-	var body = document.createElement("body");
-
-	$(rep).append(body);
-	$(rep).find("body").css(
-	{
-		'border':'2px solid black',
-		'padding':'3px',
-		'background-color':'#FFFFFF'
-	});
-	$(rep).find("body").append("<iframe></iframe>");
-	$(rep).find("iframe").css(
-	{
-		'width':'100%',
-		'height':'100%',
-		'padding':'0',
-		'border':'0'
-	});
-	//$(rep).find("iframe").attr('src', 'http://localhost:9001/p/' + this.getAttribute('paper'));
-	$(rep).find("iframe").attr('src', 'http://beta.etherpad.org/webArenaDemo' + this.getAttribute('paper') + '?showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=false');
-
-	$(rep).attr("id", this.getAttribute('id'));
+    var pWriter = $(div).attr('id', 'paperWriter');
+	pWriter.css(
+    	{
+    		'border':'2px solid black',
+    		'padding':'3px',
+    		'background-color':'#FFFFFF',
+    		'width':'90%',
+            'height':'80%'
+    	});
+    pWriter.append("<iframe></iframe>");
+    
+    var iFrame = $(pWriter.find("iframe"));
+    iFrame.css(
+    	{
+    		'width':'100%',
+    		'height':'60%',
+    		'padding':'0',
+    		'border':'0'
+    	});
+    //iFrame.attr('src', 'http://localhost:9001/p/' + this.getAttribute('paper'));
+	iFrame.attr('src', 'http://beta.etherpad.org/webArenaDemo' + this.getAttribute('paper') + '?showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=false');
 
 	this.initGUI(rep);
 	
