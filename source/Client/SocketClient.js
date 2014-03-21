@@ -17,13 +17,16 @@ SocketClient.init = function() {
   Modules.Socket = socket;
 
   socket.on('message', function(data) {
-    console.log(data);
-    if (data.type == 'call')
+    // console.log(data);
+    if (data.type == 'call') {
       Modules.Dispatcher.call(data);
-    if (data.type == 'response')
+    }
+    if (data.type == 'response') {
       Modules.Dispatcher.response(data);
+    }
   });
   socket.on('disconnect', function() {
+    console.log("disconnect");
     GUI.disconnected();
   });
   socket.on('connect', function() {

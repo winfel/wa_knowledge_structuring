@@ -1,9 +1,6 @@
 /**
  * Provides API methods for Object related tasks
  */
-
-
-
 "use strict";
 
 var fs = require('fs');

@@ -40,7 +40,7 @@ Dispatcher.call = function(message) {
     } else {
         console.log('ERROR: No function for ' + type);
     }
-}
+};
 
 /**
  * Manages a response from the server
@@ -57,7 +57,7 @@ Dispatcher.response = function(message) {
     } else {
         console.log('ERROR: No function for ' + id);
     }
-}
+};
 
 /**
  * Make a query to the server
@@ -80,7 +80,7 @@ Dispatcher.query = function(queryName, queryArguments, responseFunction) {
         responseFunction = {}; // get rid of all remaining response functions
     }, 5000);
     Modules.SocketClient.sendCall(queryName, queryArguments, responseID);
-}
+};
 
 /**
  * Register a new callfunction by type
@@ -91,11 +91,11 @@ Dispatcher.query = function(queryName, queryArguments, responseFunction) {
 Dispatcher.registerCall = function(type, callFunction) {
     //callfunction signature (socket,data);
     calls[type] = callFunction;
-}
+};
 
 /**
  * Init function called in index.html to initialize this module
  */
 Dispatcher.init = function() {
     // do nothing
-}
+};

@@ -2,12 +2,29 @@
 
 "use strict";
 
-var Modules = false;
-
 /**
  * Object providing functions for object management
  */
 var RightManager = new function() {
+
+  var that = this;
+
+  /**
+   * This function initializes the RightManager object.
+   * 
+   * @param {type} theModules   All available modules...
+   */
+  this.init = function(theModules) {
+    var Dispatcher = theModules.Dispatcher;
+    
+    Dispatcher.registerCall("rmAccessGranted", function() {
+      
+    });
+    
+    Dispatcher.registerCall("rmAccessDenied", function() {
+      
+    });
+  };
 
   /**
    *	The function returns a boolean value that 
@@ -17,14 +34,16 @@ var RightManager = new function() {
    *	@param {type} command   The used command (access right), e.g., read, write (CRUD)
    *	@param {type} object    The object that should be checked	
    */
-  this.hasAccess = function(command, object) {
+  this.hasAccess = function(command, object, user, callback) {
+    console.log("hasAccess");
 
-//    Modules.SocketClient.serverCall('hasAccess',{
-//                                    'command':command,
-//                                    'object':object.toJSON()
-//                                    });
+    Modules.SocketClient.serverCall('rmHasAccess', {
+      'command': command,
+      'object': object.id,
+      'username': user
+    });
 
-    return true;
+    callback(true);
   };
 
   /**

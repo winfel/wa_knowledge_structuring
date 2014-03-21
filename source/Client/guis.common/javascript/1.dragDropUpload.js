@@ -54,6 +54,7 @@ $(function() {
 			
 			xhr.addEventListener("load",function() {
 				GUI.progressBarManager.updateProgress(progressBarId, 100, GUI.translate("Upload completed"), true);
+				setTimeout(function(){GUI.setTag(newObject,200,200,false)},1500);
 			},false);
 			
 			xhr.addEventListener("error",function() {

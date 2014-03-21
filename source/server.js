@@ -92,10 +92,6 @@ Modules.Log = require('./Common/Log.js');
 Modules.config = config;
 Modules.Config = config;
 
-//Modules.Schema = require('./Common/dbSchema.js');
-Modules.RightManager = require('./Server/RightManager.js');
-Modules.UserManager2 = require('./Server/UserManager.js'); //FIXME: merge the two UserManagers
-
 Modules.ObjectManager = require('./Server/ObjectManager.js');
 Modules.Dispatcher = require('./Server/Dispatcher.js');
 Modules.WebServer = require('./Server/WebServer.js');
@@ -112,6 +108,8 @@ Modules.DataSet = require('./Common/DataSet.js');
 Modules.AttributeManager = require('./Common/AttributeManager.js');
 Modules.TranslationManager = require('./Common/TranslationManager.js');
 Modules.ActionManager = require('./Common/ActionManager.js');
+Modules.RightManager = require('./Server/RightManager.js');
+Modules.UserManager2 = require('./Server/UserManager2.js'); //FIXME: merge the two UserManagers
 
 if(Modules.config.tcpApiServer){
 	Modules['TcpEventServer'] = 	require("./Server/TcpSocketServer.js").create();

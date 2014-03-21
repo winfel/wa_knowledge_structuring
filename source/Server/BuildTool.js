@@ -6,7 +6,7 @@
 
 var fs = require('fs');
 
-var  BuildTool = {}
+var  BuildTool = {};
 var enter = String.fromCharCode(10);
 var Modules = false;
 var showDebugLineNumbers;
@@ -31,7 +31,7 @@ BuildTool.addToClientCode = function(filename) {
 	} catch (e) {
 		BuildTool.clientCode += enter + enter + '//' + filename + enter + enter + ' //' + e;
 	}
-}
+};
 
 BuildTool.buildClientCode = function(){
 	var that = this;
@@ -52,7 +52,7 @@ BuildTool.buildClientCode = function(){
 		that.addToClientCode(filebase + '/languages.js');
 
 	});
-}
+};
 
 /**
  *  getClientCode
@@ -61,12 +61,12 @@ BuildTool.buildClientCode = function(){
  **/
 BuildTool.getClientCode = function () {
 	return this.clientCode;
-}
+};
 
 BuildTool.init = function(theModules){
 	Modules = theModules;
 	showDebugLineNumbers = !!Modules.config.debugMode;
 	this.buildClientCode();
-}
+};
 
 module.exports = BuildTool;

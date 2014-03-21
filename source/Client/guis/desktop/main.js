@@ -48,7 +48,7 @@ GUI.uploadFile=function(object,message){
             $(uploadDialog).dialog("close");
 
 			//opens the Dialog which enables 
-			var TagDialog = document.createElement("div");
+			/*var TagDialog = document.createElement("div");
 			$(TagDialog).attr("title", GUI.translate("Set Tag"));
 			$(TagDialog).html('<p>'+message+'</p>');
 
@@ -68,7 +68,8 @@ GUI.uploadFile=function(object,message){
 				resizable: false,
 				buttons: dialogButtons
 			});
-			
+			*/
+            GUI.setTag(object,200,200,false);
 
         }, false);
         xhr.addEventListener("error", function() {
