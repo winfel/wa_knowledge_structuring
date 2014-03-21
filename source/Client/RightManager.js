@@ -8,6 +8,7 @@
 var RightManager = new function() {
 
   var that = this;
+  var Dispatcher = null;
 
   /**
    * This function initializes the RightManager object.
@@ -15,15 +16,7 @@ var RightManager = new function() {
    * @param {type} theModules   All available modules...
    */
   this.init = function(theModules) {
-    var Dispatcher = theModules.Dispatcher;
-    
-    Dispatcher.registerCall("rmAccessGranted", function() {
-      
-    });
-    
-    Dispatcher.registerCall("rmAccessDenied", function() {
-      
-    });
+    Dispatcher = theModules.Dispatcher;
   };
 
   /**
@@ -37,6 +30,20 @@ var RightManager = new function() {
   this.hasAccess = function(command, object, user, callback) {
     console.log("hasAccess");
 
+      Dispatcher.registerCall( "rmAccessGranted"+object.id, function(){
+                              // call the callback
+                              callback(true);
+                              // deregister
+                              Dispatcher.removeCall("rmAccessGranted"+object.id);
+                              });
+    
+      Dispatcher.registerCall( "rmAccessDenied"+object.id, function(){
+                              // call the callback
+                              callback(false);
+                              // deregister
+                              Dispatcher.removeCall("rmAccessDenied"+object.id);
+                              });
+      
     Modules.SocketClient.serverCall('rmHasAccess', {
       'command': command,
       'object': object.id,
