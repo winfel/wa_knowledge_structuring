@@ -46,7 +46,7 @@ var RightManager = new function() {
       
     Modules.SocketClient.serverCall('rmHasAccess', {
       'command': command,
-      'object': object.id,
+      'object': object,
       'username': user
     });
 

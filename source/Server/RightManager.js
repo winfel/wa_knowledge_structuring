@@ -100,11 +100,12 @@ var RightManager = function() {
       //var context = Modules.UserManager.getConnectionBySocket(socket);
       //Modules.ObjectController.executeServersideAction(data, context, resultCallbackWrapper(socket, responseID));
       that.hasAccess(data.command, data.object, data.username, function(result) {
-                     if(result == true){
-                        Modules.SocketServer.sendToSocket(socket,"rmAccessGranted"+data.object);
-                     }else{
-                        Modules.SocketServer.sendToSocket(socket,"rmAccessDenied"+data.object);
-                     }
+        console.log(result);
+        if (result === true) {
+          Modules.SocketServer.sendToSocket(socket, "rmAccessGranted" + data.object.id);
+        } else {
+          Modules.SocketServer.sendToSocket(socket, "rmAccessDenied" + data.object.id);
+        }
       });
     });
 
