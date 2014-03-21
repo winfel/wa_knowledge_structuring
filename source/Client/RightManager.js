@@ -50,7 +50,7 @@ var RightManager = new function() {
       'username': user
     });
 
-    callback(true);
+    //callback(true);
   };
 
   /**

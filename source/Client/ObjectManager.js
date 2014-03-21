@@ -382,7 +382,10 @@ ObjectManager.loadRoom=function(roomid, byBrowserNav, index, callback){
 	var self = this;
 
 	if (!index) var index = 'left';
-		
+    var dummy = {}; dummy.id = 1;
+	Modules.RightManager.hasAccess("create",dummy,GUI.username,function(){
+                                   console.log("42");
+                                   });
 	// in coupling mode: do not load room on both sides
 	var proceed = true;
 	if (GUI.couplingModeActive && (ObjectManager.getRoomID('left') == roomid || ObjectManager.getRoomID('right') == roomid)) {

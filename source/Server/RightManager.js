@@ -99,15 +99,13 @@ var RightManager = function() {
     Dispatcher.registerCall('rmHasAccess', function(socket, data, responseID) {
       //var context = Modules.UserManager.getConnectionBySocket(socket);
       //Modules.ObjectController.executeServersideAction(data, context, resultCallbackWrapper(socket, responseID));
-      console.log("...");
-      console.log(socket);
-      console.log(data);
-      console.log(responseID);
-      console.log("...");
-
-//      that.hasAccess(data.command, data.object, data.username, function() {
-//        console.log("rmHasAccess: callback called");
-//      });
+      that.hasAccess(data.command, data.object, data.username, function(result) {
+                     if(result == true){
+                        Modules.SocketServer.sendToSocket(socket,"rmAccessGranted"+data.object);
+                     }else{
+                        Modules.SocketServer.sendToSocket(socket,"rmAccessDenied"+data.object);
+                     }
+      });
     });
 
     console.log("RightManager has been initialized");
