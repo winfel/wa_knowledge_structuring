@@ -33,7 +33,7 @@ BuildTool.addToClientCode = function(filename) {
 	}
 };
 
-BuildTool.buildClientCode = function(){
+BuildTool.buildClientCode = function() {
 	var that = this;
 	var files = Modules.ObjectManager.getEnabledObjectTypes();
 

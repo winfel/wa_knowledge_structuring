@@ -47,7 +47,6 @@ PaperObject.register = function(type) {
     }, true);
     
     this.registerAttribute('isMain', {type:'boolean', hidden:true});
-    this.registerAttribute('contentType', {type:'text', value:"MUI"});
     this.registerAttribute('bigIcon',{hidden:true});
 }
 
@@ -58,11 +57,9 @@ PaperObject.register = function(type) {
  * @this {PaperObject}
  * @see Client/ObjectManager.js
  * @see objects/1.GeneralObject/common.js
- * @param {boolean}
- *            openInNewWindow
+ * @param {boolean} openInNewWindow
  */
 PaperObject.execute = function(openInNewWindow) {
-
     var destination = this.getAttribute('destination');
 
     // TODO this must be done serverside in the connector
@@ -76,7 +73,8 @@ PaperObject.execute = function(openInNewWindow) {
     if (openInNewWindow) {
         window.open(destination);
     } else {
-        ObjectManager.loadRoom(destination, false, ObjectManager.getIndexOfObject(this.getAttribute('id')));
+        //ObjectManager.loadRoom(destination, false, ObjectManager.getIndexOfObject(this.getAttribute('id')));
+        ObjectManager.loadPaperWriter(destination, false, 'left');
     }
 }
 

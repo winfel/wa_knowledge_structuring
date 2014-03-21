@@ -19,3 +19,6 @@ source/out.log
 
 /nbproject/private/
 /nbproject/*
+.settings/
+.project
+out/

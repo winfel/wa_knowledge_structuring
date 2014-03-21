@@ -56,20 +56,24 @@ Subroom.register=function(type){
  * @see objects/1.GeneralObject/common.js
  * @param {boolean} openInNewWindow
  */
-Subroom.execute=function(openInNewWindow){
-	
-	var destination=this.getAttribute('destination');
-	
-	//TODO this must be done serverside in the connector
-	if (!destination) {
-		var random=new Date().getTime()-1296055327011;
-		
-		this.setAttribute('destination',random);
-		destination = random;
-	}
-	
-	if (openInNewWindow) { window.open(destination); }
-	else { ObjectManager.loadRoom(destination,false,ObjectManager.getIndexOfObject(this.getAttribute('id'))); }}
+Subroom.execute = function(openInNewWindow) {
+
+    var destination = this.getAttribute('destination');
+
+    // TODO this must be done serverside in the connector
+    if (!destination) {
+        var random = new Date().getTime() - 1296055327011;
+
+        this.setAttribute('destination', random);
+        destination = random;
+    }
+
+    if (openInNewWindow) {
+        window.open(destination);
+    } else {
+        ObjectManager.loadRoom(destination, false, ObjectManager.getIndexOfObject(this.getAttribute('id')));
+    }
+}
 
 Subroom.register('Subroom');
 Subroom.isCreatable=true;
