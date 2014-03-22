@@ -19,6 +19,8 @@ var Modules = false;
 var enter = String.fromCharCode(10);
 var possibleAccessRights = [];
 
+var PAPER_WRITER = "Writer";
+
 UserManager.connections = {};
 
 /**
@@ -32,6 +34,8 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('login', UserManager.login);
   Dispatcher.registerCall('enter', UserManager.enterRoom);
   Dispatcher.registerCall('leave', UserManager.leaveRoom);
+  
+Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);  
 
   /* get all exiting access rights from the database */
   var collection = db.get('rights');
@@ -160,6 +164,28 @@ UserManager.login = function(socketOrUser, data) {
 
 }
 
+UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
+    console.log("UserManager.enterPaperWriter");
+    UserManager.enterRoom(socketOrUser, data, responseID);
+    
+    var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
+    var context = UserManager.connections[userID];
+    
+    Modules.ObjectManager.getObjects(data.roomID, context, function(inventory) {
+        for (var aux in inventory) {
+            var obj = inventory[aux];
+            
+            if (obj.type == PAPER_WRITER) {
+                return;
+            }
+        }
+        
+        var attr = {x: "20", y: "45", width: "700", locked: true, paper: data.roomID};
+        Modules.ObjectManager.createObject(data.roomID, PAPER_WRITER, attr, false, context, function(error, obj) {
+            //console.log(obj);
+        });
+    });
+}
 /**
  * Let a user enter a room with a specific roomID
  *  
