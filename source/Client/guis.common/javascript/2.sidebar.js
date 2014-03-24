@@ -26,10 +26,15 @@ GUI.sidebar.elementConfig = {
         order : 0,
         title : GUI.translate("Object inspector"),
     },
+    
     "chat" : {
         order : 1,
         title : GUI.translate("Chat"),
         onOpen : GUI.chat.opened
+    },
+    "rightmanager" : {
+        order : 3,
+        title : GUI.translate("Right Manager"),
     },
     "bug" : {
         order : 2,
