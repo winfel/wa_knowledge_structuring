@@ -421,7 +421,7 @@ GUI.initToolbar = function() {
 	if (!Modules.Config.presentationMode) {
 	
 		var rmButton = document.createElement("img");
-		$(rmButton).attr("src", "../../guis.common/images/inspector.png").attr("alt", "");
+		$(rmButton).attr("src", "../../guis.common/images/fix_me.png").attr("alt", "");
 		$(rmButton).attr("width", "24").attr("height", "24");
 
 		$(rmButton).attr("id", "rightmanager_button");
@@ -440,8 +440,6 @@ GUI.initToolbar = function() {
 		}
 
 		$("#header > .header_right").append(rmButton);
-
-		GUI.sidebar.openPage("rightmanager", rmButton);
 	
 	}
 	

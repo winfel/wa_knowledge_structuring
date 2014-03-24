@@ -25,7 +25,6 @@ NumberCreator.register = function(type) {
   this.registerAttribute('attribute', {type: 'text', standard: '', category: 'Selection'});
   this.registerAttribute('value', {type: 'number', standard: 0, category: 'Selection'});
 
-
   this.registerAction("createNumericObject", function(object) {
     var dummy = {id: "1"};
     Modules.RightManager.hasAccess("create", dummy, GUI.username, function(result) {

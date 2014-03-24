@@ -98,6 +98,8 @@ GUI.loadGUI = function(step) {
 
         // Toolbar. Needs: ObjectManager
         GUI.initToolbar();
+        
+        GUI.rightmanager.init();
       }
 
       // Adjust svg area
