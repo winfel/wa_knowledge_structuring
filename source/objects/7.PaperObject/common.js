@@ -45,6 +45,38 @@ PaperObject.register = function(type) {
         object.execute(true);
 
     }, true);
+	
+    //Test Dialog for Right mMnager
+    this.registerAction('Right manager', function(object) {
+
+        var pageOneContent = $('' +
+        '<div id="easydb-dialog">' +
+		'<h3>Roles</h3>' +
+        '<input style="margin-top:0px;" class="maxWidth" placeholder="Writer">' +
+        '<input style="margin-top:20px;" class="maxWidth" placeholder="Reviewer">' +
+		'<h3>Userlists</h3>' +
+        '<input style="margin-top:0px;" class="maxWidth" placeholder="Writer">' +
+        '<input style="margin-top:20px;" class="maxWidth" placeholder="Reviewer">' +
+        '</div>'
+		);
+		
+		var pageOneButtons = {
+            "Abbrechen":function () {
+                return false;
+            },
+            "OK":function () {
+                return true;
+            }
+
+        }
+		
+		var dialog = GUI.dialog(
+            "Right manager for PaperObject",
+            pageOneContent, pageOneButtons, 500, {height:500}
+        )
+
+    }, true);
+	
     
     this.registerAttribute('isMain', {type:'boolean', hidden:true});
     this.registerAttribute('bigIcon',{hidden:true});
