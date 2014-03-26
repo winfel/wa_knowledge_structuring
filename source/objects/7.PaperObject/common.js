@@ -28,7 +28,6 @@ var PaperObject = Object.create(Modules.ObjectManager.getPrototype('IconObject')
 PaperObject.register = function(type) {
 
     // Registering the object
-
     IconObject = Modules.ObjectManager.getPrototype('IconObject');
     IconObject.register.call(this, type);
 
@@ -51,7 +50,7 @@ PaperObject.register = function(type) {
 }
 
 /**
- * Opens a new room with the help of the attribute 'destination'. If the
+ * Opens the paper object with the help of the attribute 'destination'. If the
  * destination is not set the destination will choose randomly.
  * 
  * @this {PaperObject}
@@ -62,7 +61,6 @@ PaperObject.register = function(type) {
 PaperObject.execute = function(openInNewWindow) {
     var destination = this.getAttribute('destination');
 
-    // TODO this must be done serverside in the connector
     if (!destination) {
         var random = new Date().getTime() - 1296055327011;
 
@@ -73,7 +71,6 @@ PaperObject.execute = function(openInNewWindow) {
     if (openInNewWindow) {
         window.open(destination);
     } else {
-        //ObjectManager.loadRoom(destination, false, ObjectManager.getIndexOfObject(this.getAttribute('id')));
         ObjectManager.loadPaperWriter(destination, false, 'left');
     }
 }
@@ -81,6 +78,6 @@ PaperObject.execute = function(openInNewWindow) {
 PaperObject.register('PaperObject');
 PaperObject.isCreatable = true;
 
-PaperObject.category = 'Paper';
+PaperObject.category = 'Rooms';
 
 module.exports = PaperObject;

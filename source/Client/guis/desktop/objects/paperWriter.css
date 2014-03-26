@@ -1,0 +1,13 @@
+@CHARSET "ISO-8859-1";
+
+#paperWriter {
+	border: 2px solid black;
+    background: #FFFFFF;
+}
+
+#paperWriter iframe {
+	 width: 100%;
+	 height: 71%;
+	 padding: 0;
+	 border: 0;
+}

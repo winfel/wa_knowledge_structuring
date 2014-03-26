@@ -35,7 +35,7 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('enter', UserManager.enterRoom);
   Dispatcher.registerCall('leave', UserManager.leaveRoom);
   
-Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);  
+  Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);  
 
   /* get all exiting access rights from the database */
   var collection = db.get('rights');
@@ -165,7 +165,6 @@ UserManager.login = function(socketOrUser, data) {
 }
 
 UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
-    console.log("UserManager.enterPaperWriter");
     UserManager.enterRoom(socketOrUser, data, responseID);
     
     var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;

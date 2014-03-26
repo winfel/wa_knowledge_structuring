@@ -39,40 +39,23 @@ Writer.updateContent = function() {
 	
 }
 
-
 Writer.createRepresentation = function(parent) {
 	var rep = GUI.svg.other(parent, "foreignObject");
     rep.dataObject = this;
+    var $rep = $(rep);
     
-	var div = document.createElement("div");
-	var $rep = $(rep);
+    var body = document.createElement("body");
 	$rep.attr({ id: this.getAttribute('id') });
-	$rep.append(div);
+	$rep.append(body);
 	
-    var pWriter = $(div).attr('id', 'paperWriter');
-	pWriter.css(
-    	{
-    		'border':'2px solid black',
-    		'padding':'3px',
-    		'background-color':'#FFFFFF',
-    		'width':'90%',
-            'height':'80%'
-    	});
+    var pWriter = $(body).attr('id', 'paperWriter');
     pWriter.append("<iframe></iframe>");
     
     var iFrame = $(pWriter.find("iframe"));
-    iFrame.css(
-    	{
-    		'width':'100%',
-    		'height':'60%',
-    		'padding':'0',
-    		'border':'0'
-    	});
-    //iFrame.attr('src', 'http://localhost:9001/p/' + this.getAttribute('paper'));
-	iFrame.attr('src', 'http://beta.etherpad.org/webArenaDemo' + this.getAttribute('paper') + '?showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=false');
+    iFrame.attr('src', 'http://' + window.location.hostname + ':9001/p/' + this.getAttribute('paper'));
+	//iFrame.attr('src', 'http://beta.etherpad.org/webArenaDemo' + this.getAttribute('paper') + '?showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=false');
 
 	this.initGUI(rep);
 	
-	return rep;
-	
+	return rep;s
 }
