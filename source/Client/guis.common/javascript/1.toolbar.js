@@ -415,6 +415,34 @@ GUI.initToolbar = function() {
 	
 	}
 	
+	
+/* add Right Manager toggle */
+	
+	if (!Modules.Config.presentationMode) {
+	
+		var rmButton = document.createElement("img");
+		$(rmButton).attr("src", "../../guis.common/images/fix_me.png").attr("alt", "");
+		$(rmButton).attr("width", "24").attr("height", "24");
+
+		$(rmButton).attr("id", "rightmanager_button");
+		$(rmButton).addClass("sidebar_button");
+
+		$(rmButton).attr("title", GUI.translate("Right Manager"));
+
+		var click = function() {
+			GUI.sidebar.openPage("rightmanager", rmButton);
+		}
+		
+		if (GUI.isTouchDevice) {
+			$(rmButton).bind("touchstart", click);
+		} else {
+			$(rmButton).bind("mousedown", click);
+		}
+
+		$("#header > .header_right").append(rmButton);
+	
+	}
+	
 	/* add inspector toggle */
 	
 	if (!Modules.Config.presentationMode) {
