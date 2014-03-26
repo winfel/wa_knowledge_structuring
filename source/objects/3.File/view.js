@@ -88,3 +88,7 @@ File.getIconText = function() {
         return this.getAttribute("name");
     } else return false;
 }
+
+File.setTag = function() {
+	GUI.setTag(this, 600, 600, false);	
+}
