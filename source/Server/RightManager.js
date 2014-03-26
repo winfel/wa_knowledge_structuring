@@ -24,7 +24,7 @@ var fillCurrentDbWithLayer0CanvasData = function(){
                             var token = item.split("#");
                        
                             collection.find({id: String(token[0]), name: String(token[1])}, {}, function(e, docs) {
-                                            if(docs.length === 0){
+                                            if(typeof docs == 'undefined' || docs.length === 0){
                                                 collection.insert({id: String(token[0]), name: String(token[1])});
                                             
                                                 if (DEBUG_OF_RIGHTMANAGEMENT) {
@@ -67,7 +67,7 @@ var fillCurrentDbWithLayer0CanvasData = function(){
                         var someUser = String(token[5]).split("#");
                       
                         collection.find({name: String(aName), contextID: String(aContextID)}, {}, function(e, docs) {
-                                      if(docs.length === 0){
+                                      if(typeof docs == 'undefined' || docs.length === 0){
                                             collection.insert({id: aID,
                                                           contextID: aContextID,
                                                           name: aName,
