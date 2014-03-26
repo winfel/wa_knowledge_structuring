@@ -3,6 +3,87 @@ var db = require('monk')('localhost/WebArena');
 var Modules = false;
 var DEBUG_OF_RIGHTMANAGEMENT = false;
 
+var fillCurrentDbWithLayer0CanvasData = function(){
+    
+    if (DEBUG_OF_RIGHTMANAGEMENT) {
+        console.log("filling Layer 0 data");
+    }
+    
+    /* minimal rights possible - CRUD */
+    var pushRights = ['1#create', '2#read', '3#update', '4#delete'];
+    
+    /* no users per default */
+    var pushUsers = [];
+    
+    /* one role per default - read only for all users */
+    var pushRoles = ['0#0#CanvasLayer#read#overwrite#all'];
+    
+    /* push default rights */
+    var collection = db.get('rights');
+    pushRights.forEach(function(item) {
+                            var token = item.split("#");
+                       
+                            collection.find({id: String(token[0]), name: String(token[1])}, {}, function(e, docs) {
+                                            if(docs.length === 0){
+                                                collection.insert({id: String(token[0]), name: String(token[1])});
+                                            
+                                                if (DEBUG_OF_RIGHTMANAGEMENT) {
+                                                    console.log("pushing default right: " + String(token[1]));
+                                                }
+                                            }else{
+                                                    console.log("default right " + token[1] + " was already included");
+                                            }
+                            });
+                       });
+    
+    /* push default users */
+    collection = db.get('users');
+    pushUsers.forEach(function(item) {
+                            var token = item.split("#");
+                      
+                            collection.find({username: String(token[0]), password: String(token[1])}, {}, function(e, docs) {
+                                      if(docs.length === 0){
+                                            collection.insert({username: String(token[0]), password: String(token[1])});
+                                            
+                                            if (DEBUG_OF_RIGHTMANAGEMENT) {
+                                                console.log("pushing default user: " + String(token[1]));
+                                            }
+                                      }else{
+                                            console.log("default user " + token[1] + " was already included");
+                                      }
+                            });
+                      });
+    
+    /* push default roles */
+    collection = db.get('roles');
+    pushRoles.forEach(function(item) {
+                        var token = item.split("#");
+                      
+                        var aID = String(token[0]);
+                        var aContextID = String(token[1]);
+                        var aName = String(token[2]);
+                        var someRights = String(token[3]).split("#");
+                        var aMode = String(token[4]);
+                        var someUser = String(token[5]).split("#");
+                      
+                        collection.find({name: String(aName), contextID: String(aContextID)}, {}, function(e, docs) {
+                                      if(docs.length === 0){
+                                            collection.insert({id: aID,
+                                                          contextID: aContextID,
+                                                          name: aName,
+                                                          rights: someRights,
+                                                          mode: aMode,
+                                                          users: someUser});
+                                            if (DEBUG_OF_RIGHTMANAGEMENT) {
+                                            console.log("pushing default role: " + String(aName));
+                                            }
+                                        }else{
+                                            console.log("default role " + aName + " was already included");
+                                        }
+                                    });
+                      });
+};
+    
 var fillCurrentDbWithTestData = function() {
 
   if (DEBUG_OF_RIGHTMANAGEMENT) {
@@ -68,7 +149,8 @@ var fillCurrentDbWithTestData = function() {
 
 var RightManager = function() {
   fillCurrentDbWithTestData();
-
+  fillCurrentDbWithLayer0CanvasData();
+  
   var possibleAccessRights = [];
   var that = this;
 
