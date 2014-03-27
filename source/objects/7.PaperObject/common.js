@@ -45,7 +45,9 @@ PaperObject.register = function(type) {
 
     }, true);
 
-
+    function addroles(){
+            
+    };
         
         var pageOneButtons = {
             "Abbrechen":function () {
@@ -54,8 +56,8 @@ PaperObject.register = function(type) {
             "OK":function () {
                 return true;
             },
-            "AddMoreRoles": function(){
-                return true;
+            "AddRoles": function(){
+                addroles();
             }
 
         }
@@ -67,16 +69,22 @@ PaperObject.register = function(type) {
         var pageOneContent2 = '' +
         '<div id="easydb-dialog">' +
         '<h3>Roles</h3>';
+
         roles.forEach (function(item){
-            pageOneContent2 += '<input style="margin-top:0px;" class="maxWidth" placeholder="'+item.name + item.rights+'">';
+            pageOneContent2 += '<input style="margin-top:0px;" class="maxWidth" placeholder="'+item.name+': ' + item.rights+'">';
             });
-           pageOneContent2 +=
-        '<h3>Userlists</h3>' +
-        '<input style="margin-top:0px;" class="maxWidth" placeholder="Writer">' +
-        '<input style="margin-top:20px;" class="maxWidth" placeholder="Reviewer">' +
-        '</div>' ;
+
+        pageOneContent2 +='<h3>Userlists</h3>';
+
+        roles.forEach (function(item){
+            pageOneContent2 += '<input style="margin-top:0px;" class="maxWidth" placeholder="'+item.name+': ' + item.users+'">';
+            });
+
+        pageOneContent2 +='</div>';
+
         var pageOneContent =$(pageOneContent2);
-        console.log(pageOneContent);
+
+
         var dialog = GUI.dialog(
            "Right manager for PaperObject",
            pageOneContent, pageOneButtons, 500, {height:500}
