@@ -29,3 +29,20 @@ UserManager.removeUser = function(role, object, user) {
     // do nothing
 };
 
+UserManager.getRoles = function(object, user, callback) {
+    
+    Dispatcher.registerCall( "umGetRoles"+object.id, function(data){
+                            // call the callback
+                            callback(data);
+                            
+                            // deregister
+                            Dispatcher.removeCall("umGetRoles"+object.id);
+                            });
+    
+    Modules.SocketClient.serverCall('umGetRoles', {
+                                    'object': object,
+                                    'username': user
+                                    });
+    
+};
+

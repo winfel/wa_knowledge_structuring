@@ -34,6 +34,7 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('login', UserManager.login);
   Dispatcher.registerCall('enter', UserManager.enterRoom);
   Dispatcher.registerCall('leave', UserManager.leaveRoom);
+  Dispatcher.registerCall('umGetRoles', UserManager.getRoles);
   
   Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);  
 
@@ -503,6 +504,15 @@ UserManager.modifyUser = function(role, object, user, add) {
 
     });
   });
+};
+
+UserManager.getRoles = function(socket, data){
+    var collection = db.get('roles');
+    
+    collection.find({ contextID:String(data.object.id) }, {}, function(e, docs){
+                         Modules.SocketServer.sendToSocket(socket, "umGetRoles" + data.object.id, docs);
+                    });
+    
 };
 
 
