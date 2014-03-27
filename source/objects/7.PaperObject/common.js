@@ -44,35 +44,47 @@ PaperObject.register = function(type) {
         object.execute(true);
 
     }, true);
-	
-    //Test Dialog for Right mMnager
-    this.registerAction('Right manager', function(object) {
 
-        var pageOneContent = $('' +
-        '<div id="easydb-dialog">' +
-		'<h3>Roles</h3>' +
-        '<input style="margin-top:0px;" class="maxWidth" placeholder="Writer">' +
-        '<input style="margin-top:20px;" class="maxWidth" placeholder="Reviewer">' +
-		'<h3>Userlists</h3>' +
-        '<input style="margin-top:0px;" class="maxWidth" placeholder="Writer">' +
-        '<input style="margin-top:20px;" class="maxWidth" placeholder="Reviewer">' +
-        '</div>'
-		);
-		
-		var pageOneButtons = {
+
+        
+        var pageOneButtons = {
             "Abbrechen":function () {
                 return false;
             },
             "OK":function () {
                 return true;
+            },
+            "AddMoreRoles": function(){
+                return true;
             }
 
         }
+
+    //Test Dialog for Right mMnager
+    this.registerAction('Right manager', function(object) {
+
+	 Modules.UserManager.getRoles({id:1}, GUI.username, function(roles){
+        var pageOneContent2 = '' +
+        '<div id="easydb-dialog">' +
+        '<h3>Roles</h3>';
+        roles.forEach (function(item){
+            pageOneContent2 += '<input style="margin-top:0px;" class="maxWidth" placeholder="'+item.name + item.rights+'">';
+            });
+           pageOneContent2 +=
+        '<h3>Userlists</h3>' +
+        '<input style="margin-top:0px;" class="maxWidth" placeholder="Writer">' +
+        '<input style="margin-top:20px;" class="maxWidth" placeholder="Reviewer">' +
+        '</div>' ;
+        var pageOneContent =$(pageOneContent2);
+        console.log(pageOneContent);
+        var dialog = GUI.dialog(
+           "Right manager for PaperObject",
+           pageOneContent, pageOneButtons, 500, {height:500}
+       )
+
+        });
+
 		
-		var dialog = GUI.dialog(
-            "Right manager for PaperObject",
-            pageOneContent, pageOneButtons, 500, {height:500}
-        )
 
     }, true);
 	
