@@ -48,7 +48,7 @@ Writer.createRepresentation = function(parent) {
 	$rep.attr({ id: this.getAttribute('id') });
 	$rep.append(body);
 	
-    var pWriter = $(body).attr('id', 'paperWriter');
+    var pWriter = $(body).addClass('paperWriter');
     pWriter.append("<iframe></iframe>");
     
     var iFrame = $(pWriter.find("iframe"));

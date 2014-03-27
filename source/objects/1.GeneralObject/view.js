@@ -1416,7 +1416,6 @@ GeneralObject.clickTimeout = false;
  * @param {DomEvent} event The DOM click event
  */
 GeneralObject.click = function(event) {
-  console.info("-- GeneralObject.click: " + this.clickTimeout);
   var self = this;
 
   if (GUI.isTouchDevice) {
@@ -1468,8 +1467,6 @@ GeneralObject.click = function(event) {
  * @param {DomEvent} event DOM click event
  */
 GeneralObject.clickHandler = function(event) {
-  console.info("GeneralObject.clickHandler");
-
 
   if (GUI.isTouchDevice && event.touches.length > 1) {
     this.select(true);
@@ -1504,7 +1501,6 @@ GeneralObject.clickHandler = function(event) {
  */
 GeneralObject.clickRevertHandler = function(event) {
   /* for a faster feeling the click event is called when the first click is recognized, even if there will be a second (double) click. In case of a double click we have to revert the click action */
-  console.info("GeneralObject.clickRevertHandler");
   this.deselect();
 }
 
@@ -1535,7 +1531,6 @@ GeneralObject.selectHandler = function() {
  * Called after object deselection
  */
 GeneralObject.deselectHandler = function() {
-  console.info("GeneralObject.deselectHandler");
   GUI.hideLinks(this);
 }
 
@@ -1544,7 +1539,6 @@ GeneralObject.deselectHandler = function() {
  * @param {DomEvent} event DOM click event
  */
 GeneralObject.dblclickHandler = function(event) {
-  console.info("GeneralObject.dblclickHandler");
   this.execute(event);
 }
 
@@ -1553,7 +1547,6 @@ GeneralObject.dblclickHandler = function(event) {
  * @param {DomEvent} event DOM click event
  */
 GeneralObject.selectedClickHandler = function(event) {
-  console.info("GeneralObject.selectedClickHandler");
 
   if (GUI.shiftKeyDown) {
     this.deselect();

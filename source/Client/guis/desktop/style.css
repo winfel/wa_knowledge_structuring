@@ -780,3 +780,18 @@ svg text.font-icon{
 .hidden{
   display: none;
 }
+
+
+/* tag dialog */
+
+#tags { float: left; width: 65%; min-height: 12em; }
+.tags.custom-state-active { background: #eee; }
+.tags li { float: left; width: 96px; padding: 0.4em; margin: 0 0.4em 0.4em 0; text-align: center; }
+.tags li h5 { margin: 0; cursor: move; }
+.tags li a { float: right; }
+.tags li img { width: 100%; cursor: move; }
+#document { float: right; width: 32%; min-height: 18em; padding: 1%; }
+#document h4 { line-height: 30px; margin: 0 0 0.4em; }
+#document h4 span { padding: 5px; }
+
+/* end tag dialog */

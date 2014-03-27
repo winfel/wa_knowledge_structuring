@@ -134,6 +134,12 @@ File.register=function(type){
 		return (ObjectManager.getSelected()[0].hasContent() === true);
 	});
 	
+	this.registerAction(this.translate(this.currentLanguage, "Edit"), function(){
+		$.each(ObjectManager.getSelected(), function(key, object) {
+			object.setTag();
+		});
+	}, true);
+	
 	
 	this.registerAction(this.translate(this.currentLanguage, "Download"),function(){
 		
