@@ -1,13 +1,14 @@
 /**
  * Provides API methods for Object related tasks
  */
+
 "use strict";
 
 var api = require('etherpad-lite-client'),
 	etherpad = api.connect({
-		apikey: 'q9kBEvZ6ECvWlAskcVK6pBqA6LW52r8V',
-		host: 'localhost',
-		port: 9001,
+		apikey: global.config.etherpadlite.apikey,
+		host: global.config.etherpadlite.host,
+		port: global.config.etherpadlite.port,
 	});
 
 var EtherpadController = {};
@@ -30,7 +31,7 @@ EtherpadController.convertToPdf = function(html, callback) {
 		if (err) throw err;
 
 		// the temporary html file is written, now call wkhtmltopdf on it
-		child = execf('C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf',
+		child = execf(global.config.wkhtmltopdf.path,
 		[
 			tmpFilename + '.html',
 			tmpFilename + '.pdf',
