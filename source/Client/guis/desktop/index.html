@@ -46,7 +46,7 @@
         <script src="/ObjectManager.js"></script>
         <script src="/RightManager.js"></script>
         <script src="/UserManager.js"></script>
-		
+
         <script src="/Common/Log.js"></script>
         <script src="/Common/DataSet.js"></script>
         <script src="/Common/ActionManager.js"></script>
@@ -70,7 +70,7 @@
                 'ActionManager': ActionManager,
                 //'Schema':Schema,
                 'RightManager': RightManager,
-				'UserManager': UserManager};
+                'UserManager': UserManager};
 
 
             $(document).ready(function() {
@@ -103,7 +103,7 @@
         <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jDesktopInspector.js"></script>
         <link type="text/css" href="/guis.common/libraries/jquery/plugins/css/jquery.jDesktopInspector.css" rel="Stylesheet">
         <link type="text/css" href="/guis.common/libraries/jquery/plugins/css/jquery.jPopover.desktop.css" rel="Stylesheet">
-        
+
         <link type="text/css" href="/guis/desktop/objects/paperWriter.css" rel="Stylesheet">
 
         <script type="text/javascript" src="/guis/desktop/main.js"></script>
@@ -155,148 +155,193 @@
                 <div>
                     <div id="inspector"></div>
                     <div id="rightmanager">
-                        <div>
-                            <p>Looks like a good position for the right management of a container object to us (Lisa & Patrick).</p>
-                            <p>We need another icon :).</p>
+                        <div class="jDesktopInspector_main">
+                            <div class="jDesktopInspector_pageHead">Roles</div>
+                            <div class="jDesktopInspector_page jDesktopInspector_page_0">
+                                <div class="jDesktopInspector_section">
+                                    <div class="jDesktopInspector_element">Reader</div>
+                                    <div class="jDesktopInspector_element">Writer</div>
+                                    <div class="jDesktopInspector_element">Boss</div>
+                                    <div class="jDesktopInspector_element" style="text-align: right;">
+                                        <input type="button" value="Add">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="jDesktopInspector_pageHead">Rights</div>
+                            <div class="jDesktopInspector_page">
+                                <div class="jDesktopInspector_section">
+                                    <div class="jDesktopInspector_element">
+                                        <input type="checkbox" value="create"> Create
+                                    </div>
+                                    <div class="jDesktopInspector_element">
+                                        <input type="checkbox" value="read" checked="checked"> Read
+                                    </div>
+                                    <div class="jDesktopInspector_element">
+                                        <input type="checkbox" value="update"> Update
+                                    </div>
+                                    <div class="jDesktopInspector_element">
+                                        <input type="checkbox" value="delete"> Delete
+                                    </div>
+                                    <div class="jDesktopInspector_element" style="text-align: right;">
+                                        <input type="button" value="Add">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="jDesktopInspector_pageHead">Users</div>
+                            <div class="jDesktopInspector_page">
+                                <div class="jDesktopInspector_section">
+                                    <div class="jDesktopInspector_element">
+                                        joerg
+                                    </div>
+                                    <div class="jDesktopInspector_element">
+                                        vanessa
+                                    </div>
+                                    <div class="jDesktopInspector_element" style="text-align: right;">
+                                        <input type="button" value="Add">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div id="chat"></div>
-                    <div id="bug">                    
+                </div>
+                <div id="chat"></div>
+                <div id="bug">                    
 
-                        <div>
-                            Ist Ihnen bei der Benutzung ein Fehler aufgefallen? Teilen Sie uns ihn doch bitte mit.<br />
-                            Bitte haben Sie Verständnis dafür, dass wir nicht auf jede Anfrage persönlich antworten können.
-                            <span><br />
-                                <br />
-                                Beachten Sie: Mit Ihrer Fehlermeldung wird eine Liste aller Objekte gesendet, um uns eine Auswertung des Fehlers zu ermöglichen.
-                            </span>
-                        </div>
+                    <div>
+                        Ist Ihnen bei der Benutzung ein Fehler aufgefallen? Teilen Sie uns ihn doch bitte mit.<br />
+                        Bitte haben Sie Verständnis dafür, dass wir nicht auf jede Anfrage persönlich antworten können.
+                        <span><br />
+                            <br />
+                            Beachten Sie: Mit Ihrer Fehlermeldung wird eine Liste aller Objekte gesendet, um uns eine Auswertung des Fehlers zu ermöglichen.
+                        </span>
+                    </div>
 
-                        <div id="bug_report">
+                    <div id="bug_report">
 
-                            <span>Was wollten Sie tun?</span>
-                            <textarea id="bug_task"></textarea>
+                        <span>Was wollten Sie tun?</span>
+                        <textarea id="bug_task"></textarea>
 
-                            <span>Welches Problem ist aufgetreten?</span>
-                            <textarea id="bug_problem"></textarea>
+                        <span>Welches Problem ist aufgetreten?</span>
+                        <textarea id="bug_problem"></textarea>
 
-                            <span>Ihre Email-Adresse:</span>
-                            <input type="email" id="bug_email" />
+                        <span>Ihre Email-Adresse:</span>
+                        <input type="email" id="bug_email" />
 
-                            <p><input type="submit" value="Senden" id="bug_submit" /></p>
-
-                        </div>
-
-                        <div id="bug_result"></div>
+                        <p><input type="submit" value="Senden" id="bug_submit" /></p>
 
                     </div>
+
+                    <div id="bug_result"></div>
+
                 </div>
             </div>
         </div>
+    </div>
 
-        <div id="actionsheet"></div>
+    <div id="actionsheet"></div>
 
-        <div id="error_bg"></div>
-        <div id="error_box">
+    <div id="error_bg"></div>
+    <div id="error_box">
 
-            <div id="error_box_heading"></div>
-            <div id="error_box_message"></div>
-            <div id="error_box_button"></div>
+        <div id="error_box_heading"></div>
+        <div id="error_box_message"></div>
+        <div id="error_box_button"></div>
 
+    </div>
+
+
+    <div id="login_background" style="display: none">&nbsp;</div>
+    <div id="login" style="display: none;">
+
+        <div class="login_title" id="login_title">Webarena 1.0</div>
+
+        <div class="login_error"></div>
+
+        <div class="login_icon login_icon_username"></div>
+        <input type="text" name="username" value="" id="login_username" class="login_input" autocomplete="off" placeholder="Username" autofocus="autofocus" />
+
+        <br />
+
+        <div class="login_icon login_icon_password"></div><input type="password" name="password" value="" id="login_password" class="login_input" autocomplete="off" />
+
+        <br />
+
+        <input type="submit" name="login" value="Login" class="login_submit" id="login_submit" />
+
+    </div>
+
+
+    <div id="progressBar"><div class="progressBar_container"></div></div>
+
+    <!-- BEGIN: Underscore Template Definition. -->
+    <script type="text/template" id="proceeding-statusdialog">
+        <div>
+        <table>
+        <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Startdatum</th>
+        <th>Enddatum</th>
+        </tr>
+        <% _.each(milestones, function(mileStone, index) { %>
+        <tr>
+        <td>
+        <input type="checkbox" name="" value="" <%= mileStone.done ? 'checked disabled' : ''%> >
+        </td>
+        <td>
+        <%- mileStone.name %>
+        </td>
+        <td>
+        <%- mileStone.startdate || "Nicht gesetzt" %>
+        </td>
+        <td>
+        <% if( editable == index){ %>
+        <input readonly='true' class="datepicker-trigger" type="text" value="<%- mileStone.enddate %>">
+        <% } else { %>
+        <%- mileStone.enddate || "Nicht gesetzt" %>
+        <% } %>
+        </td>
+        <tr>
+        <% }); %>
+        </table>
         </div>
-
-
-        <div id="login_background" style="display: none">&nbsp;</div>
-        <div id="login" style="display: none;">
-
-            <div class="login_title" id="login_title">Webarena 1.0</div>
-
-            <div class="login_error"></div>
-
-            <div class="login_icon login_icon_username"></div>
-            <input type="text" name="username" value="" id="login_username" class="login_input" autocomplete="off" placeholder="Username" autofocus="autofocus" />
-
-            <br />
-
-            <div class="login_icon login_icon_password"></div><input type="password" name="password" value="" id="login_password" class="login_input" autocomplete="off" />
-
-            <br />
-
-            <input type="submit" name="login" value="Login" class="login_submit" id="login_submit" />
-
+    </script>
+    <script type="text/template" id="process-log-entry-template">
+        <div>
+        <% _.each(logEntries, function(logEntry) { %>
+        <p class="<%= logEntry.cssclass %>"> <%= moment(logEntry.timestamp).format("DD.MM.YY, HH:mm:ss") %> <br/>
+        <%= logEntry.message %></p>
+        <% }); %>
         </div>
+    </script>
+    <script type="text/template" id="discussion-message-template">
 
+        <div class='discussion-statement <%- additionalClasses %>' data-message-id='<%- message.timestamp %>'>
+        <div class='discussion-statement-heading'>
+        <span class='message-author'> <%- message.author %> </span>
+        <span class='message-timestamp'>( <%- message.formattedTimestamp %> )</span>
+        </div>
+        <p class='discussion-statement-text'> <%- message.text %> </p>
 
-        <div id="progressBar"><div class="progressBar_container"></div></div>
+        <div class='statement-delete'>löschen</div>
+        <div class='statement-edit'>bearbeiten</div>
+        </div>
+    </script>
+    <script type="text/template" id="discussion-container-template">
+        <div class="discussion">
+        <div class="embedded-toolbar moveArea">
+        <span class="minimize-button"></span>
+        </div>
+        <div class="discussion-content">
+        <div class="discussion-heading"> <%- heading %>
+        </div>
+        <div class="discussion-text"></div>
+        </div>
+        <input class="discussion-input" placeholder=Texteingabe>
+        </div>
+    </script>
+    <!-- END: Underscore Template Definition. -->
 
-        <!-- BEGIN: Underscore Template Definition. -->
-        <script type="text/template" id="proceeding-statusdialog">
-            <div>
-            <table>
-            <tr>
-            <th></th>
-            <th>Name</th>
-            <th>Startdatum</th>
-            <th>Enddatum</th>
-            </tr>
-            <% _.each(milestones, function(mileStone, index) { %>
-            <tr>
-            <td>
-            <input type="checkbox" name="" value="" <%= mileStone.done ? 'checked disabled' : ''%> >
-            </td>
-            <td>
-            <%- mileStone.name %>
-            </td>
-            <td>
-            <%- mileStone.startdate || "Nicht gesetzt" %>
-            </td>
-            <td>
-            <% if( editable == index){ %>
-            <input readonly='true' class="datepicker-trigger" type="text" value="<%- mileStone.enddate %>">
-            <% } else { %>
-            <%- mileStone.enddate || "Nicht gesetzt" %>
-            <% } %>
-            </td>
-            <tr>
-            <% }); %>
-            </table>
-            </div>
-        </script>
-        <script type="text/template" id="process-log-entry-template">
-            <div>
-            <% _.each(logEntries, function(logEntry) { %>
-            <p class="<%= logEntry.cssclass %>"> <%= moment(logEntry.timestamp).format("DD.MM.YY, HH:mm:ss") %> <br/>
-            <%= logEntry.message %></p>
-            <% }); %>
-            </div>
-        </script>
-        <script type="text/template" id="discussion-message-template">
-
-            <div class='discussion-statement <%- additionalClasses %>' data-message-id='<%- message.timestamp %>'>
-            <div class='discussion-statement-heading'>
-            <span class='message-author'> <%- message.author %> </span>
-            <span class='message-timestamp'>( <%- message.formattedTimestamp %> )</span>
-            </div>
-            <p class='discussion-statement-text'> <%- message.text %> </p>
-
-            <div class='statement-delete'>löschen</div>
-            <div class='statement-edit'>bearbeiten</div>
-            </div>
-        </script>
-        <script type="text/template" id="discussion-container-template">
-            <div class="discussion">
-            <div class="embedded-toolbar moveArea">
-            <span class="minimize-button"></span>
-            </div>
-            <div class="discussion-content">
-            <div class="discussion-heading"> <%- heading %>
-            </div>
-            <div class="discussion-text"></div>
-            </div>
-            <input class="discussion-input" placeholder=Texteingabe>
-            </div>
-        </script>
-        <!-- END: Underscore Template Definition. -->
-
-    </body>
+</body>
 </html>

@@ -10,7 +10,7 @@ GUI.rightmanager = new function() {
   };
 
   this.updateContent = function(theObject) {
-    $("#rightmanager").html("<p>Rightmanager for:<br>- " + theObject.id + "<br>- " + theObject.type + "</p>");
+    //$("#rightmanager").html("<p>Rightmanager for:<br>- " + theObject.id + "<br>- " + theObject.type + "</p>");
   };
 };
 
