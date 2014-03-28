@@ -226,6 +226,11 @@ function unassignTag( $item ) {
 	drawTags();
 };
 
+// Autocomplete start
+$( "#autocomplete" ).autocomplete({
+  source: [ "c++", "java", "php", "coldfusion", "javascript", "asp", "ruby" ]
+});
+// Autocomplete end 
 
 /**
  * Set/Edit tags using a dialog
@@ -256,6 +261,10 @@ GUI.setTag = function(webarenaObject, width, height, passThrough) {
 		content+= '		</div>';
 		content+= '		<button id="btn-previous"><</button>';
 		content+= '		<button id="btn-next">></button>';
+		content+= '     			<div id="autocomplete" class="ui-widget">';
+		content+= '     				<label for="autocomplete"><b>Manual tags:</b> </label>';
+	    content+= '						<input id="autocomplete">';
+		content+= '					</div>';
 		content+= '    </div>';
 		content+= '</div>';
 	
