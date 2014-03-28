@@ -45,10 +45,62 @@ PaperObject.register = function(type) {
 
     }, true);
 
-    function addroles(){
-            
-    };
-        
+function addroles(){
+        var roleDialog =$( ''+
+        '<div id="addrole-dialog">' +
+        '<h3>Adding roles</h3>'+
+        '<input type="checkbox" id="hacker"> Hacker </input>'+ '<br>'+
+        '<input type="checkbox" id="monkey"> Programming Monkey </input>'+'<br>'+
+        '<input type="checkbox" id="supervisor"> Supervisor </input>'+'<br>'+
+        '<input id="own" placeholder="Your own role">'
+         );
+
+        var roleButtons = {
+            "Abbrechen":function () {
+                setDialog();
+            },
+            "Save":function () {
+        Modules.UserManager.getRoles({id:1}, GUI.username, function(roles){
+        var pageOneContent2 = '' +
+        '<div id="easydb-dialog">' +
+        '<h3>Roles</h3>';
+
+        roles.forEach (function(item){
+            pageOneContent2 += '<input style="margin-top:0px;" class="maxWidth" placeholder="'+item.name+': ' + item.rights+'">';
+            });
+
+        console.log("Hacker id: "+$("#hacker").is(":checked"));
+        if ($("#hacker").is(":checked")) 
+        {
+            pageOneContent2 += '<input style="margin-top:0px;" class="maxWidth" placeholder="Hacker">'; 
+        };
+
+        pageOneContent2 +='<h3>Userlists</h3>';
+
+        roles.forEach (function(item){
+            pageOneContent2 += '<input style="margin-top:0px;" class="maxWidth" placeholder="'+item.name+': ' + item.users+'">';
+            });
+
+        pageOneContent2 +='</div>';
+
+        var pageOneContent =$(pageOneContent2);
+
+
+        var dialog = GUI.dialog(
+           "Right manager for PaperObject",
+           pageOneContent, pageOneButtons, 500, {height:400}
+       )
+
+        });
+            }
+        }
+
+         var dialog = GUI.dialog(
+           "Role manager for PaperObject",
+           roleDialog, roleButtons, 500, {height:300}
+       );
+    
+ };      
         var pageOneButtons = {
             "Abbrechen":function () {
                 return false;
@@ -62,10 +114,9 @@ PaperObject.register = function(type) {
 
         }
 
-    //Test Dialog for Right mMnager
-    this.registerAction('Right manager', function(object) {
 
-	 Modules.UserManager.getRoles({id:1}, GUI.username, function(roles){
+    function setDialog(){
+        Modules.UserManager.getRoles({id:1}, GUI.username, function(roles){
         var pageOneContent2 = '' +
         '<div id="easydb-dialog">' +
         '<h3>Roles</h3>';
@@ -87,12 +138,17 @@ PaperObject.register = function(type) {
 
         var dialog = GUI.dialog(
            "Right manager for PaperObject",
-           pageOneContent, pageOneButtons, 500, {height:500}
+           pageOneContent, pageOneButtons, 500, {height:400}
        )
 
         });
+    };
 
-		
+
+    //Test Dialog for Right mMnager
+    this.registerAction('Right manager', function(object) {
+
+        setDialog();
 
     }, true);
 	
