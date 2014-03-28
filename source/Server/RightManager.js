@@ -3,6 +3,37 @@ var db = require('monk')('localhost/WebArena');
 var Modules = false;
 var DEBUG_OF_RIGHTMANAGEMENT = false;
 
+var fillWithDefaultRights = function(){
+    /* one role per default - read only for all users */
+    var pushRoles = ['PaperObject#writer#read,write,create',
+                     'PaperObject#reviewer#read,write'];
+    
+    /* push default roles */
+    collection = db.get('defroles');
+    pushRoles.forEach(function(item) {
+                      var token = item.split("#");
+                      
+                      var aObject = String(token[0]);
+                      var aName = String(token[1]);
+                      var someRights = String(token[2]).split(",");
+                      
+                      collection.find({object: String(aObject), name: String(aName)}, {}, function(e, docs) {
+                                      if(typeof docs == 'undefined' || docs.length === 0){
+                                      collection.insert({
+                                                        object: aObject,
+                                                        name: aName,
+                                                        rights: someRights});
+                                      if (DEBUG_OF_RIGHTMANAGEMENT) {
+                                      console.log("pushing default object: " + String(aObject));
+                                      }
+                                      }else{
+                                      console.log("default object " + aObject + " was already included");
+                                      }
+                                      });
+                      });
+    
+};
+
 var fillCurrentDbWithLayer0CanvasData = function(){
     
     if (DEBUG_OF_RIGHTMANAGEMENT) {
@@ -150,7 +181,8 @@ var fillCurrentDbWithTestData = function() {
 var RightManager = function() {
   fillCurrentDbWithTestData();
   fillCurrentDbWithLayer0CanvasData();
-  
+  fillWithDefaultRights();
+    
   var possibleAccessRights = [];
   var that = this;
 
