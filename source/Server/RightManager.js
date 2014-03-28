@@ -93,9 +93,9 @@ var fillCurrentDbWithLayer0CanvasData = function(){
                         var aID = String(token[0]);
                         var aContextID = String(token[1]);
                         var aName = String(token[2]);
-                        var someRights = String(token[3]).split("#");
+                        var someRights = String(token[3]).split(",");
                         var aMode = String(token[4]);
-                        var someUser = String(token[5]).split("#");
+                        var someUser = String(token[5]).split(",");
                       
                         collection.find({name: String(aName), contextID: String(aContextID)}, {}, function(e, docs) {
                                       if(typeof docs == 'undefined' || docs.length === 0){
@@ -161,9 +161,9 @@ var fillCurrentDbWithTestData = function() {
     var aID = String(token[0]);
     var aContextID = String(token[1]);
     var aName = String(token[2]);
-    var someRights = String(token[3]).split("#");
+    var someRights = String(token[3]).split(",");
     var aMode = String(token[4]);
-    var someUser = String(token[5]).split("#");
+    var someUser = String(token[5]).split(",");
 
     collection.insert({id: aID,
       contextID: aContextID,
