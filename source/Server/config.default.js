@@ -46,7 +46,7 @@ module.exports={
         host: "localhost",
         port: 9001
     },
-    wkhtmltopdf: {
+    wkhtmltox: {
         path: ""
     }
 };

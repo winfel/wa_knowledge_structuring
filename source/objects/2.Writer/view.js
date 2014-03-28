@@ -68,5 +68,5 @@ Writer.createRepresentation = function(parent) {
 
 	this.initGUI(rep);
 	
-	return rep;s
+	return rep;
 }
