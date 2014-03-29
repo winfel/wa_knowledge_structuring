@@ -156,16 +156,20 @@
                     <div id="inspector"></div>
                     <div id="rightmanager">
                         <div class="jDesktopInspector_main">
-                            <div class="jDesktopInspector_pageHead">Roles</div>
+                            <div class="jDesktopInspector_pageHead">Roles:</div>
                             <div class="jDesktopInspector_page jDesktopInspector_page_0">
                                 <div class="jDesktopInspector_section">
-                                    <div class="jDesktopInspector_element">Reader</div>
-                                    <div class="jDesktopInspector_element">Writer</div>
-                                    <div class="jDesktopInspector_element">Boss</div>
+                                    <select class="jDesktopInspector_element" id="roles" size="1">
+								    </select>
+								</div>
+								<div>
+									<div class="jDesktopInspector_element">
+										<input name="newRoleName" type="text" size="15" value="New Role" onfocus="this.value=''">
+									</div>
                                     <div class="jDesktopInspector_element" style="text-align: right;">
-                                        <input type="button" value="Add">
-                                    </div>
-                                </div>
+                                        <input type="button" value="Add role">
+                                    </div> 
+                                </div>                               
                             </div>
 
                             <div class="jDesktopInspector_pageHead">Rights</div>

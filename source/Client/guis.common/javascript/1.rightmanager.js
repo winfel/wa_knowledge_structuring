@@ -10,7 +10,22 @@ GUI.rightmanager = new function() {
   };
 
   this.updateContent = function(theObject) {
-    //$("#rightmanager").html("<p>Rightmanager for:<br>- " + theObject.id + "<br>- " + theObject.type + "</p>");
+	  
+	  /* TODO: Display selected object information */
+
+	  /* Get Roles of selected object and write the roles into combobox */
+	  Modules.UserManager.getRoles({id:1}, GUI.username, function(roles){
+		  $("#roles").empty();
+		  roles.forEach(function(item){
+			  $("#roles").append("<option>"+item.name+"</option>");
+          });		 
+	  });
+	  
+	  /* TODO: Get rights */
+	  
+	  
+	  /* TODO: Get users */
+	  
   };
 };
 
