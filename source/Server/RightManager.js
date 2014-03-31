@@ -121,7 +121,13 @@ var fillCurrentDbWithTestData = function() {
     console.log("filling testdata");
   }
 
-  var pushRights = ['1#create', '2#read', '3#update', '4#delete'];
+  var pushRights = ['Canvas#1#create#You may create something on the canvas',
+                    'Canvas#2#read#You may read something on the canvas',
+                    'Canvas#3#update#You may change something on the canvas',
+                    'Canvas#4#delete#You may delete something on the canvas',
+                    'PaperObject#5#read#You may read the selected PaperObject',
+                    'PaperObject#6#update#You may change the selected PaperObject',
+                    'PaperObject#7#delete#You may delete the selected PaperObject'];
   var pushUsers = ['joerg#12345', 'Vanessa#xyz'];
   var pushRoles = ['1#1#RandomGuys#create,read#overwrite#joerg,vanessa',
     '2#1#Boss#read#overwrite#vanessa'];
@@ -135,7 +141,7 @@ var fillCurrentDbWithTestData = function() {
   var collection = db.get('rights');
   pushRights.forEach(function(item) {
     var token = item.split("#");
-    collection.insert({id: String(token[0]), name: String(token[1])});
+            collection.insert({type: String(token[0]), id: String(token[1]), name: String(token[2]), comment: String(token[3])});
 
     if (DEBUG_OF_RIGHTMANAGEMENT) {
       console.log("pushing testright: " + String(token[1]));
@@ -286,7 +292,41 @@ var RightManager = function() {
    *	A call could look like this:  grantAccess("read","AB","reviewer");
    */
   this.grantAccess = function(command, object, role) {
+    //FIXME: atm usage of a simple workaround to append 'typeOfThisObject'
+    if(object.typeOfThisObject == 'undefined'){
+      object.typeOfThisObject = "";
+    }
+
+    // granting access
     this.modifyAccess(command, object, role, true);
+
+    // add right also to the right list
+    var collection = db.get('rights');
+    collection.find({type: String(object.typeOfThisObject), name: String(command)}, 
+                      {}, function(e, docs) {
+
+                          // FIXME: Get correct id of the right
+                        if(typeof docs == 'undefined' || docs.length === 0){
+                          collection.insert({type: String(object.typeOfThisObject) , 
+                            type: String(object.typeOfThisObject),
+                            id: String(-1), 
+                            name: String(command),
+                            comment: "Insert a comment..."});
+
+                          if (DEBUG_OF_RIGHTMANAGEMENT) {
+                            console.log("pushing new right: " + String(token[1]));
+                          }
+                        }else{
+                          if(DEBUG_OF_RIGHTMANAGEMENT){
+                            console.log("right " + command + " was already included and has, " +
+                              "thus, not been included to the right list");
+
+                            console.log(">> The result was: ");
+                            console.log(docs);
+                            console.log(">> ---------------- <<");
+                          }
+                        }
+                      });
   };
 
   /**
