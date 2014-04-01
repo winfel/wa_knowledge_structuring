@@ -30,20 +30,20 @@ var RightManager = new function() {
   this.hasAccess = function(command, object, user, callback) {
     console.log("hasAccess");
 
-      Dispatcher.registerCall( "rmAccessGranted"+object.id, function(){
-                              // call the callback
-                              callback(true);
-                              // deregister
-                              Dispatcher.removeCall("rmAccessGranted"+object.id);
-                              });
-    
-      Dispatcher.registerCall( "rmAccessDenied"+object.id, function(){
-                              // call the callback
-                              callback(false);
-                              // deregister
-                              Dispatcher.removeCall("rmAccessDenied"+object.id);
-                              });
-      
+    Dispatcher.registerCall("rmAccessGranted" + object.id, function() {
+      // call the callback
+      callback(true);
+      // deregister
+      Dispatcher.removeCall("rmAccessGranted" + object.id);
+    });
+
+    Dispatcher.registerCall("rmAccessDenied" + object.id, function() {
+      // call the callback
+      callback(false);
+      // deregister
+      Dispatcher.removeCall("rmAccessDenied" + object.id);
+    });
+
     Modules.SocketClient.serverCall('rmHasAccess', {
       'command': command,
       'object': object,
@@ -51,6 +51,29 @@ var RightManager = new function() {
     });
 
     //callback(true);
+  };
+
+  /**
+   * 
+   * 
+   * @param {type} object   The object
+   * @param {type} user     The current user
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.getRights = function(object, role, user, callback) {
+
+    Dispatcher.registerCall("rmObjectRights" + object.id, function(data) {
+      callback(data);
+
+      Dispatcher.removeCall("rmObjectRights" + object.id);
+    });
+
+    Modules.SocketClient.serverCall('rmGetObjectRights', {
+      'object': object.type,
+      'role': role,
+      'username': user
+    });
   };
 
   /**
