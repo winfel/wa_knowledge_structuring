@@ -305,31 +305,36 @@ var RightManager = function() {
 
     // add right also to the right list
     var collection = db.get('rights');
-    collection.find({type: String(object.typeOfThisObject), name: String(command)},
-    {}, function(e, docs) {
+    collection.find({type: String(object.typeOfThisObject), name: String(command)}, 
+      {}, function(e, docs) {
 
-      // FIXME: Get correct id of the right
-      if (typeof docs == 'undefined' || docs.length === 0) {
-        collection.insert({type: String(object.typeOfThisObject),
-          type: String(object.typeOfThisObject),
-                  id: String(-1),
-          name: String(command),
-          comment: "Insert a comment..."});
+        var options = { "limit": 1, "sort": [['id','desc']]};
+        collection.find({},options, function(e2,rightWithMaxID){
 
-        if (DEBUG_OF_RIGHTMANAGEMENT) {
-          console.log("pushing new right: " + String(token[1]));
-        }
-      } else {
-        if (DEBUG_OF_RIGHTMANAGEMENT) {
-          console.log("right " + command + " was already included and has, " +
-                  "thus, not been included to the right list");
+          if(typeof docs == 'undefined' || docs.length === 0){
+            var newID = Number(rightWithMaxID[0].id)+1;
 
-          console.log(">> The result was: ");
-          console.log(docs);
-          console.log(">> ---------------- <<");
-        }
-      }
-    });
+            collection.insert({type: String(object.typeOfThisObject) , 
+              type: String(object.typeOfThisObject),
+              id: String(newID), 
+              name: String(command),
+              comment: "Insert a comment..."});
+
+            if (DEBUG_OF_RIGHTMANAGEMENT) {
+              console.log("pushing new right: " + String(token[1]));
+            }
+          }else{
+            if(DEBUG_OF_RIGHTMANAGEMENT){
+              console.log("right " + command + " was already included and has, " +
+                "thus, not been included to the right list");
+
+              console.log(">> The result was: ");
+              console.log(docs);
+              console.log(">> ---------------- <<");
+            }
+          }
+        });
+      });
   };
 
   /**
