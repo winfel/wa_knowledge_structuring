@@ -52,7 +52,7 @@ Writer.createRepresentation = function(parent) {
     pWriter.append("<iframe></iframe>");
     
     var iFrame = $(pWriter.find("iframe"));
-    iFrame.attr('src', 'http://' + window.location.hostname + ':9001/p/' + this.getAttribute('paper'));
+    iFrame.attr('src', 'http://' + window.location.hostname + ':9001/p/' + this.getAttribute('paper') + '?userName=' +  encodeURIComponent(GUI.userid));
 	//iFrame.attr('src', 'http://beta.etherpad.org/webArenaDemo' + this.getAttribute('paper') + '?showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=false');
 
 	this.initGUI(rep);
