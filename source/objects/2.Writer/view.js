@@ -57,7 +57,7 @@ Writer.createRepresentation = function(parent) {
 		iframe_loaded = true;
     });
 
-    iFrame.attr('src', 'http://' + window.location.hostname + ':9001/p/' + this.getAttribute('paper'));
+    iFrame.attr('src', 'http://' + window.location.hostname + ':9001/p/' + this.getAttribute('paper') + '?userName=' +  encodeURIComponent(GUI.userid));
 	//iFrame.attr('src', 'http://beta.etherpad.org/webArenaDemo' + this.getAttribute('paper') + '?showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=false');
 
 	window.setTimeout(function(){
