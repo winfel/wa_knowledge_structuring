@@ -26,22 +26,29 @@ var ExportObject=Object.create(Modules.ObjectManager.getPrototype('IconObject'))
  * @see objects/1.GeneralObject/client.js
  * @param {string} type The type of the object
  */
-ExportObject.register=function(type){
-	
-	// Registering the object
-	
-	IconObject=Modules.ObjectManager.getPrototype('IconObject');
-	IconObject.register.call(this,type);
-	
-	this.makeSensitive();
-	
-	this.registerAttribute('bigIcon',{type:'boolean',standard:true,changedFunction: function(object) { 
-		object.updateIcon(); 
-	}, checkFunction: function(object, value) {
-		if (object.getAttribute("preview")) return "icon size not changeable when preview is shown";
-	}});
+ExportObject.register = function(type) {
 
-	this.registerAttribute('exportFormat',{type:'text',standard:'text'});
+    // Registering the object
+
+    IconObject = Modules.ObjectManager.getPrototype('IconObject');
+    IconObject.register.call(this, type);
+
+    this.makeSensitive();
+
+    this.registerAttribute('bigIcon', {
+        type: 'boolean',
+        standard: true,
+        
+        changedFunction: function(object) {
+            object.updateIcon();
+        },
+        checkFunction: function(object, value) {
+            if (object.getAttribute("preview")) return "icon size not changeable when preview is shown";
+        }
+    });
+
+    this.registerAttribute('exportFormat', {type: 'selection', standard: 'text', 
+        options: [ 'text', 'pdf', 'html', 'image_png', 'image_jpg', 'image_svg' ], category: 'Basic'});
 };
 
 ExportObject.register('ExportObject');
