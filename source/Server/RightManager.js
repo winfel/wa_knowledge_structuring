@@ -338,7 +338,15 @@ var RightManager = function() {
    *	A call could look like this: revokeAccess("read","AB","reviewer");
    */
   this.revokeAccess = function(command, object, role) {
+    //FIXME: atm usage of a simple workaround to append 'typeOfThisObject'
+    if(object.typeOfThisObject == 'undefined'){
+      object.typeOfThisObject = "";
+    }
+
     this.modifyAccess(command, object, role, false);
+
+    //FIXME: remove right from db.rights IFF it is not used (=> there is no role that includes that right)
+    
   };
 
   /**
