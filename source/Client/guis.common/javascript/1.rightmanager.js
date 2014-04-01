@@ -28,7 +28,16 @@ GUI.rightmanager = new function() {
 
     /* Initially no object is selected */
     rm_Content = $('#rightmanager').html();
-    $("#rightmanager").replaceWith("<div class = \"jDesktopInspector\" id=\"rightmanager\"><div class=\"jDesktopInspector_main\"><div class=\"jDesktopInspector_pageHead\">Object:</div>No Object selected!</div>");
+    $("#rightmanager").replaceWith("<div class = \"jDesktopInspector\" id=\"rightmanager\">" +
+			"<div class=\"jDesktopInspector_main\">" +
+				"<div class=\"jDesktopInspector_pageHead\">Object:</div>" +
+				"<div class=\"jDesktopInspector_page jDesktopInspector_page_0\">" +
+					"<div class=\"jDesktopInspector_section\">" +
+						"<div class=\"jDesktopInspector_element\">No Object selected!</div>" +
+					"</div>" +
+				"</div>" +
+			"</div>" +
+		"</div>");
 
 
   };
@@ -46,7 +55,16 @@ GUI.rightmanager = new function() {
 
       /* Store current content of rightmanager sidebar and replace it */
       rm_Content = $('#rightmanager').html();
-      $("#rightmanager").replaceWith("<div class = \"jDesktopInspector\" id=\"rightmanager\"><div class=\"jDesktopInspector_main\"><div class=\"jDesktopInspector_pageHead\">Object:</div>No Object selected!</div>");
+      $("#rightmanager").replaceWith("<div class = \"jDesktopInspector\" id=\"rightmanager\">" +
+			"<div class=\"jDesktopInspector_main\">" +
+				"<div class=\"jDesktopInspector_pageHead\">Object:</div>" +
+				"<div class=\"jDesktopInspector_page jDesktopInspector_page_0\">" +
+					"<div class=\"jDesktopInspector_section\">" +
+						"<div class=\"jDesktopInspector_element\">No Object selected!</div>" +
+					"</div>" +
+				"</div>" +
+			"</div>" +
+		"</div>");
 
     }
 
