@@ -122,14 +122,14 @@ var fillCurrentDbWithTestData = function() {
   }
 
   var pushRights = ['Canvas#1#create#You may create something on the canvas',
-                    'Canvas#2#read#You may read something on the canvas',
-                    'Canvas#3#update#You may change something on the canvas',
-                    'Canvas#4#delete#You may delete something on the canvas',
-                    'PaperObject#5#read#You may read the selected PaperObject',
-                    'PaperObject#6#update#You may change the selected PaperObject',
-                    'PaperObject#7#delete#You may delete the selected PaperObject',                    
-                    'NumberCreator#8#create#You may create the selected NumberCreater and NumericObjects',
-                    'NumberCreator#9#update#You may drop something on the PaperObject PaperObject'];
+    'Canvas#2#read#You may read something on the canvas',
+    'Canvas#3#update#You may change something on the canvas',
+    'Canvas#4#delete#You may delete something on the canvas',
+    'PaperObject#5#read#You may read the selected PaperObject',
+    'PaperObject#6#update#You may change the selected PaperObject',
+    'PaperObject#7#delete#You may delete the selected PaperObject',
+    'NumberCreator#8#create#You may create the selected NumberCreater and NumericObjects',
+    'NumberCreator#9#update#You may drop something on the PaperObject PaperObject'];
   var pushUsers = ['joerg#12345', 'Vanessa#xyz'];
   var pushRoles = ['1#1#RandomGuys#create,read#overwrite#joerg,vanessa',
     '2#1#Boss#read#overwrite#vanessa'];
@@ -143,7 +143,7 @@ var fillCurrentDbWithTestData = function() {
   var collection = db.get('rights');
   pushRights.forEach(function(item) {
     var token = item.split("#");
-            collection.insert({type: String(token[0]), id: String(token[1]), name: String(token[2]), comment: String(token[3])});
+    collection.insert({type: String(token[0]), id: String(token[1]), name: String(token[2]), comment: String(token[3])});
 
     if (DEBUG_OF_RIGHTMANAGEMENT) {
       console.log("pushing testright: " + String(token[1]));
@@ -296,7 +296,7 @@ var RightManager = function() {
    */
   this.grantAccess = function(command, object, role) {
     //FIXME: atm usage of a simple workaround to append 'typeOfThisObject'
-    if(object.typeOfThisObject == 'undefined'){
+    if (object.typeOfThisObject == 'undefined') {
       object.typeOfThisObject = "";
     }
 
@@ -305,31 +305,31 @@ var RightManager = function() {
 
     // add right also to the right list
     var collection = db.get('rights');
-    collection.find({type: String(object.typeOfThisObject), name: String(command)}, 
-                      {}, function(e, docs) {
+    collection.find({type: String(object.typeOfThisObject), name: String(command)},
+    {}, function(e, docs) {
 
-                          // FIXME: Get correct id of the right
-                        if(typeof docs == 'undefined' || docs.length === 0){
-                          collection.insert({type: String(object.typeOfThisObject) , 
-                            type: String(object.typeOfThisObject),
-                            id: String(-1), 
-                            name: String(command),
-                            comment: "Insert a comment..."});
+      // FIXME: Get correct id of the right
+      if (typeof docs == 'undefined' || docs.length === 0) {
+        collection.insert({type: String(object.typeOfThisObject),
+          type: String(object.typeOfThisObject),
+                  id: String(-1),
+          name: String(command),
+          comment: "Insert a comment..."});
 
-                          if (DEBUG_OF_RIGHTMANAGEMENT) {
-                            console.log("pushing new right: " + String(token[1]));
-                          }
-                        }else{
-                          if(DEBUG_OF_RIGHTMANAGEMENT){
-                            console.log("right " + command + " was already included and has, " +
-                              "thus, not been included to the right list");
+        if (DEBUG_OF_RIGHTMANAGEMENT) {
+          console.log("pushing new right: " + String(token[1]));
+        }
+      } else {
+        if (DEBUG_OF_RIGHTMANAGEMENT) {
+          console.log("right " + command + " was already included and has, " +
+                  "thus, not been included to the right list");
 
-                            console.log(">> The result was: ");
-                            console.log(docs);
-                            console.log(">> ---------------- <<");
-                          }
-                        }
-                      });
+          console.log(">> The result was: ");
+          console.log(docs);
+          console.log(">> ---------------- <<");
+        }
+      }
+    });
   };
 
   /**
@@ -341,14 +341,14 @@ var RightManager = function() {
    */
   this.revokeAccess = function(command, object, role) {
     //FIXME: atm usage of a simple workaround to append 'typeOfThisObject'
-    if(object.typeOfThisObject == 'undefined'){
+    if (object.typeOfThisObject == 'undefined') {
       object.typeOfThisObject = "";
     }
 
     this.modifyAccess(command, object, role, false);
 
     //FIXME: remove right from db.rights IFF it is not used (=> there is no role that includes that right)
-    
+
   };
 
   /**
@@ -392,6 +392,9 @@ var RightManager = function() {
    */
   this.getRights = function(socket, data) {
 
+    console.log("Serverseite...");
+    console.log(data);
+
     var dbRights = db.get('rights');
     var dbRoles = db.get("roles");
 
@@ -399,9 +402,12 @@ var RightManager = function() {
       // We need to make sure that both data are send to the client in one step...
       dbRoles.find({contextID: String(data.object.id), name: String(data.role)}, {}, function(e, docsRoles) {
         // Both arrays will be merged on the client side. Why should the server do all the work ;).
+        console.log(docsRights);
+        console.log(docsRoles);
+        
         var dataRights = {
           "availableRights": docsRights,
-          "checkedRights": docsRoles.rights
+          "checkedRights": docsRoles[0].rights
         };
 
         Modules.SocketServer.sendToSocket(socket, "rmObjectRights" + data.object.id, dataRights);

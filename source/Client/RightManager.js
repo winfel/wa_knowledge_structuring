@@ -62,15 +62,20 @@ var RightManager = new function() {
    * @returns {undefined}
    */
   this.getRights = function(object, role, user, callback) {
+    console.log("Client getRights called!");
 
     Dispatcher.registerCall("rmObjectRights" + object.id, function(data) {
+
+      console.log("Das hier ist interessant!");
+      console.log(data);
+
       callback(data);
 
       Dispatcher.removeCall("rmObjectRights" + object.id);
     });
 
     Modules.SocketClient.serverCall('rmGetObjectRights', {
-      'object': object.type,
+      'object': object,
       'role': role,
       'username': user
     });
