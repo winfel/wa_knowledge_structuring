@@ -1,4 +1,4 @@
-body {
+﻿body {
 	margin: 0px;
 	padding: 0px;
 	font-family: 'Open Sans', sans-serif;
@@ -795,3 +795,13 @@ svg text.font-icon{
 #document h4 span { padding: 5px; }
 
 /* end tag dialog */
+
+
+/* Rightmanager sidebar */
+
+#rm_users .rmSidebarUser{ float: left; margin-right: 15px; cursor:pointer;}
+#rm_users .rmSidebarUser:hover{ background-color: #a6c0f7;}
+
+/*end Rightmanager sidebar */
+
+

@@ -105,7 +105,11 @@ GUI.rightmanager = new function() {
 
 
       /* TODO: Get users */
-
+      var users=["Patrick","Jörg","Vanessa","Mohammad","Lisa","Ivan","Oliver","Shari"];
+      $("#rm_users").empty();
+      users.forEach(function(item) {
+        $("#rm_users").append('<span class="rmSidebarUser">'+item+'</span>');
+      });
 
 
       this.containerSelected.show();
