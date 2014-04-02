@@ -44,9 +44,14 @@ module.exports={
 	etherpadlite : {
         apikey: "",
         host: "localhost",
-        port: 9001
+        port: 9001,
+        
+        // Right now just for Windows
+        startFiePath: "",
+        startFile: ""
     },
     wkhtmltox: {
         path: ""
-    }
+    },
+    etherpadStartFile: ""
 };
