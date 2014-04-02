@@ -154,46 +154,46 @@
             <div id="sidebar_content">
                 <div>
                     <div id="inspector"></div>
-                    <div id="rightmanager" class = "jDesktopInspector">
-                        <div class="jDesktopInspector_main">
-                        	<div class="jDesktopInspector_pageHead">Object:</div>
-                        	<div class="jDesktopInspector_page jDesktopInspector_page_0">
-	                        	<div class="jDesktopInspector_section">	                        	
-	                                    <div class="jDesktopInspector_element">
-											ID
-											<div class="jDesktopInspector_button_right" id= "rm_ID"></div>
-											<br style="clear: both">
-										</div>
-										<div class="jDesktopInspector_element">
-											Type
-											<div class="jDesktopInspector_button_right" id="rm_Type"></div>
-											<br style="clear: both">
-										</div>
-										<div class="jDesktopInspector_element">
-											Name
-											<div class="jDesktopInspector_button_right" id="rm_Name"></div>
-											<br style="clear: both">
-										</div>
-	                        	</div>
-                        	</div>
-                        	
+                    <div id="rightmanager" class="jDesktopInspector">
+                        <div class="jDesktopInspector_main rightmanagerSelected">
+                            <div class="jDesktopInspector_pageHead">Object:</div>
+                            <div class="jDesktopInspector_page jDesktopInspector_page_0">
+                                <div class="jDesktopInspector_section">	                        	
+                                    <div class="jDesktopInspector_element">
+                                        ID
+                                        <div class="jDesktopInspector_button_right" id= "rm_ID"></div>
+                                        <br style="clear: both">
+                                    </div>
+                                    <div class="jDesktopInspector_element">
+                                        Type
+                                        <div class="jDesktopInspector_button_right" id="rm_Type"></div>
+                                        <br style="clear: both">
+                                    </div>
+                                    <div class="jDesktopInspector_element">
+                                        Name
+                                        <div class="jDesktopInspector_button_right" id="rm_Name"></div>
+                                        <br style="clear: both">
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="jDesktopInspector_pageHead" id="rm_rolesHead">Roles:</div>
                             <div class="jDesktopInspector_page jDesktopInspector_page_1" id="rm_rolesPage">
                                 <div class="jDesktopInspector_section" id="rm_roles"></div>
                                 <div class="jDesktopInspector_section">
-                                <div class="jDesktopInspector_element">
-                                    	<div>										
-                                        	<input type="button" value="Remove role">
+                                    <div class="jDesktopInspector_element">
+                                        <div>										
+                                            <input type="button" value="Remove role">
                                         </div>
                                     </div>                                                               							
-									<div class="jDesktopInspector_element">
-											<input id="rmNewRoleTextfield" name="newRoleName" type="text" size="15" value="New role" onfocus="this.value=''">
-											<div class= "jDesktopInspector_button_right">										
-                                        		<input id="rmNewRoleButton" type="button" value="Add role">
-                                        	</div>
-                                        	<br style="clear: both">										
-									</div>                                    
-         						</div>	                   
+                                    <div class="jDesktopInspector_element">
+                                        <input id="rmNewRoleTextfield" name="newRoleName" type="text" size="15" value="New role" onfocus="this.value = ''">
+                                        <div class= "jDesktopInspector_button_right">										
+                                            <input id="rmNewRoleButton" type="button" value="Add role">
+                                        </div>
+                                        <br style="clear: both">										
+                                    </div>                                    
+                                </div>	                   
                             </div>
 
                             <div class="jDesktopInspector_pageHead" id="rm_rightsHead">Rights</div>
@@ -223,12 +223,22 @@
                                         vanessa
                                     </div>
                                     <div class="jDesktopInspector_element">
-											<input id="rmNewUserTextfield" type="text" size="15" value="New user" onfocus="this.value=''">
-											<div class= "jDesktopInspector_button_right">										
-                                        		<input id="rmNewUserButton" type="button" value="Add user">
-                                        	</div>
-                                        	<br style="clear: both">										
-									</div> 
+                                        <input id="rmNewUserTextfield" type="text" size="15" value="New user" onfocus="this.value = ''">
+                                        <div class= "jDesktopInspector_button_right">										
+                                            <input id="rmNewUserButton" type="button" value="Add user">
+                                        </div>
+                                        <br style="clear: both">										
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="jDesktopInspector rightmanagerNoneSelected">
+                            <div class="jDesktopInspector_main">
+                                <div class="jDesktopInspector_pageHead">Object:</div>
+                                <div class="jDesktopInspector_page jDesktopInspector_page_0">
+                                    <div class="jDesktopInspector_section">
+                                        <div class="jDesktopInspector_element">No Object selected!</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -357,17 +367,17 @@
             </div>
         </script>
         <script type="text/template" id="discussion-container-template">
-        <div class="discussion">
-        <div class="embedded-toolbar moveArea">
-        <span class="minimize-button"></span>
-        </div>
-        <div class="discussion-content">
-        <div class="discussion-heading"> <%- heading %>
-        </div>
-        <div class="discussion-text"></div>
-        </div>
-        <input class="discussion-input" placeholder=Texteingabe>
-        </div>
+            <div class="discussion">
+            <div class="embedded-toolbar moveArea">
+            <span class="minimize-button"></span>
+            </div>
+            <div class="discussion-content">
+            <div class="discussion-heading"> <%- heading %>
+            </div>
+            <div class="discussion-text"></div>
+            </div>
+            <input class="discussion-input" placeholder=Texteingabe>
+            </div>
         </script>
         <!-- END: Underscore Template Definition. -->
 
