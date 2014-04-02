@@ -117,9 +117,21 @@ GUI.rightmanager = new function() {
             var span = $("<span>");
             span.addClass("rmSidebarUser");
             span.html(user);
-            span.on("click", function() {
+            span.on("click", function(event) {
+              //if (event.ctrlKey)
               span.toggleClass("checked");
             });
+
+            var deleteImg = $("<img>");
+            deleteImg.attr("alt", "Delete");
+            deleteImg.attr("src", "/guis.common/images/oxygen/16x16/actions/edit-delete.png");
+            deleteImg.on("click", function(event) {
+              span.remove();
+              console.log("Don't worry, " + user + " is not deleted yet. He just disappeared from the html document :).");
+              // We don't want to fire the span click event. That's why we stop the propagation.
+              event.stopPropagation();
+            });
+            span.append(deleteImg);
 
             // Finally add it to the user section
             $("#rm_users").append(span);

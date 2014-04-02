@@ -17,3 +17,7 @@
 #rm_users .rmSidebarUser.checked {
     background-color: blueviolet;
 }
+
+#rm_users .rmSidebarUser img {
+    margin: 0 0 -4px 6px;
+}
