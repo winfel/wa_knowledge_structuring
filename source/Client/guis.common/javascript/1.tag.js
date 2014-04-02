@@ -231,6 +231,12 @@ $( "#autocomplete" ).autocomplete({
   source: [ "c++", "java", "php", "coldfusion", "javascript", "asp", "ruby" ]
 });
 // Autocomplete end 
+//main tag start
+function sec_tags()
+{
+    $('a[href="#secondary-tags"]').click();
+}
+//main tag end
 
 /**
  * Set/Edit tags using a dialog
@@ -248,6 +254,10 @@ GUI.setTag = function(webarenaObject, width, height, passThrough) {
 		content+= '		<li><a href="#secondary-tags">Secondary Tag</a></li>';
 		content+= '	</ul>';
 		content+= '	<div id="main-tag">';
+	 	content+= ' 	<button id="1" onClick="sec_tags()">Human Machine Interaction</button>';
+      	content+= '  	<button id="2" onClick="sec_tags()">Software Technologies</button>';
+    	content+= ' 	<button id="3" onClick="sec_tags()">Embedded Systems</button>';
+  		content+= ' 	<button id="4" onClick="sec_tags()">Algorithms</button>';
 		content+= '    </div>';
 		content+= '    <div id="secondary-tags">';
 		content+= '		<div class="ui-widget ui-helper-clearfix" style="width: 535px">';
