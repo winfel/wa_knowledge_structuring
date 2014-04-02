@@ -5,15 +5,16 @@
 GUI.rightmanager = new function() {
   var that = this;
 
+  var rm;
   var containerSelected;
   var containerNoneSelected;
 
   /* Content of rightmanager sidebar*/
-  var rm_Content;
 
   this.init = function() {
     console.log("GUI.rightmanager initialized");
 
+    this.rm = $("#rightmanager");
     this.containerSelected = $('#rightmanager .rightmanagerSelected');
     this.containerNoneSelected = $('#rightmanager .rightmanagerNoneSelected');
 
@@ -21,9 +22,12 @@ GUI.rightmanager = new function() {
     $("#rmNewUserButton").click(function(event) {
       var username = $("#rmNewUserTextfield").val();
 
-      var selectedObjects = ObjectManager.getSelected()[0];
+      if (username) {
+        var selectedObject = ObjectManager.getSelected()[0];
 
-      Modules.UserManager.addUser("role", selectedObjects, username);
+        //Modules.UserManager.addUser("RandomGuys", selectedObject.id, username);
+        Modules.UserManager.addUser("RandomGuys", 1, username);
+      }
     });
 
     /* Add role event */
