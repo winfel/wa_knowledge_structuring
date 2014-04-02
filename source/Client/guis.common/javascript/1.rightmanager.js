@@ -105,12 +105,32 @@ GUI.rightmanager = new function() {
 
 
       /* TODO: Get users */
-      var users=["Patrick","Jörg","Vanessa","Mohammad","Lisa","Ivan","Oliver","Shari"];
-      $("#rm_users").empty();
-      users.forEach(function(item) {
-        $("#rm_users").append('<span class="rmSidebarUser">'+item+'</span>');
-      });
+      Modules.UserManager.getUsers("RandomGuys", {id: 1}, GUI.username, function(result) {
+        //result=["Patrick","Jörg","Vanessa","Mohammad","Lisa","Ivan","Oliver","Shari"]; // Demo data
 
+        $("#rm_users").empty();
+
+        if (result.length > 0) {
+          result.forEach(function(user) {
+
+            // Add a span for every user and make it clickable.
+            var span = $("<span>");
+            span.addClass("rmSidebarUser");
+            span.html(user);
+            span.on("click", function() {
+              span.toggleClass("checked");
+            });
+
+            // Finally add it to the user section
+            $("#rm_users").append(span);
+          });
+        } else {
+          // No user found => show a corresponding message.
+          var span = $("<span>");
+          span.html("No users found");
+          $("#rm_users").append(span);
+        }
+      });
 
       this.containerSelected.show();
       this.containerNoneSelected.hide();

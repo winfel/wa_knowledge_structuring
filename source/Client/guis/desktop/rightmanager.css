@@ -1,0 +1,19 @@
+/*
+ * Right manager sidebar
+ */
+
+#rm_users .rmSidebarUser {
+    float: left;
+    padding: 3px 5px; 
+    margin-right: 6px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+#rm_users .rmSidebarUser:hover { 
+    background-color: #a6c0f7;
+}
+
+#rm_users .rmSidebarUser.checked {
+    background-color: blueviolet;
+}

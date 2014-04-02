@@ -43,6 +43,31 @@ UserManager.modifyRole = function(role, object, grant) {
 
 /**
  * 
+ * @param {type} object
+ * @param {type} user
+ * @param {type} callback
+ * @returns {undefined}
+ */
+UserManager.getRoles = function(object, user, callback) {
+
+  Dispatcher.registerCall("umGetRoles" + object.id, function(data) {
+    // call the callback
+    callback(data);
+
+    // deregister
+    Dispatcher.removeCall("umGetRoles" + object.id);
+  });
+
+  // The responce should be some sort of broadcast... Instead of
+
+  Modules.SocketClient.serverCall('umGetRoles', {
+    'object': object,
+    'username': user
+  });
+};
+
+/**
+ * 
  * @param {type} role
  * @param {type} object
  * @param {type} user
@@ -50,10 +75,12 @@ UserManager.modifyRole = function(role, object, grant) {
  */
 UserManager.addUser = function(role, object, user) {
   // The responce should be some sort of broadcast to users with a manager role...
+  console.log("Client:UserManager.addUser: " + role + " " + object.id + " " + user);
+
   Modules.SocketClient.serverCall('umAddUser', {
     'role': role,
-    'object': object,
-    'username': user
+    'objectid': object.id,
+    'user': user
   });
 };
 
@@ -80,21 +107,21 @@ UserManager.removeUser = function(role, object, user) {
  * @param {type} callback
  * @returns {undefined}
  */
-UserManager.getRoles = function(object, user, callback) {
+UserManager.getUsers = function(role, object, user, callback) {
 
-  Dispatcher.registerCall("umGetRoles" + object.id, function(data) {
+  Dispatcher.registerCall("umUsers" + object.id, function(data) {
     // call the callback
     callback(data);
 
     // deregister
-    Dispatcher.removeCall("umGetRoles" + object.id);
+    Dispatcher.removeCall("umUsers" + object.id);
   });
 
   // The responce should be some sort of broadcast... Instead of
 
-  Modules.SocketClient.serverCall('umGetRoles', {
-    'object': object,
+  Modules.SocketClient.serverCall('umGetUsers', {
+    'role': role,
+    'objectid': object.id,
     'username': user
   });
 };
-

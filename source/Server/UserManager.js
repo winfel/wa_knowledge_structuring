@@ -35,8 +35,13 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('enter', UserManager.enterRoom);
   Dispatcher.registerCall('leave', UserManager.leaveRoom);
   Dispatcher.registerCall('umGetRoles', UserManager.getRoles);
-  
-  Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);  
+
+  Dispatcher.registerCall('umGetUsers', UserManager.getUsers);
+  Dispatcher.registerCall('umAddUser', UserManager.addUser);
+  Dispatcher.registerCall('umRemoveUser', UserManager.removeUser);
+
+
+  Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);
 
   /* get all exiting access rights from the database */
   var collection = db.get('rights');
@@ -166,25 +171,25 @@ UserManager.login = function(socketOrUser, data) {
 }
 
 UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
-    UserManager.enterRoom(socketOrUser, data, responseID);
-    
-    var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
-    var context = UserManager.connections[userID];
-    
-    Modules.ObjectManager.getObjects(data.roomID, context, function(inventory) {
-        for (var aux in inventory) {
-            var obj = inventory[aux];
-            
-            if (obj.type == PAPER_WRITER) {
-                return;
-            }
-        }
-        
-        var attr = {x: "20", y: "45", width: "700", locked: true, paper: data.roomID};
-        Modules.ObjectManager.createObject(data.roomID, PAPER_WRITER, attr, false, context, function(error, obj) {
-            //console.log(obj);
-        });
+  UserManager.enterRoom(socketOrUser, data, responseID);
+
+  var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
+  var context = UserManager.connections[userID];
+
+  Modules.ObjectManager.getObjects(data.roomID, context, function(inventory) {
+    for (var aux in inventory) {
+      var obj = inventory[aux];
+
+      if (obj.type == PAPER_WRITER) {
+        return;
+      }
+    }
+
+    var attr = {x: "20", y: "45", width: "700", locked: true, paper: data.roomID};
+    Modules.ObjectManager.createObject(data.roomID, PAPER_WRITER, attr, false, context, function(error, obj) {
+      //console.log(obj);
     });
+  });
 }
 /**
  * Let a user enter a room with a specific roomID
@@ -463,14 +468,25 @@ UserManager.modifyRole = function(role, object, add) {
   }
 };
 
+UserManager.getRoles = function(socket, data) {
+  var collection = db.get('roles');
+
+  collection.find({contextID: String(data.object.id)}, {}, function(e, docs) {
+    Modules.SocketServer.sendToSocket(socket, "umGetRoles" + data.object.id, docs);
+  });
+
+};
+
 /**
  *	The function can be used to add a user to a specific role
  *	@param {type}	role    The used role passed as a RoleObject
  *	@param {type}	object  The object that should be used to get the specfic role
  *	@param {type}   user    The user object that should be added
  */
-UserManager.addUser = function(role, object, user) {
-  UserManager.modifyUser(role, object, user, true);
+UserManager.addUser = function(socket, data) {
+  console.log("Server:UserManager.addUser: " + data.role + " " + data.objectId + " " + data.user);
+
+  UserManager.modifyUser(data.role, data.objectid, data.user, true);
 };
 
 /**
@@ -479,8 +495,10 @@ UserManager.addUser = function(role, object, user) {
  *	@param {type}	object  The object that should be used to get the specfic role
  *	@param {type}   user    The user object that should be added
  */
-UserManager.removeUser = function(role, object, user) {
-  UserManager.modifyUser(role, object, user, false);
+UserManager.removeUser = function(socket, data) {
+  console.log("Server:UserManager.removeUser: " + data.role + " " + data.objectId + " " + data.user);
+
+  UserManager.modifyUser(data.role, data.objectid, data.user, false);
 };
 
 /**
@@ -489,33 +507,41 @@ UserManager.removeUser = function(role, object, user) {
  *	@param {type}	object  The object that should be used to get the specfic role
  *	@param {type}   user    The user object that should be added
  */
-UserManager.modifyUser = function(role, object, user, add) {
+UserManager.modifyUser = function(role, objectid, user, add) {
   /* (1) get the current users */
   var collection = db.get('roles');
-  collection.find({contextID: String(object.id), name: String(role)}, {}, function(e, docs) {
+  collection.find({contextID: String(objectid), name: String(role)}, {}, function(e, docs) {
     docs.forEach(function(item) {
       /* (2) update role */
       if (add == true) {
         /* store to database */
-        collection.update({_id: item._id}, {$addToSet: {users: user.name}});
+        collection.update({_id: item._id}, {$addToSet: {users: user}});
       } else {
-        collection.update({_id: item._id}, {$pull: {users: user.name}});
+        collection.update({_id: item._id}, {$pull: {users: user}});
       }
-
     });
+
+    // Broadcast to all manager of the object...
+
   });
 };
 
-UserManager.getRoles = function(socket, data){
-    var collection = db.get('roles');
-    
-    collection.find({ contextID:String(data.object.id) }, {}, function(e, docs){
-                         Modules.SocketServer.sendToSocket(socket, "umGetRoles" + data.object.id, docs);
-                    });
-    
+/**
+ * 
+ * @param {type} socket
+ * @param {type} data
+ * @returns {undefined}
+ */
+UserManager.getUsers = function(socket, data) {
+  var dbRoles = db.get('roles');
+
+  dbRoles.find({contextID: String(data.objectid), name: String(data.role)}, {}, function(e, docs) {
+
+    var result = (docs.length > 0 ? docs[0].users : []);
+
+    Modules.SocketServer.sendToSocket(socket, "umUsers" + data.objectid, result);
+  });
 };
-
-
 
 function loggedInInfo() {
   var connections = UserManager.connections;
@@ -541,6 +567,5 @@ function loggedInInfo() {
   }
   console.log(count + ' users: ' + userInfo);
 }
-
 
 module.exports = UserManager;
