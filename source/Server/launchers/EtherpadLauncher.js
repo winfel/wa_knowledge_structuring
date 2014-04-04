@@ -24,8 +24,14 @@ if(os.type().indexOf("Windows") > -1) {
       var cmd = path + global.config.etherpadlite.startFile; 
       //var cmd = "node";
       //var parm = "node_modules\\ep_etherpad-lite\\node\\server.js";
+      
+      console.log("running " + cmd );
     
       var child = exec(cmd, [], { cwd: path, detached: true });
+      
+        child.on('error', function(data) {
+            console.warn("error" + data.toString());
+        });
         
         //delegate the processing of stdout to another function
         child.stdout.on('data', function (data) {
@@ -38,22 +44,26 @@ if(os.type().indexOf("Windows") > -1) {
 
         child.on('exit', function (code) {
             if (!(_.isNull(callback) || _.isUndefined(callback))) {
-                return callback(true, ">>> Etherpad-lite died with exit code " + code + ", maybe it's already running? <<<");
+                console.warn(">>> Etherpad-lite died with exit code " + code + ", maybe it's already running? <<<");
             }
         });
         
        child.unref();
        
+       // console.log("Etherpad-lite has been initialized");
+       
        if (!(_.isNull(callback) || _.isUndefined(callback))) {
-           callback(false, "Etherpad-lite has been initialized");
+           callback();
        }
     }
     
 } else {
    // On any other OS 
     EtherpadLauncher.launch = function(callback) {
+        console.warn("Etherpad-lite auto-run is not yet supported for your OS, do it manually!!");
+        
         if (!(_.isNull(callback) || _.isUndefined(callback))) {
-            callback(true, "Etherpad-lite auto-run is not yet supported for your OS, do it manually!!");
+          callback();
         }
     }
 }

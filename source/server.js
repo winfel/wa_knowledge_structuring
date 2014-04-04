@@ -142,11 +142,4 @@ if (Modules.config.plugins) {
 }
 
 // launchers
-var etherPadLauncher = require('./Server/launchers/EtherpadLauncher.js').init(Modules).launch(function (error, data) {
-    if (error) {
-        console.warn(data);
-    } else {
-        console.log(data);
-    }
-});
-
+var etherPadLauncher = require('./Server/launchers/EtherpadLauncher.js').init(Modules).launch();
