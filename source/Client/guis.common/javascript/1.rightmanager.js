@@ -3,18 +3,21 @@
  */
 
 GUI.rightmanager = new function() {
-  var that = this;
-
-  var rm;
+  var rm, rmRoles, rmRights, rmUsers;
   var containerSelected;
   var containerNoneSelected;
 
   /* Content of rightmanager sidebar*/
 
   this.init = function() {
+    var that = this;
+
     console.log("GUI.rightmanager initialized");
 
     this.rm = $("#rightmanager");
+    this.rmRoles = $("#rm_roles");
+    this.rmRights = $("#rm_rights");
+    this.rmUsers = $("#rm_users");
     this.containerSelected = $('#rightmanager .rightmanagerSelected');
     this.containerNoneSelected = $('#rightmanager .rightmanagerNoneSelected');
 
@@ -42,6 +45,7 @@ GUI.rightmanager = new function() {
   };
 
   this.updateContent = function(theObject) {
+    var that = this;
 
     /* Display selected object information */
 
@@ -102,6 +106,37 @@ GUI.rightmanager = new function() {
 
       /* TODO: Get rights */
 
+      Modules.RightManager.getRights({id: 1, type: "PaperObject"}, "RandomGuys", GUI.username, function(rights) {
+        // Clear it...
+        console.log("RIGHTS: ");
+        console.log(rights);
+
+        that.rmRights.empty();
+
+        rights.availableRights.forEach(function(right) {
+          var inputId = that.rmRights.attr("id") + "_" + right.name;
+
+          var input = $("<input>");
+          input.attr({
+            id: inputId,
+            type: "checkbox",
+            value: right.name
+          });
+
+          if (rights.checkedRights.indexOf(right.name) >= 0)
+            input.attr("checked", "checked");
+
+          var label = $("<label>");
+          label.attr({
+            for : inputId
+          });
+          label.html(right.name);
+
+          that.rmRights.append(input);
+          that.rmRights.append(label);
+          that.rmRights.append("<br>");
+        });
+      });
 
 
       /* TODO: Get users */

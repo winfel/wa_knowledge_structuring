@@ -2,6 +2,10 @@
  * Right manager sidebar
  */
 
+.block {
+    display: block;
+}
+
 #rm_users .rmSidebarUser {
     float: left;
     padding: 3px 5px; 
