@@ -9,28 +9,34 @@ var Modules = false;
  */
 var UserManager = {};
 
-UserManager.addRole = function(role, object) {
+/**
+ * 
+ * @param {type} object
+ * @param {type} role
+ * @returns {undefined}
+ */
+UserManager.addRole = function(object, role) {
   this.modifyRole(role, object, true);
 };
 
 /**
  * 
- * @param {type} role
  * @param {type} object
+ * @param {type} role
  * @returns {undefined}
  */
-UserManager.removeRole = function(role, object) {
+UserManager.removeRole = function(object, role) {
   this.modifyRole(role, object, false);
 };
 
 /**
  * 
- * @param {type} role
  * @param {type} object
+ * @param {type} role
  * @param {type} grant
  * @returns {undefined}
  */
-UserManager.modifyRole = function(role, object, grant) {
+UserManager.modifyRole = function(object, role, grant) {
   // do nothing
   var serverCall = (grant ? "umAddRole" : "umRemoveRole");
 
@@ -68,12 +74,12 @@ UserManager.getRoles = function(object, user, callback) {
 
 /**
  * 
- * @param {type} role
  * @param {type} object
+ * @param {type} role
  * @param {type} user
  * @returns {undefined}
  */
-UserManager.addUser = function(role, object, user) {
+UserManager.addUser = function(object, role, user) {
   // The responce should be some sort of broadcast to users with a manager role...
   console.log("Client:UserManager.addUser: " + role + " " + object.id + " " + user);
 
@@ -86,12 +92,12 @@ UserManager.addUser = function(role, object, user) {
 
 /**
  * 
- * @param {type} role
  * @param {type} object
+ * @param {type} role
  * @param {type} user
  * @returns {undefined}
  */
-UserManager.removeUser = function(role, object, user) {
+UserManager.removeUser = function(object, role, user) {
   // The responce should be some sort of broadcast to users with a manager role...
   Modules.SocketClient.serverCall('umRemoveUser', {
     'role': role,
@@ -103,11 +109,12 @@ UserManager.removeUser = function(role, object, user) {
 /**
  * 
  * @param {type} object
+ * @param {type} role
  * @param {type} user
  * @param {type} callback
  * @returns {undefined}
  */
-UserManager.getUsers = function(role, object, user, callback) {
+UserManager.getUsers = function(object, role, user, callback) {
 
   Dispatcher.registerCall("umUsers" + object.id, function(data) {
     // call the callback

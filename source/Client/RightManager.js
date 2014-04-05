@@ -65,7 +65,7 @@ var RightManager = new function() {
     console.log("Client getRights called!");
 
     Dispatcher.registerCall("rmObjectRights" + object.id, function(data) {
-      callback(data);
+      callback(data.availableRights, data.checkedRights);
       Dispatcher.removeCall("rmObjectRights" + object.id);
     });
 
