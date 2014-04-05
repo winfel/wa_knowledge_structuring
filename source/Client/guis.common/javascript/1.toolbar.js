@@ -421,7 +421,7 @@ GUI.initToolbar = function() {
 	if (!Modules.Config.presentationMode) {
 	
 		var rmButton = document.createElement("img");
-		$(rmButton).attr("src", "../../guis.common/images/fix_me.png").attr("alt", "");
+		$(rmButton).attr("src", "../../guis.common/images/rightManagment.png").attr("alt", "");
 		$(rmButton).attr("width", "24").attr("height", "24");
 
 		$(rmButton).attr("id", "rightmanager_button");

@@ -195,12 +195,10 @@ var RightManager = function() {
   var that = this;
 
   /**
-   *		The function is needed to initialize the RightManager
-   *
-   */
-  this.init = function(theModules) {
-    Modules = theModules;
-    var Dispatcher = Modules.Dispatcher;
+  * The function gets all rights from the database and stores them in an internal array
+  */
+  this.initRights = function(){
+    possibleAccessRights = [];
 
     /* get all exiting access rights from the database */
     var collection = db.get('rights');
@@ -216,6 +214,17 @@ var RightManager = function() {
         });
       }
     });
+  };
+
+  /**
+   *		The function is needed to initialize the RightManager
+   *
+   */
+  this.init = function(theModules) {
+    Modules = theModules;
+    var Dispatcher = Modules.Dispatcher;
+
+    this.initRights();
 
     // Register RightManager related server calls...
     Dispatcher.registerCall('rmHasAccess', function(socket, data, responseID) {
@@ -228,6 +237,14 @@ var RightManager = function() {
           Modules.SocketServer.sendToSocket(socket, "rmAccessDenied" + data.object.id);
         }
       });
+    });
+
+    Dispatcher.registerCall('rmGrantAccess', function(socket, data, responseID) {
+      that.grantAccess(data.command, data.object, data.role);
+    });
+
+    Dispatcher.registerCall('rmRevokeAccess', function(socket, data, responseID) {
+      that.revokeAccess(data.command, data.object, data.role);
     });
 
     Dispatcher.registerCall("rmGetObjectRights", this.getRights);
@@ -282,7 +299,7 @@ var RightManager = function() {
       });
 
     } else {
-      console.log("<<DEBUG INFORMATION>> The given command was not valid");
+      console.log("<<DEBUG INFORMATION>> The given hasAccess command was not valid");
     }
     //return true;
   };
@@ -295,14 +312,6 @@ var RightManager = function() {
    *	A call could look like this:  grantAccess("read","AB","reviewer");
    */
   this.grantAccess = function(command, object, role) {
-    //FIXME: atm usage of a simple workaround to append 'typeOfThisObject'
-    if (object.typeOfThisObject == 'undefined') {
-      object.typeOfThisObject = "";
-    }
-
-    // granting access
-    this.modifyAccess(command, object, role, true);
-
     // add right also to the right list
     var collection = db.get('rights');
     collection.find({type: String(object.typeOfThisObject), name: String(command)}, 
@@ -315,13 +324,13 @@ var RightManager = function() {
             var newID = Number(rightWithMaxID[0].id)+1;
 
             collection.insert({type: String(object.typeOfThisObject) , 
-              type: String(object.typeOfThisObject),
+              type: String(object.type),
               id: String(newID), 
               name: String(command),
               comment: "Insert a comment..."});
 
             if (DEBUG_OF_RIGHTMANAGEMENT) {
-              console.log("pushing new right: " + String(token[1]));
+              console.log("pushing new right: " + String(command));
             }
           }else{
             if(DEBUG_OF_RIGHTMANAGEMENT){
@@ -335,6 +344,12 @@ var RightManager = function() {
           }
         });
       });
+    
+    // re-init possible rights
+    this.initRights();
+
+    // granting access
+    this.modifyAccess(command, object, role, true);
   };
 
   /**
@@ -366,28 +381,20 @@ var RightManager = function() {
    *	A call could look like this: modifyAccess("read","AB","reviewer", true);
    */
   this.modifyAccess = function(command, object, role, grant) {
-    /* check if command is feasible */
-    var commandIsInPossibleAccessRights = (possibleAccessRights.indexOf(String(command)) != -1);
-    if (commandIsInPossibleAccessRights) {
+    /* (1) get the current role */
+    var collection = db.get('roles');
+    collection.find({contextID: String(object.id), name: String(role)}, {}, function(e, docs) {
+      docs.forEach(function(item) {
+        /* (2) update role */
+        if (grant == true) {
+          /* store to database */
+          collection.update({_id: item._id}, {$addToSet: {rights: command}});
+        } else {
+          collection.update({_id: item._id}, {$pull: {rights: command}});
+        }
 
-      /* (1) get the current role */
-      var collection = db.get('roles');
-      collection.find({contextID: String(object.id), name: String(role)}, {}, function(e, docs) {
-        docs.forEach(function(item) {
-          /* (2) update role */
-          if (grant == true) {
-            /* store to database */
-            collection.update({_id: item._id}, {$addToSet: {rights: command}});
-          } else {
-            collection.update({_id: item._id}, {$pull: {rights: command}});
-          }
-
-        });
       });
-
-    } else {
-      console.log("<<DEBUG INFORMATION>> The given command was not valid");
-    }
+    });
   };
 
   /**

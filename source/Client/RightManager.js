@@ -84,7 +84,8 @@ var RightManager = new function() {
    *	A call could look like this:  grantAccess("read","AB","reviewer");
    */
   this.grantAccess = function(command, object, role) {
-
+    console.log("GRANT ON CLIENT");
+    this.modifyAccess(command,object,role,true);
   };
 
   /**
@@ -95,7 +96,7 @@ var RightManager = new function() {
    *	A call could look like this: revokeAccess("read","AB","reviewer");
    */
   this.revokeAccess = function(command, object, role) {
-
+    this.modifyAccess(command,object,role,false);
   };
 
   /**
@@ -108,8 +109,20 @@ var RightManager = new function() {
    *	A call could look like this: modifyAccess("read","AB","reviewer", true);
    */
   this.modifyAccess = function(command, object, role, grant) {
-    // do nothing
-
+    if(grant === true){
+      Modules.SocketClient.serverCall('rmGrantAccess', {
+        'command': command,
+        'object': object,
+        'role': role
+      });
+    }else{
+      Modules.SocketClient.serverCall('rmRevokeAccess', {
+        'command': command,
+        'object': object,
+        'role': role
+      });
+    }
   };
+  
 };
 
