@@ -130,8 +130,8 @@ var fillCurrentDbWithTestData = function() {
     'PaperObject#7#delete#You may delete the selected PaperObject',
     'NumberCreator#8#create#You may create the selected NumberCreater and NumericObjects',
     'NumberCreator#9#update#You may drop something on the PaperObject PaperObject'];
-  var pushUsers = ['joerg#12345', 'Vanessa#xyz'];
-  var pushRoles = ['1#1#RandomGuys#create,read#overwrite#joerg,vanessa',
+  var pushUsers = ['joerg#12345', 'Vanessa#xyz', "Lisa#123", "pb#234"];
+  var pushRoles = ['1#1#RandomGuys#create,read#overwrite#joerg,vanessa,Lisa,pb',
     '2#1#Boss#read#overwrite#vanessa'];
 
   /* clear tables */

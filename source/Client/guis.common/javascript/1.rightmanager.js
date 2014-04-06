@@ -94,10 +94,16 @@ GUI.rightmanager = new function() {
   this.updateUsersSection = function(users) {
     //result=["Patrick","Jörg","Vanessa","Mohammad","Lisa","Ivan","Oliver","Shari"]; // Demo data
     var that = GUI.rightmanager;
-    that.rmUsers.empty();
+    that.rmUsers.empty(); // Clear the output.
 
-    console.log("rm: Updating user section");
-    console.log(users);
+    var checkedSpans = new Array();
+
+    var btnDeleteUsers = $("#rmDeleteUsersButton");
+    btnDeleteUsers.on("click", function() {
+      checkedSpans.forEach(function(item) {
+        item.remove();
+      });
+    });
 
     if (users.length > 0) {
       users.forEach(function(user) {
@@ -106,20 +112,66 @@ GUI.rightmanager = new function() {
         var span = $("<span>");
         span.addClass("rmSidebarUser");
         span.html(user);
+        span.data("value", user);
         span.on("click", function(event) {
-          //if (event.ctrlKey)
-          span.toggleClass("checked");
+          span.toggleClass("checked"); // Toggle the span
+          
+          var deleteImg = span.data("deleteImg"); // The reference to the delete image.
+
+          // The index of the clicked span
+          var index = checkedSpans.indexOf(span);
+          // Check for multi/single selection
+          if (event.ctrlKey) {
+            // Multi selection
+            if (index >= 0)
+              checkedSpans.splice(index, 1); // Remove the span from the array
+            else
+              checkedSpans.push(span); // Add the span to the array
+          } else {
+            // Single selection: Uncheck all other elements
+            // Do not remove the class checked from the current span. It will be toggled later anyway...
+            if (checkedSpans.length != 1 || index != 0) {
+              checkedSpans.forEach(function(item) {
+                item.removeClass("checked");
+                item.data("deleteImg").hide();
+              });
+            }
+            checkedSpans.length = 0; // Delete all array items.
+            checkedSpans.push(span);
+          }
+
+          var checked = span.hasClass("checked");
+          if (checked && checkedSpans.length == 1)
+            deleteImg.show();
+          else
+            deleteImg.hide();
+
+          // Check if delete buttons are or the delete all button is shown.
+          if (checkedSpans.length > 1) {
+            checkedSpans.forEach(function(item) {
+              item.data("deleteImg").hide();
+            });
+            btnDeleteUsers.show();
+          } else {
+            deleteImg.show();
+            btnDeleteUsers.hide();
+          }
         });
 
         var deleteImg = $("<img>");
-        deleteImg.attr("alt", "Delete");
-        deleteImg.attr("src", "/guis.common/images/oxygen/16x16/actions/edit-delete.png");
+        deleteImg.attr({
+          alt: "Delete",
+          src: "/guis.common/images/oxygen/16x16/actions/edit-delete.png"
+        });
         deleteImg.on("click", function(event) {
           span.remove();
-          console.log("Don't worry, " + user + " is not deleted yet. He just disappeared from the html document :).");
+          console.log("Don't worry, " + user + " is not deleted yet. He/She just disappeared from the html document :).");
           // We don't want to fire the span click event. That's why we stop the propagation.
           event.stopPropagation();
         });
+        deleteImg.hide();
+
+        span.data("deleteImg", deleteImg);
         span.append(deleteImg);
 
         // Finally add it to the user section

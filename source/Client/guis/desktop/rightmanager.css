@@ -14,6 +14,10 @@
     display: block;
 }
 
+#rm_roles .rmSidebarRole {
+    margin-right: 0;
+}
+
 #rm_users .rmSidebarUser {
     float: left;
     display: inline-block;
