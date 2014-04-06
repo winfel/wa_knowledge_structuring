@@ -1,11 +1,23 @@
 /**
- * Launches etherpad-lite 
- */
-
+*    Webarena - A web application for responsive graphical knowledge work
+*
+*    @author Felix Winkelnkemper, University of Paderborn, 2012
+*
+* @class EtherpadLauncher
+* @classdesc This checks if Etherpad is running if not then etherpad is launched
+* @requires ./Server/config.default
+* @requires ./Server/controllers/EtherpadController
+* @requires child_process
+* @requires underscore
+* @requires os
+*
+*/
 
 var os = require('os');
 var _ = require('underscore');
 var exec = require('child_process').spawn;
+
+var ETHP_ERROR_CODE = -1;
 
 var EtherpadLauncher = {};
 var modules = false;
@@ -15,10 +27,33 @@ EtherpadLauncher.init = function(theModules) {
     return this;
 };
 
+EtherpadLauncher.launch = function() {
+    // First if Etherpad is already running 
+    this.isRunning(function (running) {
+        if (running) {
+            console.log("Etherpad is running");
+        } else {
+            EtherpadLauncher.launchEtherPad(null);
+        }
+    });
+}
+
+EtherpadLauncher.isRunning = function(callback) {
+    var running = false; 
+    
+    modules['EtherpadController'].pad.listPads({groupID: '1111'}, function(error, data) {
+        if (error.code != ETHP_ERROR_CODE) {
+            running = true; 
+        }
+        
+        callback(running);
+    });
+}
+
 // on windows 
 if(os.type().indexOf("Windows") > -1) {
     
-    EtherpadLauncher.launch = function(callback) {
+    EtherpadLauncher.launchEtherPad = function(callback) {
         
       var path = modules.Helper.addTrailingSlash(global.config.etherpadlite.startFiePath);   
       var cmd = path + global.config.etherpadlite.startFile; 
@@ -43,9 +78,7 @@ if(os.type().indexOf("Windows") > -1) {
         });
 
         child.on('exit', function (code) {
-            if (!(_.isNull(callback) || _.isUndefined(callback))) {
-                console.warn(">>> Etherpad-lite died with exit code " + code + ", maybe it's already running? <<<");
-            }
+            console.warn(">>> Etherpad-lite died with exit code " + code + ", maybe it's already running? <<<");
         });
         
        child.unref();
@@ -59,7 +92,7 @@ if(os.type().indexOf("Windows") > -1) {
     
 } else {
    // On any other OS 
-    EtherpadLauncher.launch = function(callback) {
+    EtherpadLauncher.launchEtherPad = function(callback) {
         console.warn("Etherpad-lite auto-run is not yet supported for your OS, do it manually!!");
         
         if (!(_.isNull(callback) || _.isUndefined(callback))) {
