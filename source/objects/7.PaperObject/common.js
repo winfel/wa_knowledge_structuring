@@ -27,58 +27,137 @@ var PaperObject = Object.create(Modules.ObjectManager.getPrototype('IconObject')
  */
 PaperObject.register = function(type) {
 
-    // Registering the object
-    IconObject = Modules.ObjectManager.getPrototype('IconObject');
-    IconObject.register.call(this, type);
+  // Registering the object
+  IconObject = Modules.ObjectManager.getPrototype('IconObject');
+  IconObject.register.call(this, type);
 
-    var self = this;
+  var self = this;
 
-    this.registerAction('Follow', function(object) {
+  this.registerAction('Follow', function(object) {
 
-        object.execute();
+    object.execute();
 
-    }, true);
+  }, true);
 
-    this.registerAction('Open in new window', function(object) {
+  this.registerAction('Open in new window', function(object) {
 
-        object.execute(true);
+    object.execute(true);
 
-    }, true);
-	
-    //Test Dialog for Right mMnager
-    this.registerAction('Right manager', function(object) {
+  }, true);
 
-        var pageOneContent = $('' +
-        '<div id="easydb-dialog">' +
-		'<h3>Roles</h3>' +
-        '<input style="margin-top:0px;" class="maxWidth" placeholder="Writer">' +
-        '<input style="margin-top:20px;" class="maxWidth" placeholder="Reviewer">' +
-		'<h3>Userlists</h3>' +
-        '<input style="margin-top:0px;" class="maxWidth" placeholder="Writer">' +
-        '<input style="margin-top:20px;" class="maxWidth" placeholder="Reviewer">' +
-        '</div>'
-		);
-		
-		var pageOneButtons = {
-            "Abbrechen":function () {
-                return false;
-            },
-            "OK":function () {
-                return true;
-            }
+  function addroles() {
+    var roleDialog = $('' +
+            '<div id="addrole-dialog">' +
+            '<h3>Adding roles</h3>' +
+            '<input type="checkbox" id="hacker"> Hacker </input>' + '<br>' +
+            '<input type="checkbox" id="monkey"> Programming Monkey </input>' + '<br>' +
+            '<input type="checkbox" id="supervisor"> Supervisor </input>' + '<br>' +
+            '<input id="own" placeholder="Your own role">'
+            );
 
-        }
-		
-		var dialog = GUI.dialog(
-            "Right manager for PaperObject",
-            pageOneContent, pageOneButtons, 500, {height:500}
-        )
+    var roleButtons = {
+      "Abbrechen": function() {
+        setDialog();
+      },
+      "Save": function() {
+        Modules.UserManager.getRoles({id: 1}, GUI.username, function(roles) {
+          var pageOneContent2 = '' +
+                  '<div id="easydb-dialog">' +
+                  '<h3>Roles</h3>';
 
-    }, true);
-	
-    
-    this.registerAttribute('isMain', {type:'boolean', hidden:true});
-    this.registerAttribute('bigIcon',{hidden:true});
+          roles.forEach(function(item) {
+            pageOneContent2 += '<input style="margin-top:0px;" class="maxWidth" placeholder="' + item.name + ': ' + item.rights + '">';
+          });
+
+          console.log("Hacker id: " + $("#hacker"));
+          if ($("#hacker").is(":checked"))
+          {
+            pageOneContent2 += '<input style="margin-top:0px;" class="maxWidth" placeholder="Hacker">';
+          }
+          ;
+
+          pageOneContent2 += '<h3>Userlists</h3>';
+
+          roles.forEach(function(item) {
+            pageOneContent2 += '<input style="margin-top:0px;" class="maxWidth" placeholder="' + item.name + ': ' + item.users + '">';
+          });
+
+          pageOneContent2 += '</div>';
+
+          var pageOneContent = $(pageOneContent2);
+
+
+          var dialog = GUI.dialog(
+                  "Right manager for PaperObject",
+                  pageOneContent, pageOneButtons, 500, {height: 400}
+          )
+
+        });
+      }
+    }
+
+    var dialog = GUI.dialog(
+            "Role manager for PaperObject",
+            roleDialog, roleButtons, 500, {height: 300}
+    );
+
+  }
+  ;
+  var pageOneButtons = {
+    "Abbrechen": function() {
+      return false;
+    },
+    "OK": function() {
+      return true;
+    },
+    "AddRoles": function() {
+      addroles();
+    }
+
+  }
+
+
+  function setDialog() {
+    Modules.UserManager.getRoles({id: 1}, GUI.username, function(roles) {
+      var pageOneContent2 = '' +
+              '<div id="easydb-dialog">' +
+              '<h3>Roles</h3>';
+
+      roles.forEach(function(item) {
+        pageOneContent2 += '<input style="margin-top:0px;" class="maxWidth" placeholder="' + item.name + ': ' + item.rights + '">';
+      });
+
+      pageOneContent2 += '<h3>Userlists</h3>';
+
+      roles.forEach(function(item) {
+        pageOneContent2 += '<input style="margin-top:0px;" class="maxWidth" placeholder="' + item.name + ': ' + item.users + '">';
+      });
+
+      pageOneContent2 += '</div>';
+
+      var pageOneContent = $(pageOneContent2);
+
+
+      var dialog = GUI.dialog(
+              "Right manager for PaperObject",
+              pageOneContent, pageOneButtons, 500, {height: 400}
+      )
+
+    });
+  }
+  ;
+
+
+  //Test Dialog for Right mMnager
+  this.registerAction('Right manager', function(object) {
+
+    setDialog();
+
+  }, true);
+
+
+  this.registerAttribute('isMain', {type: 'boolean', hidden: true});
+  this.registerAttribute('bigIcon', {hidden: true});
 }
 
 /**
@@ -91,20 +170,20 @@ PaperObject.register = function(type) {
  * @param {boolean} openInNewWindow
  */
 PaperObject.execute = function(openInNewWindow) {
-    var destination = this.getAttribute('destination');
+  var destination = this.getAttribute('destination');
 
-    if (!destination) {
-        var random = new Date().getTime() - 1296055327011;
+  if (!destination) {
+    var random = new Date().getTime() - 1296055327011;
 
-        this.setAttribute('destination', random);
-        destination = random;
-    }
+    this.setAttribute('destination', random);
+    destination = random;
+  }
 
-    if (openInNewWindow) {
-        window.open(destination);
-    } else {
-        ObjectManager.loadPaperWriter(destination, false, 'left');
-    }
+  if (openInNewWindow) {
+    window.open(destination);
+  } else {
+    ObjectManager.loadPaperWriter(destination, false, 'left');
+  }
 }
 
 PaperObject.register('PaperObject');

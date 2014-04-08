@@ -13,7 +13,9 @@
     "underscore.string": "~2.3.3",
     "eventemitter2": "~0.4.13",
     "async": "~0.2.9",
-    "json-socket": "~0.1.2"
+    "json-socket": "~0.1.2",
+    "lodash": "",
+    "monk": ""
   },
   "devDependencies": {
     "superagent": "~0.15.7",

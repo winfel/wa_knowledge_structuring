@@ -30,20 +30,20 @@ var RightManager = new function() {
   this.hasAccess = function(command, object, user, callback) {
     console.log("hasAccess");
 
-      Dispatcher.registerCall( "rmAccessGranted"+object.id, function(){
-                              // call the callback
-                              callback(true);
-                              // deregister
-                              Dispatcher.removeCall("rmAccessGranted"+object.id);
-                              });
-    
-      Dispatcher.registerCall( "rmAccessDenied"+object.id, function(){
-                              // call the callback
-                              callback(false);
-                              // deregister
-                              Dispatcher.removeCall("rmAccessDenied"+object.id);
-                              });
-      
+    Dispatcher.registerCall("rmAccessGranted" + object.id, function() {
+      // call the callback
+      callback(true);
+      // deregister
+      Dispatcher.removeCall("rmAccessGranted" + object.id);
+    });
+
+    Dispatcher.registerCall("rmAccessDenied" + object.id, function() {
+      // call the callback
+      callback(false);
+      // deregister
+      Dispatcher.removeCall("rmAccessDenied" + object.id);
+    });
+
     Modules.SocketClient.serverCall('rmHasAccess', {
       'command': command,
       'object': object,
@@ -54,6 +54,29 @@ var RightManager = new function() {
   };
 
   /**
+   * 
+   * 
+   * @param {type} object   The object
+   * @param {type} user     The current user
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.getRights = function(object, role, user, callback) {
+    console.log("Client getRights called!");
+
+    Dispatcher.registerCall("rmObjectRights" + object.id, function(data) {
+      callback(data.availableRights, data.checkedRights);
+      Dispatcher.removeCall("rmObjectRights" + object.id);
+    });
+
+    Modules.SocketClient.serverCall('rmGetObjectRights', {
+      'object': object,
+      'role': role,
+      'username': user
+    });
+  };
+
+  /**
    *	The function can be used to grant access rights
    *	@param {type}	command   The used command (access right), e.g., read, write (CRUD)
    *	@param {type}	object    The object that should be used to change the access right
@@ -61,7 +84,8 @@ var RightManager = new function() {
    *	A call could look like this:  grantAccess("read","AB","reviewer");
    */
   this.grantAccess = function(command, object, role) {
-
+    console.log("GRANT ON CLIENT");
+    this.modifyAccess(command,object,role,true);
   };
 
   /**
@@ -72,7 +96,7 @@ var RightManager = new function() {
    *	A call could look like this: revokeAccess("read","AB","reviewer");
    */
   this.revokeAccess = function(command, object, role) {
-
+    this.modifyAccess(command,object,role,false);
   };
 
   /**
@@ -85,8 +109,20 @@ var RightManager = new function() {
    *	A call could look like this: modifyAccess("read","AB","reviewer", true);
    */
   this.modifyAccess = function(command, object, role, grant) {
-    // do nothing
-
+    if(grant === true){
+      Modules.SocketClient.serverCall('rmGrantAccess', {
+        'command': command,
+        'object': object,
+        'role': role
+      });
+    }else{
+      Modules.SocketClient.serverCall('rmRevokeAccess', {
+        'command': command,
+        'object': object,
+        'role': role
+      });
+    }
   };
+  
 };
 

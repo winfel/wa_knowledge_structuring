@@ -226,6 +226,17 @@ function unassignTag( $item ) {
 	drawTags();
 };
 
+// Autocomplete start
+$( "#autocomplete" ).autocomplete({
+  source: [ "c++", "java", "php", "coldfusion", "javascript", "asp", "ruby" ]
+});
+// Autocomplete end 
+//main tag start
+function sec_tags()
+{
+    $('a[href="#secondary-tags"]').click();
+}
+//main tag end
 
 /**
  * Set/Edit tags using a dialog
@@ -243,6 +254,10 @@ GUI.setTag = function(webarenaObject, width, height, passThrough) {
 		content+= '		<li><a href="#secondary-tags">Secondary Tag</a></li>';
 		content+= '	</ul>';
 		content+= '	<div id="main-tag">';
+	 	content+= ' 	<button id="1" onClick="sec_tags()">Human Machine Interaction</button>';
+      	content+= '  	<button id="2" onClick="sec_tags()">Software Technologies</button>';
+    	content+= ' 	<button id="3" onClick="sec_tags()">Embedded Systems</button>';
+  		content+= ' 	<button id="4" onClick="sec_tags()">Algorithms</button>';
 		content+= '    </div>';
 		content+= '    <div id="secondary-tags">';
 		content+= '		<div class="ui-widget ui-helper-clearfix" style="width: 535px">';
@@ -256,6 +271,10 @@ GUI.setTag = function(webarenaObject, width, height, passThrough) {
 		content+= '		</div>';
 		content+= '		<button id="btn-previous"><</button>';
 		content+= '		<button id="btn-next">></button>';
+		content+= '     			<div id="autocomplete" class="ui-widget">';
+		content+= '     				<label for="autocomplete"><b>Manual tags:</b> </label>';
+	    content+= '						<input id="autocomplete">';
+		content+= '					</div>';
 		content+= '    </div>';
 		content+= '</div>';
 	

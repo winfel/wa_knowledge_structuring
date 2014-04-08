@@ -355,9 +355,12 @@ GeneralObject.deselect = function() {
   this.startNoAnimationTimer();
 
   this.draw();
-
+  
   /* inform all clients about the deselection */
   ObjectManager.informAboutDeselection(this.id);
+  
+//Update the right manager sidebar on the right
+  GUI.rightmanager.updateContent(this);
 
 }
 

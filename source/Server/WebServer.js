@@ -69,8 +69,6 @@ WebServer.init = function (theModules) {
 			/* open room */
 		    
 			try {
-
-			    console.log("URL: " + url);
 				var roomId = url.substr(6);
 
 				var indexFilename = '/../Client/guis/desktop/index.html';

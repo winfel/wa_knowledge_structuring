@@ -1,0 +1,53 @@
+/*
+ * Right manager sidebar
+ */
+
+#rm_roles .rmSidebarRole,
+#rm_users .rmSidebarUser {
+  padding: 3px 5px; 
+  margin-right: 6px;
+  cursor: pointer;
+  display: block;
+}
+
+#rm_roles .rmSidebarRole {
+  margin-right: 0;
+}
+
+#rm_users .rmSidebarUser {
+  float: left;
+  display: inline-block;
+}
+
+#rm_roles .rmSidebarRole:hover,
+#rm_users .rmSidebarUser:hover { 
+  background-color: #a6c0f7;
+}
+
+#rm_roles .rmSidebarRole.checked,
+#rm_users .rmSidebarUser.checked {
+  background-color: blueviolet;
+}
+
+#rm_roles .rmSidebarRole img,
+#rm_users .rmSidebarUser img {
+  margin: 0 0 -4px 6px;
+  float: right;
+  visibility: hidden;
+}
+
+#rmDeleteUsersButton {
+  visibility: hidden;
+}
+
+.block {
+  display: block !important;
+}
+
+.visible {
+  visibility: visible !important;
+}
+
+.invisible {
+  visibility: hidden !important;
+}
