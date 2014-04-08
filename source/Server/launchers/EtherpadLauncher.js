@@ -55,7 +55,7 @@ if(os.type().indexOf("Windows") > -1) {
     
     EtherpadLauncher.launchEtherPad = function(callback) {
         
-      var path = modules.Helper.addTrailingSlash(global.config.etherpadlite.startFiePath);   
+      var path = modules.Helper.addTrailingSlash(global.config.etherpadlite.startFilePath);   
       var cmd = path + global.config.etherpadlite.startFile; 
       //var cmd = "node";
       //var parm = "node_modules\\ep_etherpad-lite\\node\\server.js";
