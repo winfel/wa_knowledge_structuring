@@ -299,7 +299,9 @@ var RightManager = function() {
       });
 
     } else {
-      console.log("<<DEBUG INFORMATION>> The given hasAccess command was not valid");
+		if(DEBUG_OF_RIGHTMANAGEMENT) {
+			console.log("<<DEBUG INFORMATION>> The given hasAccess command was not valid");
+		}
     }
     //return true;
   };
