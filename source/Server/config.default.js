@@ -47,8 +47,8 @@ module.exports={
         port: 9001,
         
         // Right now just for Windows
-        startFiePath: "",
-        startFile: ""
+        startFilePath: "<path_where_the_start_file_is>",
+        startFile: "start.bat"
     },
     wkhtmltox: {
         path: ""
