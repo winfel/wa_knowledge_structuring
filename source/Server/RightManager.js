@@ -305,16 +305,15 @@ var RightManager = function() {
   };
 
   /**
-   *	The function can be used to grant access rights
-   *	@param {type}	command   The used command (access right), e.g., read, write (CRUD)
-   *	@param {type}	object    The object that should be used to change the access right
-   *	@param {type} role      The role that should be changed
-   *	A call could look like this:  grantAccess("read","AB","reviewer");
-   */
-  this.grantAccess = function(command, object, role) {
-    // add right also to the right list
+  *   The function can be used to put a right into the db.right document space.
+  *   If it is already included, the call will do nothing but log this fact.
+  *
+  *   @param {type} command   The used command (access right), e.g., read, write (CRUD)
+  *   @param {type} object    The object that should be used to change the access right
+  */
+  this.addRightToRightTableIfItIsNotThere = function(command,object){
     var collection = db.get('rights');
-    collection.find({type: String(object.typeOfThisObject), name: String(command)}, 
+    collection.find({type: String(object.type), name: String(command)}, 
       {}, function(e, docs) {
 
         var options = { "limit": 1, "sort": [['id','desc']]};
@@ -323,8 +322,8 @@ var RightManager = function() {
           if(typeof docs == 'undefined' || docs.length === 0){
             var newID = Number(rightWithMaxID[0].id)+1;
 
-            collection.insert({type: String(object.typeOfThisObject) , 
-              type: String(object.type),
+            collection.insert({
+              type: String(object.type) , 
               id: String(newID), 
               name: String(command),
               comment: "Insert a comment..."});
@@ -344,6 +343,18 @@ var RightManager = function() {
           }
         });
       });
+  };
+  
+  /**
+   *  The function can be used to grant access rights
+   *  @param {type} command   The used command (access right), e.g., read, write (CRUD)
+   *  @param {type} object    The object that should be used to change the access right
+   *  @param {type} role      The role that should be changed
+   *  A call could look like this:  grantAccess("read","AB","reviewer");
+   */
+  this.grantAccess = function(command, object, role) {
+    // add right also to the right list
+  addRightToRightTableIfItIsNotThere(command,object);
     
     // re-init possible rights
     this.initRights();
