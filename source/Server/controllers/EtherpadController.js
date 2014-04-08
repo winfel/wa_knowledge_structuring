@@ -51,7 +51,7 @@ EtherpadController.convertToPdf = function(html, callback) {
 			fs.readFile(ostmpdir + '/' + tmpFilename + '.pdf', function (err, data) {
 				if (err) throw err;
 				// pdf is read
-				callback(data.toString());
+				callback(data);
 			});
 
 		});
@@ -93,7 +93,7 @@ EtherpadController.convertToImage = function(html, imgtype, callback) {
 			fs.readFile(ostmpdir + '/' + tmpFilename + '.' + imgtype, function (err, data) {
 				if (err) throw err;
 				// img is read
-				callback(data.toString());
+				callback(data);
 			});
 		});
 	});
