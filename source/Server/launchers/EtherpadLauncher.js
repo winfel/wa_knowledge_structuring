@@ -10,7 +10,6 @@
 * @requires child_process
 * @requires underscore
 * @requires os
-*
 */
 
 var os = require('os');
@@ -28,14 +27,21 @@ EtherpadLauncher.init = function(theModules) {
 };
 
 EtherpadLauncher.launch = function() {
-    // First if Etherpad is already running 
-    this.isRunning(function (running) {
-        if (running) {
-            console.log("Etherpad is running");
-        } else {
-            EtherpadLauncher.launchEtherPad(null);
-        }
-    });
+    
+    if (global.config.etherpadlite.startFilePath != '') {
+    
+        // First if Etherpad is already running 
+        this.isRunning(function (running) {
+            if (running) {
+                console.log("Etherpad is running");
+            } else {
+                EtherpadLauncher.launchEtherPad(null);
+            }
+        });
+    } else {
+        console.error('\x1B[31;1meetherpadlite.startFilePath is not defined in config.local.js.\n' +
+                'Copy the appropriate settings from config.default.js.\x1B[39m');
+    }
 }
 
 EtherpadLauncher.isRunning = function(callback) {

@@ -142,4 +142,6 @@ if (Modules.config.plugins) {
 }
 
 // launchers
-var etherPadLauncher = require('./Server/launchers/EtherpadLauncher.js').init(Modules).launch();
+var mongoDBLauncher = require('./Server/launchers/MongoDBLauncher.js').init(Modules).launch();
+var etherPadLauncher = require('./Server/launchers/EtherpadLauncher.js').init(Modules).launch(); 
+

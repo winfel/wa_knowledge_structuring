@@ -52,5 +52,12 @@ module.exports={
     },
     wkhtmltox: {
         path: ""
-    }
+    },
+    mongodb: {
+              user: "",  
+              password: "", 
+              dbname: "WebArena",
+              host: "localhost",
+              port: 27017
+            }      
 };
