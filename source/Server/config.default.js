@@ -56,8 +56,8 @@ module.exports={
     mongodb: {
               user: "",  
               password: "", 
-              dbname: "WebArena",
-              host: "localhost",
+              dbname: "",
+              host: "",
               port: 27017
             }      
 };
