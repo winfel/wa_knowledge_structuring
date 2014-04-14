@@ -6,6 +6,7 @@ GUI.rightmanager = new function() {
   var rm, rmRoles, rmRights, rmUsers;
   var containerSelected;
   var containerNoneSelected;
+  var DEBUG = false;
 
   /* Content of rightmanager sidebar*/
 
@@ -38,7 +39,7 @@ GUI.rightmanager = new function() {
     /* Add role event */
     $("#rmNewRoleButton").click(function(event) {
       var role = $("#rmNewRoleTextfield").val();
-      console.log(role);
+      if (DEBUG) {console.log(role);}
     });
 
     /* Initially no object is selected */
@@ -55,9 +56,9 @@ GUI.rightmanager = new function() {
   this.updateRightsSection = function(availableRights, checkedRights) {
     var that = GUI.rightmanager;
 
-    console.log("rm: Updating right section");
-    console.log(availableRights);
-    console.log(checkedRights);
+    if (DEBUG) {console.log("rm: Updating right section");}
+    if (DEBUG) {console.log(availableRights);}
+   if (DEBUG) { console.log(checkedRights);}
 
     that.rmRights.empty();
 
@@ -188,7 +189,7 @@ GUI.rightmanager = new function() {
           checkedSpans.splice(index, 1); // Remove the span from the array
           checkedUsers.splice(index, 1); // Remove the user from the array
 
-          console.log("Don't worry, " + user + " is not deleted yet. He/She just disappeared from the html document :).");
+          if (DEBUG) {console.log("Don't worry, " + user + " is not deleted yet. He/She just disappeared from the html document :).");}
           event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
         });
 
@@ -292,7 +293,7 @@ GUI.rightmanager = new function() {
           deleteImg.attr("src", "/guis.common/images/oxygen/16x16/actions/edit-delete.png");
           deleteImg.on("click", function(event) {
             span.remove();
-            console.log("Don't worry, the role '" + role.name + "' is not deleted yet. She just disappeared from the html document :).");
+            if (DEBUG) {console.log("Don't worry, the role '" + role.name + "' is not deleted yet. She just disappeared from the html document :).");}
             // We don't want to fire the span click event. That's why we stop the propagation.
             event.stopPropagation();
           });

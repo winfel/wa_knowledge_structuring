@@ -417,8 +417,10 @@ var RightManager = function() {
    */
   this.getRights = function(socket, data) {
 
-    console.log("Serverseite...");
-    console.log(data);
+    if (DEBUG_OF_RIGHTMANAGEMENT) {
+      console.log("Serverseite...");
+      console.log(data);
+    }
 
     var dbRights = db.get('rights');
     var dbRoles = db.get("roles");
@@ -427,9 +429,10 @@ var RightManager = function() {
       // We need to make sure that both data are send to the client in one step...
       dbRoles.find({contextID: String(data.object.id), name: String(data.role)}, {}, function(e, docsRoles) {
         // Both arrays will be merged on the client side. Why should the server do all the work ;).
-        console.log(docsRights);
-        console.log(docsRoles);
-        
+        if (DEBUG_OF_RIGHTMANAGEMENT) {
+           console.log(docsRights);
+           console.log(docsRoles);
+        }
         var dataRights = {
           "availableRights": docsRights,
           "checkedRights": docsRoles[0].rights
