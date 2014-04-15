@@ -263,9 +263,6 @@ var RightManager = function() {
    *    @param {function}   callback    The callback function with one boolean parameter (the answer)
    */
   this.hasAccess = function(command, object, user, callback) {
-    // add right also to the right list
-    //addRightToRightTableIfItIsNotThere(command, object);
-
     /* check if command is feasible */
     var commandIsInPossibleAccessRights = (possibleAccessRights.indexOf(String(command)) != -1);
     if (commandIsInPossibleAccessRights) {
@@ -358,10 +355,11 @@ var RightManager = function() {
    *  A call could look like this:  grantAccess("read","AB","reviewer");
    */
   this.grantAccess = function(command, object, role) {
+    // add right also to the right list
+    //addRightToRightTableIfItIsNotThere(command, object);
+
     // re-init possible rights
     this.initRights();
-
-    console.log(command + " " + object + " " + role);
 
     // granting access
     this.modifyAccess(command, object, role, true);
@@ -407,6 +405,7 @@ var RightManager = function() {
         } else {
           collection.update({_id: item._id}, {$pull: {rights: command}});
         }
+
       });
     });
   };
@@ -417,6 +416,12 @@ var RightManager = function() {
    * @returns {undefined}
    */
   this.getRights = function(socket, data) {
+
+    if (DEBUG_OF_RIGHTMANAGEMENT) {
+      console.log("Serverseite...");
+      console.log(data);
+    }
+
     var dbRights = db.get('rights');
     var dbRoles = db.get("roles");
 
@@ -424,7 +429,10 @@ var RightManager = function() {
       // We need to make sure that both data are send to the client in one step...
       dbRoles.find({contextID: String(data.object.id), name: String(data.role)}, {}, function(e, docsRoles) {
         // Both arrays will be merged on the client side. Why should the server do all the work ;).
-
+        if (DEBUG_OF_RIGHTMANAGEMENT) {
+          console.log(docsRights);
+          console.log(docsRoles);
+        }
         var dataRights = {
           "availableRights": docsRights,
           "checkedRights": docsRoles[0].rights

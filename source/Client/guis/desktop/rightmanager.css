@@ -15,8 +15,23 @@
 }
 
 #rm_users .rmSidebarUser {
+  width: 70px;
   float: left;
   display: inline-block;
+ 
+}
+
+#rm_usersPage {
+   background-color: #D2D9FC;
+}
+#rm_rightsPage {
+   background-color: #D2D9FC;
+}
+#rm_rightsHead{
+   background-color: #D2D9FC;
+}
+#rm_usersHead{
+   background-color: #D2D9FC;
 }
 
 #rm_roles .rmSidebarRole:hover,
@@ -26,7 +41,7 @@
 
 #rm_roles .rmSidebarRole.checked,
 #rm_users .rmSidebarUser.checked {
-  background-color: blueviolet;
+  background-color: #A4B5FF;
 }
 
 #rm_roles .rmSidebarRole img,
@@ -51,3 +66,54 @@
 .invisible {
   visibility: hidden !important;
 }
+
+
+
+/*
+ * Right manager pop-up dialog
+ */
+ 
+  ul.tabs {
+    margin: 0;
+    padding: 0;
+    float: left;
+    list-style: none;
+    height: 32px;
+    border-bottom: 1px solid #999999;
+    border-left: 1px solid #999999;
+    width: 100%;
+  }
+  ul.tabs li {
+    float: left;
+    margin: 0;
+    cursor: pointer;
+    padding: 0px 21px ;
+    height: 31px;
+    line-height: 31px;
+    border: 1px solid #999999;
+    border-left: none;
+    font-weight: bold;
+    background: #EEEEEE;
+    overflow: hidden;
+    position: relative;
+  }
+  ul.tabs li:hover {
+    background: #CCCCCC;
+  } 
+  ul.tabs li.active{
+    background: #FFFFFF;
+    border-bottom: 1px solid #FFFFFF;
+  }
+  .tab_container {
+    border: 1px solid #999999;
+    border-top: none;
+    clear: both;
+    float: left; 
+    width: 100%;
+    background: #FFFFFF;
+  }
+  .tab_content {
+    padding: 20px;
+    font-size: 1.2em;
+    display: none;
+  }

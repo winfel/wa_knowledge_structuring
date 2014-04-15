@@ -268,15 +268,55 @@
     </div>
 
     <div id="actionsheet"></div>
-
     <div id="error_bg"></div>
     <div id="error_box">
-
       <div id="error_box_heading"></div>
       <div id="error_box_message"></div>
       <div id="error_box_button"></div>
-
     </div>
+
+ <!-- BEGIN: GUI rightmanager pop-up dialog -->
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+          $(".tab_content").hide();
+          $(".tab_content:first").show(); 
+
+          $("ul.tabs li").click(function() {
+            $("ul.tabs li").removeClass("active");
+            $(this).addClass("active");
+            $(".tab_content").hide();
+            var activeTab = $(this).attr("rel"); 
+            $("#"+activeTab).fadeIn(); 
+          });
+        })
+    </script>
+   
+  <ul class="tabs" style="display: none"> 
+        <li class="active" rel="tab1"> 'Writer'</li>
+        <li rel="tab2"> Reviewer</li>
+        <li rel="tab3"> + </li>
+    </ul>
+  
+<div id ="rightmanager-dialog" class="tab_container" style="display: none"> 
+     <div id="tab1" class="tab_content"> 
+         <p>
+         bla bla
+         </p>
+     </div><!-- #tab1 -->
+     <div id="tab2" class="tab_content"> 
+       <p>
+        bla bla bla
+        </p>
+     </div><!-- #tab2 -->
+     <div id="tab3" class="tab_content"> 
+       <p>
+        blabla
+       </p>
+     </div><!-- #tab3 -->
+ </div> <!-- .tab_container --> 
+
+
 
 
     <div id="login_background" style="display: none">&nbsp;</div>
