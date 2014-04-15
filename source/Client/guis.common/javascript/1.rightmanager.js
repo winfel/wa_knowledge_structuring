@@ -4,6 +4,7 @@
 
 GUI.rightmanager = new function() {
   var rm, rmRoles, rmRights, rmUsers;
+  var selectedRoleSpan;
   var containerSelected;
   var containerNoneSelected;
 
@@ -20,6 +21,7 @@ GUI.rightmanager = new function() {
     this.rmRoles = $("#rm_roles");
     this.rmRights = $("#rm_rights");
     this.rmUsers = $("#rm_users");
+    this.selectedRoleSpan = null;
     this.containerSelected = $('#rightmanager .rightmanagerSelected');
     this.containerNoneSelected = $('#rightmanager .rightmanagerNoneSelected');
 
@@ -43,7 +45,6 @@ GUI.rightmanager = new function() {
 
     /* Initially no object is selected */
     this.containerSelected.hide();
-
   };
 
   /**
@@ -55,11 +56,7 @@ GUI.rightmanager = new function() {
   this.updateRightsSection = function(availableRights, checkedRights) {
     var that = GUI.rightmanager;
 
-    console.log("rm: Updating right section");
-    console.log(availableRights);
-    console.log(checkedRights);
-
-    that.rmRights.empty();
+    that.rmRights.empty(); // Clear the rights section
 
     availableRights.forEach(function(right) {
       var inputId = that.rmRights.attr("id") + "_" + right.name;
@@ -71,8 +68,16 @@ GUI.rightmanager = new function() {
         value: right.name
       });
 
+      input.on("click", function() {
+        var checked = input.prop("checked");
+        if(checked)
+          Modules.RightManager.grantAccess(right.name, {id: 1}, that.selectedRoleSpan.data("role").name);
+        else
+          Modules.RightManager.revokeAccess(right.name, {id: 1}, that.selectedRoleSpan.data("role").name);
+      });
+
       if (checkedRights.indexOf(right.name) >= 0)
-        input.attr("checked", "checked");
+        input.prop("checked", true);
 
       var label = $("<label>");
       label.attr({
@@ -80,6 +85,7 @@ GUI.rightmanager = new function() {
       });
       label.html(right.name);
 
+      // Update the rights section
       that.rmRights.append(input);
       that.rmRights.append(label);
       that.rmRights.append("<br>");
@@ -92,18 +98,21 @@ GUI.rightmanager = new function() {
    * @returns {undefined}
    */
   this.updateUsersSection = function(users) {
-    //result=["Patrick","Jörg","Vanessa","Mohammad","Lisa","Ivan","Oliver","Shari"]; // Demo data
+    //users=["Patrick","Jörg","Vanessa","Mohammad","Lisa","Ivan","Oliver","Shari"]; // Demo data
     var that = GUI.rightmanager;
     that.rmUsers.empty(); // Clear the output.
 
-    var checkedSpans = new Array();
-    var checkedUsers = new Array();
+    var checkedUsers = new Array(); // Keep track of the selected users. Needed for a delete server call.
+    var checkedSpans = new Array(); // Keep track of the corresponding spans, which display a user.
 
     var btnDeleteUsers = $("#rmDeleteUsersButton");
     btnDeleteUsers.on("click", function() {
       checkedSpans.forEach(function(item) {
         item.remove();
       });
+
+      if (checkedSpans.length == 0)
+        btnDeleteUsers.removeClass("visible");
     });
 
     if (users.length > 0) {
@@ -125,9 +134,10 @@ GUI.rightmanager = new function() {
             span.data("deleteImg").removeClass("visible");
         });
 
+        // The whole click magic ;)...
         span.on("click", function(event) {
           var deleteImg = span.data("deleteImg"); // The reference to the delete image.
-          var index = checkedSpans.indexOf(span); // The index of the clicked span
+          var index = checkedSpans.indexOf(span); // The index of the clicked span.
 
           // Check for multi/single selection
           if (event.ctrlKey) {
@@ -139,6 +149,7 @@ GUI.rightmanager = new function() {
               checkedSpans.push(span); // Add the span to the array
               checkedUsers.push(user); // Add the user to the array
             }
+            // If there is only one item left, show the delete image again.
             if (checkedSpans.length == 1)
               checkedSpans[0].data("deleteImg").addClass("visible");
           } else {
@@ -192,7 +203,7 @@ GUI.rightmanager = new function() {
           event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
         });
 
-        span.data("deleteImg", deleteImg);
+        span.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
         span.append(deleteImg);
 
         // Finally add it to the user section
@@ -212,10 +223,9 @@ GUI.rightmanager = new function() {
    * @returns {undefined}
    */
   this.updateContent = function(theObject) {
-    var that = this;
+    var that = GUI.rightmanager;
 
     /* Display selected object information */
-
     var selectedObjects = ObjectManager.getSelected();
 
     /* Depending on how many objects are selected display nothing, only object information or everything */
@@ -256,11 +266,11 @@ GUI.rightmanager = new function() {
       $("#rm_Name").html(theObject.getAttribute("name"));
       $("#rm_Type").html(theObject.type);
 
+      that.selectedRoleSpan = null;
+
       /* Get Roles of selected object and write the roles into combobox */
       Modules.UserManager.getRoles({id: 1}, GUI.username, function(roles) {
         that.rmRoles.empty();
-
-        var selectedSpan = null;
 
         roles.forEach(function(role) {
           //$("#rm_roles").append("<div class=\"jDesktopInspector_element\"><input type=\"radio\" value=\"" + item.name + "\" name=\"rm_rolesRadio\">" + item.name + "</div>");
@@ -269,10 +279,13 @@ GUI.rightmanager = new function() {
           var span = $("<span>");
           span.addClass("rmSidebarRole");
           span.html(role.name);
-          span.data("value", role.name);
+          span.data("role", role);
           span.on("click", function(event) {
-            selectedSpan.removeClass("checked");
-            selectedSpan = span;
+            if (that.selectedRoleSpan == span)
+              return;
+
+            that.selectedRoleSpan.removeClass("checked");
+            that.selectedRoleSpan = span;
             span.addClass("checked");
 
             // Update the other sections
@@ -282,9 +295,9 @@ GUI.rightmanager = new function() {
             Modules.UserManager.getUsers({id: 1}, role.name, GUI.username, that.updateUsersSection);
           });
 
-          if (!selectedSpan) {
-            selectedSpan = span;
-            selectedSpan.addClass("checked");
+          if (!that.selectedRoleSpan) {
+            that.selectedRoleSpan = span;
+            that.selectedRoleSpan.addClass("checked");
           }
 
           var deleteImg = $("<img>");
@@ -304,9 +317,9 @@ GUI.rightmanager = new function() {
         // Initially
         // 
         // Get rights depending on the selected role...
-        Modules.RightManager.getRights({id: 1, type: "PaperObject"}, selectedSpan.data("value"), GUI.username, that.updateRightsSection);
+        Modules.RightManager.getRights({id: 1, type: "PaperObject"}, that.selectedRoleSpan.data("role").name, GUI.username, that.updateRightsSection);
         // Get users depending on the selected role...
-        Modules.UserManager.getUsers({id: 1}, selectedSpan.data("value"), GUI.username, that.updateUsersSection);
+        Modules.UserManager.getUsers({id: 1}, that.selectedRoleSpan.data("role").name, GUI.username, that.updateUsersSection);
       });
 
       this.containerSelected.show();

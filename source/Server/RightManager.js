@@ -195,9 +195,9 @@ var RightManager = function() {
   var that = this;
 
   /**
-  * The function gets all rights from the database and stores them in an internal array
-  */
-  this.initRights = function(){
+   * The function gets all rights from the database and stores them in an internal array
+   */
+  this.initRights = function() {
     possibleAccessRights = [];
 
     /* get all exiting access rights from the database */
@@ -263,6 +263,9 @@ var RightManager = function() {
    *    @param {function}   callback    The callback function with one boolean parameter (the answer)
    */
   this.hasAccess = function(command, object, user, callback) {
+    // add right also to the right list
+    //addRightToRightTableIfItIsNotThere(command, object);
+
     /* check if command is feasible */
     var commandIsInPossibleAccessRights = (possibleAccessRights.indexOf(String(command)) != -1);
     if (commandIsInPossibleAccessRights) {
@@ -299,54 +302,54 @@ var RightManager = function() {
       });
 
     } else {
-		if(DEBUG_OF_RIGHTMANAGEMENT) {
-			console.log("<<DEBUG INFORMATION>> The given hasAccess command was not valid");
-		}
+      if (DEBUG_OF_RIGHTMANAGEMENT) {
+        console.log("<<DEBUG INFORMATION>> The given hasAccess command was not valid");
+      }
     }
     //return true;
   };
 
   /**
-  *   The function can be used to put a right into the db.right document space.
-  *   If it is already included, the call will do nothing but log this fact.
-  *
-  *   @param {type} command   The used command (access right), e.g., read, write (CRUD)
-  *   @param {type} object    The object that should be used to change the access right
-  */
-  this.addRightToRightTableIfItIsNotThere = function(command,object){
+   *   The function can be used to put a right into the db.right document space.
+   *   If it is already included, the call will do nothing but log this fact.
+   *
+   *   @param {type} command   The used command (access right), e.g., read, write (CRUD)
+   *   @param {type} object    The object that should be used to change the access right
+   */
+  this.addRightToRightTableIfItIsNotThere = function(command, object) {
     var collection = db.get('rights');
-    collection.find({type: String(object.type), name: String(command)}, 
-      {}, function(e, docs) {
+    collection.find({type: String(object.type), name: String(command)},
+    {}, function(e, docs) {
 
-        var options = { "limit": 1, "sort": [['id','desc']]};
-        collection.find({},options, function(e2,rightWithMaxID){
+      var options = {"limit": 1, "sort": [['id', 'desc']]};
+      collection.find({}, options, function(e2, rightWithMaxID) {
 
-          if(typeof docs == 'undefined' || docs.length === 0){
-            var newID = Number(rightWithMaxID[0].id)+1;
+        if (typeof docs == 'undefined' || docs.length === 0) {
+          var newID = Number(rightWithMaxID[0].id) + 1;
 
-            collection.insert({
-              type: String(object.type) , 
-              id: String(newID), 
-              name: String(command),
-              comment: "Insert a comment..."});
+          collection.insert({
+            type: String(object.type),
+            id: String(newID),
+            name: String(command),
+            comment: "Insert a comment..."});
 
-            if (DEBUG_OF_RIGHTMANAGEMENT) {
-              console.log("pushing new right: " + String(command));
-            }
-          }else{
-            if(DEBUG_OF_RIGHTMANAGEMENT){
-              console.log("right " + command + " was already included and has, " +
-                "thus, not been included to the right list");
-
-              console.log(">> The result was: ");
-              console.log(docs);
-              console.log(">> ---------------- <<");
-            }
+          if (DEBUG_OF_RIGHTMANAGEMENT) {
+            console.log("pushing new right: " + String(command));
           }
-        });
+        } else {
+          if (DEBUG_OF_RIGHTMANAGEMENT) {
+            console.log("right " + command + " was already included and has, " +
+                    "thus, not been included to the right list");
+
+            console.log(">> The result was: ");
+            console.log(docs);
+            console.log(">> ---------------- <<");
+          }
+        }
       });
+    });
   };
-  
+
   /**
    *  The function can be used to grant access rights
    *  @param {type} command   The used command (access right), e.g., read, write (CRUD)
@@ -355,11 +358,10 @@ var RightManager = function() {
    *  A call could look like this:  grantAccess("read","AB","reviewer");
    */
   this.grantAccess = function(command, object, role) {
-    // add right also to the right list
-  addRightToRightTableIfItIsNotThere(command,object);
-    
     // re-init possible rights
     this.initRights();
+
+    console.log(command + " " + object + " " + role);
 
     // granting access
     this.modifyAccess(command, object, role, true);
@@ -405,7 +407,6 @@ var RightManager = function() {
         } else {
           collection.update({_id: item._id}, {$pull: {rights: command}});
         }
-
       });
     });
   };
@@ -416,10 +417,6 @@ var RightManager = function() {
    * @returns {undefined}
    */
   this.getRights = function(socket, data) {
-
-    console.log("Serverseite...");
-    console.log(data);
-
     var dbRights = db.get('rights');
     var dbRoles = db.get("roles");
 
@@ -427,9 +424,7 @@ var RightManager = function() {
       // We need to make sure that both data are send to the client in one step...
       dbRoles.find({contextID: String(data.object.id), name: String(data.role)}, {}, function(e, docsRoles) {
         // Both arrays will be merged on the client side. Why should the server do all the work ;).
-        console.log(docsRights);
-        console.log(docsRoles);
-        
+
         var dataRights = {
           "availableRights": docsRights,
           "checkedRights": docsRoles[0].rights

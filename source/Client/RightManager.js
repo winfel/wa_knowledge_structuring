@@ -28,8 +28,6 @@ var RightManager = new function() {
    *	@param {type} object    The object that should be checked	
    */
   this.hasAccess = function(command, object, user, callback) {
-    console.log("hasAccess");
-
     Dispatcher.registerCall("rmAccessGranted" + object.id, function() {
       // call the callback
       callback(true);
@@ -84,7 +82,6 @@ var RightManager = new function() {
    *	A call could look like this:  grantAccess("read","AB","reviewer");
    */
   this.grantAccess = function(command, object, role) {
-    console.log("GRANT ON CLIENT");
     this.modifyAccess(command,object,role,true);
   };
 
