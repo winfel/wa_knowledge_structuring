@@ -50,7 +50,7 @@ File.register=function(type){
 	this.registerAttribute('fillcolor',{hidden: true});
 	this.registerAttribute('width',{hidden: true});
 	this.registerAttribute('height',{hidden: true});
-	this.registerAttribute('mainTag',{type:'text', standard:[]});
+	this.registerAttribute('mainTag',{type:'text', standard:""});
 	this.registerAttribute('secondaryTags',{type: 'list', multiple: true});
 
 	this.registerAttribute('preview',{type:'boolean',standard:false,category:'Basic',changedFunction: function(object, value, local) {
