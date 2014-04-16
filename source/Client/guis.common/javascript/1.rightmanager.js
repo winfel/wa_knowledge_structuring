@@ -69,6 +69,8 @@ GUI.rightmanager = new function() {
     if (DEBUG) {
       console.log(checkedRights);
     }
+    
+    that.rmRights.empty();
 
     availableRights.forEach(function(right) {
       var inputId = that.rmRights.attr("id") + "_" + right.name;
