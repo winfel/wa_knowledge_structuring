@@ -110,6 +110,7 @@ Modules.TranslationManager = require('./Common/TranslationManager.js');
 Modules.ActionManager = require('./Common/ActionManager.js');
 Modules.RightManager = require('./Server/RightManager.js');
 //Modules.UserManager2 = require('./Server/UserManager2.js'); 
+Modules.TagManager = require('./Server/TagManager.js');
 
 if(Modules.config.tcpApiServer){
 	Modules['TcpEventServer'] = 	require("./Server/TcpSocketServer.js").create();

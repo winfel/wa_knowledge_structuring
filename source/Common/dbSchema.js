@@ -39,4 +39,16 @@ Schema.roleSchema = mongoose.Schema({
      users: Array
 });
 
+/**
+*		Table: MainTags
+*		|-----------------------------------------|
+*		|	id	|	name	|	secTags (array)   |
+*		|
+*/
+Schema.TagSchema = mongoose.Schema({
+    	id: String,
+  	  name: String,
+    secTags: Array,
+});
+
 module.exports=Schema;

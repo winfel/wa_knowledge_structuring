@@ -36,10 +36,26 @@ function removeListItem(arr, item) {
     }
 }
 
+//only for testing
+function printMainTags(data){
+
+console.log(data);
+
+}
+
+//only for testing
+function printSecTags(data){
+
+console.log(data);
+
+}
 
 //TODO
 //queries the database for related tags
 function getRelatedTags(){
+
+	Modules.TagManager.getMainTags(printMainTags);
+	Modules.TagManager.getSecTags("Algorithms", printSecTags);
 	
 	return ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj",
 			   "kkkk", "llll", "mmmmm", "nnnn", "oooo"];
@@ -276,9 +292,10 @@ GUI.setTag = function(webarenaObject, width, height, passThrough) {
 	
 	$( "#custom-tag" ).live("keyup", function(event) {
 		
-		if (event.keyCode == 13) {
+		var customTag = dom.find("#custom-tag").val();
+		
+		if (event.keyCode == 13 & customTag != "") {
 			
-			var customTag = dom.find("#custom-tag").val();
 			removeListItem(relatedTags, customTag);
 			drawTags();
 			
@@ -346,6 +363,9 @@ GUI.setTag = function(webarenaObject, width, height, passThrough) {
 		// set the main tag
 		mainTag = $(this).text();
 				
+		//sec tag disable
+		$( "#tabs" ).tabs( "option", "disabled", [] );		
+				
 		// go to secondary tags page
 		$( "#tabs" ).tabs( "select", 1 );
 		
@@ -367,11 +387,15 @@ GUI.setTag = function(webarenaObject, width, height, passThrough) {
 		
 	};
 	
-	
 	GUI.dialog("Set Tag", dom, buttons, width, passThrough);
 	
 	// Initialize tabs
 	$( "#tabs" ).tabs();
+	
+	//sec tag disable
+	if(webarenaObject.getAttribute('mainTag') == ""){
+		$( "#tabs" ).tabs( "option", "disabled", [ 1] );
+	}
 	
 	// Initialize autocomplete
 	//$( "#autocomplete" ).autocomplete({
