@@ -262,49 +262,56 @@ var RightManager = function() {
    *    @param {type}       user        The username of the user
    *    @param {function}   callback    The callback function with one boolean parameter (the answer)
    */
-  this.hasAccess = function(command, object, user, callback) {
+   this.hasAccess = function(command, object, user, callback) {
     /* check if command is feasible */
     var commandIsInPossibleAccessRights = (possibleAccessRights.indexOf(String(command)) != -1);
     if (commandIsInPossibleAccessRights) {
 
-      /* (1) get the roles that include the current command within the context of
-       the given object */
+      /* (0) Check if rights are set up for this object. If not: call update for parent */
       var collection = db.get('roles');
       collection.find({contextID: String(object.id)}, {}, function(e, docs) {
-        var found = false;
-        docs.forEach(function(item) {
-          var commandIsInRights = (String(item.rights).split(",").indexOf(String(command)) != -1);
+        if (typeof docs == 'undefined' || docs.length === 0) {
+          // TODO get parent
 
-          if (commandIsInRights) {
-            if (DEBUG_OF_RIGHTMANAGEMENT) {
-              console.log("Command is used in Role " + item.name);
-            }
+          // call method for parent; FIXME: Currently usage of canvas
+          this.hasAccess(command, {id : 0, type : Canvas}, user, callback);
 
-            /* (2) check if current user is inside of one of these roles */
-            var userIsInUserList = (String(item.users).split(",").indexOf(String(user)) != -1);
+        }else{
+                /* (1) get the roles that include the current command within the context of
+                the given object */
+                var found = false;
+                docs.forEach(function(item) {
+                  var commandIsInRights = (String(item.rights).split(",").indexOf(String(command)) != -1);
 
-            if (userIsInUserList) {
-              /* (3) if (2) is fulfilled return true */
-              found = true;
-            }
-          }
-        });
+                  if (commandIsInRights) {
+                    if (DEBUG_OF_RIGHTMANAGEMENT) {
+                      console.log("Command is used in Role " + item.name);
+                    }
 
-        if (found) {
-          callback(true);
-        } else {
-          callback(false);
-        }
+                    /* (2) check if current user is inside of one of these roles */
+                    var userIsInUserList = (String(item.users).split(",").indexOf(String(user)) != -1);
 
-      });
+                    if (userIsInUserList) {
+                      /* (3) if (2) is fulfilled return true */
+                      found = true;
+                    }
+                  }
+                });
 
-    } else {
-      if (DEBUG_OF_RIGHTMANAGEMENT) {
-        console.log("<<DEBUG INFORMATION>> The given hasAccess command was not valid");
-      }
-    }
-    //return true;
-  };
+                if (found) {
+                  callback(true);
+                } else {
+                  callback(false);
+                }
+              }
+            });
+} else {
+  if (DEBUG_OF_RIGHTMANAGEMENT) {
+    console.log("<<DEBUG INFORMATION>> The given hasAccess command was not valid");
+  }
+}
+  //return true;
+};
 
   /**
    *   The function can be used to put a right into the db.right document space.
