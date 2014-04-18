@@ -7,15 +7,24 @@
 
 
 NumberCreator.justCreated = function() {
-  var testClientGrantAccess 	= true;
-  var testClientRevokeAccess 	= true;
+  var testClientGrantAccess 	= false;
+  var testClientRevokeAccess 	= false;
   var testClientGetRights 		= false;
+  var testClientGetRoles      = true;
 
   if(testClientGetRights === true){
   	console.log(">>> TESTING CLIENT GET RIGHTS <<<");
   	Modules.RightManager.getRights({id: 1, type: "NumberCreator"}, "Boss", GUI.username, function(result) {
   		console.log("GET RIGHTS ON CLIENT SIDE");
   	});
+  }
+
+  if(testClientGetRoles === true){
+    console.log(">>> TESTING CLIENT GET ROLES <<<");
+    Modules.RightManager.getRolesForObject({id: 1, type: "NumberCreator"}, function(result) {
+      console.log("GET ROLES FOR OBJECT");
+      console.log(result);
+    });
   }
 
   if(testClientGrantAccess === true){
