@@ -248,9 +248,9 @@ var RightManager = function() {
     });
 
     Dispatcher.registerCall("rmGetObjectRoles", function(socket, data){
-      var dbRights = db.get('rights');
+      var dbRights = db.get('defroles');
 
-      dbRights.find({type: String(data.object.type)}, {}, function(e, docs) {
+      dbRights.find({object: String(data.object.type)}, {}, function(e, docs) {
         Modules.SocketServer.sendToSocket(socket, "rmObjectRoles" + data.object.id, docs);
       });
     });
