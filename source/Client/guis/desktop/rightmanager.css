@@ -22,16 +22,16 @@
 }
 
 #rm_usersPage {
-   background-color: #D2D9FC;
+   /*background-color: #D2D9FC;*/
 }
 #rm_rightsPage {
-   background-color: #D2D9FC;
+   /*background-color: #D2D9FC;*/
 }
 #rm_rightsHead{
-   background-color: #D2D9FC;
+   /*background-color: #D2D9FC;*/
 }
 #rm_usersHead{
-   background-color: #D2D9FC;
+   /*background-color: #D2D9FC;*/
 }
 
 #rm_roles .rmSidebarRole:hover,
@@ -51,8 +51,31 @@
   visibility: hidden;
 }
 
+#rm_rights {
+  
+}
+
+#rm_rights label {
+  margin-top: 1px;
+  display: inline-block;
+  width: 90%;
+  vertical-align: top;
+}
+
+#rm_rights input[type="checkbox"] {
+  vertical-align: top;
+}
+
 #rmDeleteUsersButton {
   visibility: hidden;
+}
+
+#rm_rightsHead span,
+#rm_usersHead span {
+  margin-left: 8px;
+  font-size: 8px;
+  font-style: italic;
+  color: gray;
 }
 
 .block {

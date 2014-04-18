@@ -3,7 +3,11 @@
  */
 
 GUI.rightmanager = new function() {
-  var rm, rmRoles, rmRights, rmUsers;
+  var rm, rmRoles;
+  var rmRightsHead, rmRights;
+  var rmUsersHead, rmUsers;
+  var btnDeleteUsers;
+
   var selectedRoleSpan;
   var containerSelected;
   var containerNoneSelected;
@@ -20,8 +24,11 @@ GUI.rightmanager = new function() {
 
     this.rm = $("#rightmanager");
     this.rmRoles = $("#rm_roles");
+    this.rmRightsHead = $("#rm_rightsHead");
     this.rmRights = $("#rm_rights");
+    this.rmUsersHead = $("#rm_usersHead");
     this.rmUsers = $("#rm_users");
+    this.btnDeleteUsers = $("#rmDeleteUsersButton");
     this.selectedRoleSpan = null;
     this.containerSelected = $('#rightmanager .rightmanagerSelected');
     this.containerNoneSelected = $('#rightmanager .rightmanagerNoneSelected');
@@ -69,7 +76,10 @@ GUI.rightmanager = new function() {
     if (DEBUG) {
       console.log(checkedRights);
     }
-    
+
+    // Update the rights header
+    that.rmRightsHead.html("Rights <span>(" + that.selectedRoleSpan.data("role").name + ")</span>");
+
     that.rmRights.empty();
 
     availableRights.forEach(function(right) {
@@ -114,19 +124,25 @@ GUI.rightmanager = new function() {
   this.updateUsersSection = function(users) {
     //users=["Patrick","Jörg","Vanessa","Mohammad","Lisa","Ivan","Oliver","Shari"]; // Demo data
     var that = GUI.rightmanager;
-    that.rmUsers.empty(); // Clear the output.
+
+    // Update the rights header
+    that.rmUsersHead.html("Users <span>(" + that.selectedRoleSpan.data("role").name + ")</span>");
+    // Clear the output.
+    that.rmUsers.empty();
 
     var checkedUsers = new Array(); // Keep track of the selected users. Needed for a delete server call.
     var checkedSpans = new Array(); // Keep track of the corresponding spans, which display a user.
 
-    var btnDeleteUsers = $("#rmDeleteUsersButton");
-    btnDeleteUsers.on("click", function() {
+    that.btnDeleteUsers.on("click", function() {
       checkedSpans.forEach(function(item) {
         item.remove();
       });
 
-      if (checkedSpans.length == 0)
-        btnDeleteUsers.removeClass("visible");
+      // No users checked anymore
+      checkedSpans.length = 0;
+      checkedUsers.length = 0;
+
+      that.btnDeleteUsers.removeClass("visible");
     });
 
     if (users.length > 0) {
@@ -163,17 +179,12 @@ GUI.rightmanager = new function() {
               checkedSpans.push(span); // Add the span to the array
               checkedUsers.push(user); // Add the user to the array
             }
-            // If there is only one item left, show the delete image again.
-            if (checkedSpans.length == 1)
-              checkedSpans[0].data("deleteImg").addClass("visible");
+
           } else {
-            // Single selection: Uncheck all other elements
-            // Do not remove the class checked from the current span. It will be toggled later anyway...
+            // Single selection: Uncheck all elements first and then check the current element again..
             checkedSpans.forEach(function(item) {
-              if (item && item.data("deleteImg") && item != span) {
-                item.removeClass("checked");
-                item.data("deleteImg").removeClass("visible");
-              }
+              item.removeClass("checked");
+              item.data("deleteImg").removeClass("visible");
             });
             checkedSpans.length = 0; // Delete all array items.
             checkedSpans.push(span);
@@ -194,10 +205,10 @@ GUI.rightmanager = new function() {
             checkedSpans.forEach(function(item) {
               item.data("deleteImg").removeClass("visible");
             });
-            btnDeleteUsers.addClass("visible");
+            that.btnDeleteUsers.addClass("visible");
           } else {
             deleteImg.addClass("visible");
-            btnDeleteUsers.removeClass("visible");
+            that.btnDeleteUsers.removeClass("visible");
           }
         });
 
