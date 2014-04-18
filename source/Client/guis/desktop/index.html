@@ -159,7 +159,7 @@
         <div>
           <div id="inspector"></div>
           
-          
+       <!-- BEGIN: GUI rightmanager sidebar dialog -->    
           <div id="rightmanager" class="jDesktopInspector">
             <div class="jDesktopInspector_main rightmanagerSelected">
               <div class="jDesktopInspector_pageHead">Object:</div>
@@ -236,6 +236,7 @@
               </div>
             </div>
           </div>
+          <!-- END: GUI rightmanager sidebar dialog -->
           <div id="chat"></div>
           <div id="bug">                    
 
@@ -279,48 +280,21 @@
     </div>
 
  <!-- BEGIN: GUI rightmanager pop-up dialog -->
-    <script type="text/javascript">
-        $(document).ready(function() {
-
-          $(".tab_content").hide();
-          $(".tab_content:first").show(); 
-
-          $("ul.tabs li").click(function() {
-            $("ul.tabs li").removeClass("active");
-            $(this).addClass("active");
-            $(".tab_content").hide();
-            var activeTab = $(this).attr("rel"); 
-            $("#"+activeTab).fadeIn(); 
-          });
-        })
-    </script>
-   
-  <ul class="tabs" style="display: none"> 
-        <li class="active" rel="tab1"> 'Writer'</li>
-        <li rel="tab2"> Reviewer</li>
-        <li rel="tab3"> + </li>
-    </ul>
-  
-<div id ="rightmanager-dialog" class="tab_container" style="display: none"> 
-     <div id="tab1" class="tab_content"> 
-         <p>
-         bla bla
-         </p>
-     </div><!-- #tab1 -->
-     <div id="tab2" class="tab_content"> 
-       <p>
-        bla bla bla
-        </p>
-     </div><!-- #tab2 -->
-     <div id="tab3" class="tab_content"> 
-       <p>
-        blabla
-       </p>
-     </div><!-- #tab3 -->
- </div> <!-- .tab_container --> 
-
-
-
+  <div id="rightmanagerdialog">
+    <div class="tabs">
+      <ul id="rmdTabList">
+        <li id="tabHeader_1"></li>
+      </ul>
+    </div>
+    <div class="tabscontent">
+      <div class="tabpage" id="tabpage_1">
+            <input id="rmdNewUserButton" type="rmdbutton" value="Add user">
+            <input id="rmdNewUserButton" type="rmdbutton" value="Delete user">
+            <input id="rmdNewUserButton" type="rmdbutton" value="Take default">
+      </div>
+    </div>
+  </div>
+  <!-- END: GUI rightmanager pop-up dialog -->
 
     <div id="login_background" style="display: none">&nbsp;</div>
     <div id="login" style="display: none;">
