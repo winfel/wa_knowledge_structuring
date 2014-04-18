@@ -203,7 +203,7 @@ var RightManager = function() {
     /* get all exiting access rights from the database */
     var collection = db.get('rights');
     collection.find({}, {}, function(e, docs) {
-      if (docs != undefined) {
+      if (typeof docs != 'undefined' || docs.length > 0) {
         docs.forEach(function(entry) {
 
           if (DEBUG_OF_RIGHTMANAGEMENT) {
@@ -299,12 +299,12 @@ var RightManager = function() {
   *
   */
   this.getParentOfObject = function(obj){
-    boolean parentHasBeenFound = false;
+    var parentHasBeenFound = false;
 
     if(!parentHasBeenFound){
-      return = {id : 0, type : Canvas};
+      return {id : 0, type : "Canvas"};
     }
-  }
+  };
 
   /**
    *	The function returns a boolean value that 
@@ -317,59 +317,53 @@ var RightManager = function() {
    *  @param {function}   callback    The callback function with one boolean parameter (the answer)
    */
    this.hasAccess = function(command, object, user, callback) {
+    var that = this;
     // add right also to the right list
-    addRightToRightTableIfItIsNotThere(command, object);
+    this.addRightToRightTableIfItIsNotThere(command, object);
 
     // re-init possible rights
     this.initRights();
 
-    /* check if command is feasible */
-    var commandIsInPossibleAccessRights = (possibleAccessRights.indexOf(String(command)) != -1);
-    if (commandIsInPossibleAccessRights) {
+    /* (0) Check if rights are set up for this object. If not: call update for parent */
+    var collection = db.get('roles');
+    collection.find({contextID: String(object.id)}, {}, function(e, docs) {
+      if (typeof docs == 'undefined' || docs.length === 0) {
+        var parent = that.getParentOfObject(object);
 
-      /* (0) Check if rights are set up for this object. If not: call update for parent */
-      var collection = db.get('roles');
-      collection.find({contextID: String(object.id)}, {}, function(e, docs) {
-        if (typeof docs == 'undefined' || docs.length === 0) {
-          var parent = this.getParentOfObject(object);
+        // call method for parent
+        that.hasAccess(command, parent, user, callback);
+      }else{
+              /* (1) get the roles that includes the current command within the context of
+              the given object */
+              var found = false;
+              docs.forEach(function(item) {
+                var commandIsInRights = (String(item.rights).split(",").indexOf(String(command)) != -1);
 
-          // call method for parent
-          this.hasAccess(command, parent, user, callback);
-
-        }else{
-                /* (1) get the roles that includes the current command within the context of
-                the given object */
-                var found = false;
-                docs.forEach(function(item) {
-                  var commandIsInRights = (String(item.rights).split(",").indexOf(String(command)) != -1);
-
-                  if (commandIsInRights) {
-                    if (DEBUG_OF_RIGHTMANAGEMENT) {
-                      console.log("Command is used in Role " + item.name);
-                    }
-
-                    /* (2) check if current user is inside of one of these roles */
-                    var userIsInUserList = (String(item.users).split(",").indexOf(String(user)) != -1);
-
-                    if (userIsInUserList) {
-                      /* (3) if (2) is fulfilled return true */
-                      found = true;
-                    }
+                if (commandIsInRights) {
+                  if (DEBUG_OF_RIGHTMANAGEMENT) {
+                    console.log("Command is used in Role " + item.name);
                   }
-                });
 
-                if (found) {
-                  callback(true);
-                } else {
-                  callback(false);
+                  /* (2) check if current user is inside of one of these roles */
+                  var userIsInUserList = (String(item.users).split(",").indexOf(String(user)) != -1);
+
+                  /* (2') check if 'all' is included in the user list */
+                  var userDoesNotMatter = (String(item.users).split(",").indexOf(String("all")) != -1);                  
+
+                  if (userIsInUserList || userDoesNotMatter) {
+                    /* (3) if (2) is fulfilled return true */
+                    found = true;
+                  }
                 }
+              });
+
+              if (found) {
+                callback(true);
+              } else {
+                callback(false);
               }
-            });
-} else {
-  if (DEBUG_OF_RIGHTMANAGEMENT) {
-    console.log("<<DEBUG INFORMATION>> The given hasAccess command was not valid");
-  }
-}
+            }
+          });
   //return true;
 };
 
