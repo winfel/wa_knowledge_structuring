@@ -253,67 +253,6 @@ var RightManager = function() {
   };
 
   /**
-   *	The function returns a boolean value that 
-   *	represents if the current user has the right 
-   *	to perform a specific command.
-   *	
-   *	@param {type}       command     The used command (access right), e.g., read, write (CRUD)
-   *	@param {type}       object      The object that should be checked
-   *    @param {type}       user        The username of the user
-   *    @param {function}   callback    The callback function with one boolean parameter (the answer)
-   */
-   this.hasAccess = function(command, object, user, callback) {
-    /* check if command is feasible */
-    var commandIsInPossibleAccessRights = (possibleAccessRights.indexOf(String(command)) != -1);
-    if (commandIsInPossibleAccessRights) {
-
-      /* (0) Check if rights are set up for this object. If not: call update for parent */
-      var collection = db.get('roles');
-      collection.find({contextID: String(object.id)}, {}, function(e, docs) {
-        if (typeof docs == 'undefined' || docs.length === 0) {
-          // TODO get parent
-
-          // call method for parent; FIXME: Currently usage of canvas
-          this.hasAccess(command, {id : 0, type : Canvas}, user, callback);
-
-        }else{
-                /* (1) get the roles that include the current command within the context of
-                the given object */
-                var found = false;
-                docs.forEach(function(item) {
-                  var commandIsInRights = (String(item.rights).split(",").indexOf(String(command)) != -1);
-
-                  if (commandIsInRights) {
-                    if (DEBUG_OF_RIGHTMANAGEMENT) {
-                      console.log("Command is used in Role " + item.name);
-                    }
-
-                    /* (2) check if current user is inside of one of these roles */
-                    var userIsInUserList = (String(item.users).split(",").indexOf(String(user)) != -1);
-
-                    if (userIsInUserList) {
-                      /* (3) if (2) is fulfilled return true */
-                      found = true;
-                    }
-                  }
-                });
-
-                if (found) {
-                  callback(true);
-                } else {
-                  callback(false);
-                }
-              }
-            });
-} else {
-  if (DEBUG_OF_RIGHTMANAGEMENT) {
-    console.log("<<DEBUG INFORMATION>> The given hasAccess command was not valid");
-  }
-}
-  //return true;
-};
-
-  /**
    *   The function can be used to put a right into the db.right document space.
    *   If it is already included, the call will do nothing but log this fact.
    *
@@ -355,6 +294,86 @@ var RightManager = function() {
   };
 
   /**
+  *   This method returns the parent of this object
+  *   If the parent cannot be determined it returns the root (i.e., the canvas element)
+  *
+  */
+  this.getParentOfObject = function(obj){
+    boolean parentHasBeenFound = false;
+
+    if(!parentHasBeenFound){
+      return = {id : 0, type : Canvas};
+    }
+  }
+
+  /**
+   *	The function returns a boolean value that 
+   *	represents if the current user has the right 
+   *	to perform a specific command.
+   *	
+   *	@param {type}       command     The used command (access right), e.g., read, write (CRUD)
+   *	@param {type}       object      The object that should be checked
+   *  @param {type}       user        The username of the user
+   *  @param {function}   callback    The callback function with one boolean parameter (the answer)
+   */
+   this.hasAccess = function(command, object, user, callback) {
+    // add right also to the right list
+    addRightToRightTableIfItIsNotThere(command, object);
+
+    // re-init possible rights
+    this.initRights();
+
+    /* check if command is feasible */
+    var commandIsInPossibleAccessRights = (possibleAccessRights.indexOf(String(command)) != -1);
+    if (commandIsInPossibleAccessRights) {
+
+      /* (0) Check if rights are set up for this object. If not: call update for parent */
+      var collection = db.get('roles');
+      collection.find({contextID: String(object.id)}, {}, function(e, docs) {
+        if (typeof docs == 'undefined' || docs.length === 0) {
+          var parent = this.getParentOfObject(object);
+
+          // call method for parent
+          this.hasAccess(command, parent, user, callback);
+
+        }else{
+                /* (1) get the roles that includes the current command within the context of
+                the given object */
+                var found = false;
+                docs.forEach(function(item) {
+                  var commandIsInRights = (String(item.rights).split(",").indexOf(String(command)) != -1);
+
+                  if (commandIsInRights) {
+                    if (DEBUG_OF_RIGHTMANAGEMENT) {
+                      console.log("Command is used in Role " + item.name);
+                    }
+
+                    /* (2) check if current user is inside of one of these roles */
+                    var userIsInUserList = (String(item.users).split(",").indexOf(String(user)) != -1);
+
+                    if (userIsInUserList) {
+                      /* (3) if (2) is fulfilled return true */
+                      found = true;
+                    }
+                  }
+                });
+
+                if (found) {
+                  callback(true);
+                } else {
+                  callback(false);
+                }
+              }
+            });
+} else {
+  if (DEBUG_OF_RIGHTMANAGEMENT) {
+    console.log("<<DEBUG INFORMATION>> The given hasAccess command was not valid");
+  }
+}
+  //return true;
+};
+
+  /**
    *  The function can be used to grant access rights
    *  @param {type} command   The used command (access right), e.g., read, write (CRUD)
    *  @param {type} object    The object that should be used to change the access right
@@ -362,12 +381,6 @@ var RightManager = function() {
    *  A call could look like this:  grantAccess("read","AB","reviewer");
    */
   this.grantAccess = function(command, object, role) {
-    // add right also to the right list
-    //addRightToRightTableIfItIsNotThere(command, object);
-
-    // re-init possible rights
-    this.initRights();
-
     // granting access
     this.modifyAccess(command, object, role, true);
   };
