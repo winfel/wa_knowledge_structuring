@@ -167,7 +167,7 @@ GeneralObject.getIconPath = function() {
 
 GeneralObject.justCreated=function(){
 	//react on client side if an object has just been created and needs further input
-	GUI.rightmanagerDialog.init(this.type);
+	GUI.rightmanagerDialog.show(this);
 }
 
 GeneralObject.getRoom=function(){

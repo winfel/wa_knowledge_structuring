@@ -3,64 +3,53 @@
  */
 
 GUI.rightmanagerDialog = new function() {
-	
-	var rightsObjects=["PaperObject","Subroom"];
-	
-	this.init = function(typeOfObject) {
-	    console.log("GUI.rightmanagerDialog initialized");
 
-		//Show rightmanager popup dialog if object has the rightmanager
-		if(rightsObjects.indexOf(typeOfObject)!=-1){
-			console.log("Just created");
-		}
-	    
-	  };
+  var rightsObjects = ["PaperObject", "Subroom"];
+
+  var rmd = null;
+  var rmdTabs = null;
+  var rmdTabAdd = null;
+
+  this.init = function() {
+    console.log("GUI.rightmanagerDialog initialized");
 
 
+    // Create the tabs
+    this.rmdTabs = $("#rmdTabs").tabs();
 
-window.onload=function() {
+    // Create the dialog
+    this.rmd = $("#rightmanagerDialog").dialog({
+      title: "Right manager dialog...",
+      autoOpen: false,
+      modal: true,
+      buttons: {
+        "Delete all items": function() {
+          $(this).dialog("close");
+        },
+        "Cancel": function() {
+          $(this).dialog("close");
+        }
+      }
+    });
+    
+    // The add button
+    this.rmdTabAdd = $(".rmdTabPage_add a").first();
+    this.rmdTabAdd.on("click", function() {
+      console.log("clicked");
+    });
+  };
 
-  // get tab container
-  var container = document.getElementById("tabContainer");
-    // set current tab
-    var navitem = container.querySelector(".tabs ul li");
-    //store which tab we are on
-    var ident = navitem.id.split("_")[1];
-    navitem.parentNode.setAttribute("data-current",ident);
-    //set current tab with class of activetabheader
-    navitem.setAttribute("class","tabActiveHeader");
+  this.show = function(typeOfObject) {
 
-    //hide two tab contents we don't need
-    var pages = container.querySelectorAll(".tabpage");
-    for (var i = 1; i < pages.length; i++) {
-      pages[i].style.display="none";
+    //Show rightmanager popup dialog if object has the rightmanager
+    if (rightsObjects.indexOf(typeOfObject.type) >= 0) {
+      console.log("Just created");
+
+      // Open the dialog
+      this.rmd.dialog("open");
     }
+  };
 
-    //this adds click event to tabs
-    var tabs = container.querySelectorAll(".tabs ul li");
-    for (var i = 0; i < tabs.length; i++) {
-      tabs[i].onclick=displayPage;
-    }
-}
 
-// on click of one of tabs
-function displayPage() {
-  var current = this.parentNode.getAttribute("data-current");
-  //remove class of activetabheader and hide old contents
-  document.getElementById("tabHeader_" + current).removeAttribute("class");
-  document.getElementById("tabpage_" + current).style.display="none";
-
-  var ident = this.id.split("_")[1];
-  //add class of activetabheader to new active tab and show contents
-  this.setAttribute("class","tabActiveHeader");
-  document.getElementById("tabpage_" + ident).style.display="block";
-  this.parentNode.setAttribute("data-current",ident);
-}
-
-function editusers(){
-	window.open();
-}
-	  
-  
 };
 
