@@ -247,6 +247,14 @@ var RightManager = function() {
       that.revokeAccess(data.command, data.object, data.role);
     });
 
+    Dispatcher.registerCall("rmGetObjectRoles", function(socket, data){
+      var dbRights = db.get('rights');
+
+      dbRights.find({type: String(data.object.type)}, {}, function(e, docs) {
+        Modules.SocketServer.sendToSocket(socket, "rmObjectRoles" + data.object.id, docs);
+      });
+    });
+
     Dispatcher.registerCall("rmGetObjectRights", this.getRights);
 
     console.log("RightManager has been initialized");

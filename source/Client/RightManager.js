@@ -75,6 +75,23 @@ var RightManager = new function() {
   };
 
   /**
+   * 
+   * 
+   * @param {type} object   The object
+   * @param {type} callback
+   */
+  this.getRolesForObject = function(object, callback) {
+    Dispatcher.registerCall("rmObjectRoles" + object.id, function(data) {
+      callback(data);
+      Dispatcher.removeCall("rmObjectRoles" + object.id);
+    });
+
+    Modules.SocketClient.serverCall('rmGetObjectRoles', {
+      'object': object
+    });
+  };
+
+  /**
    *	The function can be used to grant access rights
    *	@param {type}	command   The used command (access right), e.g., read, write (CRUD)
    *	@param {type}	object    The object that should be used to change the access right
