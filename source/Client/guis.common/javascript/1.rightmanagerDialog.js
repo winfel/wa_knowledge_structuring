@@ -5,6 +5,9 @@
 GUI.rightmanagerDialog = new function() {
 
   var rightsObjects = ["PaperObject", "Subroom"];
+  var roles = ["Writer","Reviewer"];
+   var listitems = "";
+   var tabpages = "";
 
   var rmd = null;
   var rmdTabs = null;
@@ -13,23 +16,76 @@ GUI.rightmanagerDialog = new function() {
   this.init = function() {
     console.log("GUI.rightmanagerDialog initialized");
 
+    for (var i = 0; i < roles.length; i++) {          
+           var j= i+1;
+           listitems += "<li><a href='#tabs-"+j+"'>"+roles[i]+"</a></li>";
+           
+ 
+           tabpages += "<div id='tabs-"+j+"'>";
+           
+           //content of tabpages
+           /*
+           Modules.RightManager.getRolesForObject({id: 1"}, function(roles) {
+               roles.forEach(function(role) {
+                 console.log(role);
+               });
+           });
+           */
+ 
+           tabpages +=  "</div>";
+             
+         $("#rmdTabList").append(listitems);
+         
+        $("#rmdTabs").append(tabpages);
+ 
+        listitems="";
+        tabpages = "";
+     };
+ 
+ 
+     //Append Plus Tab
+     $("#rmdTabList").append('<li class="rmdTabPage_add"><a href="#rmdTabPage_add">+</a></li>');
+     //Set content for Plus Tab
+     $("#rmdTabs").append('<div id="rmdTabPage_add">Bla</div>')
+
 
     // Create the tabs
     this.rmdTabs = $("#rmdTabs").tabs();
 
     // Create the dialog
     this.rmd = $("#rightmanagerDialog").dialog({
-      title: "Right manager dialog...",
+      title: "Right Manager Setupkgjfjf",
       autoOpen: false,
       modal: true,
-      buttons: {
-        "Delete all items": function() {
-          $(this).dialog("close");
-        },
-        "Cancel": function() {
-          $(this).dialog("close");
-        }
-      }
+      width: 500,
+      buttons: [
+        {
+             text: "Take default",
+             click: function() {
+                  $(this).dialog("close");
+             }
+         },
+         {
+             text: "Add user",            
+             click: function() {
+                  $(this).dialog("close");
+             }
+         },
+         {
+             text: "Delete user",
+             click: function() {
+                  $(this).dialog("close");
+             }
+          },
+          
+         {
+             text: "Save",
+             click: function() {
+                  $(this).dialog("close");
+             }
+          }
+       
+     ]
     });
     
     // The add button
