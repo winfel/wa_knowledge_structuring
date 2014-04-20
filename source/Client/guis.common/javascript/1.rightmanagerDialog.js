@@ -6,6 +6,7 @@ GUI.rightmanagerDialog = new function() {
 
   var rightsObjects = ["PaperObject", "Subroom"];
   var roles = ["Writer","Reviewer"];
+  var rights = [];
   var listitems = "";
   var tabpages = "";
 
@@ -16,18 +17,34 @@ GUI.rightmanagerDialog = new function() {
 
   this.init = function(typeObject,idObject) {
     console.log("GUI.rightmanagerDialog initialized");
+
+
     var j=1;
+    
 
      Modules.RightManager.getRolesForObject({id: idObject, type: typeObject}, function(roles2) {
-               roles2.forEach(function(role) {
+               roles2.forEach(function(role) {      
+                    var i = 0;          
                     //Create tabs
                     listitems += "<li><a href='#tabs-"+j+"'>"+role.name+"</a></li>";
 
                     //Create tabpages
                       tabpages += "<div id='tabs-"+j+"'>";
 
-                        //TODO: Create content of tabpages
+                      //Create content of tabpages
+                        //Rights
+                        tabpages += '<h3>Rights </h3><hr><br>';
+                        rights = role.rights;
+                        rights.forEach(function(right) {
+                              tabpages += '<input type="checkbox" id="right-'+i+'" checked>'+rights[i]+' </input>';    
+                              i++;                            
+                              });
+                          
 
+                        //TODO: Users
+                        tabpages += '<h3>Users </h3><hr><br>';
+                        
+                        
                       tabpages +=  "</div>";
                  
                       $("#rmdTabList").append(listitems);
@@ -102,7 +119,6 @@ GUI.rightmanagerDialog = new function() {
     if (rightsObjects.indexOf(typeOfObject.type) >= 0) {
       this.init(typeOfObject.type,typeOfObject.id);
       console.log("Just created");
-
       // Open the dialog
       this.rmd.dialog("open");
     }
