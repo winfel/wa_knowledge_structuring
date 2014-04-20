@@ -261,3 +261,29 @@
 .jstree-default.jstree-focused {
   background: #ffffff;
 }
+
+.markup-border {
+  position: relative;
+  padding: 5px;
+  margin: 1em 0 3em;
+  border: 5px solid RGBA(68, 78, 91, 1);
+  color: #333;
+  background: #fff;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+}
+
+.markup-border:before {
+  content: "";
+position: absolute;
+bottom: 30px;
+left: -20px;
+border-width: 0px 0px 20px 20px;
+border-style: solid;
+border-color: RGBA(10, 1, 1, 1) transparent;
+display: block;
+width: 0;
+}
