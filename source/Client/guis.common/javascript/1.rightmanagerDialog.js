@@ -6,25 +6,31 @@ GUI.rightmanagerDialog = new function() {
 
   var rightsObjects = ["PaperObject", "Subroom"];
   var roles = ["Writer","Reviewer"];
-   var listitems = "";
-   var tabpages = "";
+  var listitems = "";
+  var tabpages = "";
 
   var rmd = null;
   var rmdTabs = null;
   var rmdTabAdd = null;
 
-  this.init = function() {
+
+  this.init = function(typeObject,idObject) {
     console.log("GUI.rightmanagerDialog initialized");
     var j=1;
 
-     Modules.RightManager.getRolesForObject({id: 1, type: "PaperObject"}, function(roles2) {
+     Modules.RightManager.getRolesForObject({id: idObject, type: typeObject}, function(roles2) {
                roles2.forEach(function(role) {
+                    //Create tabs
                     listitems += "<li><a href='#tabs-"+j+"'>"+role.name+"</a></li>";
-                    tabpages += "<div id='tabs-"+j+"'>";
-                    // console.log(role);
+
+                    //Create tabpages
+                      tabpages += "<div id='tabs-"+j+"'>";
+
+                        //TODO: Create content of tabpages
+
                       tabpages +=  "</div>";
                  
-                       $("#rmdTabList").append(listitems);
+                      $("#rmdTabList").append(listitems);
                        
                       $("#rmdTabs").append(tabpages);
                
@@ -39,7 +45,7 @@ GUI.rightmanagerDialog = new function() {
                 $("#rmdTabs").append('<div id="rmdTabPage_add">Bla</div>');
 
                 // Create the tabs
-                this.rmdTabs = $("#rmdTabs").tabs();
+                rmdTabs = $("#rmdTabs").tabs();
 
            });
 
@@ -88,10 +94,13 @@ GUI.rightmanagerDialog = new function() {
     });
   };
 
+
+
   this.show = function(typeOfObject) {
 
     //Show rightmanager popup dialog if object has the rightmanager
     if (rightsObjects.indexOf(typeOfObject.type) >= 0) {
+      this.init(typeOfObject.type,typeOfObject.id);
       console.log("Just created");
 
       // Open the dialog

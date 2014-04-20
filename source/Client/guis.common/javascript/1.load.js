@@ -102,7 +102,6 @@ GUI.loadGUI = function(step) {
         GUI.rightmanager.init();
 
 
-        GUI.rightmanagerDialog.init();
        // GUI.rightmanagerDialog.show("PaperObject"); // Delete me, once done testing
       }
 
