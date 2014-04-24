@@ -44,8 +44,8 @@ GUI.rightmanagerDialog = new function() {
                           
 
                         //TODO: Users
-                        tabpages += '<h3>Users</h3><hr><p><font color="#A1A1A1">Select users to add to role</font></p>';
-                        tabpages += '<div id=selectusers></div><br>';
+                        tabpages += '<h3>Users</h3><hr>';
+                        tabpages += '<div id=selectusers> <p><font color="#A1A1A1">Select users to add to role</font></p></div><br>';
                         
                       tabpages +=  "</div>";
                  
@@ -287,9 +287,9 @@ GUI.rightmanagerDialog = new function() {
     }; //buttons end
     var dialog = GUI.dialog(
             "Add Users",
-            userDialog, userButtons, 500
+            userDialog, userButtons
     );
-
+    
   }; //addusers function ends
 
    function deleteusers() {
