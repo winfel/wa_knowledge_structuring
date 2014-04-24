@@ -47,7 +47,7 @@ GUI.uploadFile=function(object,message){
             //upload complete
             $(uploadDialog).dialog("close");
 
-            GUI.setTag(object,600,600,false);
+            GUI.tagManager.open(object, 600, 600,false);
 
         }, false);
         xhr.addEventListener("error", function() {

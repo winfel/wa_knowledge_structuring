@@ -4,33 +4,38 @@ var Modules = false;
 
 var fillCurrentDbWithTestData = function() {
 
-	//TODO
 	
-	
-	
-	
-	
-	
-	/*
-	var pushMainTags = ['1#HMI#a#b#c', '2#ST#d#e#f', "3#ES#g#h#i", "4#A#j#k#l"];
-
 	/* clear table */
 	db.get('MainTags').drop();
-
-	/* push test tags */
-	/*
-	var collection = db.get('MainTags');
-	pushMainTags.forEach(function(item) {
-		var token = item.split("#");
-		collection.insert({id: String(token[0]), name: String(token[1]), secTags: String(token[3])});
-	});
-	*/
+	
+	var maintags = db.get("MainTags");
+	 
+    maintags.insert(
+		   [
+			  { id: "1", name: "Human Machine Interaction", 
+			    secTags: ["aaaa", "h bbbb", "h cccc", "h dddd", "h eeee", "h ffff","h gggg","h hhhh","h iiii","h jjjj","h kkkk", "h llll", "h mmmmm", "h nnnn", "h oooo"] },
+			  { id: "2", name: "Software Technologies", 
+			    secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] },
+			  { id: "3", name: "Embedded Systems", 
+			    secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] },
+			  { id: "4", name: "Models and Algorithm", 
+			    secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] },
+			  { id: "4", name: "The Best Category", 
+				secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] }
+		   ]	
+	);
+		
+	//maintags.find( {} ,function (e, list){
+	//	console.log(list);	
+	//});
+	
+	
 };
 
 
 
 var TagManager = function() {
-	//fillCurrentDbWithTestData();
+	fillCurrentDbWithTestData();
 	
 	var that = this;
 	
@@ -49,6 +54,10 @@ var TagManager = function() {
     Dispatcher.registerCall('getSecTags', function(socket, data, responseID) {
 		that.getSecTags(socket, data.mainTag); 
 	});
+   
+    Dispatcher.registerCall('updSecTags', function(socket, data, responseID) {
+		that.updSecTags(socket, data.mainTag, data.secTag); 
+	});
  
   };
   
@@ -58,26 +67,46 @@ var TagManager = function() {
 	* @returns {undefined}
 	*/
 	this.getMainTags = function(socket) {
-	  
-	//TODO: get mainTags from the DB
-	var mainTags = "Algorithms";
-	
-	Modules.SocketServer.sendToSocket(socket, "getMainTags", mainTags);
+	  			
+		var dbMainTags = db.get('MainTags');
+		
+		dbMainTags.find( {}, ["id", "name"], function(e, mainTags){
+			console.log(mainTags);	
+			Modules.SocketServer.sendToSocket(socket, "getMainTags", mainTags);
+		} );
 	 
 	};
 	
-		/**
+	/**
 	* 
 	* @param {type} object
 	* @returns {undefined}
 	*/
 	this.getSecTags = function(socket, mainTag) {
-	  
-	//TODO: get SecTags from the DB
-	var SecTags = "Cryptology";
-
-	Modules.SocketServer.sendToSocket(socket, "getSecTags", SecTags);
-	 
+	  		
+		var dbMainTags = db.get('MainTags');
+		
+		dbMainTags.find( {name: mainTag}, ["secTags"] , function(e, secTags){
+			console.log(secTags);	
+			Modules.SocketServer.sendToSocket(socket, "getSecTags", secTags);
+		} );
+		 
+	};
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.updSecTags = function(socket, mainTag, newSecTag) {
+	  		
+		var dbMainTags = db.get('MainTags');
+		
+		dbMainTags.update( {name: mainTag}, { 
+												$addToSet: { secTags:  newSecTag } 
+										    }
+		                 );
+		 
 	};
   
 };

@@ -53,4 +53,18 @@ var TagManager = new function() {
 	});
   };
 
+  /**
+   * 
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.updSecTags = function(mainTag, secTag) {
+
+    Modules.SocketClient.serverCall('updSecTags', {
+		'mainTag': mainTag,
+		'secTag': secTag
+	});
+  };
+  
+  
 };

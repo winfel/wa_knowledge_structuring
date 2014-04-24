@@ -90,5 +90,5 @@ File.getIconText = function() {
 }
 
 File.setTag = function() {
-	GUI.setTag(this, 600, 600, false);	
+	GUI.tagManager.open(this, 600, 600, false);	
 }
