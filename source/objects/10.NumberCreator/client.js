@@ -10,7 +10,8 @@ NumberCreator.justCreated = function() {
   var testClientGrantAccess 	= false;
   var testClientRevokeAccess 	= false;
   var testClientGetRights 		= false;
-  var testClientGetRoles      = true;
+  var testClientGetRoles      = false;
+  var testClientGetUsers      = true;
 
   if(testClientGetRights === true){
   	console.log(">>> TESTING CLIENT GET RIGHTS <<<");
@@ -23,6 +24,14 @@ NumberCreator.justCreated = function() {
     console.log(">>> TESTING CLIENT GET ROLES <<<");
     Modules.RightManager.getRolesForObject({id: 1, type: "NumberCreator"}, function(result) {
       console.log("GET ROLES FOR OBJECT");
+      console.log(result);
+    });
+  }
+
+  if(testClientGetUsers === true){
+    console.log(">>> TESTING CLIENT GET Users <<<");
+    Modules.RightManager.getAllUsers(function(result) {
+      console.log("GET All Users");
       console.log(result);
     });
   }

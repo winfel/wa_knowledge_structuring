@@ -255,6 +255,14 @@ var RightManager = function() {
       });
     });
 
+    Dispatcher.registerCall("rmGetAllUsers", function(socket, data){
+      var dbRights = db.get('users');
+
+      dbRights.find({}, {}, function(e, docs) {
+        Modules.SocketServer.sendToSocket(socket, "rmUsers", docs);
+      });
+    });
+
     Dispatcher.registerCall("rmGetObjectRights", this.getRights);
 
     console.log("RightManager has been initialized");
