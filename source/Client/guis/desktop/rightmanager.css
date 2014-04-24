@@ -217,31 +217,24 @@
 }
 
 
-#rmd_users:hover { 
+.rmd_users:hover { 
   background-color: #a6c0f7;
 }
 
-#rmd_users.checked {
+.rmd_users.checked {
   background-color: #A4B5FF;
 }
 
-#rmd_users  img {
+.rmd_users  img {
   margin: 0 0 -4px 6px;
   float: right;
   visibility: hidden;
 }
 
-#rmd_users{
+.rmd_users{
   padding: 3px 5px; 
   margin-right: 6px;
   cursor: pointer;
-  display: block;
-}
-
-
-#rmd_users {
-  width: 70px;
   float: left;
   display: inline-block;
- 
 }

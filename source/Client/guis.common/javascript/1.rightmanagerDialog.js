@@ -9,6 +9,7 @@ GUI.rightmanagerDialog = new function() {
   var rights = [];
   var listitems = "";
   var tabpages = "";
+  var plustabcontent ="";
 
   var rmd = null;
   var rmdTabs = null;
@@ -43,7 +44,7 @@ GUI.rightmanagerDialog = new function() {
                           
 
                         //TODO: Users
-                        tabpages += '<h3>Users </h3><hr><br>';
+                        tabpages += '<h3>Users</h3><hr><p><font color="#A1A1A1">Select users to add to role</font></p>';
                         tabpages += '<div id=selectusers></div><br>';
                         
                       tabpages +=  "</div>";
@@ -60,7 +61,11 @@ GUI.rightmanagerDialog = new function() {
                  //Append Plus Tab
                 $("#rmdTabList").append('<li class="rmdTabPage_add"><a href="#rmdTabPage_add">+</a></li>');
                 //Set content for Plus Tab
-                $("#rmdTabs").append('<div id="rmdTabPage_add">Bla</div>');
+                $("#rmdTabs").append('<div id="rmdTabPage_add"><h3>Add a new role</h3><input id="newrolename" placeholder="Add rolename here"></div>');
+                plustabcontent += '<h4>Rights </h4><hr><br>';
+                plustabcontent += '<input type="checkbox" id="create">Create</input><input type="checkbox" id="read">Read</input><input type="checkbox" id="update">Update</input><input type="checkbox" id="delete">Delete</input>';
+                plustabcontent += '<h4>Users </h4><hr><p><font color="#A1A1A1">Select users to add to role</font></p><br>';
+                 $("#rmdTabPage_add").append(plustabcontent);
 
                 // Create the tabs
                 rmdTabs = $("#rmdTabs").tabs();
@@ -90,8 +95,8 @@ GUI.rightmanagerDialog = new function() {
          {
              text: "Delete user",
              click: function() {
-                  $(this).dialog("close");
-             }
+              deleteusers(); 
+            }
           },
           
          {
@@ -138,7 +143,7 @@ GUI.rightmanagerDialog = new function() {
       // Open the dialog
       this.rmd.dialog("open");
     }
-  };
+  };// show functions ends
 
 
   function addusers() {
@@ -148,11 +153,11 @@ GUI.rightmanagerDialog = new function() {
     var userDialog = $('' +
             '<div id="addrole-dialog">' +
             '<h3>Users </h3><hr>' +
-            '<input type="checkbox" id="joerg"> Joerg </input>' + '<br>' +
-            '<input type="checkbox" id="patrick"> Patrick </input>' + '<br>' +
-            '<input type="checkbox" id="lisa"> Lisa </input>' + '<br>' +
-            '<input type="checkbox" id="vanessa"> Vanessa </input>' + '<br>' +
-            '<input type="checkbox" id="mohammad"> Mohammad </input>' + '<br><br>' +
+            '<input type="checkbox" id="joerg" class="friendlist"> Joerg </input>' + '<br>' +
+            '<input type="checkbox" id="patrick" class="friendlist"> Patrick </input>' + '<br>' +
+            '<input type="checkbox" id="lisa" class="friendlist"> Lisa </input>' + '<br>' +
+            '<input type="checkbox" id="vanessa" class="friendlist"> Vanessa </input>' + '<br>' +
+            '<input type="checkbox" id="mohammad" class="friendlist"> Mohammad </input>' + '<br><br>' +
             ' <select id="userlist" name="userlist" size="5" multiple>'+
                 '<option>Brice</option>'+
                 '<option>Oliver</option>'+
@@ -173,17 +178,27 @@ GUI.rightmanagerDialog = new function() {
       },
       "Add users": function() {
 
+          // select list part
     var checkedUsers = new Array(); // Keep track of the selected users. Needed for a delete server call.
     var checkedSpans = new Array(); // Keep track of the corresponding spans, which display a user
 
       // No users checked anymore
       checkedSpans.length = 0;
       checkedUsers.length = 0;
+            
+        //checkbox part doesn't work yet
+/*           $("input[type='checkbox']:checked").each(
+               function() {
+                var span = $("<span>");
+                span.addClass("rmd_users");
+                span.html($(this).id());
+                span.data("value", $(this).id());
+                $("#selectusers").append(span);
+            });
+*/
 
-      
-    
           $('#userlist option:selected').each(function(){
-              var span = $("<span style ='margin-right:15px; display:inline-block;'>");
+              var span = $("<span>");
               span.addClass("rmd_users");
               span.html($(this).text());
               span.data("value", $(this).text());
@@ -264,19 +279,24 @@ GUI.rightmanagerDialog = new function() {
 
         span.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
         span.append(deleteImg);
-              
-        $("#selectusers").append(span);
-            
-              
-        });
-      }
-    };
+
+        $("#selectusers").append(span);        
+        });//iteration over section userlist ends
+
+      } //add button ends here
+    }; //buttons end
     var dialog = GUI.dialog(
             "Add Users",
             userDialog, userButtons, 500
     );
 
-  };
+  }; //addusers function ends
+
+   function deleteusers() {
+     alert("tadah");
+   };
+
+
 
 };
 
