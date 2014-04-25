@@ -7,6 +7,7 @@ GUI.rightmanagerDialog = new function() {
   var rightsObjects = ["PaperObject", "Subroom"];
   var roles = ["Writer","Reviewer"];
   var rights = [];
+  var allrights = ["create", "read","write", "delete"];
   var listitems = "";
   var tabpages = "";
   var plustabcontent ="";
@@ -41,8 +42,12 @@ GUI.rightmanagerDialog = new function() {
                               tabpages += '<input type="checkbox" id="right-'+i+'" checked>'+rights[i]+' </input>';    
                               i++;                            
                               });
-                          
-
+                        for (var i = 0; i < allrights.length; i++) {
+                            if($.inArray(allrights[i], rights) <= -1){
+                                 tabpages += '<input type="checkbox" id="right-'+i+'">'+allrights[i]+' </input>';
+                             }
+                        };
+                     
                         //TODO: Users
                         tabpages += '<h3>Users</h3><hr>';
                         tabpages += '<div id=selectusers> <p><font color="#A1A1A1">Select users to add to role</font></p></div><br>';
@@ -147,17 +152,22 @@ GUI.rightmanagerDialog = new function() {
 
 
   function addusers() {
+
+
+    Modules.RightManager.getAllUsers(function(users) {
+        var friends="";
+        users.forEach(function(user) {
+                friends+= '<input type="checkbox" id="'+ user.username+ '" class="friendlist">'+ user.username+'</input><br>'
+               });
+        $("#user-friendlist").append(friends);
+             });
     /* todo: get users from db userlist*/ 
     var selectedusers ="";
 
     var userDialog = $('' +
             '<div id="addrole-dialog">' +
             '<h3>Users </h3><hr>' +
-            '<input type="checkbox" id="joerg" class="friendlist"> Joerg </input>' + '<br>' +
-            '<input type="checkbox" id="patrick" class="friendlist"> Patrick </input>' + '<br>' +
-            '<input type="checkbox" id="lisa" class="friendlist"> Lisa </input>' + '<br>' +
-            '<input type="checkbox" id="vanessa" class="friendlist"> Vanessa </input>' + '<br>' +
-            '<input type="checkbox" id="mohammad" class="friendlist"> Mohammad </input>' + '<br><br>' +
+            '<div id="user-friendlist"> </div><br>'+
             ' <select id="userlist" name="userlist" size="5" multiple>'+
                 '<option>Brice</option>'+
                 '<option>Oliver</option>'+
