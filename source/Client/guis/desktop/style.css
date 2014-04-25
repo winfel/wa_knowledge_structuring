@@ -795,7 +795,7 @@ svg text.font-icon{
 #document { float: right; width: 32%; min-height: 18em; padding: 1%; }
 #document h4 { line-height: 30px; margin: 0 0 0.4em; }
 #document h4 span { padding: 5px; }
-.assigned-main-tag { background: yellow; }
+.assigned-main-tag { background: lightskyblue; }
 .buttons-holder { margin-top: 10px; }
 .buttons-holder button { width: 40px;}
 button#btn-previous {margin-left: 125px;}

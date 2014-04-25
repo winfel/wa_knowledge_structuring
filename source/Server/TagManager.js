@@ -71,7 +71,7 @@ var TagManager = function() {
 		var dbMainTags = db.get('MainTags');
 		
 		dbMainTags.find( {}, ["id", "name"], function(e, mainTags){
-			console.log(mainTags);	
+			//console.log(mainTags);	
 			Modules.SocketServer.sendToSocket(socket, "getMainTags", mainTags);
 		} );
 	 
@@ -87,7 +87,7 @@ var TagManager = function() {
 		var dbMainTags = db.get('MainTags');
 		
 		dbMainTags.find( {name: mainTag}, ["secTags"] , function(e, secTags){
-			console.log(secTags);	
+			//console.log(secTags);	
 			Modules.SocketServer.sendToSocket(socket, "getSecTags", secTags);
 		} );
 		 
