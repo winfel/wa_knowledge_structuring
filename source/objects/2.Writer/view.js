@@ -52,10 +52,21 @@ Writer.createRepresentation = function(parent) {
     pWriter.append("<iframe></iframe>");
     
     var iFrame = $(pWriter.find("iframe"));
-    iFrame.attr('src', 'http://' + window.location.hostname + ':9001/p/' + this.getAttribute('paper'));
+    var iframe_loaded = false;
+    iFrame.one('load', function(){
+		iframe_loaded = true;
+    });
+
+    iFrame.attr('src', 'http://' + window.location.hostname + ':9001/p/' + this.getAttribute('paper') + '?userName=' +  encodeURIComponent(GUI.userid));
 	//iFrame.attr('src', 'http://beta.etherpad.org/webArenaDemo' + this.getAttribute('paper') + '?showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=false');
+
+	window.setTimeout(function(){
+		if(!iframe_loaded) {
+			alert('Maybe etherpad is not installed / started at this server...');
+		}
+	}, 20000);
 
 	this.initGUI(rep);
 	
-	return rep;s
+	return rep;
 }

@@ -141,6 +141,17 @@ var Helper = new function () {
 		}
 		return '';
 	};
+	
+	
+	/**
+     * Add a slash to the end of the pad if not presented
+     *
+     *
+     *  @param  path (String) the path that should be checked
+     **/
+	this.addTrailingSlash = function(path) {
+	    return path.replace(/\/?(\?|#|$)/, '/$1');
+	}
 
 
 }

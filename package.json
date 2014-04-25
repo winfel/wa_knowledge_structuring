@@ -15,7 +15,8 @@
     "async": "~0.2.9",
     "json-socket": "~0.1.2",
     "lodash": "",
-    "monk": ""
+    "monk": "",
+    "etherpad-lite-client":""
   },
   "devDependencies": {
     "superagent": "~0.15.7",

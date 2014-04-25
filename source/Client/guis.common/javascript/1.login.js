@@ -1,6 +1,20 @@
 "use strict";
 
 /**
+ * Show sign up prompt
+ */
+GUI.showSignUp = function() {
+    $("#sign_up").css("opacity", 0);
+    $("#sign_up").show();
+    
+    $("#sign_up").animate({
+        opacity: 1
+    }, 1000);
+    
+    //$("#login_submit").click(GUI.login);
+}
+
+/**
  * Show login prompt
  * 
  * @param {bool|String} [err=false] Optional error message 
@@ -43,6 +57,8 @@ GUI.showLogin = function(err) {
       GUI.login();
     }
   });
+  
+  GUI.showSignUp();
 
 };
 
@@ -50,6 +66,7 @@ GUI.showLogin = function(err) {
  * Hide the login prompt
  */
 GUI.hideLogin = function() {
+  GUI.hideSignUp();
 
   $("#login").hide();
   $("#login_background").hide();
@@ -58,7 +75,13 @@ GUI.hideLogin = function() {
   GUI.progressBarManager.updateProgress("login", 100);
 
   GUI.loginProcessActive = false;
+};
 
+/**
+ * Hide the sign up prompt
+ */
+GUI.hideSignUp = function() {
+  $("#sign_up").hide();
 };
 
 /**
@@ -105,23 +128,20 @@ GUI.externalSession = false;
  */
 GUI.login = function() {
 
-  if (GUI.loginProcessActive)
-    return;
-  if (GUI.isLoggedIn)
-    return;
+  if (GUI.loginProcessActive) return;
+  if (GUI.isLoggedIn) return;
 
   GUI.loginProcessActive = true;
 
-  if (GUI.username === undefined)
-    GUI.username = $("#login_username").val();
-  if (GUI.password === undefined)
-    GUI.password = $("#login_password").val();
+  if (GUI.username === undefined) GUI.username = $("#login_username").val();
+  if (GUI.password === undefined) GUI.password = $("#login_password").val();
 
   $("#login_username").blur();
   $("#login_password").blur();
 
   if (window.location.hash != "" && window.location.hash.indexOf('externalSession/') > -1) {
     var hashData = window.location.hash.substr(1).split("/");
+    
     if (hashData[0] == "externalSession") {
       GUI.username = hashData[1];
       GUI.password = hashData[2];
@@ -131,8 +151,7 @@ GUI.login = function() {
     }
   }
 
-  if (GUI.username == "")
-    GUI.username = "User";
+  if (GUI.username == "") GUI.username = "User";
 
   GUI.userid = GUI.username;
 
@@ -144,5 +163,7 @@ GUI.login = function() {
   $("#disconnected_message").remove();
 
   GUI.progressBarManager.addProgress(GUI.translate('checking login information'), "login");
-  GUI.loadGUI(); //reload GUI
+  GUI.loadGUI(); // reload GUI
 };
+
+

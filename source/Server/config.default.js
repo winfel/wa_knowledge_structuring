@@ -40,5 +40,24 @@ module.exports={
 	},
 	objectWhitelist: [],	//an empty whitelist whitelists everything
 	objectBlacklist: ['HtmlTest'],    //Syntax: objectBlacklist:['SharePoint','EasyDBImage']
-	debugMode: false
+	debugMode: false,
+	etherpadlite : {
+        apikey: "",
+        host: "localhost",
+        port: 9001,
+        
+        // Right now just for Windows
+        startFilePath: "<path_where_the_start_file_is>",
+        startFile: "start.bat"
+    },
+    wkhtmltox: {
+        path: ""
+    },
+    mongodb: {
+              user: "",  
+              password: "", 
+              dbname: "",
+              host: "",
+              port: 27017
+            }      
 };
