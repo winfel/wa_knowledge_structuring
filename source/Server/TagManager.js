@@ -12,16 +12,16 @@ var fillCurrentDbWithTestData = function() {
 	 
     maintags.insert(
 		   [
-			  { id: "1", name: "Human Machine Interaction", 
-			    secTags: ["aaaa", "h bbbb", "h cccc", "h dddd", "h eeee", "h ffff","h gggg","h hhhh","h iiii","h jjjj","h kkkk", "h llll", "h mmmmm", "h nnnn", "h oooo"] },
+			  { id: "1", name: "Human-Machine Interaction", 
+			    secTags: ["Didactics of Informatics","Computer Graphics","Visualization","Image Processing","Human-Computer Interaction","Computers and Society","Computing in Context"] },
 			  { id: "2", name: "Software Technologies", 
-			    secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] },
+			    secTags: ["Model Driven Software Engineering", "Knowledge- Based Systems", "Electronic Commerce", "Databases", "Information Systems", "Software Engineering","Computational Intelligence","Specification and Modelling"] },
 			  { id: "3", name: "Embedded Systems", 
-			    secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] },
-			  { id: "4", name: "Models and Algorithm", 
-			    secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] },
-			  { id: "4", name: "The Best Category", 
-				secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] }
+			    secTags: ["Distributed Embedded Systems", "Computer Engineering", "Custom Computing", "Computer Networks", "Swarm Robotics"] },
+			  { id: "4", name: "Models and Algorithms", 
+			    secTags: ["Cryptography", "Algorithms", "Complexity", "Theory of Distributed Systems", "Swarm Intelligence"] }
+			  //{ id: "4", name: "The Best Category", 
+				//secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] }
 		   ]	
 	);
 		
