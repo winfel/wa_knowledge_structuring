@@ -97,12 +97,12 @@ if(os.type().indexOf("Windows") > -1) {
     }
     
 } 
-
-else if(os.type().indexOf("MAC") > 0) {
+else if(os.type().indexOf("Darwin") > -1) {
+	
 	EtherpadLauncher.launchEtherPad = function(callback) {
         
-	      var path = modules.Helper.addTrailingSlash(global.config.etherpadlite.startFiePath);   
-	      var cmd = path + global.config.etherpadlite.startFile; 
+	      var path = modules.Helper.addTrailingSlash(global.config.etherpadlite.startFilePath);   
+	      var cmd = global.config.etherpadlite.startFile; 
 	      //var cmd = "node";
 	      //var parm = "node_modules\\ep_etherpad-lite\\node\\server.js";
 	      
@@ -111,7 +111,7 @@ else if(os.type().indexOf("MAC") > 0) {
 	      var child = exec(cmd, [], { cwd: path, detached: true });
 	      
 	        child.on('error', function(data) {
-	            console.warn("error" + data.toString());
+	            console.warn("error " + data.toString());
 	        });
 	        
 	        //delegate the processing of stdout to another function
@@ -120,7 +120,7 @@ else if(os.type().indexOf("MAC") > 0) {
 	        });
 
 	        child.stderr.on('data', function (data) {
-	            console.error("error" + data.toString());
+	            console.error("error " + data.toString());
 	        });
 
 	        child.on('exit', function (code) {
@@ -136,7 +136,7 @@ else if(os.type().indexOf("MAC") > 0) {
 	       }
 	    }
 	    
-}
+} 
 
 else {
    // On any other OS 
