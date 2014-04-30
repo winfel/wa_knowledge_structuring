@@ -20,15 +20,8 @@ var fillCurrentDbWithTestData = function() {
 			    secTags: ["Distributed Embedded Systems", "Computer Engineering", "Custom Computing", "Computer Networks", "Swarm Robotics"] },
 			  { id: "4", name: "Models and Algorithms", 
 			    secTags: ["Cryptography", "Algorithms", "Complexity", "Theory of Distributed Systems", "Swarm Intelligence"] }
-			  //{ id: "4", name: "The Best Category", 
-				//secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] }
 		   ]	
-	);
-		
-	//maintags.find( {} ,function (e, list){
-	//	console.log(list);	
-	//});
-	
+	);	
 	
 };
 
@@ -71,8 +64,9 @@ var TagManager = function() {
 		var dbMainTags = db.get('MainTags');
 		
 		dbMainTags.find( {}, ["id", "name"], function(e, mainTags){
-			//console.log(mainTags);	
+			
 			Modules.SocketServer.sendToSocket(socket, "getMainTags", mainTags);
+			
 		} );
 	 
 	};
@@ -87,8 +81,9 @@ var TagManager = function() {
 		var dbMainTags = db.get('MainTags');
 		
 		dbMainTags.find( {name: mainTag}, ["secTags"] , function(e, secTags){
-			//console.log(secTags);	
+			
 			Modules.SocketServer.sendToSocket(socket, "getSecTags", secTags);
+			
 		} );
 		 
 	};
