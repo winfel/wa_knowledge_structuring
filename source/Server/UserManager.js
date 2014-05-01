@@ -34,12 +34,14 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('login', UserManager.login);
   Dispatcher.registerCall('enter', UserManager.enterRoom);
   Dispatcher.registerCall('leave', UserManager.leaveRoom);
+
   Dispatcher.registerCall('umGetRoles', UserManager.getRoles);
+  Dispatcher.registerCall('umAddRole', UserManager.addRole);
+  Dispatcher.registerCall('umRemoveRole', UserManager.removeRole);
 
   Dispatcher.registerCall('umGetUsers', UserManager.getUsers);
   Dispatcher.registerCall('umAddUser', UserManager.addUser);
   Dispatcher.registerCall('umRemoveUser', UserManager.removeUser);
-
 
   Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);
 
@@ -49,19 +51,13 @@ UserManager.init = function(theModules) {
     if (docs != undefined) {
       docs.forEach(function(entry) {
 
-        if (DEBUG_OF_USERMANAGEMENT) {
-          console.log("adding right: " + String(entry.name));
-        }
-
+        Modules.Log.debug("adding right: " + String(entry.name));
         possibleAccessRights.push(entry.name);
       });
     }
-
   });
-  if (DEBUG_OF_USERMANAGEMENT) {
-    console.log("UserManager has been initialized");
-  }
-}
+  Modules.Log.debug.log("UserManager has been initialized");
+};
 
 /**
  * In case of a new connection, a new entry is created.
@@ -70,7 +66,7 @@ UserManager.init = function(theModules) {
  */
 UserManager.socketConnect = function(socket) {
   this.connections[socket.id] = ({'socket': socket, 'user': false, 'rooms': {'left': false, 'right': false}});
-}
+};
 
 /**
  * Delete all connection data, when a socket disconnects and informs all remaining users 
@@ -90,7 +86,7 @@ UserManager.socketDisconnect = function(socket) {
     }
   }
 
-}
+};
 
 /**
  * When a user tries to log in, his credentials are tested and added to the
@@ -137,7 +133,7 @@ UserManager.login = function(socketOrUser, data) {
         "#1d68c4",
         "#c41d73",
         "#1dc46e",
-        "#c46b1d",
+        "#c46b1d"
       ];
 
       var userColor = colors[Math.floor(Math.random() * colors.length + 1)];
@@ -168,7 +164,7 @@ UserManager.login = function(socketOrUser, data) {
 
   });
 
-}
+};
 
 UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
   UserManager.enterRoom(socketOrUser, data, responseID);
@@ -187,10 +183,11 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
 
     var attr = {x: "20", y: "45", width: "700", locked: true, paper: data.roomID};
     Modules.ObjectManager.createObject(data.roomID, PAPER_WRITER, attr, false, context, function(error, obj) {
-      //console.log(obj);
+      //Modules.Log.debug(obj);
     });
   });
-}
+};
+
 /**
  * Let a user enter a room with a specific roomID
  *  
@@ -256,7 +253,7 @@ UserManager.enterRoom = function(socketOrUser, data, responseID) {
     }
 
   });
-}
+};
 
 /**
  * Let a user leave a room with a specific roomID
@@ -282,7 +279,7 @@ UserManager.leaveRoom = function(socket, data, responseID) {
   UserManager.sendAwarenessData(roomID);
 
   Modules.Dispatcher.respond(socket, responseID, false);
-}
+};
 
 /**
  * AwarenessData is a set of information about the users in the current room.
@@ -305,7 +302,7 @@ UserManager.getAwarenessData = function(roomID, connections) {
     awarenessData.present.push(presData);
   }
   return awarenessData;
-}
+};
 
 /**
  * Sends awarenessData about a room to all clients within that room.
@@ -330,7 +327,7 @@ UserManager.sendAwarenessData = function(roomID) {
     Modules.SocketServer.sendToSocket(sock, 'inform', data);
   }
   loggedInInfo();
-}
+};
 
 /**
  * Get the connections of the specified room.
@@ -351,7 +348,7 @@ UserManager.getConnectionsForRoom = function(roomID) {
   }
 
   return result;
-}
+};
 
 /**
  * Get connections by socket.
@@ -367,7 +364,7 @@ UserManager.getConnectionBySocket = function(socket) {
   }
 
   return false;
-}
+};
 
 /**
  * Get connections by the Id of a socket.
@@ -383,7 +380,7 @@ UserManager.getConnectionBySocketID = function(socketID) {
   }
 
   return false;
-}
+};
 
 /**
  * Get connections by User hash.
@@ -399,7 +396,7 @@ UserManager.getConnectionByUserHash = function(userHash) {
   }
 
   return false;
-}
+};
 
 
 
@@ -412,8 +409,8 @@ UserManager.getConnectionByUserHash = function(userHash) {
  *
  *	A call could look like this: modifyAccess(ReviewRole.create(),"AB");
  */
-UserManager.addRole = function(role, object) {
-  UserManager.modifyRole(role, object, true);
+UserManager.addRole = function(socket, data) {
+  UserManager.modifyRole(socket, data, true);
 };
 
 /**
@@ -423,8 +420,8 @@ UserManager.addRole = function(role, object) {
  * @param {type} object The object that should be used to change the access right
  * @returns {undefined}
  */
-UserManager.removeRole = function(role, object) {
-  UserManager.modifyRole(role, object, false);
+UserManager.removeRole = function(socket, data) {
+  UserManager.modifyRole(socket, data, false);
 };
 
 /**
@@ -435,7 +432,14 @@ UserManager.removeRole = function(role, object) {
  *			granted. Set false, to revoke access.
  *	A call could look like this: modifyAccess(ReviewRole.create(),"AB", true);
  */
-UserManager.modifyRole = function(role, object, add) {
+UserManager.modifyRole = function(socket, data, add) {
+  console.log(data);
+
+  var role = {
+    contextID: data.object.id,
+    name: data.role.name
+  };
+
   var collection = db.get('roles');
 
   /* create empty arrays if the arrays are not exisiting */
@@ -454,8 +458,8 @@ UserManager.modifyRole = function(role, object, add) {
 
   /* add resp. remove the role */
   if (add == true) {
-    collection.insert({id: role.id,
-      contextID: object.id,
+    collection.insert({
+      contextID: String(role.contextID),
       mode: role.mode,
       name: role.name,
       rights: role.rights,
@@ -463,7 +467,7 @@ UserManager.modifyRole = function(role, object, add) {
 
   } else {
     console.log("trying to remove : " + object.id + " | " + role.name);
-    collection.remove({contextID: String(object.id),
+    collection.remove({contextID: String(role.contextID.id),
       name: String(role.name)});
   }
 };
@@ -484,7 +488,7 @@ UserManager.getRoles = function(socket, data) {
  *	@param {type}   user    The user object that should be added
  */
 UserManager.addUser = function(socket, data) {
-  console.log("Server:UserManager.addUser: " + data.role + " " + data.objectId + " " + data.user);
+  Modules.Log.debug("Server:UserManager.addUser: " + data.role + " " + data.objectId + " " + data.user);
 
   UserManager.modifyUser(data.role, data.objectid, data.user, true);
 };
@@ -496,7 +500,7 @@ UserManager.addUser = function(socket, data) {
  *	@param {type}   user    The user object that should be added
  */
 UserManager.removeUser = function(socket, data) {
-  console.log("Server:UserManager.removeUser: " + data.role + " " + data.objectId + " " + data.user);
+  Modules.Log.debug("Server:UserManager.removeUser: " + data.role + " " + data.objectId + " " + data.user);
 
   UserManager.modifyUser(data.role, data.objectid, data.user, false);
 };
@@ -565,7 +569,7 @@ function loggedInInfo() {
       }
     }
   }
-  console.log(count + ' users: ' + userInfo);
+  Modules.Log.debug(count + ' users: ' + userInfo);
 }
 
 module.exports = UserManager;

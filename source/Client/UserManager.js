@@ -16,7 +16,7 @@ var UserManager = {};
  * @returns {undefined}
  */
 UserManager.addRole = function(object, role) {
-  this.modifyRole(role, object, true);
+  this.modifyRole(object, role, true);
 };
 
 /**
@@ -26,7 +26,7 @@ UserManager.addRole = function(object, role) {
  * @returns {undefined}
  */
 UserManager.removeRole = function(object, role) {
-  this.modifyRole(role, object, false);
+  this.modifyRole(object, role, false);
 };
 
 /**
