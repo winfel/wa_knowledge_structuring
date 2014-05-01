@@ -14,7 +14,6 @@ GUI.rightmanager = new function() {
   var selectedRoleSpan;
   var containerSelected;
   var containerNoneSelected;
-  var DEBUG = false;
 
   /* Content of rightmanager sidebar*/
 
@@ -38,24 +37,38 @@ GUI.rightmanager = new function() {
     this.containerNoneSelected = $('#rightmanager .rightmanagerNoneSelected');
 
     /* Add user event */
+
     $("#rmNewUserButton").click(function(event) {
-      var username = $("#rmNewUserTextfield").val();
+      var newUser = $("#rmNewUserTextfield").val();
 
-      if (username) {
-        var selectedObject = ObjectManager.getSelected()[0];
+      if (newUser)
+        Modules.UserManager.addUser(that.objData, that.selectedRoleSpan.data("role"), newUser);
+    });
 
-        //Modules.UserManager.addUser("RandomGuys", selectedObject.id, username);
-        Modules.UserManager.addUser(that.objData, "RandomGuys", username);
+    var userInput = $("#rmNewUserTextfield");
+
+    userInput.on("keyup", function(event) {
+      if (event.keyCode == 13) {
+        var newUser = userInput.val();
+
+        if (newUser)
+          Modules.UserManager.addUser(that.objData, that.selectedRoleSpan.data("role"), newUser);
       }
+    });
+
+    Modules.RightManager.getAllUsers(function(users) {
+      // Proof of concept... We need some other solution..
+      var logins = [];
+      users.forEach(function(user) {
+        logins.push(user.username);
+      });
+      userInput.autocomplete({source: logins});
     });
 
     /* Add role event */
     $("#rmNewRoleButton").click(function(event) {
       var role = $("#rmNewRoleTextfield").val();
-
-      if (DEBUG) {
-        console.log(role);
-      }
+      console.log(role);
     });
 
     /* Initially no object is selected */
@@ -70,16 +83,6 @@ GUI.rightmanager = new function() {
    */
   this.updateRightsSection = function(availableRights, checkedRights) {
     var that = GUI.rightmanager;
-
-    if (DEBUG) {
-      console.log("rm: Updating right section");
-    }
-    if (DEBUG) {
-      console.log(availableRights);
-    }
-    if (DEBUG) {
-      console.log(checkedRights);
-    }
 
     // Update the rights header
     that.rmRightsHead.html("Rights <span>(" + that.selectedRoleSpan.data("role").name + ")</span>");
@@ -99,9 +102,9 @@ GUI.rightmanager = new function() {
       input.on("click", function() {
         var checked = input.prop("checked");
         if (checked)
-          Modules.RightManager.grantAccess(right.name, that.objData, that.selectedRoleSpan.data("role").name);
+          Modules.RightManager.grantAccess(right.name, that.objData, that.selectedRoleSpan.data("role"));
         else
-          Modules.RightManager.revokeAccess(right.name, that.objData, that.selectedRoleSpan.data("role").name);
+          Modules.RightManager.revokeAccess(right.name, that.objData, that.selectedRoleSpan.data("role"));
       });
 
       if (checkedRights.indexOf(right.name) >= 0)
@@ -139,6 +142,7 @@ GUI.rightmanager = new function() {
 
     that.btnDeleteUsers.on("click", function() {
       checkedSpans.forEach(function(item) {
+        Modules.UserManager.removeUser(that.objData, that.selectedRoleSpan.data("role"), item.data("user"));
         item.remove();
       });
 
@@ -156,7 +160,7 @@ GUI.rightmanager = new function() {
         var span = $("<span>");
         span.addClass("rmSidebarUser");
         span.html(user);
-        span.data("value", user);
+        span.data("user", user);
 
         span.on("mouseenter", function(event) {
           if (!span.hasClass("checked"))
@@ -228,9 +232,8 @@ GUI.rightmanager = new function() {
           checkedSpans.splice(index, 1); // Remove the span from the array
           checkedUsers.splice(index, 1); // Remove the user from the array
 
-          if (DEBUG) {
-            console.log("Don't worry, " + user + " is not deleted yet. He/She just disappeared from the html document :).");
-          }
+          Modules.UserManager.removeUser(that.objData, that.selectedRoleSpan.data("role"), user);
+
           event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
         });
 
@@ -307,55 +310,71 @@ GUI.rightmanager = new function() {
         that.rmRoles.empty();
 
         roles.forEach(function(role) {
-          //$("#rm_roles").append("<div class=\"jDesktopInspector_element\"><input type=\"radio\" value=\"" + item.name + "\" name=\"rm_rolesRadio\">" + item.name + "</div>");
-
           // Add a span for every user and make it clickable.
           var span = $("<span>");
           span.addClass("rmSidebarRole");
           span.html(role.name);
           span.data("role", role);
+
+          span.on("mouseenter", function(event) {
+            if (!span.hasClass("checked"))
+              span.data("deleteImg").addClass("visible");
+          });
+
+          span.on("mouseleave", function(event) {
+            if (!span.hasClass("checked"))
+              span.data("deleteImg").removeClass("visible");
+          });
+
           span.on("click", function(event) {
             if (that.selectedRoleSpan == span)
               return;
 
-            that.selectedRoleSpan.removeClass("checked");
+            if (that.selectedRoleSpan != undefined) {
+              that.selectedRoleSpan.removeClass("checked");
+              that.selectedRoleSpan.data("deleteImg").removeClass("visible");
+            }
             that.selectedRoleSpan = span;
             span.addClass("checked");
+            span.data("deleteImg").addClass("visible");
 
             // Update the other sections
             // Get rights depending on the selected role...
-            Modules.RightManager.getRights(that.objData, role.name, GUI.username, that.updateRightsSection);
+            Modules.RightManager.getRights(that.objData, role, GUI.username, that.updateRightsSection);
             // Get users depending on the selected role...
-            Modules.UserManager.getUsers(that.objData, role.name, GUI.username, that.updateUsersSection);
+            Modules.UserManager.getUsers(that.objData, role, GUI.username, that.updateUsersSection);
           });
-
-          if (!that.selectedRoleSpan) {
-            that.selectedRoleSpan = span;
-            that.selectedRoleSpan.addClass("checked");
-          }
 
           var deleteImg = $("<img>");
           deleteImg.attr("alt", "Delete");
           deleteImg.attr("src", "/guis.common/images/oxygen/16x16/actions/edit-delete.png");
           deleteImg.on("click", function(event) {
             span.remove();
-            if (DEBUG) {
-              console.log("Don't worry, the role '" + role.name + "' is not deleted yet. She just disappeared from the html document :).");
-            }
+
+            Modules.UserManager.removeRole(that.objData, role);
+
             // We don't want to fire the span click event. That's why we stop the propagation.
             event.stopPropagation();
           });
+          span.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
           span.append(deleteImg);
 
           that.rmRoles.append(span);
+
+          // Initially
+          if (!that.selectedRoleSpan) {
+            that.selectedRoleSpan = span;
+            that.selectedRoleSpan.addClass("checked");
+            that.selectedRoleSpan.data("deleteImg").addClass("visible");
+          }
         });
 
         // Initially
         // 
         // Get rights depending on the selected role...
-        Modules.RightManager.getRights(that.objData, that.selectedRoleSpan.data("role").name, GUI.username, that.updateRightsSection);
+        Modules.RightManager.getRights(that.objData, that.selectedRoleSpan.data("role"), GUI.username, that.updateRightsSection);
         // Get users depending on the selected role...
-        Modules.UserManager.getUsers(that.objData, that.selectedRoleSpan.data("role").name, GUI.username, that.updateUsersSection);
+        Modules.UserManager.getUsers(that.objData, that.selectedRoleSpan.data("role"), GUI.username, that.updateUsersSection);
       });
 
       this.containerSelected.show();

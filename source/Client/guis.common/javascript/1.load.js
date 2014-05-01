@@ -100,9 +100,7 @@ GUI.loadGUI = function(step) {
         GUI.initToolbar();
         
         GUI.rightmanager.init();
-
-
-       // GUI.rightmanagerDialog.show("PaperObject"); // Delete me, once done testing
+        GUI.rightmanagerDialog.init();
       }
 
       // Adjust svg area
