@@ -85,7 +85,7 @@ UserManager.addUser = function(object, role, user) {
 
   Modules.SocketClient.serverCall('umAddUser', {
     'role': role,
-    'objectid': object.id,
+    'object': object,
     'user': user
   });
 };
