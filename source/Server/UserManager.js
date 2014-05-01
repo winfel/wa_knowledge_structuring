@@ -490,7 +490,7 @@ UserManager.getRoles = function(socket, data) {
 UserManager.addUser = function(socket, data) {
   Modules.Log.debug("Server:UserManager.addUser: " + data.role + " " + data.object.id + " " + data.user);
 
-  UserManager.modifyUser(data.role, data.object.id, data.user, true);
+  UserManager.modifyUser(data.role, data.object, data.user, true);
 };
 
 /**
@@ -502,7 +502,7 @@ UserManager.addUser = function(socket, data) {
 UserManager.removeUser = function(socket, data) {
   Modules.Log.debug("Server:UserManager.removeUser: " + data.role + " " + data.object.id + " " + data.user);
 
-  UserManager.modifyUser(data.role, data.object.id, data.user, false);
+  UserManager.modifyUser(data.role, data.object, data.user, false);
 };
 
 /**
@@ -515,6 +515,8 @@ UserManager.modifyUser = function(role, object, user, add) {
   /* (1) get the current users */
   var collection = db.get('roles');
   collection.find({contextID: String(object.id), name: String(role)}, {}, function(e, docs) {
+    Modules.Log.debug(docs);
+    
     docs.forEach(function(item) {
       /* (2) update role */
       if (add == true) {
