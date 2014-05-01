@@ -84,10 +84,11 @@ var TagManager = new function() {
    * @param {type} callback
    * @returns {undefined}
    */
-  this.updMainTags = function(mainTag) {
+  this.updMainTags = function(mainTag, newId) {
 
     Modules.SocketClient.serverCall('updMainTags', {
-		'mainTag': mainTag
+		'mainTag': mainTag,
+		'newId': newId,
 	});
   };
   

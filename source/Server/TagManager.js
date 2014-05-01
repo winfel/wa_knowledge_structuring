@@ -53,7 +53,7 @@ var TagManager = function() {
 	});
 	
 	Dispatcher.registerCall('updMainTags', function(socket, data, responseID) {
-		that.updMainTags(socket, data.mainTag); 
+		that.updMainTags(socket, data.mainTag, data.newId); 
 	});
 	
 	Dispatcher.registerCall('deleteSecTags', function(socket, data, responseID) {
@@ -133,23 +133,17 @@ var TagManager = function() {
 	* @param {type} object
 	* @returns {undefined}
 	*/
-	this.updMainTags = function(socket, newMainTag) {
+	this.updMainTags = function(socket, newMainTag, newId) {
 
 		var dbMainTags = db.get('MainTags');
-		
+			
 		dbMainTags.insert(
 		   [
-			  { id: "5", name: newMainTag, 
+			  { id: newId, name: newMainTag, 
 			    secTags: [] }
 		   ]	
 		);	
 		
-		/*
-		dbMainTags.update(
-                     {},
-                     { $push: { id: 5, name: newMainTag, secTags: ""  } }
-                   );
-		*/
 	};
 	  
 };

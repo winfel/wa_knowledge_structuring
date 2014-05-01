@@ -190,7 +190,7 @@ GUI.tagManager= new function() {
 				}
 					
 				//save the newly created tag in the database  
-				Modules.TagManager.updMainTags(customMainTagValue);
+				Modules.TagManager.updMainTags(customMainTagValue, that.mainTags.length+1);
 					
 				//get the complete list froom mainTags from the Database and set them
 				Modules.TagManager.getMainTags(that.setMainTags);
