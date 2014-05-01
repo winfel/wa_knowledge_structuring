@@ -128,7 +128,7 @@ UserManager.getUsers = function(object, role, user, callback) {
 
   Modules.SocketClient.serverCall('umGetUsers', {
     'role': role,
-    'objectid': object.id,
+    'object': object,
     'username': user
   });
 };

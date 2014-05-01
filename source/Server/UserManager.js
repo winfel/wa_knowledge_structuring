@@ -490,7 +490,7 @@ UserManager.getRoles = function(socket, data) {
 UserManager.addUser = function(socket, data) {
   Modules.Log.debug("Server:UserManager.addUser: " + data.role + " " + data.objectId + " " + data.user);
 
-  UserManager.modifyUser(data.role, data.objectid, data.user, true);
+  UserManager.modifyUser(data.role, data.object.id, data.user, true);
 };
 
 /**
@@ -502,7 +502,7 @@ UserManager.addUser = function(socket, data) {
 UserManager.removeUser = function(socket, data) {
   Modules.Log.debug("Server:UserManager.removeUser: " + data.role + " " + data.objectId + " " + data.user);
 
-  UserManager.modifyUser(data.role, data.objectid, data.user, false);
+  UserManager.modifyUser(data.role, data.object.id, data.user, false);
 };
 
 /**
@@ -511,10 +511,10 @@ UserManager.removeUser = function(socket, data) {
  *	@param {type}	object  The object that should be used to get the specfic role
  *	@param {type}   user    The user object that should be added
  */
-UserManager.modifyUser = function(role, objectid, user, add) {
+UserManager.modifyUser = function(role, object, user, add) {
   /* (1) get the current users */
   var collection = db.get('roles');
-  collection.find({contextID: String(objectid), name: String(role)}, {}, function(e, docs) {
+  collection.find({contextID: String(object.id), name: String(role)}, {}, function(e, docs) {
     docs.forEach(function(item) {
       /* (2) update role */
       if (add == true) {
@@ -539,11 +539,11 @@ UserManager.modifyUser = function(role, objectid, user, add) {
 UserManager.getUsers = function(socket, data) {
   var dbRoles = db.get('roles');
 
-  dbRoles.find({contextID: String(data.objectid), name: String(data.role)}, {}, function(e, docs) {
+  dbRoles.find({contextID: String(data.object.id), name: String(data.role)}, {}, function(e, docs) {
 
     var result = (docs.length > 0 ? docs[0].users : []);
 
-    Modules.SocketServer.sendToSocket(socket, "umUsers" + data.objectid, result);
+    Modules.SocketServer.sendToSocket(socket, "umUsers" + data.object.id, result);
   });
 };
 
