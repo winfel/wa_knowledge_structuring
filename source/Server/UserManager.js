@@ -488,9 +488,9 @@ UserManager.getRoles = function(socket, data) {
  *	@param {type}   user    The user object that should be added
  */
 UserManager.addUser = function(socket, data) {
-  Modules.Log.debug("Server:UserManager.addUser: " + data.role + " " + data.object.id + " " + data.user);
+  Modules.Log.info("Server:UserManager.addUser: " + data.role + " " + data.object.id + " " + data.username);
 
-  UserManager.modifyUser(data.role, data.object, data.user, true);
+  UserManager.modifyUser(data.role, data.object, data.username, true);
 };
 
 /**
@@ -500,18 +500,18 @@ UserManager.addUser = function(socket, data) {
  *	@param {type}   user    The user object that should be added
  */
 UserManager.removeUser = function(socket, data) {
-  Modules.Log.debug("Server:UserManager.removeUser: " + data.role + " " + data.object.id + " " + data.user);
+  Modules.Log.info("Server:UserManager.removeUser: " + data.role + " " + data.object.id + " " + data.username);
 
-  UserManager.modifyUser(data.role, data.object, data.user, false);
+  UserManager.modifyUser(data.role, data.object, data.username, false);
 };
 
 /**
  *	The function can be used to remove a user to a specific role
  *	@param {type}	role    The used role passed as a RoleObject
  *	@param {type}	object  The object that should be used to get the specfic role
- *	@param {type}   user    The user object that should be added
+ *	@param {type}   username    The user object that should be added
  */
-UserManager.modifyUser = function(role, object, user, add) {
+UserManager.modifyUser = function(role, object, username, add) {
   /* (1) get the current users */
   var collection = db.get('roles');
   collection.find({contextID: String(object.id), name: String(role)}, {}, function(e, docs) {
@@ -521,9 +521,9 @@ UserManager.modifyUser = function(role, object, user, add) {
       /* (2) update role */
       if (add == true) {
         /* store to database */
-        collection.update({_id: item._id}, {$addToSet: {users: user}});
+        collection.update({_id: item._id}, {$addToSet: {users: username}});
       } else {
-        collection.update({_id: item._id}, {$pull: {users: user}});
+        collection.update({_id: item._id}, {$pull: {users: username}});
       }
     });
 

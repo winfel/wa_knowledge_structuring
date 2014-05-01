@@ -81,12 +81,12 @@ UserManager.getRoles = function(object, user, callback) {
  */
 UserManager.addUser = function(object, role, user) {
   // The responce should be some sort of broadcast to users with a manager role...
-  console.log("Client:UserManager.addUser: " + role + " " + object.id + " " + user);
+  Modules.Log.info("Client:UserManager.addUser: " + role + " " + object.id + " " + user);
 
   Modules.SocketClient.serverCall('umAddUser', {
     'role': role,
     'object': object,
-    'user': user
+    'username': user
   });
 };
 
@@ -98,6 +98,9 @@ UserManager.addUser = function(object, role, user) {
  * @returns {undefined}
  */
 UserManager.removeUser = function(object, role, user) {
+  
+  Modules.Log.info("Client:UserManager.removeUser: " + role + " " + object.id + " " + user);
+  
   // The responce should be some sort of broadcast to users with a manager role...
   Modules.SocketClient.serverCall('umRemoveUser', {
     'role': role,
