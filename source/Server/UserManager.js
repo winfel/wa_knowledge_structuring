@@ -56,7 +56,7 @@ UserManager.init = function(theModules) {
       });
     }
   });
-  Modules.Log.debug.log("UserManager has been initialized");
+  Modules.Log.debug("UserManager has been initialized");
 };
 
 /**
