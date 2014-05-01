@@ -8,6 +8,9 @@ GUI.rightmanager = new function() {
   var rmUsersHead, rmUsers;
   var btnDeleteUsers;
 
+  var obj = null;
+  var objData = null; // It is used...
+
   var selectedRoleSpan;
   var containerSelected;
   var containerNoneSelected;
@@ -21,6 +24,7 @@ GUI.rightmanager = new function() {
    */
   this.init = function() {
     console.log("GUI.rightmanager initialized");
+    var that = this;
 
     this.rm = $("#rightmanager");
     this.rmRoles = $("#rm_roles");
@@ -41,7 +45,7 @@ GUI.rightmanager = new function() {
         var selectedObject = ObjectManager.getSelected()[0];
 
         //Modules.UserManager.addUser("RandomGuys", selectedObject.id, username);
-        Modules.UserManager.addUser({id: 1}, "RandomGuys", username);
+        Modules.UserManager.addUser(that.objData, "RandomGuys", username);
       }
     });
 
@@ -95,9 +99,9 @@ GUI.rightmanager = new function() {
       input.on("click", function() {
         var checked = input.prop("checked");
         if (checked)
-          Modules.RightManager.grantAccess(right.name, {id: 1}, that.selectedRoleSpan.data("role").name);
+          Modules.RightManager.grantAccess(right.name, that.objData, that.selectedRoleSpan.data("role").name);
         else
-          Modules.RightManager.revokeAccess(right.name, {id: 1}, that.selectedRoleSpan.data("role").name);
+          Modules.RightManager.revokeAccess(right.name, that.objData, that.selectedRoleSpan.data("role").name);
       });
 
       if (checkedRights.indexOf(right.name) >= 0)
@@ -252,6 +256,9 @@ GUI.rightmanager = new function() {
   this.updateContent = function(theObject) {
     var that = GUI.rightmanager;
 
+    that.obj = theObject;
+    that.objData = {id: 1, type: theObject.type}; //{id: theObject.id, type: theObject.type};
+
     /* Display selected object information */
     var selectedObjects = ObjectManager.getSelected();
 
@@ -296,7 +303,7 @@ GUI.rightmanager = new function() {
       that.selectedRoleSpan = null;
 
       /* Get Roles of selected object and write the roles into combobox */
-      Modules.UserManager.getRoles({id: 1}, GUI.username, function(roles) {
+      Modules.UserManager.getRoles(that.objData, GUI.username, function(roles) {
         that.rmRoles.empty();
 
         roles.forEach(function(role) {
@@ -317,9 +324,9 @@ GUI.rightmanager = new function() {
 
             // Update the other sections
             // Get rights depending on the selected role...
-            Modules.RightManager.getRights({id: 1, type: "PaperObject"}, role.name, GUI.username, that.updateRightsSection);
+            Modules.RightManager.getRights(that.objData, role.name, GUI.username, that.updateRightsSection);
             // Get users depending on the selected role...
-            Modules.UserManager.getUsers({id: 1}, role.name, GUI.username, that.updateUsersSection);
+            Modules.UserManager.getUsers(that.objData, role.name, GUI.username, that.updateUsersSection);
           });
 
           if (!that.selectedRoleSpan) {
@@ -346,9 +353,9 @@ GUI.rightmanager = new function() {
         // Initially
         // 
         // Get rights depending on the selected role...
-        Modules.RightManager.getRights({id: 1, type: "PaperObject"}, that.selectedRoleSpan.data("role").name, GUI.username, that.updateRightsSection);
+        Modules.RightManager.getRights(that.objData, that.selectedRoleSpan.data("role").name, GUI.username, that.updateRightsSection);
         // Get users depending on the selected role...
-        Modules.UserManager.getUsers({id: 1}, that.selectedRoleSpan.data("role").name, GUI.username, that.updateUsersSection);
+        Modules.UserManager.getUsers(that.objData, that.selectedRoleSpan.data("role").name, GUI.username, that.updateUsersSection);
       });
 
       this.containerSelected.show();
