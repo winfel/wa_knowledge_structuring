@@ -488,7 +488,7 @@ UserManager.getRoles = function(socket, data) {
  *	@param {type}   user    The user object that should be added
  */
 UserManager.addUser = function(socket, data) {
-  Modules.Log.debug("Server:UserManager.addUser: " + data.role + " " + data.objectId + " " + data.user);
+  Modules.Log.debug("Server:UserManager.addUser: " + data.role + " " + data.object.id + " " + data.user);
 
   UserManager.modifyUser(data.role, data.object.id, data.user, true);
 };
@@ -500,7 +500,7 @@ UserManager.addUser = function(socket, data) {
  *	@param {type}   user    The user object that should be added
  */
 UserManager.removeUser = function(socket, data) {
-  Modules.Log.debug("Server:UserManager.removeUser: " + data.role + " " + data.objectId + " " + data.user);
+  Modules.Log.debug("Server:UserManager.removeUser: " + data.role + " " + data.object.id + " " + data.user);
 
   UserManager.modifyUser(data.role, data.object.id, data.user, false);
 };
