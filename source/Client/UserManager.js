@@ -42,8 +42,8 @@ UserManager.modifyRole = function(object, role, grant) {
 
   // The responce should be some sort of broadcast to users with a manager role...
   Modules.SocketClient.serverCall(serverCall, {
-    'role': role,
-    'object': object
+    'object': object,
+    'role': role
   });
 };
 
@@ -81,8 +81,6 @@ UserManager.getRoles = function(object, user, callback) {
  */
 UserManager.addUser = function(object, role, user) {
   // The responce should be some sort of broadcast to users with a manager role...
-  Modules.Log.info("Client:UserManager.addUser: " + role + " " + object.id + " " + user);
-
   Modules.SocketClient.serverCall('umAddUser', {
     'role': role,
     'object': object,
@@ -98,13 +96,10 @@ UserManager.addUser = function(object, role, user) {
  * @returns {undefined}
  */
 UserManager.removeUser = function(object, role, user) {
-  
-  Modules.Log.info("Client:UserManager.removeUser: " + role + " " + object.id + " " + user);
-  
   // The responce should be some sort of broadcast to users with a manager role...
   Modules.SocketClient.serverCall('umRemoveUser', {
-    'role': role,
     'object': object,
+    'role': role,
     'username': user
   });
 };
@@ -130,8 +125,8 @@ UserManager.getUsers = function(object, role, user, callback) {
   // The responce should be some sort of broadcast... Instead of
 
   Modules.SocketClient.serverCall('umGetUsers', {
-    'role': role,
     'object': object,
+    'role': role,
     'username': user
   });
 };

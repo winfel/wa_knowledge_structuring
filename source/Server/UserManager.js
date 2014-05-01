@@ -433,8 +433,6 @@ UserManager.removeRole = function(socket, data) {
  *	A call could look like this: modifyAccess(ReviewRole.create(),"AB", true);
  */
 UserManager.modifyRole = function(socket, data, add) {
-  console.log(data);
-
   var role = {
     contextID: data.object.id,
     name: data.role.name
@@ -466,8 +464,8 @@ UserManager.modifyRole = function(socket, data, add) {
       users: role.users});
 
   } else {
-    console.log("trying to remove : " + object.id + " | " + role.name);
-    collection.remove({contextID: String(role.contextID.id),
+    console.log("trying to remove : " + role.contextID + " | " + role.name);
+    collection.remove({contextID: String(role.contextID),
       name: String(role.name)});
   }
 };
@@ -488,8 +486,6 @@ UserManager.getRoles = function(socket, data) {
  *	@param {type}   user    The user object that should be added
  */
 UserManager.addUser = function(socket, data) {
-  Modules.Log.info("Server:UserManager.addUser: " + data.role + " " + data.object.id + " " + data.username);
-
   UserManager.modifyUser(data.role, data.object, data.username, true);
 };
 
@@ -500,8 +496,6 @@ UserManager.addUser = function(socket, data) {
  *	@param {type}   user    The user object that should be added
  */
 UserManager.removeUser = function(socket, data) {
-  Modules.Log.info("Server:UserManager.removeUser: " + data.role + " " + data.object.id + " " + data.username);
-
   UserManager.modifyUser(data.role, data.object, data.username, false);
 };
 
@@ -514,9 +508,9 @@ UserManager.removeUser = function(socket, data) {
 UserManager.modifyUser = function(role, object, username, add) {
   /* (1) get the current users */
   var collection = db.get('roles');
-  collection.find({contextID: String(object.id), name: String(role)}, {}, function(e, docs) {
+  collection.find({contextID: String(object.id), name: String(role.name)}, {}, function(e, docs) {
     Modules.Log.debug(docs);
-    
+
     docs.forEach(function(item) {
       /* (2) update role */
       if (add == true) {
@@ -541,7 +535,7 @@ UserManager.modifyUser = function(role, object, username, add) {
 UserManager.getUsers = function(socket, data) {
   var dbRoles = db.get('roles');
 
-  dbRoles.find({contextID: String(data.object.id), name: String(data.role)}, {}, function(e, docs) {
+  dbRoles.find({contextID: String(data.object.id), name: String(data.role.name)}, {}, function(e, docs) {
 
     var result = (docs.length > 0 ? docs[0].users : []);
 

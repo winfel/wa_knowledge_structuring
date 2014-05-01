@@ -7,20 +7,20 @@
 
 
 NumberCreator.justCreated = function() {
-  var testClientGrantAccess 	= false;
-  var testClientRevokeAccess 	= false;
-  var testClientGetRights 		= false;
-  var testClientGetRoles      = false;
-  var testClientGetUsers      = true;
+  var testClientGrantAccess = false;
+  var testClientRevokeAccess = false;
+  var testClientGetRights = false;
+  var testClientGetRoles = false;
+  var testClientGetUsers = true;
 
-  if(testClientGetRights === true){
-  	console.log(">>> TESTING CLIENT GET RIGHTS <<<");
-  	Modules.RightManager.getRights({id: 1, type: "NumberCreator"}, "Boss", GUI.username, function(result) {
-  		console.log("GET RIGHTS ON CLIENT SIDE");
-  	});
+  if (testClientGetRights === true) {
+    console.log(">>> TESTING CLIENT GET RIGHTS <<<");
+    Modules.RightManager.getRights({id: 1, type: "NumberCreator"}, {name: "Boss"}, GUI.username, function(result) {
+      console.log("GET RIGHTS ON CLIENT SIDE");
+    });
   }
 
-  if(testClientGetRoles === true){
+  if (testClientGetRoles === true) {
     console.log(">>> TESTING CLIENT GET ROLES <<<");
     Modules.RightManager.getRolesForObject({id: 1, type: "NumberCreator"}, function(result) {
       console.log("GET ROLES FOR OBJECT");
@@ -28,7 +28,7 @@ NumberCreator.justCreated = function() {
     });
   }
 
-  if(testClientGetUsers === true){
+  if (testClientGetUsers === true) {
     console.log(">>> TESTING CLIENT GET Users <<<");
     Modules.RightManager.getAllUsers(function(result) {
       console.log("GET All Users");
@@ -36,14 +36,14 @@ NumberCreator.justCreated = function() {
     });
   }
 
-  if(testClientGrantAccess === true){
-  	console.log(">>> TESTING CLIENT GRANT ACCESS <<<");
-  	Modules.RightManager.grantAccess("IMBAAccess",{id: 1, type: "NumberCreator"}, "Boss", GUI.username);
+  if (testClientGrantAccess === true) {
+    console.log(">>> TESTING CLIENT GRANT ACCESS <<<");
+    Modules.RightManager.grantAccess("IMBAAccess", {id: 1, type: "NumberCreator"}, {name: "Boss"}, GUI.username);
   }
 
-  if(testClientRevokeAccess === true){
-  	console.log(">>> TESTING CLIENT REVOKE ACCESS <<<");
-  	Modules.RightManager.revokeAccess("IMBAAccess",{id: 1, type: "NumberCreator"}, "Boss", GUI.username);
+  if (testClientRevokeAccess === true) {
+    console.log(">>> TESTING CLIENT REVOKE ACCESS <<<");
+    Modules.RightManager.revokeAccess("IMBAAccess", {id: 1, type: "NumberCreator"}, {name: "Boss"}, GUI.username);
   }
 //  this.getRoom().createObject('Textarea', function(err, obj) {
 //    obj.setAttribute('name', 'logger2');
