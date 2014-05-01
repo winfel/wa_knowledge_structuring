@@ -51,6 +51,14 @@ var TagManager = function() {
     Dispatcher.registerCall('updSecTags', function(socket, data, responseID) {
 		that.updSecTags(socket, data.mainTag, data.secTag); 
 	});
+	
+	Dispatcher.registerCall('updMainTags', function(socket, data, responseID) {
+		that.updMainTags(socket, data.mainTag); 
+	});
+	
+	Dispatcher.registerCall('deleteSecTags', function(socket, data, responseID) {
+		that.deleteSecTags(socket, data.mainTag, data.secTag); 
+	});
  
   };
   
@@ -94,16 +102,56 @@ var TagManager = function() {
 	* @returns {undefined}
 	*/
 	this.updSecTags = function(socket, mainTag, newSecTag) {
-	  		
+
 		var dbMainTags = db.get('MainTags');
-		
+
 		dbMainTags.update( {name: mainTag}, { 
 												$addToSet: { secTags:  newSecTag } 
 										    }
 		                 );
-		 
+
 	};
-  
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.deleteSecTags = function(socket, mainTag, SecTag) {
+
+		var dbMainTags = db.get('MainTags');
+
+		dbMainTags.update( {name: mainTag}, { 
+												$pull: { secTags:  SecTag } 
+										    }
+		                 );
+
+	};
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.updMainTags = function(socket, newMainTag) {
+
+		var dbMainTags = db.get('MainTags');
+		
+		dbMainTags.insert(
+		   [
+			  { id: "5", name: newMainTag, 
+			    secTags: [] }
+		   ]	
+		);	
+		
+		/*
+		dbMainTags.update(
+                     {},
+                     { $push: { id: 5, name: newMainTag, secTags: ""  } }
+                   );
+		*/
+	};
+	  
 };
 
 module.exports = new TagManager();

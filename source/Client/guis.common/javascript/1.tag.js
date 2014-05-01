@@ -35,7 +35,10 @@ GUI.tagManager= new function() {
 	var $containerMainTags;
 	
 	// selector for the input field for the custom secondary tag
-	var $customTag;
+	var $customSecTag;
+	
+	// selector for the input field for the custom main tag
+	var $customMainTag;
 	
 	// selector for the label of the name of the file object
 	var $documentName;
@@ -63,7 +66,8 @@ GUI.tagManager= new function() {
 		this.$containerUnassignedSecondaryTags = this.dialogDom.find("ul#unassignedTags");
 		this.$containerAssignedSecondaryTags = this.dialogDom.find("#document");
 		this.$containerMainTags = this.dialogDom.find("#mainTag");
-		this.$customTag = this.dialogDom.find("#custom-tag")
+		this.$customSecTag = this.dialogDom.find("#custom-Sec-tag");
+		this.$customMainTag = this.dialogDom.find("#custom-Main-tag");
 	    this.$documentName = this.dialogDom.find("#document-name"); 
 	    
 		this.makeContainersDroppable();
@@ -107,6 +111,10 @@ GUI.tagManager= new function() {
 			content+= '		<li><a href="#secondaryTags">Secondary Tag</a></li>';
 			content+= '	</ul>';
 			content+= '	<div id="mainTag">';
+			content+= '     <div class="custom-Main-tag-holder">';
+			content+= '     	<label for="custom-Main-tag"><b>Custom tag:</b> </label>';
+		    content+= '			<input id="custom-Main-tag">';
+			content+= '		</div>';
 			content+= '	</div>';
 			content+= ' <div id="secondaryTags">';
 			content+= '		<div class="ui-widget ui-helper-clearfix" style="width: 555px">';
@@ -119,9 +127,9 @@ GUI.tagManager= new function() {
 			content+= '				<button id="btn-previous"><</button>';
 			content+= '				<button id="btn-next">></button>';
 			content+= '			</div>';
-			content+= '     	<div class="custom-tag-holder">';
-			content+= '     		<label for="custom-tag"><b>Custom tag:</b> </label>';
-		    content+= '				<input id="custom-tag">';
+			content+= '     	<div class="custom-Sec-tag-holder">';
+			content+= '     		<label for="custom-Sec-tag"><b>Custom tag:</b> </label>';
+		    content+= '				<input id="custom-Sec-tag">';
 			content+= '			</div>';		
 			content+= '			</div>';
 			content+= '			<div id="document" class="ui-widget-content ui-state-default">';
@@ -162,26 +170,61 @@ GUI.tagManager= new function() {
 			
 		});	
 		
+		// event handler for the input field for creation of custom main tags
+		// creates new main tag and assigns it to the file object		
+		$("#custom-Main-tag").live("keyup", function(event) {
+			var that = GUI.tagManager;
+			var customMainTagValue = $(this).val();
+			
+			if (event.keyCode == 13 && customMainTagValue != "") {
+				
+				//if a MainTag with this name already exists, discard the new entry
+				for (var index = 0; index < that.mainTags.length; ++index) {
+					if(that.mainTags[index].name == customMainTagValue){
+					
+						//reset the value of the input field
+						$(this).val("");
+					
+						return
+					}
+				}
+					
+				//save the newly created tag in the database  
+				Modules.TagManager.updMainTags(customMainTagValue);
+					
+				//get the complete list froom mainTags from the Database and set them
+				Modules.TagManager.getMainTags(that.setMainTags);
+
+				//draw the MainTags, including the new Tag
+				that.drawMainTags();
+
+				//reset the value of the input field
+				$(this).val("");
+					
+			}
+			
+		});
+		
 		// event handler for the input field for creation of custom secondary tags
 		// creates new secondary tag and assigns it to the file object		
-		$("#custom-tag").live("keyup", function(event) {
+		$("#custom-Sec-tag").live("keyup", function(event) {
 			var that = GUI.tagManager;
-			var customTagValue = $(this).val();
+			var customSecTagValue = $(this).val();
 			
-			if (event.keyCode == 13 && customTagValue != "") {
+			if (event.keyCode == 13 && customSecTagValue != "") {
 				
 				//remove the newly created tag if it already exists in the list of unassigned secondary tags
 				// and redraw the unassigned secondary tags
-				that.removeListItem( that.unassignedSecTags, customTagValue);
+				that.removeListItem( that.unassignedSecTags, customSecTagValue);
 				that.drawUnassignedTags();
 				
 				//insert the newly created secondary tag into the list of assigned secondary tags
 				// and redraw the assigned secondary tags
-				that.assignedSecTags.push(customTagValue);
+				that.assignedSecTags.push(customSecTagValue);
 				that.drawAssignedTags();
 				
 				//save the newly created tag in the database
-				Modules.TagManager.updSecTags(that.mainTag, customTagValue);
+				Modules.TagManager.updSecTags(that.mainTag, customSecTagValue);
 				
 				//reset the value of the input field
 				$(this).val("");
@@ -217,7 +260,7 @@ GUI.tagManager= new function() {
 			that.drawUnassignedTags();
 		});
 		
-		/*
+
 		$( "#del-tag" ).die().live("click", function(e){
 			var that = GUI.tagManager;
 			
@@ -227,14 +270,15 @@ GUI.tagManager= new function() {
 			
 			$(this).parent().remove();
 				
-			that.removeListItem(that.assignedSecTags, value);
+			//that.removeListItem(that.assignedSecTags, value);
 			that.removeListItem(that.unassignedSecTags, value);
+			
+			Modules.TagManager.deleteSecTags(that.mainTag, value);
 			
 			that.updatePagingParameters();
 			that.drawUnassignedTags();
 			
 		});
-		*/
 	
 	}
 	
@@ -356,7 +400,7 @@ GUI.tagManager= new function() {
 		var tagList = that.getCurrentPageTags();
 		
 		$.each(tagList, function( index, value ) {		
-			that.drawTag(value,that.$containerUnassignedSecondaryTags);
+			that.drawTag(value,that.$containerUnassignedSecondaryTags, "unassigned");
 			
 		});
 		
@@ -372,7 +416,7 @@ GUI.tagManager= new function() {
 		container.html("");
 		
 		$.each(that.assignedSecTags, function( index, value ) {		
-			that.drawTag(value, container);
+			that.drawTag(value, container, "assigned");
 			
 		});
 		
@@ -380,16 +424,27 @@ GUI.tagManager= new function() {
 		
 	};
 	
-	this.drawTag = function(value, container){
+	this.drawTag = function(value, container, s){
 	
 		var that = GUI.tagManager;
 		
-		$(
-		  '<li class="ui-widget-content" data-sectag="'+value+'">'+
-		      '<h5 class="ui-widget-header tagValue">'+value+'</h5>'+
-		//      '<a href="" id="del-tag" title="Delete this tag" class="ui-icon ui-icon-closethick">Delete image</a>'+
-		  '</li>'
-		 ).appendTo(container);
+		if(s=="assigned"){
+		
+			$(
+			  '<li class="ui-widget-content" data-sectag="'+value+'">'+
+				  '<h5 class="ui-widget-header tagValue">'+value+'</h5>'+
+			  '</li>'
+			 ).appendTo(container);
+		}
+		else{
+			$(
+			  '<li class="ui-widget-content" data-sectag="'+value+'">'+
+				  '<h5 class="ui-widget-header tagValue">'+value+'</h5>'+
+			      '<a href="" id="del-tag" title="Delete this tag" class="ui-icon ui-icon-closethick">Delete image</a>'+
+			  '</li>'
+			 ).appendTo(container);
+		
+		}
 		
 		that.makeTagItemsDraggable(container);
 		
@@ -399,6 +454,9 @@ GUI.tagManager= new function() {
 	this.drawMainTags = function(){
 		
 		var that = GUI.tagManager; 
+			
+		that.$containerMainTags.find( "button" ).remove();
+		
 		$.each(this.mainTags, function( index, value ) {
 			
 			if(that.mainTag == value.name) {
