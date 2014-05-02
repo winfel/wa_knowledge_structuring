@@ -198,7 +198,7 @@ var RightManager = function() {
     /* get all exiting access rights from the database */
     var collection = db.get('rights');
     collection.find({}, {}, function(e, docs) {
-      if (typeof docs != 'undefined' || docs.length > 0) {
+      if (typeof docs != 'undefined' && docs.length > 0) {
         docs.forEach(function(entry) {
 
           Modules.Log.debug("adding right: " + String(entry.name));
