@@ -96,6 +96,7 @@ GUI.rightmanager = new function() {
       input.attr({
         id: inputId,
         type: "checkbox",
+        class: "rightmanager-right-checkbox",
         value: right.name
       });
 
@@ -158,7 +159,7 @@ GUI.rightmanager = new function() {
 
         // Add a span for every user and make it clickable.
         var span = $("<span>");
-        span.addClass("rmSidebarUser");
+        span.addClass("rightmanager-item rightmanager-user");
         span.html(user);
         span.data("user", user);
 
@@ -214,8 +215,8 @@ GUI.rightmanager = new function() {
               item.data("deleteImg").removeClass("visible");
             });
             that.btnDeleteUsers.addClass("visible");
-          } else {
-            deleteImg.addClass("visible");
+          } else if (checkedSpans.length == 1) {
+            checkedSpans[0].data("deleteImg").addClass("visible");
             that.btnDeleteUsers.removeClass("visible");
           }
         });
@@ -312,7 +313,7 @@ GUI.rightmanager = new function() {
         roles.forEach(function(role) {
           // Add a span for every user and make it clickable.
           var span = $("<span>");
-          span.addClass("rmSidebarRole");
+          span.addClass("rightmanager-item rightmanager-role");
           span.html(role.name);
           span.data("role", role);
 

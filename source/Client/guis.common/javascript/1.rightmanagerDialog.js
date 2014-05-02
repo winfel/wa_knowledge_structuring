@@ -43,18 +43,18 @@ GUI.rightmanagerDialog = new function() {
             setDefaultRoles();
           }
         },
-//        {
-//          text: "Add users",
-//          click: function() {
-//            addUsers();
-//          }
-//        },
-//        {
-//          text: "Delete user",
-//          click: function() {
-//            //deleteusers();
-//          }
-//        },
+        {
+          text: "Add users",
+          click: function() {
+            //addUsers();
+          }
+        },
+        {
+          text: "Delete user",
+          click: function() {
+            //deleteusers();
+          }
+        },
         {
           text: "Close",
           click: function() {
@@ -134,7 +134,7 @@ GUI.rightmanagerDialog = new function() {
       sectionRights.attr({
         class: "rightmanager-section"
       });
-      sectionRights.append('<h3 class="rmSectionHeader">Rights</h3>');
+      sectionRights.append('<h3 class="rightmanager-section-header">Rights</h3>');
       tabPage.append(sectionRights);
 
       Modules.RightManager.getRights(that.objData, role, GUI.username, function(availableRights, checkedRights) {
@@ -148,6 +148,7 @@ GUI.rightmanagerDialog = new function() {
             checkbox.attr({
               id: inputId,
               type: "checkbox",
+              class: "rightmanager-right-checkbox",
               value: right.name
             });
             checkbox.on("click", function() {
@@ -165,7 +166,7 @@ GUI.rightmanagerDialog = new function() {
             var label = $("<label>");
             label.attr({
               for : inputId,
-              class: "rmdRightLabel",
+              class: "rightmanager-right-label",
               title: right.name + "<br>" + right.comment
             });
             label.html(right.name);
@@ -189,36 +190,36 @@ GUI.rightmanagerDialog = new function() {
       sectionUsers.attr({
         class: "rightmanager-section"
       });
-      sectionUsers.append('<h3 class="rmSectionHeader">Users</h3>');
+      sectionUsers.append('<h3 class="rightmanager-section-header">Users</h3>');
       tabPage.append(sectionUsers);
 
-      var userInput = $("<input>");
-      userInput.attr({
-        type: "text"
-      });
-
-      userInput.on("keyup", function(event) {
-        if (event.keyCode == 13) {
-          var newUser = userInput.val();
-
-          if (newUser != "") {
-            Modules.UserManager.addUser(that.objData, role, newUser);
-          }
-        }
-      });
-
-      Modules.RightManager.getAllUsers(function(users) {
-        // Proof of concept... We need some other solution..
-        var logins = [];
-        users.forEach(function(user) {
-          logins.push(user.username);
-        });
-
-        userInput.autocomplete({source: logins});
-
-        sectionUsers.append(userInput);
-        sectionUsers.append("<br>");
-      });
+//      var userInput = $("<input>");
+//      userInput.attr({
+//        type: "text"
+//      });
+//
+//      userInput.on("keyup", function(event) {
+//        if (event.keyCode == 13) {
+//          var newUser = userInput.val();
+//
+//          if (newUser != "") {
+//            Modules.UserManager.addUser(that.objData, role, newUser);
+//          }
+//        }
+//      });
+//
+//      Modules.RightManager.getAllUsers(function(users) {
+//        // Proof of concept... We need some other solution..
+//        var logins = [];
+//        users.forEach(function(user) {
+//          logins.push(user.username);
+//        });
+//
+//        userInput.autocomplete({source: logins});
+//
+//        sectionUsers.append(userInput);
+//        sectionUsers.append("<br>");
+//      });
 
       Modules.UserManager.getUsers(that.objData, role, GUI.username, function(users) {
         var checkedUsers = new Array(); // Keep track of the selected users. Needed for a delete server call.
@@ -241,7 +242,7 @@ GUI.rightmanagerDialog = new function() {
 
             // Add a span for every user and make it clickable.
             var span = $("<span>");
-            span.addClass("rmSidebarUser");
+            span.addClass("rightmanager-item rightmanager-user");
             span.html(user);
             span.data("value", user);
 
@@ -296,10 +297,10 @@ GUI.rightmanagerDialog = new function() {
                 checkedSpans.forEach(function(item) {
                   item.data("deleteImg").removeClass("visible");
                 });
-//                that.btnDeleteUsers.addClass("visible");
-              } else {
-                deleteImg.addClass("visible");
-//                that.btnDeleteUsers.removeClass("visible");
+                // that.btnDeleteUsers.addClass("visible");
+              } else if (checkedSpans.length == 1) {
+                checkedSpans[0].data("deleteImg").addClass("visible");
+                // that.btnDeleteUsers.removeClass("visible");
               }
             });
 
