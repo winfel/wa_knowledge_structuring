@@ -143,42 +143,10 @@ GUI.rightmanagerDialog = new function() {
 
       Modules.RightManager.getRights(that.objData, role, GUI.username, function(availableRights, checkedRights) {
         // Finally add the rights to the rights section
-
         if (availableRights.length > 0) {
           availableRights.forEach(function(right) {
-            var inputId = tabPage.attr("id") + "_" + right.name; // This id is used to link the input and the label
-
-            var checkbox = $("<input>");
-            checkbox.attr({
-              id: inputId,
-              type: "checkbox",
-              class: "rightmanager-right-checkbox",
-              value: right.name
-            });
-            checkbox.on("click", function() {
-              var checked = checkbox.prop("checked");
-
-              if (checked)
-                Modules.RightManager.grantAccess(right.name, that.objData, role);
-              else
-                Modules.RightManager.revokeAccess(right.name, that.objData, role);
-            });
-
-            if (checkedRights.indexOf(right.name) >= 0) // Check if the right is actually checked
-              checkbox.prop("checked", true);
-
-            var label = $("<label>");
-            label.attr({
-              for : inputId,
-              class: "rightmanager-right-label",
-              title: right.name + "<br>" + right.comment
-            });
-            label.html(right.name);
-            //label.tooltip();
-
-            // Update the rights section
-            sectionRights.append(checkbox);
-            sectionRights.append(label);
+            var checked = checkedRights.indexOf(right.name) >= 0;
+            addRightToSection(that, right, role, sectionRights, checked);
           });
         } else {
           // No rights found
