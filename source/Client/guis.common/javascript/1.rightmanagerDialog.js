@@ -20,6 +20,10 @@ GUI.rightmanagerDialog = new function() {
   var obj = null;
   var objData = null; // It is used...
 
+
+  var checkedUsers = null; // Keep track of the selected users. Needed for a delete server call.
+  var checkedSpans = null; // Keep track of the corresponding spans, which display a user.
+
   /*
    * Initializes the right manager dialog.
    * 
@@ -46,7 +50,7 @@ GUI.rightmanagerDialog = new function() {
         {
           text: "Add users",
           click: function() {
-            //addUsers();
+            openUserDialog();
           }
         },
         {
@@ -132,7 +136,7 @@ GUI.rightmanagerDialog = new function() {
       // -------------------------------
       var sectionRights = $("<div>");
       sectionRights.attr({
-        class: "rightmanager-section"
+        class: "rightmanager-section rightmanager-right-section"
       });
       sectionRights.append('<h3 class="rightmanager-section-header">Rights</h3>');
       tabPage.append(sectionRights);
@@ -188,144 +192,20 @@ GUI.rightmanagerDialog = new function() {
       // ------------------------------
       var sectionUsers = $("<div>");
       sectionUsers.attr({
-        class: "rightmanager-section"
+        id: "rightmanager-user-section-" + index,
+        class: "rightmanager-section rightmanager-user-section"
       });
       sectionUsers.append('<h3 class="rightmanager-section-header">Users</h3>');
       tabPage.append(sectionUsers);
 
-//      var userInput = $("<input>");
-//      userInput.attr({
-//        type: "text"
-//      });
-//
-//      userInput.on("keyup", function(event) {
-//        if (event.keyCode == 13) {
-//          var newUser = userInput.val();
-//
-//          if (newUser != "") {
-//            Modules.UserManager.addUser(that.objData, role, newUser);
-//          }
-//        }
-//      });
-//
-//      Modules.RightManager.getAllUsers(function(users) {
-//        // Proof of concept... We need some other solution..
-//        var logins = [];
-//        users.forEach(function(user) {
-//          logins.push(user.username);
-//        });
-//
-//        userInput.autocomplete({source: logins});
-//
-//        sectionUsers.append(userInput);
-//        sectionUsers.append("<br>");
-//      });
-
       Modules.UserManager.getUsers(that.objData, role, GUI.username, function(users) {
-        var checkedUsers = new Array(); // Keep track of the selected users. Needed for a delete server call.
-        var checkedSpans = new Array(); // Keep track of the corresponding spans, which display a user.
 
-//        that.btnDeleteUsers.on("click", function() {
-//          checkedSpans.forEach(function(item) {
-//            item.remove();
-//          });
-//
-//          // No users checked anymore
-//          checkedSpans.length = 0;
-//          checkedUsers.length = 0;
-//
-//          that.btnDeleteUsers.removeClass("visible");
-//        });
+        that.checkedUsers = new Array();
+        that.checkedSpans = new Array();
 
         if (users.length > 0) {
           users.forEach(function(user) {
-
-            // Add a span for every user and make it clickable.
-            var span = $("<span>");
-            span.addClass("rightmanager-item rightmanager-user");
-            span.html(user);
-            span.data("value", user);
-
-            span.on("mouseenter", function(event) {
-              if (!span.hasClass("checked"))
-                span.data("deleteImg").addClass("visible");
-            });
-
-            span.on("mouseleave", function(event) {
-              if (!span.hasClass("checked"))
-                span.data("deleteImg").removeClass("visible");
-            });
-
-            // The whole click magic ;)...
-            span.on("click", function(event) {
-              var deleteImg = span.data("deleteImg"); // The reference to the delete image.
-              var index = checkedSpans.indexOf(span); // The index of the clicked span.
-
-              // Check for multi/single selection
-              if (event.ctrlKey) {
-                // Multi selection
-                if (index >= 0) {
-                  checkedSpans.splice(index, 1); // Remove the span from the array
-                  checkedUsers.splice(index, 1); // Remove the user from the array
-                } else {
-                  checkedSpans.push(span); // Add the span to the array
-                  checkedUsers.push(user); // Add the user to the array
-                }
-
-              } else {
-                // Single selection: Uncheck all elements first and then check the current element again..
-                checkedSpans.forEach(function(item) {
-                  item.removeClass("checked");
-                  item.data("deleteImg").removeClass("visible");
-                });
-                checkedSpans.length = 0; // Delete all array items.
-                checkedSpans.push(span);
-
-                checkedUsers.length = 0; // Delete all array items.
-                checkedUsers.push(user);
-              }
-
-              span.toggleClass("checked"); // Toggle the span
-
-              // Check if delete buttons are or the delete all button is shown.
-              if (span.hasClass("checked") && checkedSpans.length == 1)
-                deleteImg.addClass("visible");
-              else
-                deleteImg.removeClass("visible");
-
-              if (checkedSpans.length > 1) {
-                checkedSpans.forEach(function(item) {
-                  item.data("deleteImg").removeClass("visible");
-                });
-                // that.btnDeleteUsers.addClass("visible");
-              } else if (checkedSpans.length == 1) {
-                checkedSpans[0].data("deleteImg").addClass("visible");
-                // that.btnDeleteUsers.removeClass("visible");
-              }
-            });
-
-            var deleteImg = $("<img>");
-            deleteImg.attr({
-              alt: "Delete",
-              src: "/guis.common/images/oxygen/16x16/actions/edit-delete.png"
-            });
-            deleteImg.on("click", function(event) {
-              span.remove();
-              // Update the arrays
-              var index = checkedSpans.indexOf(span); // The index of the clicked span
-              checkedSpans.splice(index, 1); // Remove the span from the array
-              checkedUsers.splice(index, 1); // Remove the user from the array
-
-              Modules.UserManager.removeUser(that.objData, role, user);
-
-              event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
-            });
-
-            span.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
-            span.append(deleteImg);
-
-            // Finally add it to the user section
-            sectionUsers.append(span);
+            addUserToSection(that, user, sectionUsers, true);
           });
         } else {
           // No user found => show a corresponding message.
@@ -470,12 +350,28 @@ GUI.rightmanagerDialog = new function() {
     textfield.focus();
   }
 
+  /**
+   * 
+   * @returns {undefined}
+   */
   function setDefaultRoles() {
     alert("Well... You got me. This function is not implemented yet :).");
   }
 
-  function addUsers() {
+  function openUserDialog() {
+    var that = GUI.rightmanagerDialog;
 
+    var selectedTabId = that.rmdTabs.tabs("option", "selected") + 1;
+
+    var resultCallback = function(users) {
+      var sectionUsers = $("#rightmanager-user-section-" + selectedTabId);
+
+      users.forEach(function(user) {
+        addUserToSection(that, user, sectionUsers, true);
+      });
+    };
+
+    GUI.userdialog.show(resultCallback);
   }
 
 //    Modules.RightManager.getAllUsers(function(users) {

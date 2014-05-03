@@ -217,7 +217,6 @@
                     <br style="clear: both">										
                   </div> 
                   <div class="jDesktopInspector_element">
-                    <input id="rmNewUserTextfield" type="text" size="15" value="New user" onfocus="this.value = ''">
                     <div class= "jDesktopInspector_button_right">					
                       <input id="rmNewUserButton" type="button" value="Add user">
                     </div>
@@ -291,21 +290,15 @@
     <!-- END: GUI rightmanager pop-up dialog -->
     
     <!-- BEGIN: GUI add user dialog -->
-    <div id="addUserDialog" style="display: none;">
-      <table style="width: 100%">
-        <tr>
-          <td>
-            <!-- NOT USED YET -->
-            <select id="addUserDialogCurrentUsers">
-              
-            </select>
-          </td>
-          <td style="width: 30px;">
-            
-          </td>
-          <td></td>
-        </tr>
-      </table>
+    <div id="manageUserDialog" class="rightmanager-user-dialog" style="display: none;">
+      <h3>Friend list</h3>
+      <div id="manageUserDialogFriendList" class="rightmanager-user-dialog-section"></div>
+      <h3>Suggested</h3>
+      <div id="manageUserDialogSuggested" class="rightmanager-user-dialog-section"></div>
+      <h3>Searched Users</h3>
+      <input id="manageUserDialogNewTextfield" type="text" value="Type in the username" />
+      <div id="manageUserDialogSearched" class="rightmanager-user-dialog-section">
+      </div>
     </div>
     <!-- END: GUI add user dialog -->
 
