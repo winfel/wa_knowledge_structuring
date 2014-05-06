@@ -436,6 +436,16 @@ function addRightToSection(that, right, role, sectionRights, checkedInitially) {
 function addUserToSection(that, user, sectionUsers, role, withDelete, forceMulti, checkedInitially) {
   if (!that.objData)
     withDelete = false;
+  
+  var checkedSpans, checkedUsers;
+  
+  if(that.checkedSpans[role.name]) {
+    checkedSpans = that.checkedSpans[role.name];
+    checkedUsers = that.checkedUsers[role.name];
+  } else {
+    checkedSpans = that.checkedSpans;
+    checkedUsers = that.checkedUsers;
+  }
 
   // Add a span for every user and make it clickable.
   var span = $("<span>");
@@ -444,7 +454,7 @@ function addUserToSection(that, user, sectionUsers, role, withDelete, forceMulti
     span.addClass("show-delete-img");
 
   span.html(user);
-  span.data("value", user);
+  span.data("user", user);
 
   span.on("mouseenter", function(event) {
     if (!span.hasClass("checked") && withDelete)
@@ -458,31 +468,31 @@ function addUserToSection(that, user, sectionUsers, role, withDelete, forceMulti
 
   // The whole click magic ;)...
   span.on("click", function(event) {
-    var index = that.checkedSpans.indexOf(span); // The index of the clicked span.
+    var index = checkedSpans.indexOf(span); // The index of the clicked span.
 
     // Check for multi/single selection
     if (event.ctrlKey || forceMulti) {
       // Multi selection
       if (index >= 0) {
-        that.checkedSpans.splice(index, 1); // Remove the span from the array
-        that.checkedUsers.splice(index, 1); // Remove the user from the array
+        checkedSpans.splice(index, 1); // Remove the span from the array
+        checkedUsers.splice(index, 1); // Remove the user from the array
       } else {
-        that.checkedSpans.push(span); // Add the span to the array
-        that.checkedUsers.push(user); // Add the user to the array
+        checkedSpans.push(span); // Add the span to the array
+        checkedUsers.push(user); // Add the user to the array
       }
 
     } else {
       // Single selection: Uncheck all elements first and then check the current element again..
-      that.checkedSpans.forEach(function(item) {
+      checkedSpans.forEach(function(item) {
         item.removeClass("checked");
         if (withDelete)
           item.data("deleteImg").removeClass("visible");
       });
-      that.checkedSpans.length = 0; // Delete all array items.
-      that.checkedSpans.push(span);
+      checkedSpans.length = 0; // Delete all array items.
+      checkedSpans.push(span);
 
-      that.checkedUsers.length = 0; // Delete all array items.
-      that.checkedUsers.push(user);
+      checkedUsers.length = 0; // Delete all array items.
+      checkedUsers.push(user);
     }
 
     span.toggleClass("checked"); // Toggle the span
@@ -491,21 +501,23 @@ function addUserToSection(that, user, sectionUsers, role, withDelete, forceMulti
       var deleteImg = span.data("deleteImg"); // The reference to the delete image.
 
       // Check if delete buttons are or the delete all button is shown.
-      if (span.hasClass("checked") && that.checkedSpans.length == 1)
+      if (span.hasClass("checked") && checkedSpans.length == 1)
         deleteImg.addClass("visible");
       else
         deleteImg.removeClass("visible");
 
-      if (that.checkedSpans.length > 1) {
-        that.checkedSpans.forEach(function(item) {
+      if (checkedSpans.length > 1) {
+        checkedSpans.forEach(function(item) {
           item.data("deleteImg").removeClass("visible");
         });
         // that.btnDeleteUsers.addClass("visible");
-      } else if (that.checkedSpans.length == 1) {
-        that.checkedSpans[0].data("deleteImg").addClass("visible");
+      } else if (checkedSpans.length == 1) {
+        checkedSpans[0].data("deleteImg").addClass("visible");
         // that.btnDeleteUsers.removeClass("visible");
       }
     }
+    
+    console.log(checkedUsers);
   });
 
   if (checkedInitially)
@@ -521,9 +533,9 @@ function addUserToSection(that, user, sectionUsers, role, withDelete, forceMulti
     deleteImg.on("click", function(event) {
       span.remove();
       // Update the arrays
-      var index = that.checkedSpans.indexOf(span); // The index of the clicked span
-      that.checkedSpans.splice(index, 1); // Remove the span from the array
-      that.checkedUsers.splice(index, 1); // Remove the user from the array
+      var index = checkedSpans.indexOf(span); // The index of the clicked span
+      checkedSpans.splice(index, 1); // Remove the span from the array
+      checkedUsers.splice(index, 1); // Remove the user from the array
 
       Modules.UserManager.removeUser(that.objData, role, user);
 

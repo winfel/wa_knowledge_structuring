@@ -6,17 +6,18 @@ GUI.rightmanagerDialog = new function() {
 
   var rightsObjects = ["PaperObject", "Subroom"]; // It is used...
 
-  var rmd = null;
-  var rmdTabs = null;
-  var rmdTabList = null;
-  var rmdTabItemAdd = null; // It is used...
+  var rmd;
+  var rmdTabs;
+  var rmdTabList;
+  var rmdTabItemAdd; // It is used...
+  var activeRole;
+  var deleteButton;
 
-  var obj = null;
-  var objData = null; // It is used...
+  var obj;
+  var objData; // It is used...
 
-
-  var checkedUsers = null; // Keep track of the selected users. Needed for a delete server call.
-  var checkedSpans = null; // Keep track of the corresponding spans, which display a user.
+  var checkedUsers; // Keep track of the selected users. Needed for a delete server call.
+  var checkedSpans; // Keep track of the corresponding spans, which display a user.
 
   /*
    * Initializes the right manager dialog.
@@ -48,9 +49,9 @@ GUI.rightmanagerDialog = new function() {
           }
         },
         {
-          text: "Delete user",
-          click: function() {
-            //deleteusers();
+          text: "Delete users",
+          click: function(event) {
+            deleteUsers();
           }
         },
         {
@@ -66,6 +67,14 @@ GUI.rightmanagerDialog = new function() {
     // Store references to the particular elements in the dom list
     this.rmdTabs = $("#rmdTabs");
     this.rmdTabList = $("#rmdTabList");
+
+    this.checkedUsers = {};
+    this.checkedSpans = {};
+
+    this.activeRole = null;
+
+    this.deleteButton = $(".ui-dialog-buttonpane button:contains('Delete users')");
+    this.deleteButton.button("disable");
   }; // init functions ends
 
   /*
@@ -108,6 +117,9 @@ GUI.rightmanagerDialog = new function() {
     var index = 0;
     roles.forEach(function(role) {
       index++;
+      
+      if(!that.activeRole)
+        that.activeRole = role;
 
       // Create a tab for each role
       var listItem = $("<li>");
@@ -117,6 +129,13 @@ GUI.rightmanagerDialog = new function() {
         class: "tabs-header",
         href: "#tabs-" + index
       });
+
+      tabItem.on("click", function() {
+        that.activeRole = role;
+
+        checkDeleteUsersButton();
+      });
+
       tabItem.html(role.name);
       listItem.append(tabItem);
       that.rmdTabList.append(listItem);
@@ -181,14 +200,20 @@ GUI.rightmanagerDialog = new function() {
       sectionUsers.append('<h3 class="rightmanager-section-header">Users</h3><hr>');
       tabPage.append(sectionUsers);
 
+      // The delete button at the bottom of the dialog
+
       Modules.UserManager.getUsers(that.objData, role, GUI.username, function(users) {
 
-        that.checkedUsers = new Array();
-        that.checkedSpans = new Array();
+        that.checkedUsers[role.name] = new Array();
+        that.checkedSpans[role.name] = new Array();
 
         if (users.length > 0) {
           users.forEach(function(user) {
-            addUserToSection(that, user, sectionUsers, role, true);
+            var userSpan = addUserToSection(that, user, sectionUsers, role, true);
+
+            userSpan.on("click", function() {
+              checkDeleteUsersButton();
+            });
           });
         }
       });
@@ -367,19 +392,56 @@ GUI.rightmanagerDialog = new function() {
     var that = GUI.rightmanagerDialog;
 
     var selectedTabId = that.rmdTabs.tabs("option", "selected") + 1;
-    var role = $("#tabs-header-" + selectedTabId, that.rmdTabList).text();
 
     var resultCallback = function(users) {
       var sectionUsers = $("#rightmanager-user-section-" + selectedTabId);
 
       users.forEach(function(user) {
-        addUserToSection(that, user, sectionUsers, {name: role}, true);
+        var userSpan = addUserToSection(that, user, sectionUsers, that.activeRole, true);
 
-        Modules.UserManager.addUser(that.objData, {name: role}, user);
+        userSpan.on("click", function() {
+          checkDeleteUsersButton();
+        });
+
+        Modules.UserManager.addUser(that.objData, that.activeRole, user);
       });
     };
 
     GUI.userdialog.show(resultCallback);
+  }
+
+  /**
+   * Checks whether the delete users button is active or not. Depending on the selected role.
+   * 
+   * @returns {undefined}
+   */
+  function checkDeleteUsersButton() {
+    var that = GUI.rightmanagerDialog;
+
+    if (that.activeRole) {
+      // Check how many              
+      if (that.checkedSpans[that.activeRole.name].length > 0) {
+        that.deleteButton.button("enable");
+      } else {
+        that.deleteButton.button("disable");
+      }
+    } else {
+      that.deleteButton.button("disable");
+    }
+  }
+  ;
+
+  /**
+   * 
+   * @returns {undefined}
+   */
+  function deleteUsers() {
+    var that = GUI.rightmanagerDialog;
+
+    that.checkedSpans[that.activeRole.name].forEach(function(span) {
+      Modules.UserManager.removeUser(that.objData, that.activeRole, span.data("user"));
+      span.remove();
+    });
   }
 };
 
