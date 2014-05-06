@@ -53,6 +53,11 @@
   visibility: hidden;
 }
 
+.tabs-header img {
+  margin: 0 0 -4px 0;
+  padding: 1px 3px;
+}
+
 .rightmanager-right-label {
   margin-top: 1px;
   display: inline-block;

@@ -35,6 +35,8 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('enter', UserManager.enterRoom);
   Dispatcher.registerCall('leave', UserManager.leaveRoom);
 
+  Dispatcher.registerCall("umClearRoles", UserManager.clearRoles);
+  Dispatcher.registerCall("umLoadDefaultRoles", UserManager.loadDefaulRoles);
   Dispatcher.registerCall('umGetRoles', UserManager.getRoles);
   Dispatcher.registerCall('umAddRole', UserManager.addRole);
   Dispatcher.registerCall('umRemoveRole', UserManager.removeRole);
@@ -480,10 +482,54 @@ UserManager.getRoles = function(socket, data) {
 };
 
 /**
+ * 
+ * @param {type} socket
+ * @param {type} data
+ * @returns {undefined}
+ */
+UserManager.loadDefaulRoles = function(socket, data) {
+  var object = data.object;
+
+  var dbDefRoles = db.get("defroles");
+  var dbRoles = db.get("roles");
+  
+  // Remove the old roles first
+  dbRoles.remove({contextID: String(object.id)});
+  
+  // Load the default roles
+  dbDefRoles.find({object: String(object.type)}, {}, function(e, roles) {
+    roles.forEach(function(role) {
+      dbRoles.insert({
+        contextID: String(object.id),
+        name: String(role.name),
+        rights: role.rights,
+        mode: String("overwrite"),
+        users: new Array()
+      });
+    });
+    Modules.SocketServer.sendToSocket(socket, "umDefaultRoles" + object.id, roles);
+  });
+};
+
+/**
+ * 
+ * @param {type} socket
+ * @param {type} data
+ * @returns {undefined}
+ */
+UserManager.clearRoles = function(socket, data) {
+  var object = data.object;
+
+  var collection = db.get("roles");
+  
+  Modules.SocketServer.sendToSocket(socket, "umRolesCleared" + object.id);
+};
+
+/**
  *	The function can be used to add a user to a specific role
- *	@param {type}	role    The used role passed as a RoleObject
- *	@param {type}	object  The object that should be used to get the specfic role
- *	@param {type}   user    The user object that should be added
+ *	
+ *	@param {Object} socket  Socket connection
+ *	@param {Object}	data    Send data
  */
 UserManager.addUser = function(socket, data) {
   UserManager.modifyUser(data.role, data.object, data.username, true);

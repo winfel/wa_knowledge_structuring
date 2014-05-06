@@ -359,14 +359,9 @@ GUI.rightmanager = new function() {
     var that = GUI.rightmanager;
     var role = that.selectedRoleSpan.data("role");
 
-
     var resultCallback = function(users) {
-      console.log(role);
-      console.log(users);
-
       users.forEach(function(user) {
         addUserToSection(that, user, that.rmUsers, role, true);
-
         Modules.UserManager.addUser(that.objData, {name: role}, user);
       });
     };
@@ -387,7 +382,7 @@ GUI.rightmanager = new function() {
  * @returns {Object}                  The created checkbox.
  */
 function addRightToSection(that, right, role, sectionRights, checkedInitially) {
-  var inputId = role.name + "-" + right.name; // This id is used to link the input and the label
+  var inputId = role.name + "-" + right.name + "-" + Math.round(Math.random() * 100); // This id is used to link the input and the label
 
   var checkbox = $("<input>");
   checkbox.attr({

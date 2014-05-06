@@ -4,13 +4,7 @@
 
 GUI.rightmanagerDialog = new function() {
 
-  var rightsObjects = ["PaperObject", "Subroom"];
-  var roles = ["Writer", "Reviewer"];
-  var rights = [];
-  var allrights = ["create", "read", "write", "delete"];
-  var listitems = "";
-  var tabpages = "";
-  var plustabcontent = "";
+  var rightsObjects = ["PaperObject", "Subroom"]; // It is used...
 
   var rmd = null;
   var rmdTabs = null;
@@ -60,7 +54,7 @@ GUI.rightmanagerDialog = new function() {
           }
         },
         {
-          text: "Save",
+          text: "Done",
           click: function() {
             $(this).dialog("close");
           }
@@ -120,6 +114,7 @@ GUI.rightmanagerDialog = new function() {
       var tabItem = $("<a>");
       tabItem.attr({
         id: "tabs-header-" + index,
+        class: "tabs-header",
         href: "#tabs-" + index
       });
       tabItem.html(role.name);
@@ -132,7 +127,7 @@ GUI.rightmanagerDialog = new function() {
       });
       // Append the tab page to the DOM
       that.rmdTabs.append(tabPage);
-      
+
 
       var deleteImg = $("<img>");
       deleteImg.attr({
@@ -142,7 +137,7 @@ GUI.rightmanagerDialog = new function() {
       deleteImg.on("click", function(event) {
         listItem.remove(); // Remove the tab 
         tabPage.remove(); // Remove the tab content
-       
+
         Modules.UserManager.removeRole(that.objData, role);
 
         event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
@@ -150,7 +145,7 @@ GUI.rightmanagerDialog = new function() {
 
       tabItem.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
       tabItem.append(deleteImg);
-      
+
 
       // The specific section for rights
       // -------------------------------
@@ -340,9 +335,34 @@ GUI.rightmanagerDialog = new function() {
    * @returns {undefined}
    */
   function setDefaultRoles() {
-    alert("Well... You got me. This function is not implemented yet :).");
+    var that = GUI.rightmanagerDialog;
+
+    $("#confirmDialog").dialog({
+      title: "Load default roles",
+      resizable: false,
+      modal: true,
+      open: function() {
+        $("#confirmDialogMessage").html("The current roles of this object will be <b>permanently deleted</b> and cannot be recovered. <b>Are you sure?</b>");
+      },
+      buttons: {
+        "Delete the current roles": function() {
+          // Load default roles will delete the old roles and insert the default ones.
+          Modules.UserManager.loadDefaultRoles(that.objData, function(defaultRoles) {
+            updateTabs(defaultRoles);
+          });
+          $(this).dialog("close");
+        },
+        Cancel: function() {
+          $(this).dialog("close");
+        }
+      }
+    });
   }
 
+  /**
+   * 
+   * @returns {undefined}
+   */
   function openUserDialog() {
     var that = GUI.rightmanagerDialog;
 
@@ -351,7 +371,7 @@ GUI.rightmanagerDialog = new function() {
 
     var resultCallback = function(users) {
       var sectionUsers = $("#rightmanager-user-section-" + selectedTabId);
-      
+
       users.forEach(function(user) {
         addUserToSection(that, user, sectionUsers, {name: role}, true);
 

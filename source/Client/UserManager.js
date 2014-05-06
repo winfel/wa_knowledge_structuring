@@ -72,6 +72,35 @@ UserManager.getRoles = function(object, user, callback) {
   });
 };
 
+UserManager.loadDefaultRoles = function(object, callback) {
+
+  Dispatcher.registerCall("umDefaultRoles" + object.id, function(data) {
+    // call the callback
+    callback(data);
+
+    // deregister
+    Dispatcher.removeCall("umDefaultRoles" + object.id);
+  });
+  
+  Modules.SocketClient.serverCall("umLoadDefaultRoles", {
+    'object': object
+  });
+};
+
+UserManager.removeAllRoles = function(object, callback) {
+  Dispatcher.registerCall("umRolesCleared" + object.id, function(data) {
+    // call the callback
+    callback(data);
+
+    // deregister
+    Dispatcher.removeCall("umRolesCleared" + object.id);
+  });
+  
+  Modules.SocketClient.serverCall("umClearRoles", {
+    'object': object
+  });
+};
+
 /**
  * 
  * @param {type} object
