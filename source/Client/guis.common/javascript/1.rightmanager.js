@@ -29,7 +29,7 @@ GUI.userdialog = new function() {
         var newUser = $(this).val();
 
         if (newUser)
-          addUserToSection(that, newUser, that.searched, false, true, true);
+          addUserToSection(that, newUser, that.searched, false, false, true, true);
       }
     });
 
@@ -77,12 +77,12 @@ GUI.userdialog = new function() {
       that.searched.empty();
 
       users.forEach(function(user) {
-        addUserToSection(that, user.username, that.friendlist, false, true);
+        addUserToSection(that, user.username, that.friendlist, false, false, true);
       });
 
       var suggestedDummy = ["hugo", "egon", "fritz", "franz", "josef", "heinz"];
       suggestedDummy.forEach(function(user) {
-        addUserToSection(that, user, that.suggested, false, true);
+        addUserToSection(that, user, that.suggested, false, false, true);
       });
 
       that.inputfield.autocomplete({source: ["anna", "cindy", "anouk", "marissa", "dummy"]});
@@ -138,7 +138,7 @@ GUI.rightmanager = new function() {
       var role = $("#rmNewRoleTextfield").val();
       console.log(role);
     });
-    
+
     // Add user event
     $("#rmAddUsersButton").click(function() {
       openUserDialog();
@@ -205,7 +205,7 @@ GUI.rightmanager = new function() {
 
     if (users.length > 0) {
       users.forEach(function(user) {
-        var span = addUserToSection(that, user, that.rmUsers, true);
+        var span = addUserToSection(that, user, that.rmUsers, that.selectedRoleSpan.data("role"), true);
 
         span.on("click", function() {
           if (that.checkedSpans.length > 1) {
@@ -232,7 +232,7 @@ GUI.rightmanager = new function() {
     var that = GUI.rightmanager;
 
     that.obj = theObject;
-    that.objData = {id: 1, type: theObject.type}; //{id: theObject.id, type: theObject.type};
+    that.objData = {id: theObject.id, type: theObject.type};
 
     /* Display selected object information */
     var selectedObjects = ObjectManager.getSelected();
@@ -342,11 +342,12 @@ GUI.rightmanager = new function() {
         });
 
         // Initially
-        // 
-        // Get rights depending on the selected role...
-        Modules.RightManager.getRights(that.objData, that.selectedRoleSpan.data("role"), GUI.username, that.updateRightsSection);
-        // Get users depending on the selected role...
-        Modules.UserManager.getUsers(that.objData, that.selectedRoleSpan.data("role"), GUI.username, that.updateUsersSection);
+        if (that.selectedRoleSpan) {
+          // Get rights depending on the selected role...
+          Modules.RightManager.getRights(that.objData, that.selectedRoleSpan.data("role"), GUI.username, that.updateRightsSection);
+          // Get users depending on the selected role...
+          Modules.UserManager.getUsers(that.objData, that.selectedRoleSpan.data("role"), GUI.username, that.updateUsersSection);
+        }
       });
 
       this.containerSelected.show();
@@ -358,9 +359,15 @@ GUI.rightmanager = new function() {
     var that = GUI.rightmanager;
     var role = that.selectedRoleSpan.data("role");
 
+
     var resultCallback = function(users) {
+      console.log(role);
+      console.log(users);
+
       users.forEach(function(user) {
-        addUserToSection(that, user, that.rmUsers, true);
+        addUserToSection(that, user, that.rmUsers, role, true);
+
+        Modules.UserManager.addUser(that.objData, {name: role}, user);
       });
     };
 
@@ -424,13 +431,14 @@ function addRightToSection(that, right, role, sectionRights, checkedInitially) {
  *                                    The variables checkedSpans, checkedUsers and objData are needed.
  * @param {String}  user              The user to add
  * @param {Object}  sectionUsers      The section where to add the users to
+ * @param {Object}  role              The role the user has.
  * @param {bool}    withDelete        With or without delete button. If that.objData is not set, withDelete is set to false.
  * @param {bool}    forceMulti        Indicates whether multi selection is always enabled or not.
  * @param {bool}    checkedInitially  Indicates if the user is checked when added.
  * 
  * @returns {Object}                  The created span.
  */
-function addUserToSection(that, user, sectionUsers, withDelete, forceMulti, checkedInitially) {
+function addUserToSection(that, user, sectionUsers, role, withDelete, forceMulti, checkedInitially) {
   if (!that.objData)
     withDelete = false;
 
