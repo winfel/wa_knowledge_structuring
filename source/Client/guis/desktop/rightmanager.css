@@ -20,8 +20,14 @@
   overflow: hidden;
 }
 
+
+
 #rightmanagerDialog .rightmanager-user {
   width: auto;
+}
+
+#rightmanagerDialog .checked {
+  padding-right: 20px;
 }
 
 #rightmanagerDialog .rightmanager-user.show-delete-img:hover {
