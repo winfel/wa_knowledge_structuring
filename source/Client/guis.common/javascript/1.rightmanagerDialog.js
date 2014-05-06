@@ -11,7 +11,8 @@ GUI.rightmanagerDialog = new function() {
   var rmdTabList;
   var rmdTabItemAdd; // It is used...
   var activeRole;
-  var deleteButton;
+  
+  var doneButton, deleteButton;
 
   var obj;
   var objData; // It is used...
@@ -72,6 +73,9 @@ GUI.rightmanagerDialog = new function() {
     this.checkedSpans = {};
 
     this.activeRole = null;
+    
+    this.doneButton = $(".ui-dialog-buttonpane button:contains('Done')");
+    this.doneButton.button("disable");
 
     this.deleteButton = $(".ui-dialog-buttonpane button:contains('Delete users')");
     this.deleteButton.button("disable");
@@ -106,6 +110,9 @@ GUI.rightmanagerDialog = new function() {
    */
   function updateTabs(roles) {
     var that = GUI.rightmanagerDialog;
+    
+    if(roles.length > 0)
+      that.doneButton.button("enable");
 
     // Remove the previous tabs...
     that.rmdTabs.tabs("destroy");
@@ -158,6 +165,11 @@ GUI.rightmanagerDialog = new function() {
         tabPage.remove(); // Remove the tab content
 
         Modules.UserManager.removeRole(that.objData, role);
+        
+        if($("a.tabs-header", that.rmdTabs).length > 0)
+          that.doneButton.button("enable");
+        else
+          that.doneButton.button("disable");
 
         event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
       });
