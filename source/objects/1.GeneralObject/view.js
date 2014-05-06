@@ -324,7 +324,7 @@ GeneralObject.select = function(multiple, groupSelect) {
   // Update the right manager sidebar on the right
   
   GUI.rightmanager.updateContent(this);
-  GUI.rightmanagerDialog.show(this);
+  //GUI.rightmanagerDialog.show(this);
 
   if (!groupSelect && !multiple)
     GUI.showLinks(this);
