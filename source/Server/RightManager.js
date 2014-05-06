@@ -134,8 +134,8 @@ var fillCurrentDbWithTestData = function() {
     "patrick#234"
   ];
   var pushRoles = [
-    '1#1#RandomGuys#create,read#overwrite#joerg,vanessa,lisa,patrick',
-    '2#1#Boss#read#overwrite#vanessa,joerg'
+    '1#1#RandomGuys#create,read#overwrite#',
+    '2#1#Boss#read#overwrite#'
   ];
 
   /* clear tables */

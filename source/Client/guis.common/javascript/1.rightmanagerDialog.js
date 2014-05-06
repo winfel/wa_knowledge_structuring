@@ -60,7 +60,7 @@ GUI.rightmanagerDialog = new function() {
           }
         },
         {
-          text: "Close",
+          text: "Save",
           click: function() {
             $(this).dialog("close");
           }
@@ -138,7 +138,7 @@ GUI.rightmanagerDialog = new function() {
       sectionRights.attr({
         class: "rightmanager-section rightmanager-right-section"
       });
-      sectionRights.append('<h3 class="rightmanager-section-header">Rights</h3>');
+      sectionRights.append('<h3 class="rightmanager-section-header">Rights</h3><hr>');
       tabPage.append(sectionRights);
 
       Modules.RightManager.getRights(that.objData, role, GUI.username, function(availableRights, checkedRights) {
@@ -163,24 +163,22 @@ GUI.rightmanagerDialog = new function() {
         id: "rightmanager-user-section-" + index,
         class: "rightmanager-section rightmanager-user-section"
       });
-      sectionUsers.append('<h3 class="rightmanager-section-header">Users</h3>');
+      sectionUsers.append('<h3 class="rightmanager-section-header">Users</h3><hr>');
       tabPage.append(sectionUsers);
+
+      // include current that is currently logged in
+      addUserToSection(that, GUI.username, sectionUsers, true);
 
       Modules.UserManager.getUsers(that.objData, role, GUI.username, function(users) {
 
         that.checkedUsers = new Array();
         that.checkedSpans = new Array();
-
+  
         if (users.length > 0) {
           users.forEach(function(user) {
             addUserToSection(that, user, sectionUsers, true);
           });
-        } else {
-          // No user found => show a corresponding message.
-          var span = $("<span>");
-          span.html("No users found");
-          sectionUsers.append(span);
-        }
+        } 
       });
     });
 
