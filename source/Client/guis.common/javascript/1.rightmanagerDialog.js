@@ -11,7 +11,7 @@ GUI.rightmanagerDialog = new function() {
   var rmdTabList;
   var rmdTabItemAdd; // It is used...
   var activeRole;
-  
+
   var doneButton, deleteButton;
 
   var obj;
@@ -73,7 +73,7 @@ GUI.rightmanagerDialog = new function() {
     this.checkedSpans = {};
 
     this.activeRole = null;
-    
+
     this.doneButton = $(".ui-dialog-buttonpane button:contains('Done')");
     this.doneButton.button("disable");
 
@@ -110,8 +110,8 @@ GUI.rightmanagerDialog = new function() {
    */
   function updateTabs(roles) {
     var that = GUI.rightmanagerDialog;
-    
-    if(roles.length > 0)
+
+    if (roles.length > 0)
       that.doneButton.button("enable");
 
     // Remove the previous tabs...
@@ -124,8 +124,8 @@ GUI.rightmanagerDialog = new function() {
     var index = 0;
     roles.forEach(function(role) {
       index++;
-      
-      if(!that.activeRole)
+
+      if (!that.activeRole)
         that.activeRole = role;
 
       // Create a tab for each role
@@ -165,8 +165,8 @@ GUI.rightmanagerDialog = new function() {
         tabPage.remove(); // Remove the tab content
 
         Modules.UserManager.removeRole(that.objData, role);
-        
-        if($("a.tabs-header", that.rmdTabs).length > 0)
+
+        if ($("a.tabs-header", that.rmdTabs).length > 0)
           that.doneButton.button("enable");
         else
           that.doneButton.button("disable");
@@ -374,26 +374,33 @@ GUI.rightmanagerDialog = new function() {
   function setDefaultRoles() {
     var that = GUI.rightmanagerDialog;
 
-    $("#confirmDialog").dialog({
-      title: "Load default roles",
-      resizable: false,
-      modal: true,
-      open: function() {
-        $("#confirmDialogMessage").html("The current roles of this object will be <b>permanently deleted</b> and cannot be recovered. <b>Are you sure?</b>");
-      },
-      buttons: {
-        "Delete the current roles": function() {
-          // Load default roles will delete the old roles and insert the default ones.
-          Modules.UserManager.loadDefaultRoles(that.objData, function(defaultRoles) {
-            updateTabs(defaultRoles);
-          });
-          $(this).dialog("close");
+    if (that.activeRole) {
+      $("#confirmDialog").dialog({
+        title: "Load default roles",
+        resizable: false,
+        modal: true,
+        open: function() {
+          $("#confirmDialogMessage").html("The current roles of this object will be <b>permanently deleted</b> and cannot be recovered. <b>Are you sure?</b>");
         },
-        Cancel: function() {
-          $(this).dialog("close");
+        buttons: {
+          "Delete the current roles": function() {
+            // Load default roles will delete the old roles and insert the default ones.
+            Modules.UserManager.loadDefaultRoles(that.objData, function(defaultRoles) {
+              updateTabs(defaultRoles);
+            });
+            $(this).dialog("close");
+          },
+          Cancel: function() {
+            $(this).dialog("close");
+          }
         }
-      }
-    });
+      });
+    } else {
+      // Not roles yet...
+      Modules.UserManager.loadDefaultRoles(that.objData, function(defaultRoles) {
+        updateTabs(defaultRoles);
+      });
+    }
   }
 
   /**
