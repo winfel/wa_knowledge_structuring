@@ -16,7 +16,8 @@
     "json-socket": "~0.1.2",
     "lodash": "",
     "monk": "",
-    "etherpad-lite-client":""
+    "etherpad-lite-client": "",
+    "mongoose": "^3.8.8"
   },
   "devDependencies": {
     "superagent": "~0.15.7",
