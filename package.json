@@ -20,7 +20,11 @@
     "express": ">=4.x",
     "path": "*",
     "hbs": "*",
-    "validator": "*"
+    "validator": "*",
+    "everyauth": "*",
+    "body-parser": "*",
+    "cookie-parser": "*",
+    "express-session": "*"
   },
   "devDependencies": {
     "superagent": "~0.15.7",
