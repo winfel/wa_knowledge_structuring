@@ -159,3 +159,35 @@ UserManager.getUsers = function(object, role, user, callback) {
     'username': user
   });
 };
+
+/**
+ * 
+ * @param {type} object
+ * @param {type} role
+ * @param {type} callback
+ * @returns {undefined}
+ */
+UserManager.getMissingUsers = function(object, role, callback) {
+
+  Dispatcher.registerCall("umMissingUsers" + object.id, function(data) {
+    // call the callback
+    var users = new Array();
+    
+    data.allUsers.forEach(function(user) {
+      // If the user is not already added, push it to the result array.
+      if(data.alreadyAddedUsers.indexOf(user.username) < 0)
+        users.push(user);
+    });
+    callback(users);
+
+    // deregister
+    Dispatcher.removeCall("umMissingUsers" + object.id);
+  });
+
+  // The responce should be some sort of broadcast... Instead of
+
+  Modules.SocketClient.serverCall('umGetMissingUsers', {
+    'object': object,
+    'role': role
+  });
+};

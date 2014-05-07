@@ -38,6 +38,7 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall("umClearRoles", UserManager.clearRoles);
   Dispatcher.registerCall("umLoadDefaultRoles", UserManager.loadDefaulRoles);
   Dispatcher.registerCall('umGetRoles', UserManager.getRoles);
+  Dispatcher.registerCall("umGetMissingUsers", UserManager.getMissingUsers);
   Dispatcher.registerCall('umAddRole', UserManager.addRole);
   Dispatcher.registerCall('umRemoveRole', UserManager.removeRole);
 
@@ -492,10 +493,10 @@ UserManager.loadDefaulRoles = function(socket, data) {
 
   var dbDefRoles = db.get("defroles");
   var dbRoles = db.get("roles");
-  
+
   // Remove the old roles first
   dbRoles.remove({contextID: String(object.id)});
-  
+
   // Load the default roles
   dbDefRoles.find({object: String(object.type)}, {}, function(e, roles) {
     roles.forEach(function(role) {
@@ -521,7 +522,7 @@ UserManager.clearRoles = function(socket, data) {
   var object = data.object;
 
   var collection = db.get("roles");
-  
+
   Modules.SocketServer.sendToSocket(socket, "umRolesCleared" + object.id);
 };
 
@@ -586,6 +587,27 @@ UserManager.getUsers = function(socket, data) {
     var result = (docs.length > 0 ? docs[0].users : []);
 
     Modules.SocketServer.sendToSocket(socket, "umUsers" + data.object.id, result);
+  });
+};
+
+/**
+ * 
+ * @param {type} socket
+ * @param {type} data
+ * @returns {undefined}
+ */
+UserManager.getMissingUsers = function(socket, data) {
+  var dbRoles = db.get('roles');
+  var dbUsers = db.get('users');
+
+  dbUsers.find({}, {}, function(e, userDocuments) {
+
+    dbRoles.find({contextID: String(data.object.id), name: String(data.role.name)}, {}, function(e, roleDocuments) {
+
+      var result = (roleDocuments && roleDocuments.length > 0 ? roleDocuments[0].users : []);
+
+      Modules.SocketServer.sendToSocket(socket, "umMissingUsers" + data.object.id, {allUsers: userDocuments, alreadyAddedUsers: result});
+    });
   });
 };
 

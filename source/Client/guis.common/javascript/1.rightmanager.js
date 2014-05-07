@@ -63,12 +63,11 @@ GUI.userdialog = new function() {
    * @param {type} callback
    * @returns {undefined}
    */
-  this.show = function(callback) {
+  this.show = function(object, role, callback) {
     var that = GUI.userdialog;
 
     // Set the content of the dialog
-    Modules.RightManager.getAllUsers(function(users) {
-
+    Modules.UserManager.getMissingUsers(object, role, function(users) {
       that.checkedUsers = new Array();
       that.checkedSpans = new Array();
 
@@ -362,11 +361,11 @@ GUI.rightmanager = new function() {
     var resultCallback = function(users) {
       users.forEach(function(user) {
         addUserToSection(that, user, that.rmUsers, role, true);
-        Modules.UserManager.addUser(that.objData, {name: role}, user);
+        Modules.UserManager.addUser(that.objData, role, user);
       });
     };
 
-    GUI.userdialog.show(resultCallback);
+    GUI.userdialog.show(that.objData, role, resultCallback);
   }
 };
 

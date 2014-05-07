@@ -46,7 +46,7 @@ GUI.rightmanagerDialog = new function() {
         {
           text: "Add users",
           click: function() {
-            openUserDialog();
+            openUserDialog(that.activeRole);
           }
         },
         {
@@ -398,9 +398,10 @@ GUI.rightmanagerDialog = new function() {
 
   /**
    * 
+   * @param {Object} role 
    * @returns {undefined}
    */
-  function openUserDialog() {
+  function openUserDialog(role) {
     var that = GUI.rightmanagerDialog;
 
     var selectedTabId = that.rmdTabs.tabs("option", "selected") + 1;
@@ -419,7 +420,7 @@ GUI.rightmanagerDialog = new function() {
       });
     };
 
-    GUI.userdialog.show(resultCallback);
+    GUI.userdialog.show(that.objData, role, resultCallback);
   }
 
   /**
