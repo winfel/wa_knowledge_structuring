@@ -84,11 +84,10 @@ everyauth.password
         var errors = [];
         
         if (!newUserAttributes.login) errors.push('Missing username');
-        else if (!validator.isLength(newUserAttributes.login, 4, 8)) errors.push('Username should be 4 to 8 characters long');
+        else if (!validator.isLength(newUserAttributes.login, 3, 8)) errors.push('Username should be 3 to 8 characters long');
         if (!newUserAttributes.password) errors.push('Missing password');
         else if (!validator.isLength(newUserAttributes.password, 4, 8)) errors.push('Password should be 4 to 8 characters long');
-        if (!newUserAttributes.e_mail) errors.push('Missing e-mail');
-        else if (!validator.isEmail(newUserAttributes.e_mail)) errors.push('A valid email is required');
+        if ((newUserAttributes.e_mail) && (!validator.isEmail(newUserAttributes.e_mail))) errors.push('A valid email is required');
         
         return errors;
     })
