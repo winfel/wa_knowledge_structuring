@@ -99,5 +99,20 @@ theObject.onEnter=function(object,oldData,newData){
 			});
 		}
 	}
+	else if(object.get('type')=='File' && (object.getAttribute('mimeType')=='text/html' || object.getName().match(/\.html?$/i)))
+	{
+		if(this.getAttribute('exportFormat')=='pdf')
+		{
+			console.log('exporting normal html-file to pdf');
+			var html = object.getContentAsString();
+			// convert html to pdf
+			Modules.EtherpadController.convertToPdf(html, function(pdfcontent){
+
+				// create pdf file object in webarena
+				createFile(object.getName().replace(/(\.html?)?$/i, '.pdf'), pdfcontent, 'application/pdf');
+			});
+		}
+	}
+
 	this.fireEvent('enter',object);
 };
