@@ -54,7 +54,7 @@ $(function() {
 			
 			xhr.addEventListener("load",function() {
 				GUI.progressBarManager.updateProgress(progressBarId, 100, GUI.translate("Upload completed"), true);
-				GUI.tagManager.open(newObject, 600, 600,false);
+				
 			},false);
 			
 			xhr.addEventListener("error",function() {
@@ -74,7 +74,7 @@ $(function() {
 			newObject.setAttribute('mimeType',mimeType);
 			newObject.setAttribute('name',filename);
 			
-		
+			GUI.tagManager.open(newObject, 600, 600,false);
 			
 		});
 				

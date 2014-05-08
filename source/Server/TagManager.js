@@ -59,6 +59,10 @@ var TagManager = function() {
 	Dispatcher.registerCall('deleteSecTags', function(socket, data, responseID) {
 		that.deleteSecTags(socket, data.mainTag, data.secTag); 
 	});
+	
+	Dispatcher.registerCall('deleteMainTag', function(socket, data, responseID) {
+		that.deleteMainTag(socket, data.mainTag); 
+	});
  
   };
   
@@ -139,11 +143,28 @@ var TagManager = function() {
 			
 		dbMainTags.insert(
 		   [
-			  { id: newId, name: newMainTag, 
-			    secTags: [] }
+			  { 
+				  id: newId,
+				  name: newMainTag,				  
+			      secTags: [] 
+			  }
 		   ]	
 		);	
 		
+	};
+	
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.deleteMainTag = function(socket, mainTag) {
+
+		var dbMainTags = db.get('MainTags');
+
+		dbMainTags.remove({name: mainTag},{justOne: true});
+
 	};
 	  
 };
