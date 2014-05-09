@@ -158,7 +158,7 @@ GUI.tagManager= new function() {
 		
 		//click event handler for the buttons which represent the main tags
 		//sets the main tag of the file object to the clicked main tag
-		$("#mainTag :button").live("click", function(){
+		$("#mainTag :button").die().live("click", function(){
 			
 			var newMainTag = $(this).text();
 			
@@ -196,7 +196,7 @@ GUI.tagManager= new function() {
 		
 		// event handler for the input field for creation of custom main tags
 		// creates new main tag and assigns it to the file object		
-		$("#custom-Main-tag").live("keyup", function(event) {
+		$("#custom-Main-tag").die().live("keyup", function(event) {
 			var that = GUI.tagManager;
 			var customMainTagValue = $(this).val();
 			
@@ -258,7 +258,7 @@ GUI.tagManager= new function() {
 		
 		// event handler for the input field for creation of custom secondary tags
 		// creates new secondary tag and assigns it to the file object		
-		$("#custom-Sec-tag").live("keyup", function(event) {
+		$("#custom-Sec-tag").die().live("keyup", function(event) {
 			var that = GUI.tagManager;
 			var customSecTagValue = $(this).val();
 			
