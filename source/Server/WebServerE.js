@@ -346,8 +346,8 @@ app.get('/objectIcons/:objectType/:section?', function(req, res, next) {
     res.sendfile(path.resolve(__dirname, obj.localIconPath(req.params.section)));
 });
 
-// TODO: test this
-app.post('/setContent/:roomID/:objectID', function(req, res, next) {
+
+app.post('/setContent/:roomID/:objectID/:hash', function(req, res, next) {
     var roomID = req.params.roomID
     var objectID = req.params.objectID
     
