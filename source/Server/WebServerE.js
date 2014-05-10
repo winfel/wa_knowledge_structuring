@@ -207,7 +207,9 @@ app.get('/getContent/:roomID/:objectID/:p3/:hash', function(req, res, next) {
     }
 
     var mimeType = object.getAttribute('mimeType') || 'text/plain';
-    res.set('Content-Type', mimeType);
+    
+    res.set('Content-Type', mimeType + '; charset=ISO-8859-1');
+    res.set('Content-Disposition', 'inline; filename="' + object.getAttribute("name") + '"');
     
     if (Modules.Connector.getContentStream !== undefined) {
         var objStream = Modules.Connector.getContentStream(req.params.roomID, req.params.objectID, context);
