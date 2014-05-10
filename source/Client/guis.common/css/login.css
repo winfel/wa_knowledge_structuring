@@ -20,11 +20,11 @@
 
 #login {
 	width: 400px;
-	height: 250px;
+	height: 285px;
 	background-color: #FFFFFF;
 	border: 1px solid #C7C7C7;
 	position: absolute;
-	top: 70px;
+	top: 40px;
 	left: 50%;
 	margin-left: -200px;
 	z-index: 15001;
@@ -127,7 +127,7 @@
 
 #sign_up {
 	width: 400px;
-	height: 250px;
+	height: 295px;
 	background-color: #FFFFFF;
 	border: 1px solid #C7C7C7;
 	position: absolute;
