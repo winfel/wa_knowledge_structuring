@@ -48,6 +48,8 @@ UserManager.init = function(theModules) {
 
   Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);
 
+  Dispatcher.registerCall('umIsManager', UserManager.isManager);
+
   /* get all exiting access rights from the database */
   var collection = db.get('rights');
   collection.find({}, {}, function(e, docs) {
@@ -493,25 +495,32 @@ UserManager.getRoles = function(socket, data) {
 };
 
 UserManager.isManager = function(socket, data) {
-  var collection = db.get('roles');
+ var collection = db.get('roles');
 
-  collection.find({contextID: String(data.object.id)}, {}, function(e, docs) {
-    docs.forEach(function(doc){
-      if(doc.name == "Manager"){
+ collection.find({contextID: String(data.object.id)}, {}, function(e,
+  docs) {
 
-        var found = false;
-        doc.users.forEach(function(u){
-          
+   docs.forEach(function(doc){
+     if(doc.name == "Manager"){
 
+       var found = false;
+       doc.users.forEach(function(u){
+         if (GUI.username == u)
+           found=true;
+       });
 
-        });
-        Modules.SocketServer.sendToSocket(socket, "umIsManager" + data.object.id, docs);
-      }  
+       if (found) {
+         Modules.SocketServer.sendToSocket(socket, "umIsManager" + data.object.id, docs);
+       } else {
+         Modules.SocketServer.sendToSocket(socket, "umIsNotManager" + data.object.id, docs);
+       }
+     }
 
-    });
-  });
+   });
+ });
 
 };
+
 
 /**
  * 
