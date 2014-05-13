@@ -492,17 +492,18 @@ UserManager.getRoles = function(socket, data) {
 };
 
 UserManager.isManager = function(socket, data) {
+  var that = UserManager;
+  var connection = that.getConnectionBySocket(socket);
+
   var collection = db.get('roles');
 
-  collection.find({contextID: String(data.object.id)}, {}, function(e,
-          docs) {
-
+  collection.find({contextID: String(data.object.id)}, {}, function(e, docs) {
     docs.forEach(function(doc) {
       if (doc.name == "Manager") {
 
         var found = false;
         doc.users.forEach(function(u) {
-          if (data.username == u)
+          if (connection.user.username == u)
             found = true;
         });
 
@@ -512,7 +513,6 @@ UserManager.isManager = function(socket, data) {
           Modules.SocketServer.sendToSocket(socket, "umIsNotManager" + data.object.id, docs);
         }
       }
-
     });
   });
 };

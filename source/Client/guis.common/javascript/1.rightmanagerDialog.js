@@ -47,7 +47,7 @@ GUI.rightmanagerDialog = new function() {
           text: "Add users",
           click: function() {
             /* check if user is in manager-role */
-            Modules.UserManager.isManager(that.objData, GUI.username, function(result){
+            Modules.UserManager.isManager(that.objData, function(result){
               /* If so: */
               if(result)
                 openUserDialog(that.activeRole);

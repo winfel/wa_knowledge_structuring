@@ -70,7 +70,7 @@ UserManager.getRoles = function(object, callback) {
   });
 };
 
-UserManager.isManager = function(object, user, callback) {
+UserManager.isManager = function(object, callback) {
 
    Dispatcher.registerCall("umIsManager" + object.id, function() {
       // call the callback
@@ -89,8 +89,7 @@ UserManager.isManager = function(object, user, callback) {
   // The responce should be some sort of broadcast... Instead of
 
   Modules.SocketClient.serverCall('umIsManager', {
-    'object': object,
-    'username': user
+    'object': object
   });
 };
 
