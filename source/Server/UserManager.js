@@ -459,7 +459,7 @@ UserManager.modifyRole = function(socket, data, add) {
 
   /* add resp. remove the role */
   if (add == true) {
-    if(role.name == "Owner"){
+    if(role.name == "Manager"){
       /* overwrite rights and users */
       role.rights = ["create","read","update","delete"];
       role.users = [data.username];
@@ -473,8 +473,8 @@ UserManager.modifyRole = function(socket, data, add) {
       users: role.users});
 
   } else {
-    if(role.name == "Owner"){
-      console.log("you cannot remove the owner role!");
+    if(role.name == "Manager"){
+      console.log("you cannot remove the manager role!");
     }else{
       console.log("trying to remove : " + role.contextID + " | " + role.name);
       collection.remove({contextID: String(role.contextID),
@@ -504,13 +504,13 @@ UserManager.loadDefaulRoles = function(socket, data) {
   var dbDefRoles = db.get("defroles");
   var dbRoles = db.get("roles");
 
-  // get current owner
-  dbRoles.find({contextID: String(object.id),name:"Owner"}, {}, function(e, owner) {
+  // get current manager
+  dbRoles.find({contextID: String(object.id),name:"Manager"}, {}, function(e, owner) {
 
     var createTmpOwner = { contextID : owner[0].contextID,
                           rights : owner[0].rights,
                           users: owner[0].users,
-                          name : "Owner",
+                          name : "Manager",
                           mode: "overwrite" };
 
       // Load the default roles

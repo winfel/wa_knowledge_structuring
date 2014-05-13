@@ -271,7 +271,7 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
 		// SciWoAr added owner of an object
 		Modules.UserManager.modifyRole(null,
 										{object : object, 
-										role : {name : "Owner"},
+										role : {name : "Manager"},
 										username : context.user.username},
 										true);
 
