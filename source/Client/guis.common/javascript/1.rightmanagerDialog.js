@@ -46,11 +46,12 @@ GUI.rightmanagerDialog = new function() {
         {
           text: "Add users",
           click: function() {
-
             /* check if user is in manager-role */
-
-            /* If so: */
-            openUserDialog(that.activeRole);
+            Modules.UserManager.isManager(that.objData, GUI.username, function(result){
+              /* If so: */
+              if(result)
+                openUserDialog(that.activeRole);
+              });
           }
         },
         {
