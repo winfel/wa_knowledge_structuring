@@ -542,7 +542,9 @@ UserManager.loadDefaulRoles = function(socket, data) {
                           users: owner[0].users,
                           name : "Manager",
                           mode: "overwrite" };
-
+                    
+      dbRoles.remove({contextID: String(object.id)});
+                          
       // Load the default roles
       dbDefRoles.find({object: String(object.type)}, {}, function(e, roles) {
         roles.push(createTmpOwner);
@@ -553,7 +555,7 @@ UserManager.loadDefaulRoles = function(socket, data) {
             name: String(role.name),
             rights: role.rights,
             mode: String("overwrite"),
-            users: new Array()
+            users: role.users
           });
         });
         Modules.SocketServer.sendToSocket(socket, "umDefaultRoles" + object.id, roles);
