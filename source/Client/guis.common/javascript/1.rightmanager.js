@@ -277,7 +277,7 @@ GUI.rightmanager = new function() {
       that.selectedRoleSpan = null;
 
       /* Get Roles of selected object and write the roles into combobox */
-      Modules.UserManager.getRoles(that.objData, GUI.username, function(roles) {
+      Modules.UserManager.getRoles(that.objData, function(roles) {
         that.rmRoles.empty();
 
         roles.forEach(function(role) {
@@ -311,41 +311,45 @@ GUI.rightmanager = new function() {
 
             // Update the other sections
             // Get rights depending on the selected role...
-            Modules.RightManager.getRights(that.objData, role, GUI.username, that.updateRightsSection);
+            Modules.RightManager.getRights(that.objData, role, that.updateRightsSection);
             // Get users depending on the selected role...
-            Modules.UserManager.getUsers(that.objData, role, GUI.username, that.updateUsersSection);
+            Modules.UserManager.getUsers(that.objData, role, that.updateUsersSection);
           });
 
-          var deleteImg = $("<img>");
-          deleteImg.attr("alt", "Delete");
-          deleteImg.attr("src", "/guis.common/images/oxygen/16x16/actions/edit-delete.png");
-          deleteImg.on("click", function(event) {
-            span.remove();
+          if (!role.readonly) {
+            var deleteImg = $("<img>");
+            deleteImg.attr("alt", "Delete");
+            deleteImg.attr("src", "/guis.common/images/oxygen/16x16/actions/edit-delete.png");
+            deleteImg.on("click", function(event) {
+              span.remove();
 
-            Modules.UserManager.removeRole(that.objData, role);
+              Modules.UserManager.removeRole(that.objData, role);
 
-            // We don't want to fire the span click event. That's why we stop the propagation.
-            event.stopPropagation();
-          });
-          span.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
-          span.append(deleteImg);
-
+              // We don't want to fire the span click event. That's why we stop the propagation.
+              event.stopPropagation();
+            });
+            span.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
+            span.append(deleteImg);
+          }
+          
           that.rmRoles.append(span);
 
           // Initially
           if (!that.selectedRoleSpan) {
             that.selectedRoleSpan = span;
             that.selectedRoleSpan.addClass("checked");
-            that.selectedRoleSpan.data("deleteImg").addClass("visible");
+            
+            if(that.selectedRoleSpan.data("deleteImg"))
+              that.selectedRoleSpan.data("deleteImg").addClass("visible");
           }
         });
 
         // Initially
         if (that.selectedRoleSpan) {
           // Get rights depending on the selected role...
-          Modules.RightManager.getRights(that.objData, that.selectedRoleSpan.data("role"), GUI.username, that.updateRightsSection);
+          Modules.RightManager.getRights(that.objData, that.selectedRoleSpan.data("role"), that.updateRightsSection);
           // Get users depending on the selected role...
-          Modules.UserManager.getUsers(that.objData, that.selectedRoleSpan.data("role"), GUI.username, that.updateUsersSection);
+          Modules.UserManager.getUsers(that.objData, that.selectedRoleSpan.data("role"), that.updateUsersSection);
         }
       });
 
@@ -435,10 +439,10 @@ function addRightToSection(that, right, role, sectionRights, checkedInitially) {
 function addUserToSection(that, user, sectionUsers, role, withDelete, forceMulti, checkedInitially) {
   if (!that.objData)
     withDelete = false;
-  
+
   var checkedSpans, checkedUsers;
-  
-  if(that.checkedSpans[role.name]) {
+
+  if (that.checkedSpans[role.name]) {
     checkedSpans = that.checkedSpans[role.name];
     checkedUsers = that.checkedUsers[role.name];
   } else {
@@ -496,7 +500,7 @@ function addUserToSection(that, user, sectionUsers, role, withDelete, forceMulti
 
     span.toggleClass("checked"); // Toggle the span
 
-    if (withDelete) {
+    if (withDelete && !role.readonly) {
       var deleteImg = span.data("deleteImg"); // The reference to the delete image.
 
       // Check if delete buttons are or the delete all button is shown.
@@ -515,7 +519,7 @@ function addUserToSection(that, user, sectionUsers, role, withDelete, forceMulti
         // that.btnDeleteUsers.removeClass("visible");
       }
     }
-    
+
     console.log(checkedUsers);
   });
 

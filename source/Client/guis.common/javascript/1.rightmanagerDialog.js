@@ -99,7 +99,7 @@ GUI.rightmanagerDialog = new function() {
       that.obj = theObject;
       that.objData = {id: theObject.id, type: theObject.type}; // { id: theObject.id, type: theObject.type };
 
-      Modules.UserManager.getRoles(that.objData, GUI.username, updateTabs);
+      Modules.UserManager.getRoles(that.objData, updateTabs);
 
       // Open the dialog
       this.rmd.dialog("open");
@@ -158,29 +158,29 @@ GUI.rightmanagerDialog = new function() {
       // Append the tab page to the DOM
       that.rmdTabs.append(tabPage);
 
+      if (!role.readonly) {
+        var deleteImg = $("<img>");
+        deleteImg.attr({
+          alt: "Delete",
+          src: "/guis.common/images/oxygen/16x16/actions/edit-delete.png"
+        });
+        deleteImg.on("click", function(event) {
+          listItem.remove(); // Remove the tab 
+          tabPage.remove(); // Remove the tab content
 
-      var deleteImg = $("<img>");
-      deleteImg.attr({
-        alt: "Delete",
-        src: "/guis.common/images/oxygen/16x16/actions/edit-delete.png"
-      });
-      deleteImg.on("click", function(event) {
-        listItem.remove(); // Remove the tab 
-        tabPage.remove(); // Remove the tab content
+          Modules.UserManager.removeRole(that.objData, role);
 
-        Modules.UserManager.removeRole(that.objData, role);
+          if ($("a.tabs-header", that.rmdTabs).length > 0)
+            that.doneButton.button("enable");
+          else
+            that.doneButton.button("disable");
 
-        if ($("a.tabs-header", that.rmdTabs).length > 0)
-          that.doneButton.button("enable");
-        else
-          that.doneButton.button("disable");
+          event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
+        });
 
-        event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
-      });
-
-      tabItem.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
-      tabItem.append(deleteImg);
-
+        tabItem.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
+        tabItem.append(deleteImg);
+      }
 
       // The specific section for rights
       // -------------------------------
@@ -191,7 +191,7 @@ GUI.rightmanagerDialog = new function() {
       sectionRights.append('<h3 class="rightmanager-section-header">Rights</h3><hr>');
       tabPage.append(sectionRights);
 
-      Modules.RightManager.getRights(that.objData, role, GUI.username, function(availableRights, checkedRights) {
+      Modules.RightManager.getRights(that.objData, role, function(availableRights, checkedRights) {
         // Finally add the rights to the rights section
         if (availableRights.length > 0) {
           availableRights.forEach(function(right) {
@@ -218,7 +218,7 @@ GUI.rightmanagerDialog = new function() {
 
       // The delete button at the bottom of the dialog
 
-      Modules.UserManager.getUsers(that.objData, role, GUI.username, function(users) {
+      Modules.UserManager.getUsers(that.objData, role, function(users) {
 
         that.checkedUsers[role.name] = new Array();
         that.checkedSpans[role.name] = new Array();
@@ -340,7 +340,7 @@ GUI.rightmanagerDialog = new function() {
       }
 
       // Update the tabs
-      Modules.UserManager.getRoles(that.objData, GUI.username, function(roles) {
+      Modules.UserManager.getRoles(that.objData, function(roles) {
         updateTabs(roles);
 
         that.rmdTabs.tabs("select", index);

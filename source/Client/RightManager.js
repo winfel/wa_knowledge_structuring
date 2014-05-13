@@ -24,10 +24,11 @@ var RightManager = new function() {
    *	represents if the current user has the right 
    *	to perform a specific command.
    *	
-   *	@param {type} command   The used command (access right), e.g., read, write (CRUD)
-   *	@param {type} object    The object that should be checked	
+   *	@param {String}   command   The used command (access right), e.g., read, write (CRUD)
+   *	@param {Object}   object    The object that should be checked	
+   *	@param {function} callback  The callback function
    */
-  this.hasAccess = function(command, object, user, callback) {
+  this.hasAccess = function(command, object, callback) {
     Dispatcher.registerCall("rmAccessGranted" + object.id, function() {
       // call the callback
       callback(true);
@@ -44,24 +45,21 @@ var RightManager = new function() {
 
     Modules.SocketClient.serverCall('rmHasAccess', {
       'command': command,
-      'object': object,
-      'username': user
+      'object': object
     });
 
     //callback(true);
   };
 
   /**
-   * 
+   * Returns the rights for a particular object and role.
    * 
    * @param {type} object   The object
    * @param {type} user     The current user
    * @param {type} callback
    * @returns {undefined}
    */
-  this.getRights = function(object, role, user, callback) {
-    console.log("Client getRights called!");
-
+  this.getRights = function(object, role, callback) {
     Dispatcher.registerCall("rmObjectRights" + object.id, function(data) {
       callback(data.availableRights, data.checkedRights);
       Dispatcher.removeCall("rmObjectRights" + object.id);
@@ -69,8 +67,7 @@ var RightManager = new function() {
 
     Modules.SocketClient.serverCall('rmGetObjectRights', {
       'object': object,
-      'role': role,
-      'username': user
+      'role': role
     });
   };
 

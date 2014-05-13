@@ -50,15 +50,14 @@ UserManager.modifyRole = function(object, role, grant) {
 /**
  * 
  * @param {type} object
- * @param {type} user
  * @param {type} callback
  * @returns {undefined}
  */
-UserManager.getRoles = function(object, user, callback) {
+UserManager.getRoles = function(object, callback) {
 
-  Dispatcher.registerCall("umGetRoles" + object.id, function(data) {
-    // call the callback
-    callback(data);
+  Dispatcher.registerCall("umGetRoles" + object.id, function(roles) {
+    roles = prepareRoles(roles);
+    callback(roles);
 
     // deregister
     Dispatcher.removeCall("umGetRoles" + object.id);
@@ -67,25 +66,61 @@ UserManager.getRoles = function(object, user, callback) {
   // The responce should be some sort of broadcast... Instead of
 
   Modules.SocketClient.serverCall('umGetRoles', {
-    'object': object,
-    'username': user
+    'object': object
   });
 };
 
 UserManager.loadDefaultRoles = function(object, callback) {
 
-  Dispatcher.registerCall("umDefaultRoles" + object.id, function(data) {
-    // call the callback
-    callback(data);
+  Dispatcher.registerCall("umDefaultRoles" + object.id, function(roles) {
+    roles = prepareRoles(roles);
+    callback(roles);
 
     // deregister
     Dispatcher.removeCall("umDefaultRoles" + object.id);
   });
-  
+
   Modules.SocketClient.serverCall("umLoadDefaultRoles", {
     'object': object
   });
 };
+
+/**
+ * Prepares the given roles for the user interface.
+ * 
+ * @param {type} roles
+ * @returns {Array}
+ */
+function prepareRoles(roles) {
+  var username = GUI.username;
+  var rolesOfUser = new Array();
+  var isManager = false;
+
+  // Check if the user is a manager of this object
+  roles.forEach(function(role) {
+    if (role.name.toLowerCase() == "manager"
+            && role.users.indexOf(username) > -1) {
+      isManager = true;
+    }
+  });
+
+
+  roles.forEach(function(role) {
+    role.readonly = !isManager;
+    
+    if(role.name.toLowerCase() == "manager")
+      role.readonly = true;
+
+    if (role.users.indexOf(username) > -1) {
+      rolesOfUser.push(role);
+    }
+  });
+
+  if (isManager)
+    return roles;
+  else
+    return rolesOfUser;
+}
 
 UserManager.removeAllRoles = function(object, callback) {
   Dispatcher.registerCall("umRolesCleared" + object.id, function(data) {
@@ -95,7 +130,7 @@ UserManager.removeAllRoles = function(object, callback) {
     // deregister
     Dispatcher.removeCall("umRolesCleared" + object.id);
   });
-  
+
   Modules.SocketClient.serverCall("umClearRoles", {
     'object': object
   });
@@ -137,11 +172,10 @@ UserManager.removeUser = function(object, role, user) {
  * 
  * @param {type} object
  * @param {type} role
- * @param {type} user
  * @param {type} callback
  * @returns {undefined}
  */
-UserManager.getUsers = function(object, role, user, callback) {
+UserManager.getUsers = function(object, role, callback) {
 
   Dispatcher.registerCall("umUsers" + object.id, function(data) {
     // call the callback
@@ -155,8 +189,7 @@ UserManager.getUsers = function(object, role, user, callback) {
 
   Modules.SocketClient.serverCall('umGetUsers', {
     'object': object,
-    'role': role,
-    'username': user
+    'role': role
   });
 };
 
@@ -172,10 +205,10 @@ UserManager.getMissingUsers = function(object, role, callback) {
   Dispatcher.registerCall("umMissingUsers" + object.id, function(data) {
     // call the callback
     var users = new Array();
-    
+
     data.allUsers.forEach(function(user) {
       // If the user is not already added, push it to the result array.
-      if(data.alreadyAddedUsers.indexOf(user.username) < 0)
+      if (data.alreadyAddedUsers.indexOf(user.username) < 0)
         users.push(user);
     });
     callback(users);

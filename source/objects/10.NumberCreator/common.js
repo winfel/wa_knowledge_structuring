@@ -27,7 +27,7 @@ NumberCreator.register = function(type) {
 
   this.registerAction("createNumericObject", function(object) {
     var dummy = {id: "1"};
-    Modules.RightManager.hasAccess("create", dummy, GUI.username, function(result) {
+    Modules.RightManager.hasAccess("create", dummy, function(result) {
       var theValue = object.getAttribute("value");
       if (result) {
         ObjectManager.createObject("NumericObject", {value: theValue});

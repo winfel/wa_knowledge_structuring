@@ -398,7 +398,7 @@ ObjectManager.loadRoom = function(roomid, byBrowserNav, index, callback) {
   var dummy = {};
   dummy.id = 1;
   
-  Modules.RightManager.hasAccess("create", dummy, GUI.username, function(result) {
+  Modules.RightManager.hasAccess("create", dummy, function(result) {
     console.log("42 " + result);
   });
   // in coupling mode: do not load room on both sides
