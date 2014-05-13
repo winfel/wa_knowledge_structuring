@@ -48,6 +48,8 @@ UserManager.init = function(theModules) {
 
   Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);
 
+  Dispatcher.registerCall('umIsManager', UserManager.isManager);
+
   /* get all exiting access rights from the database */
   var collection = db.get('rights');
   collection.find({}, {}, function(e, docs) {
