@@ -46,6 +46,10 @@ GUI.rightmanagerDialog = new function() {
         {
           text: "Add users",
           click: function() {
+
+            /* check if user is in manager-role */
+
+            /* If so: */
             openUserDialog(that.activeRole);
           }
         },

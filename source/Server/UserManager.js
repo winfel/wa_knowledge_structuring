@@ -492,6 +492,27 @@ UserManager.getRoles = function(socket, data) {
 
 };
 
+UserManager.isManager = function(socket, data) {
+  var collection = db.get('roles');
+
+  collection.find({contextID: String(data.object.id)}, {}, function(e, docs) {
+    docs.forEach(function(doc){
+      if(doc.name == "Manager"){
+
+        var found = false;
+        doc.users.forEach(function(u){
+          
+
+
+        });
+        Modules.SocketServer.sendToSocket(socket, "umIsManager" + data.object.id, docs);
+      }  
+
+    });
+  });
+
+};
+
 /**
  * 
  * @param {type} socket
