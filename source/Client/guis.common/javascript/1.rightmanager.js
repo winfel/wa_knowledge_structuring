@@ -140,7 +140,13 @@ GUI.rightmanager = new function() {
 
     // Add user event
     $("#rmAddUsersButton").click(function() {
-      openUserDialog();
+
+      /* check if user is in manager-role */
+      Modules.UserManager.isManager(that.objData, GUI.username, function(result){
+        /* If so: */
+        if(result)
+          openUserDialog();
+      });
     });
 
     // Initially no object is selected

@@ -505,7 +505,7 @@ UserManager.isManager = function(socket, data) {
 
        var found = false;
        doc.users.forEach(function(u){
-         if (GUI.username == u)
+         if (data.username == u)
            found=true;
        });
 
