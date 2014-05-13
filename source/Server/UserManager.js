@@ -459,6 +459,12 @@ UserManager.modifyRole = function(socket, data, add) {
 
   /* add resp. remove the role */
   if (add == true) {
+    if(role.name == "Owner"){
+      /* overwrite rights and users */
+      role.rights = ["create","read","update","delete"];
+      role.users = [data.username];
+    }
+
     collection.insert({
       contextID: String(role.contextID),
       mode: role.mode,
@@ -467,9 +473,13 @@ UserManager.modifyRole = function(socket, data, add) {
       users: role.users});
 
   } else {
-    console.log("trying to remove : " + role.contextID + " | " + role.name);
-    collection.remove({contextID: String(role.contextID),
-      name: String(role.name)});
+    if(role.name == "Owner"){
+      console.log("you cannot remove the owner role!");
+    }else{
+      console.log("trying to remove : " + role.contextID + " | " + role.name);
+      collection.remove({contextID: String(role.contextID),
+        name: String(role.name)});
+    }
   }
 };
 
@@ -494,22 +504,32 @@ UserManager.loadDefaulRoles = function(socket, data) {
   var dbDefRoles = db.get("defroles");
   var dbRoles = db.get("roles");
 
-  // Remove the old roles first
-  dbRoles.remove({contextID: String(object.id)});
+  // get current owner
+  dbRoles.find({contextID: String(object.id),name:"Owner"}, {}, function(e, owner) {
 
-  // Load the default roles
-  dbDefRoles.find({object: String(object.type)}, {}, function(e, roles) {
-    roles.forEach(function(role) {
-      dbRoles.insert({
-        contextID: String(object.id),
-        name: String(role.name),
-        rights: role.rights,
-        mode: String("overwrite"),
-        users: new Array()
+    var createTmpOwner = { contextID : owner[0].contextID,
+                          rights : owner[0].rights,
+                          users: owner[0].users,
+                          name : "Owner",
+                          mode: "overwrite" };
+
+      // Load the default roles
+      dbDefRoles.find({object: String(object.type)}, {}, function(e, roles) {
+        roles.push(createTmpOwner);
+
+        roles.forEach(function(role) {
+          dbRoles.insert({
+            contextID: String(object.id),
+            name: String(role.name),
+            rights: role.rights,
+            mode: String("overwrite"),
+            users: new Array()
+          });
+        });
+        Modules.SocketServer.sendToSocket(socket, "umDefaultRoles" + object.id, roles);
       });
     });
-    Modules.SocketServer.sendToSocket(socket, "umDefaultRoles" + object.id, roles);
-  });
+
 };
 
 /**
