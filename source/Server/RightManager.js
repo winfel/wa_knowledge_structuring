@@ -228,9 +228,9 @@ var RightManager = function() {
 
     // Register RightManager related server calls...
     Dispatcher.registerCall('rmHasAccess', function(socket, data, responseID) {
-      //var context = Modules.UserManager.getConnectionBySocket(socket);
-      //Modules.ObjectController.executeServersideAction(data, context, resultCallbackWrapper(socket, responseID));
-      that.hasAccess(data.command, data.object, data.username, function(result) {
+      var connection = Modules.UserManager.getConnectionBySocket(socket);
+      
+      that.hasAccess(data.command, data.object, connection.user, function(result) {
         if (result === true) {
           Modules.SocketServer.sendToSocket(socket, "rmAccessGranted" + data.object.id);
         } else {
@@ -326,7 +326,7 @@ var RightManager = function() {
    *	
    *	@param {type}       command     The used command (access right), e.g., read, write (CRUD)
    *	@param {type}       object      The object that should be checked
-   *  @param {type}       user        The username of the user
+   *  @param {type}       user        The user object
    *  @param {function}   callback    The callback function with one boolean parameter (the answer)
    */
   this.hasAccess = function(command, object, user, callback) {
@@ -344,7 +344,7 @@ var RightManager = function() {
         var parent = that.getParentOfObject(object);
 
         // call method for parent
-        that.hasAccess(command, parent, user, callback);
+        parent.hasAccess(command, parent, user, callback);
       } else {
         /* (1) get the roles that includes the current command within the context of
          the given object */
@@ -356,7 +356,7 @@ var RightManager = function() {
             Modules.Log.debug("Command is used in Role " + item.name);
 
             /* (2) check if current user is inside of one of these roles */
-            var userIsInUserList = (String(item.users).split(",").indexOf(String(user)) != -1);
+            var userIsInUserList = (String(item.users).split(",").indexOf(String(user.username)) != -1);
 
             /* (2') check if 'all' is included in the user list */
             var userDoesNotMatter = (String(item.users).split(",").indexOf(String("all")) != -1);
