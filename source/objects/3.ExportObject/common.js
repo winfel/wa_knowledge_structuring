@@ -35,18 +35,6 @@ ExportObject.register = function(type) {
 
     this.makeSensitive();
 
-    this.registerAttribute('bigIcon', {
-        type: 'boolean',
-        standard: true,
-        
-        changedFunction: function(object) {
-            object.updateIcon();
-        },
-        checkFunction: function(object, value) {
-            if (object.getAttribute("preview")) return "icon size not changeable when preview is shown";
-        }
-    });
-
     this.registerAttribute('exportFormat', {type: 'selection', standard: 'text', 
         options: [ 'text', 'pdf', 'html', 'image_png', 'image_jpg', 'image_svg' ], category: 'Basic'});
 };

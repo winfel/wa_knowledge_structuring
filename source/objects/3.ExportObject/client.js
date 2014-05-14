@@ -1,5 +1,5 @@
-File.contentUpdated=function(){
+ExportObject.contentUpdated=function(){
 
 	this.updateIcon();
 	
-}
+};

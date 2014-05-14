@@ -5,62 +5,40 @@
 *
 */
 
-File.draw = function(external) {
+ExportObject.draw = function(external) {
 	
 	GeneralObject.draw.call(this,external);
 	
-	if (this.hasContent() == false || this.getAttribute("preview") == false || this.getAttribute("preview") == undefined) {
-		
-		if (this.getAttribute("bigIcon")) {
-			this.setViewWidth(64);
-			this.setViewHeight(64);
-		} else {
-			this.setViewWidth(32);
-			this.setViewHeight(32);
-		}
-		
-	}
-	
+	this.setViewWidth(64);
+	this.setViewHeight(64);
+
 	var rep = this.getRepresentation();
 
-    if (this.getIconText()) {
-        this.renderText(this.getIconText());
-    } else {
-        $(rep).find("text").remove();
-    }
-	
+	//$(rep).find("text").remove();
+
 	if (!$(rep).hasClass("selected")) {
 		$(rep).find("rect").attr("stroke", this.getAttribute('linecolor'));
 		$(rep).find("rect").attr("stroke-width", this.getAttribute('linesize'));
 	}
 	
 	this.createPixelMap();
-}
+};
 
 /* get the width of the objects bounding box */
-File.getViewBoundingBoxWidth = function() {
-	if (this.hasContent() == false || this.getAttribute("preview") == false) {
-		if (this.getAttribute("bigIcon")) {
-			return 64;
-		} else return 32;
-	} else {
-		return GeneralObject.getViewBoundingBoxWidth.call(this);
-	}
-}
+ExportObject.getViewBoundingBoxWidth = function() {
+	//return 64;
+	return GeneralObject.getViewBoundingBoxWidth.call(this);
+};
 
 /* get the height of the objects bounding box */
-File.getViewBoundingBoxHeight = function() {
-	if (this.hasContent() == false || this.getAttribute("preview") == false) {
-		if (this.getAttribute("bigIcon")) {
-			return 64;
-		} else return 32;
-	} else {
-		return GeneralObject.getViewBoundingBoxHeight.call(this);
-	}
-}
+ExportObject.getViewBoundingBoxHeight = function() {
+	//return 64;
+	return GeneralObject.getViewBoundingBoxHeight.call(this);
+};
 
-File.getStatusIcon = function() {
-	if (this.hasContent() == false) {
+ExportObject.getStatusIcon = function() {
+	return this.getIconPath();
+/*	if (this.hasContent() == false) {
 		return this.getIconPath() + "/upload";
 	} else if (this.getAttribute("preview") == false || this.getAttribute("preview") == undefined) {	
 		var typeIcon = "file";
@@ -80,11 +58,10 @@ File.getStatusIcon = function() {
 		return this.getIconPath() + "/" + typeIcon;
 	} else {
 		return this.getPreviewContentURL();
-	}
-}
+	} */
+};
 
-File.getIconText = function() {
-    if ((this.getAttribute("preview") == false || this.getAttribute("preview") == undefined) && this.hasContent()) {
-        return this.getAttribute("name");
-    } else return false;
-}
+ExportObject.getIconText = function() {
+	return false;
+};
+

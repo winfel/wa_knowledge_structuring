@@ -1,4 +1,3 @@
-
 ExportObject.setTranslations('de',{
 }
 );
