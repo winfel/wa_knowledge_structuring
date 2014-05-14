@@ -492,7 +492,7 @@ UserManager.getRoles = function(socket, data) {
 
 };
 
-UserManager.isManager = function(socket, data) {
+UserManager.isManager = function(socket, data, callback) {
   var collection = db.get('roles');
 
   collection.find({contextID: String(data.object.id)}, {}, function(e, docs) {
@@ -501,12 +501,19 @@ UserManager.isManager = function(socket, data) {
 
         var found = false;
         doc.users.forEach(function(u){
-          
+          if (GUI.username == u)
+           found=true;
+       });
 
+       if (found) {
+         Modules.SocketServer.sendToSocket(socket, "umIsManager" + data.object.id, docs);
+       } else {
+         Modules.SocketServer.sendToSocket(socket, "umIsNotManager" + data.object.id, docs);
+       }
+     }
 
-        });
-        Modules.SocketServer.sendToSocket(socket, "umIsManager" + data.object.id, docs);
-      }  
+   });
+ });
 
     });
   });
@@ -519,7 +526,7 @@ UserManager.isManager = function(socket, data) {
  * @param {type} data
  * @returns {undefined}
  */
-UserManager.loadDefaulRoles = function(socket, data) {
+UserManager.loadDefaultRoles = function(socket, data) {
   var object = data.object;
 
   var dbDefRoles = db.get("defroles");

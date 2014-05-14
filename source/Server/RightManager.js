@@ -117,21 +117,21 @@ var fillCurrentDbWithTestData = function() {
     'NumberCreator#8#create#You may create the selected NumberCreater and NumericObjects',
     'NumberCreator#9#update#You may drop something on the PaperObject PaperObject'];
   var pushUsers = [
-    'joerg#12345',
-    'vanessa#xyz',
-    "shari#345",
-    "oliver#345",
-    "steven#345",
-    "lisa#123",
-    "mohammad#345",
-    "alexjandro#345",
-    "sharath#345",
-    "ivan#345",
-    "siby#345",
-    "brice#345",
-    "manasa#345",
-    "nitesh#345",
-    "patrick#234"
+    'Joerg#12345',
+    'Vanessa#xyz',
+    "Shari#345",
+    "Oliver#345",
+    "Steven#345",
+    "Lisa#123",
+    "Mohammad#345",
+    "Alexjandro#345",
+    "Sharath#345",
+    "Ivan#345",
+    "Siby#345",
+    "Brice#345",
+    "Manasa#345",
+    "Nitesh#345",
+    "Patrick#234"
   ];
   var pushRoles = [
     '1#1#RandomGuys#create,read#overwrite#',
