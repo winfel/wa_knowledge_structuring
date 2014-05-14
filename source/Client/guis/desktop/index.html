@@ -197,14 +197,14 @@
                 </div>	                   
               </div>
               
-              <div class="rmRoleSeparator"></div>
+              <div class="rightmanager-role-separator"></div>
 
-              <div class="jDesktopInspector_pageHead" id="rm_rightsHead">Rights</div>
+              <div class="jDesktopInspector_pageHead rightmanager-section-header" id="rm_rightsHead">Rights <span>&nbsp;</span></div>
               <div class="jDesktopInspector_page jDesktopInspector_page_2" id="rm_rightsPage">
                 <div class="jDesktopInspector_section" id="rm_rights"></div>
               </div>
 
-              <div class="jDesktopInspector_pageHead" id="rm_usersHead">Users</div>
+              <div class="jDesktopInspector_pageHead rightmanager-section-header" id="rm_usersHead">Users <span>&nbsp;</span></div>
               <div class="jDesktopInspector_page jDesktopInspector_page_3" id="rm_usersPage">
                 <div class="jDesktopInspector_section" id="rm_users">
                 </div>
@@ -212,14 +212,13 @@
                 <div class="jDesktopInspector_section">
                   <div class="jDesktopInspector_element">
                     <div class= "jDesktopInspector_button_right">					
-                      <input id="rmDeleteUsersButton" type="button" value="Delete users">
+                      <input id="rmDeleteUsersButton" class="rightmanager-delete-all" type="button" value="Delete users">
                     </div>
                     <br style="clear: both">										
                   </div> 
                   <div class="jDesktopInspector_element">
-                    <input id="rmNewUserTextfield" type="text" size="15" value="New user" onfocus="this.value = ''">
                     <div class= "jDesktopInspector_button_right">					
-                      <input id="rmNewUserButton" type="button" value="Add user">
+                      <input id="rmAddUsersButton" type="button" value="Add users">
                     </div>
                     <br style="clear: both">										
                   </div> 
@@ -281,15 +280,33 @@
     </div>
 
 
- <!-- BEGIN: GUI rightmanager pop-up dialog -->
- <div id="rightmanagerDialog" style="display: none;">
-      <div id="rmdTabs">
-        <ul id="rmdTabList">       
-        </ul>
+    <!-- BEGIN: GUI rightmanager pop-up dialog -->
+    <div id="rightmanagerDialog" style="display: none;">
+         <div id="rmdTabs">
+           <ul id="rmdTabList">       
+           </ul>
+         </div>
+    </div>
+    <!-- END: GUI rightmanager pop-up dialog -->
+    
+    <!-- BEGIN: GUI add user dialog -->
+    <div id="manageUserDialog" class="rightmanager-user-dialog" style="display: none;">
+      <h3>Friend list</h3>
+      <div id="manageUserDialogFriendList" class="rightmanager-user-dialog-section"></div>
+      <h3>Suggested</h3>
+      <div id="manageUserDialogSuggested" class="rightmanager-user-dialog-section"></div>
+      <h3>Searched Users</h3>
+      <input id="manageUserDialogNewTextfield" type="text" value="Type in the username" />
+      <div id="manageUserDialogSearched" class="rightmanager-user-dialog-section">
       </div>
-</div>
-   <!-- END: GUI rightmanager pop-up dialog -->
- 
+    </div>
+    <!-- END: GUI add user dialog -->
+
+    <!-- BEGIN: GUI confirm dialog -->
+    <div id="confirmDialog" style="display: none;">
+         <span id="confirmDialogMessage"></span>
+    </div>
+    <!-- END: GUI confirm dialog -->
 
     <div id="login_background" style="display: none">&nbsp;</div>
     <div id="login" style="display: none;">

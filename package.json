@@ -24,7 +24,8 @@
     "everyauth": "*",
     "body-parser": "*",
     "cookie-parser": "*",
-    "express-session": "*"
+    "express-session": "*",
+    "mongoose": "^3.8.8"
   },
   "devDependencies": {
     "superagent": "~0.15.7",

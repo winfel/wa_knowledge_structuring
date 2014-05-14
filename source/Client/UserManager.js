@@ -16,7 +16,7 @@ var UserManager = {};
  * @returns {undefined}
  */
 UserManager.addRole = function(object, role) {
-  this.modifyRole(role, object, true);
+  this.modifyRole(object, role, true);
 };
 
 /**
@@ -26,7 +26,7 @@ UserManager.addRole = function(object, role) {
  * @returns {undefined}
  */
 UserManager.removeRole = function(object, role) {
-  this.modifyRole(role, object, false);
+  this.modifyRole(object, role, false);
 };
 
 /**
@@ -42,8 +42,8 @@ UserManager.modifyRole = function(object, role, grant) {
 
   // The responce should be some sort of broadcast to users with a manager role...
   Modules.SocketClient.serverCall(serverCall, {
-    'role': role,
-    'object': object
+    'object': object,
+    'role': role
   });
 };
 
@@ -72,6 +72,35 @@ UserManager.getRoles = function(object, user, callback) {
   });
 };
 
+UserManager.loadDefaultRoles = function(object, callback) {
+
+  Dispatcher.registerCall("umDefaultRoles" + object.id, function(data) {
+    // call the callback
+    callback(data);
+
+    // deregister
+    Dispatcher.removeCall("umDefaultRoles" + object.id);
+  });
+  
+  Modules.SocketClient.serverCall("umLoadDefaultRoles", {
+    'object': object
+  });
+};
+
+UserManager.removeAllRoles = function(object, callback) {
+  Dispatcher.registerCall("umRolesCleared" + object.id, function(data) {
+    // call the callback
+    callback(data);
+
+    // deregister
+    Dispatcher.removeCall("umRolesCleared" + object.id);
+  });
+  
+  Modules.SocketClient.serverCall("umClearRoles", {
+    'object': object
+  });
+};
+
 /**
  * 
  * @param {type} object
@@ -81,12 +110,10 @@ UserManager.getRoles = function(object, user, callback) {
  */
 UserManager.addUser = function(object, role, user) {
   // The responce should be some sort of broadcast to users with a manager role...
-  console.log("Client:UserManager.addUser: " + role + " " + object.id + " " + user);
-
   Modules.SocketClient.serverCall('umAddUser', {
     'role': role,
-    'objectid': object.id,
-    'user': user
+    'object': object,
+    'username': user
   });
 };
 
@@ -100,8 +127,8 @@ UserManager.addUser = function(object, role, user) {
 UserManager.removeUser = function(object, role, user) {
   // The responce should be some sort of broadcast to users with a manager role...
   Modules.SocketClient.serverCall('umRemoveUser', {
-    'role': role,
     'object': object,
+    'role': role,
     'username': user
   });
 };
@@ -127,8 +154,40 @@ UserManager.getUsers = function(object, role, user, callback) {
   // The responce should be some sort of broadcast... Instead of
 
   Modules.SocketClient.serverCall('umGetUsers', {
+    'object': object,
     'role': role,
-    'objectid': object.id,
     'username': user
+  });
+};
+
+/**
+ * 
+ * @param {type} object
+ * @param {type} role
+ * @param {type} callback
+ * @returns {undefined}
+ */
+UserManager.getMissingUsers = function(object, role, callback) {
+
+  Dispatcher.registerCall("umMissingUsers" + object.id, function(data) {
+    // call the callback
+    var users = new Array();
+    
+    data.allUsers.forEach(function(user) {
+      // If the user is not already added, push it to the result array.
+      if(data.alreadyAddedUsers.indexOf(user.username) < 0)
+        users.push(user);
+    });
+    callback(users);
+
+    // deregister
+    Dispatcher.removeCall("umMissingUsers" + object.id);
+  });
+
+  // The responce should be some sort of broadcast... Instead of
+
+  Modules.SocketClient.serverCall('umGetMissingUsers', {
+    'object': object,
+    'role': role
   });
 };

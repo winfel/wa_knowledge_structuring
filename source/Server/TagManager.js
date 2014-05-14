@@ -12,23 +12,16 @@ var fillCurrentDbWithTestData = function() {
 	 
     maintags.insert(
 		   [
-			  { id: "1", name: "Human Machine Interaction", 
-			    secTags: ["aaaa", "h bbbb", "h cccc", "h dddd", "h eeee", "h ffff","h gggg","h hhhh","h iiii","h jjjj","h kkkk", "h llll", "h mmmmm", "h nnnn", "h oooo"] },
+			  { id: "1", name: "Human-Machine Interaction", 
+			    secTags: ["Didactics of Informatics","Computer Graphics","Visualization","Image Processing","Human-Computer Interaction","Computers and Society","Computing in Context"] },
 			  { id: "2", name: "Software Technologies", 
-			    secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] },
+			    secTags: ["Model Driven Software Engineering", "Knowledge- Based Systems", "Electronic Commerce", "Databases", "Information Systems", "Software Engineering","Computational Intelligence","Specification and Modelling"] },
 			  { id: "3", name: "Embedded Systems", 
-			    secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] },
-			  { id: "4", name: "Models and Algorithm", 
-			    secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] },
-			  { id: "4", name: "The Best Category", 
-				secTags: ["aaaa", "bbbb", "cccc", "dddd", "eeee", "ffff","gggg","hhhh","iiii","jjjj","kkkk", "llll", "mmmmm", "nnnn", "oooo"] }
+			    secTags: ["Distributed Embedded Systems", "Computer Engineering", "Custom Computing", "Computer Networks", "Swarm Robotics"] },
+			  { id: "4", name: "Models and Algorithms", 
+			    secTags: ["Cryptography", "Algorithms", "Complexity", "Theory of Distributed Systems", "Swarm Intelligence"] }
 		   ]	
-	);
-		
-	//maintags.find( {} ,function (e, list){
-	//	console.log(list);	
-	//});
-	
+	);	
 	
 };
 
@@ -58,6 +51,18 @@ var TagManager = function() {
     Dispatcher.registerCall('updSecTags', function(socket, data, responseID) {
 		that.updSecTags(socket, data.mainTag, data.secTag); 
 	});
+	
+	Dispatcher.registerCall('updMainTags', function(socket, data, responseID) {
+		that.updMainTags(socket, data.mainTag, data.newId); 
+	});
+	
+	Dispatcher.registerCall('deleteSecTags', function(socket, data, responseID) {
+		that.deleteSecTags(socket, data.mainTag, data.secTag); 
+	});
+	
+	Dispatcher.registerCall('deleteMainTag', function(socket, data, responseID) {
+		that.deleteMainTag(socket, data.mainTag); 
+	});
  
   };
   
@@ -71,8 +76,9 @@ var TagManager = function() {
 		var dbMainTags = db.get('MainTags');
 		
 		dbMainTags.find( {}, ["id", "name"], function(e, mainTags){
-			//console.log(mainTags);	
+			
 			Modules.SocketServer.sendToSocket(socket, "getMainTags", mainTags);
+			
 		} );
 	 
 	};
@@ -87,8 +93,9 @@ var TagManager = function() {
 		var dbMainTags = db.get('MainTags');
 		
 		dbMainTags.find( {name: mainTag}, ["secTags"] , function(e, secTags){
-			//console.log(secTags);	
+			
 			Modules.SocketServer.sendToSocket(socket, "getSecTags", secTags);
+			
 		} );
 		 
 	};
@@ -99,16 +106,67 @@ var TagManager = function() {
 	* @returns {undefined}
 	*/
 	this.updSecTags = function(socket, mainTag, newSecTag) {
-	  		
+
 		var dbMainTags = db.get('MainTags');
-		
+
 		dbMainTags.update( {name: mainTag}, { 
 												$addToSet: { secTags:  newSecTag } 
 										    }
 		                 );
-		 
+
 	};
-  
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.deleteSecTags = function(socket, mainTag, SecTag) {
+
+		var dbMainTags = db.get('MainTags');
+
+		dbMainTags.update( {name: mainTag}, { 
+												$pull: { secTags:  SecTag } 
+										    }
+		                 );
+
+	};
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.updMainTags = function(socket, newMainTag, newId) {
+
+		var dbMainTags = db.get('MainTags');
+			
+		dbMainTags.insert(
+		   [
+			  { 
+				  id: newId,
+				  name: newMainTag,				  
+			      secTags: [] 
+			  }
+		   ]	
+		);	
+		
+	};
+	
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.deleteMainTag = function(socket, mainTag) {
+
+		var dbMainTags = db.get('MainTags');
+
+		dbMainTags.remove({name: mainTag},{justOne: true});
+
+	};
+	  
 };
 
 module.exports = new TagManager();

@@ -4,81 +4,33 @@
 
 GUI.rightmanagerDialog = new function() {
 
-  var rightsObjects = ["PaperObject", "Subroom"];
-  var roles = ["Writer","Reviewer"];
-  var rights = [];
-  var allrights = ["create", "read","write", "delete"];
-  var listitems = "";
-  var tabpages = "";
-  var plustabcontent ="";
+  var rightsObjects = ["PaperObject", "Subroom"]; // It is used...
 
-  var rmd = null;
-  var rmdTabs = null;
-  var rmdTabAdd = null;
-  var usersss = null;
+  var rmd;
+  var rmdTabs;
+  var rmdTabList;
+  var rmdTabItemAdd; // It is used...
+  var activeRole;
 
+  var doneButton, deleteButton;
 
-  this.init = function(typeObject,idObject) {
+  var obj;
+  var objData; // It is used...
+
+  var checkedUsers; // Keep track of the selected users. Needed for a delete server call.
+  var checkedSpans; // Keep track of the corresponding spans, which display a user.
+
+  /*
+   * Initializes the right manager dialog.
+   * 
+   * @returns {undefined}
+   */
+  this.init = function() {
     console.log("GUI.rightmanagerDialog initialized");
 
+    var that = GUI.rightmanagerDialog;
 
-    var j=1;
-    
-
-     Modules.RightManager.getRolesForObject({id: idObject, type: typeObject}, function(roles2) {
-               roles2.forEach(function(role) {      
-                    var i = 0;          
-                    //Create tabs
-                    listitems += "<li><a href='#tabs-"+j+"'>"+role.name+"</a></li>";
-
-                    //Create tabpages
-                      tabpages += "<div id='tabs-"+j+"'>";
-
-                      //Create content of tabpages
-                        //Rights
-                        tabpages += '<h3>Rights </h3><hr><br>';
-                        rights = role.rights;
-                        rights.forEach(function(right) {
-                              tabpages += '<input type="checkbox" id="right-'+i+'" checked>'+rights[i]+' </input>';    
-                              i++;                            
-                              });
-                        for (var i = 0; i < allrights.length; i++) {
-                            if($.inArray(allrights[i], rights) <= -1){
-                                 tabpages += '<input type="checkbox" id="right-'+i+'">'+allrights[i]+' </input>';
-                             }
-                        };
-                     
-                        //TODO: Users
-                        tabpages += '<h3>Users</h3><hr>';
-                        tabpages += '<div id=selectusers> <p><font color="#A1A1A1">Select users to add to role</font></p></div><br>';
-                        
-                      tabpages +=  "</div>";
-                 
-                      $("#rmdTabList").append(listitems);
-                       
-                      $("#rmdTabs").append(tabpages);
-               
-                      listitems="";
-                      tabpages = "";
-                      j++;
-               });
-
-                 //Append Plus Tab
-                $("#rmdTabList").append('<li class="rmdTabPage_add"><a href="#rmdTabPage_add">+</a></li>');
-                //Set content for Plus Tab
-                $("#rmdTabs").append('<div id="rmdTabPage_add"><h3>Add a new role</h3><input id="newrolename" placeholder="Add rolename here"></div>');
-                plustabcontent += '<h4>Rights </h4><hr><br>';
-                plustabcontent += '<input type="checkbox" id="create">Create</input><input type="checkbox" id="read">Read</input><input type="checkbox" id="update">Update</input><input type="checkbox" id="delete">Delete</input>';
-                plustabcontent += '<h4>Users </h4><hr><p><font color="#A1A1A1">Select users to add to role</font></p><br>';
-                 $("#rmdTabPage_add").append(plustabcontent);
-
-                // Create the tabs
-                rmdTabs = $("#rmdTabs").tabs();
-
-           });
-
-
-    // Create the dialog
+    // Setup the dialog
     this.rmd = $("#rightmanagerDialog").dialog({
       title: "Right Manager Setup",
       autoOpen: false,
@@ -86,227 +38,430 @@ GUI.rightmanagerDialog = new function() {
       width: 500,
       buttons: [
         {
-             text: "Take default",
-             click: function() {
-                  $(this).dialog("close");
-             }
-         },
-         {
-             text: "Add user",            
-             click: function() { 
-              addusers();
-            }   
-         },
-         {
-             text: "Delete user",
-             click: function() {
-              deleteusers(); 
-            }
-          },
-          
-         {
-             text: "Save",
-             click: function() {
-                  $(this).dialog("close");
-             }
+          text: "Load default",
+          click: function() {
+            setDefaultRoles();
           }
-       
-     ]
-    });
-    
-    // The add button
-    this.rmdTabAdd = $(".rmdTabPage_add a").first();
-    this.rmdTabAdd.on("click", function() {
-      console.log("clicked");
-    });
-  
-
-
-     this.usersss = $("#userdialog").dialog({
-         //autoOpen: false,
-         buttons: [
+        },
         {
-             text: "Take default",
-             click: function() {
-                  $(this).dialog("close");
-             }
-         }
-       
-     ]
+          text: "Add users",
+          click: function() {
+            openUserDialog(that.activeRole);
+          }
+        },
+        {
+          text: "Delete users",
+          click: function(event) {
+            deleteUsers();
+          }
+        },
+        {
+          text: "Done",
+          click: function() {
+            $(this).dialog("close");
+          }
+        }
+
+      ]
     });
 
+    // Store references to the particular elements in the dom list
+    this.rmdTabs = $("#rmdTabs");
+    this.rmdTabList = $("#rmdTabList");
+
+    this.checkedUsers = {};
+    this.checkedSpans = {};
+
+    this.activeRole = null;
+
+    this.doneButton = $(".ui-dialog-buttonpane button:contains('Done')");
+    this.doneButton.button("disable");
+
+    this.deleteButton = $(".ui-dialog-buttonpane button:contains('Delete users')");
+    this.deleteButton.button("disable");
   }; // init functions ends
 
+  /*
+   * 
+   * @param {type} typeOfObject
+   * @returns {undefined}
+   */
+  this.show = function(theObject) {
+    var that = GUI.rightmanagerDialog;
 
+    // Check whether this object is supposed to have a right manager dialog or not.
+    if (rightsObjects.indexOf(theObject.type) >= 0) {
+      // Load roles 
+      that.obj = theObject;
+      that.objData = {id: theObject.id, type: theObject.type}; // { id: theObject.id, type: theObject.type };
 
-  this.show = function(typeOfObject) {
+      Modules.UserManager.getRoles(that.objData, GUI.username, updateTabs);
 
-    //Show rightmanager popup dialog if object has the rightmanager
-    if (rightsObjects.indexOf(typeOfObject.type) >= 0) {
-      this.init(typeOfObject.type,typeOfObject.id);
-      console.log("Just created");
       // Open the dialog
       this.rmd.dialog("open");
     }
   };// show functions ends
 
+  /*
+   * Updates the tabs within the dialog
+   * 
+   * @param {type} roles        An array of role objects
+   * @returns {undefined}
+   */
+  function updateTabs(roles) {
+    var that = GUI.rightmanagerDialog;
 
-  function addusers() {
+    if (roles.length > 0)
+      that.doneButton.button("enable");
+
+    // Remove the previous tabs...
+    that.rmdTabs.tabs("destroy");
+
+    // Clear the tab list and all contents
+    that.rmdTabList.empty();
+    that.rmdTabs.empty();
+
+    var index = 0;
+    roles.forEach(function(role) {
+      index++;
+
+      if (!that.activeRole)
+        that.activeRole = role;
+
+      // Create a tab for each role
+      var listItem = $("<li>");
+      var tabItem = $("<a>");
+      tabItem.attr({
+        id: "tabs-header-" + index,
+        class: "tabs-header",
+        href: "#tabs-" + index
+      });
+
+      tabItem.on("click", function() {
+        that.activeRole = role;
+
+        checkDeleteUsersButton();
+      });
+
+      tabItem.html(role.name);
+      listItem.append(tabItem);
+      that.rmdTabList.append(listItem);
+
+      var tabPage = $("<div>");
+      tabPage.attr({
+        id: "tabs-" + index
+      });
+      // Append the tab page to the DOM
+      that.rmdTabs.append(tabPage);
 
 
-    Modules.RightManager.getAllUsers(function(users) {
-        var friends="";
-        users.forEach(function(user) {
-                friends+= '<input type="checkbox" id="'+ user.username+ '" class="friendlist">'+ user.username+'</input><br>'
-               });
-        $("#user-friendlist").append(friends);
-             });
-    /* todo: get users from db userlist*/ 
-    var selectedusers ="";
+      var deleteImg = $("<img>");
+      deleteImg.attr({
+        alt: "Delete",
+        src: "/guis.common/images/oxygen/16x16/actions/edit-delete.png"
+      });
+      deleteImg.on("click", function(event) {
+        listItem.remove(); // Remove the tab 
+        tabPage.remove(); // Remove the tab content
 
-    var userDialog = $('' +
-            '<div id="addrole-dialog">' +
-            '<h3>Users </h3><hr>' +
-            '<div id="user-friendlist"> </div><br>'+
-            ' <select id="userlist" name="userlist" size="5" multiple>'+
-                '<option>Brice</option>'+
-                '<option>Oliver</option>'+
-                '<option>Manasa</option>'+
-                '<option>Ivan</option>'+
-                '<option>Shari</option>'+
-                '<option>Steven</option>'+
-                '<option>Sharath</option>'+
-                '<option>Alejandro</option>'+
-                '<option>Nitesh</option>'+
-                '<option>Siby</option>'+
-            '</select>'
-            );
+        Modules.UserManager.removeRole(that.objData, role);
 
-    var userButtons = {
-      "Cancel": function() {
-        $(this).dialog("close");
-      },
-      "Add users": function() {
+        if ($("a.tabs-header", that.rmdTabs).length > 0)
+          that.doneButton.button("enable");
+        else
+          that.doneButton.button("disable");
 
-          // select list part
-    var checkedUsers = new Array(); // Keep track of the selected users. Needed for a delete server call.
-    var checkedSpans = new Array(); // Keep track of the corresponding spans, which display a user
+        event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
+      });
 
-      // No users checked anymore
-      checkedSpans.length = 0;
-      checkedUsers.length = 0;
-            
-        //checkbox part doesn't work yet
-/*           $("input[type='checkbox']:checked").each(
-               function() {
-                var span = $("<span>");
-                span.addClass("rmd_users");
-                span.html($(this).id());
-                span.data("value", $(this).id());
-                $("#selectusers").append(span);
+      tabItem.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
+      tabItem.append(deleteImg);
+
+
+      // The specific section for rights
+      // -------------------------------
+      var sectionRights = $("<div>");
+      sectionRights.attr({
+        class: "rightmanager-section rightmanager-right-section"
+      });
+      sectionRights.append('<h3 class="rightmanager-section-header">Rights</h3><hr>');
+      tabPage.append(sectionRights);
+
+      Modules.RightManager.getRights(that.objData, role, GUI.username, function(availableRights, checkedRights) {
+        // Finally add the rights to the rights section
+        if (availableRights.length > 0) {
+          availableRights.forEach(function(right) {
+            var checked = checkedRights.indexOf(right.name) >= 0;
+            addRightToSection(that, right, role, sectionRights, checked);
+          });
+        } else {
+          // No rights found
+          var span = $("<span>");
+          span.html("Ups! That's wired, I was not able to find any right for this role.");
+          sectionRights.append(span);
+        }
+      });
+
+      // The specific section for users
+      // ------------------------------
+      var sectionUsers = $("<div>");
+      sectionUsers.attr({
+        id: "rightmanager-user-section-" + index,
+        class: "rightmanager-section rightmanager-user-section"
+      });
+      sectionUsers.append('<h3 class="rightmanager-section-header">Users</h3><hr>');
+      tabPage.append(sectionUsers);
+
+      // The delete button at the bottom of the dialog
+
+      Modules.UserManager.getUsers(that.objData, role, GUI.username, function(users) {
+
+        that.checkedUsers[role.name] = new Array();
+        that.checkedSpans[role.name] = new Array();
+
+        if (users.length > 0) {
+          users.forEach(function(user) {
+            var userSpan = addUserToSection(that, user, sectionUsers, role, true);
+
+            userSpan.on("click", function() {
+              checkDeleteUsersButton();
             });
-*/
+          });
+        }
+      });
+    });
 
-          $('#userlist option:selected').each(function(){
-              var span = $("<span>");
-              span.addClass("rmd_users");
-              span.html($(this).text());
-              span.data("value", $(this).text());
-              
+    // Insert the tab list at the beginning of the tab container
+    that.rmdTabs.prepend(that.rmdTabList);
 
-              span.on("mouseenter", function(event) {
-          if (!span.hasClass("checked"))
-            span.data("deleteImg").addClass("visible");
-        });
+    // Recreate the tabs
+    that.rmdTabs.tabs({
+      collapsible: true
+    });
 
-        span.on("mouseleave", function(event) {
-          if (!span.hasClass("checked"))
-            span.data("deleteImg").removeClass("visible");
-        });
+    // Add the + button to the tabs
+    var tabItemAdd = $("<a>");
+    tabItemAdd.html("+");
+    tabItemAdd.on("click", function() {
+      newTabTextfield(tabItemAdd, index);
+    });
 
-        // The whole click magic ;)...
-        span.on("click", function(event) {
-          var deleteImg = span.data("deleteImg"); // The reference to the delete image.
-          var index = checkedSpans.indexOf(span); // The index of the clicked span.
+    // Add the tab item to the tab list
+    addTabItem(tabItemAdd, false);
 
-          // Check for multi/single selection
-          if (event.ctrlKey) {
-            // Multi selection
-            if (index >= 0) {
-              checkedSpans.splice(index, 1); // Remove the span from the array
-              checkedUsers.splice(index, 1); // Remove the user from the array
-            } else {
-              checkedSpans.push(span); // Add the span to the array
-              checkedUsers.push($(this).text()); // Add the user to the array
-            }
+    // Store the add tab item reference
+    that.rmdTabItemAdd = tabItemAdd;
+  }
 
-          } else {
-            // Single selection: Uncheck all elements first and then check the current element again..
-            checkedSpans.forEach(function(item) {
-              item.removeClass("checked");
-              item.data("deleteImg").removeClass("visible");
+  /**
+   * Helper function to create a new tab item.
+   * 
+   * @param {type} element      The link (<a>) object.
+   * @param {type} content      The content of the new tab.
+   * @param {type} tabItemAdd   Reference to the special add (+) tab.
+   * @param {type} cssClass     Some custom css classes.
+   * @returns {undefined}
+   */
+  function addTabItem(element, content, tabItemAdd, cssClass) {
+    var that = GUI.rightmanagerDialog;
+
+    var listitem = $("<li>");
+    listitem.append(element);
+
+    if (content) {
+      that.rmdTabs.append(content);
+    } else {
+      // No content? This means it is a dummy button with no tab page.
+      // Simulate the jquery ui effects.
+      listitem.addClass("ui-state-default ui-corner-top");
+
+      listitem.hover(function() {
+        listitem.addClass("ui-state-hover");
+      }, function() {
+        listitem.removeClass("ui-state-hover");
+      });
+    }
+
+    if (cssClass) {
+      // Add the custom css classes
+      listitem.addClass(cssClass);
+    }
+
+    // If tabItemAdd is available insert the listitem in front of it.
+    if (tabItemAdd)
+      tabItemAdd.parent().before(listitem);
+    else
+      that.rmdTabList.append(listitem);
+
+    return listitem;
+  }
+
+  /**
+   * Helper function to create a tab containing a textfield
+   * 
+   * @param {type} tabItemAdd
+   * @param {type} index
+   * @returns {undefined}
+   */
+  function newTabTextfield(tabItemAdd, index) {
+    var that = GUI.rightmanagerDialog;
+
+    var tabItemTextfield = $("<a>");
+    tabItemTextfield.attr({
+      class: "newTabTextfield"
+    });
+
+    var textfield = $("<input>");
+    textfield.attr({
+      type: "text",
+      size: 10
+    });
+    tabItemTextfield.append(textfield);
+
+    var addRoleCalled = false;
+    /**
+     * Calls the UserManager to store the given role
+     * 
+     * @returns {undefined}
+     */
+    var storeNewRole = function() {
+      // New name of the role
+      var value = textfield.val();
+
+      // Store the new role in the database
+      if (!addRoleCalled) {
+        Modules.UserManager.addRole(that.objData, {name: value});
+        // Make sure it is only called once on the client side.
+        addRoleCalled = true;
+      }
+
+      // Update the tabs
+      Modules.UserManager.getRoles(that.objData, GUI.username, function(roles) {
+        updateTabs(roles);
+
+        that.rmdTabs.tabs("select", index);
+      });
+    };
+
+    textfield.on("keyup", function(event) {
+      if (event.keyCode == 13) {
+        // enter pressed
+        storeNewRole();
+      }
+    });
+
+    textfield.on("blur", function() {
+      if (!addRoleCalled) {
+        // If the role has not been stored yet, remove the textfield.
+        tabItemTextfield.parent().remove();
+        that.rmdTabs.tabs("select", 0);
+      }
+    });
+
+    addTabItem(tabItemTextfield, true, tabItemAdd, "ui-tabs-selected ui-state-active");
+
+    // Unselect every tab
+    that.rmdTabs.tabs("select", -1);
+
+    // Set the focus to the textfield
+    textfield.focus();
+  }
+
+  /**
+   * 
+   * @returns {undefined}
+   */
+  function setDefaultRoles() {
+    var that = GUI.rightmanagerDialog;
+
+    if (that.rmdTabs.tabs("length") > 0) {
+      $("#confirmDialog").dialog({
+        title: "Load default roles",
+        resizable: false,
+        modal: true,
+        open: function() {
+          $("#confirmDialogMessage").html("The current roles of this object will be <b>permanently deleted</b> and cannot be recovered. <b>Are you sure?</b>");
+        },
+        buttons: {
+          "Delete the current roles": function() {
+            // Load default roles will delete the old roles and insert the default ones.
+            Modules.UserManager.loadDefaultRoles(that.objData, function(defaultRoles) {
+              updateTabs(defaultRoles);
             });
-            checkedSpans.length = 0; // Delete all array items.
-            checkedSpans.push(span);
-
-            checkedUsers.length = 0; // Delete all array items.
-            checkedUsers.push($(this).text());
+            $(this).dialog("close");
+          },
+          Cancel: function() {
+            $(this).dialog("close");
           }
+        }
+      });
+    } else {
+      // Not roles yet...
+      Modules.UserManager.loadDefaultRoles(that.objData, function(defaultRoles) {
+        updateTabs(defaultRoles);
+      });
+    }
+  }
 
-          span.toggleClass("checked"); // Toggle the span
+  /**
+   * 
+   * @param {Object} role 
+   * @returns {undefined}
+   */
+  function openUserDialog(role) {
+    var that = GUI.rightmanagerDialog;
 
-          // Check if delete buttons are or the delete all button is shown.
-          if (span.hasClass("checked") && checkedSpans.length == 1)
-            deleteImg.addClass("visible");
-          else
-            deleteImg.removeClass("visible");
+    var selectedTabId = that.rmdTabs.tabs("option", "selected") + 1;
 
-          if (checkedSpans.length > 1) {
-            checkedSpans.forEach(function(item) {
-              item.data("deleteImg").removeClass("visible");
-            });
-            
-          } else {
-            deleteImg.addClass("visible");
-            
-          }
+    var resultCallback = function(users) {
+      var sectionUsers = $("#rightmanager-user-section-" + selectedTabId);
+
+      users.forEach(function(user) {
+        var userSpan = addUserToSection(that, user, sectionUsers, that.activeRole, true);
+
+        userSpan.on("click", function() {
+          checkDeleteUsersButton();
         });
 
-        var deleteImg = $("<img>");
-        deleteImg.attr({
-          alt: "Delete",
-          src: "/guis.common/images/oxygen/16x16/actions/edit-delete.png"
-        });
-        deleteImg.on("click", function(event) {
-          span.remove();
-          // Update the arrays
-          var index = checkedSpans.indexOf(span); // The index of the clicked span
-          checkedSpans.splice(index, 1); // Remove the span from the array
-          checkedUsers.splice(index, 1); // Remove the user from the array
+        Modules.UserManager.addUser(that.objData, that.activeRole, user);
+      });
+    };
 
-          event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
-        });
+    GUI.userdialog.show(that.objData, role, resultCallback);
+  }
 
-        span.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
-        span.append(deleteImg);
+  /**
+   * Checks whether the delete users button is active or not. Depending on the selected role.
+   * 
+   * @returns {undefined}
+   */
+  function checkDeleteUsersButton() {
+    var that = GUI.rightmanagerDialog;
 
-        $("#selectusers").append(span);        
-        });//iteration over section userlist ends
+    if (that.activeRole && that.checkedSpans[that.activeRole.name]) {
+      // Check how many              
+      if (that.checkedSpans[that.activeRole.name].length > 0) {
+        that.deleteButton.button("enable");
+      } else {
+        that.deleteButton.button("disable");
+      }
+    } else {
+      that.deleteButton.button("disable");
+    }
+  }
+  ;
 
-      } //add button ends here
-    }; //buttons end
-    var dialog = GUI.dialog(
-            "Add Users",
-            userDialog, userButtons
-    );
-    
-  }; //addusers function ends
+  /**
+   * 
+   * @returns {undefined}
+   */
+  function deleteUsers() {
+    var that = GUI.rightmanagerDialog;
 
-   function deleteusers() {
-     alert("tadah");
-   };
-
-
-
+    that.checkedSpans[that.activeRole.name].forEach(function(span) {
+      Modules.UserManager.removeUser(that.objData, that.activeRole, span.data("user"));
+      span.remove();
+    });
+  }
 };
 

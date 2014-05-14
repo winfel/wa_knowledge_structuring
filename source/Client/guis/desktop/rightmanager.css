@@ -2,75 +2,87 @@
  * Right manager sidebar
  */
 
-#rm_roles .rmSidebarRole,
-#rm_users .rmSidebarUser {
+.rightmanager-item {
   padding: 3px 5px; 
   margin-right: 6px;
   cursor: pointer;
   display: block;
+  position: relative;
 }
 
-#rm_roles .rmSidebarRole {
+.rightmanager-role {
   margin-right: 0;
 }
 
-#rm_users .rmSidebarUser {
+.rightmanager-user {
   width: 70px;
-  float: left;
   display: inline-block;
- 
+  overflow: hidden;
 }
 
-#rm_usersPage {
-   /*background-color: #D2D9FC;*/
-}
-#rm_rightsPage {
-   /*background-color: #D2D9FC;*/
-}
-#rm_rightsHead{
-   /*background-color: #D2D9FC;*/
-}
-#rm_usersHead{
-   /*background-color: #D2D9FC;*/
+
+
+#rightmanagerDialog .rightmanager-user {
+  width: auto;
 }
 
-#rm_roles .rmSidebarRole:hover,
-#rm_users .rmSidebarUser:hover { 
+#rightmanagerDialog .checked {
+  padding-right: 20px;
+}
+
+#rightmanagerDialog .rightmanager-user.show-delete-img:hover {
+  padding-right: 20px;
+}
+
+.rightmanager-item:hover { 
   background-color: #a6c0f7;
 }
 
-#rm_roles .rmSidebarRole.checked,
-#rm_users .rmSidebarUser.checked {
+.rightmanager-item.checked {
   background-color: #A4B5FF;
 }
 
-#rm_roles .rmSidebarRole img,
-#rm_users .rmSidebarUser img {
-  margin: 0 0 -4px 6px;
-  float: right;
+#manageUserDialog .rightmanager-item.checked.show-delete-img {
+  padding-right: 20px;
+}
+
+.rightmanager-item img {
+  margin: 0 2px -4px 6px;
+  position: absolute;
+  right: 0;
   visibility: hidden;
 }
 
-#rm_rights {
-  
+.tabs-header img {
+  margin: 0 0 -4px 0;
+  padding: 1px 3px;
 }
 
-#rm_rights label {
+.rightmanager-right-label {
   margin-top: 1px;
   display: inline-block;
   width: 90%;
   vertical-align: top;
 }
 
-#rm_rights input[type="checkbox"] {
+#manageUserDialogNewTextfield {
+  margin-bottom: 15px;
+}
+
+#rightmanagerDialog .rightmanager-right-label {
+  width: auto;
+  margin-right: 5px;
+}
+
+.rightmanager-right-checkbox {
   vertical-align: top;
 }
 
-#rmDeleteUsersButton {
+.rightmanager-delete-all {
   visibility: hidden;
 }
 
-#rm_rightsHead span,
+.rightmanager-section-header span,
 #rm_usersHead span {
   margin-left: 8px;
   font-size: 8px;
@@ -90,14 +102,31 @@
   visibility: hidden !important;
 }
 
-.rmRoleSeparator {
+.rightmanager-role-separator {
   background-color: black;
   height: 2px;
   width: 100%;
 }
 
-.rmdTabPage_add a {
+#rmdTabAdd {
   cursor: pointer !important;
+}
+
+.newTabTextfield {
+  /*padding: 0.3em 1em !important;*/
+}
+
+.newTabTextfield input {
+  margin: -2px 0 -3px 0;
+  font-size: 10px;
+}
+
+.rightmanager-section {
+  margin-bottom: 15px;
+}
+
+.rightmanager-section .ui-autocomplete-input {
+  margin-bottom: 6px;
 }
 
 .rmdbutton {

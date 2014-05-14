@@ -66,5 +66,42 @@ var TagManager = new function() {
 	});
   };
   
+   /**
+   * 
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.deleteSecTags = function(mainTag, secTag) {
+
+    Modules.SocketClient.serverCall('deleteSecTags', {
+		'mainTag': mainTag,
+		'secTag': secTag
+	});
+  };
+  
+    /**
+   * 
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.updMainTags = function(mainTag, newId) {
+
+    Modules.SocketClient.serverCall('updMainTags', {
+		'mainTag': mainTag,
+		'newId': newId,
+	});
+  };
+  
+  /**
+   * 
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.deleteMainTag = function(mainTag) {
+
+    Modules.SocketClient.serverCall('deleteMainTag', {
+		'mainTag': mainTag
+	});
+  };
   
 };
