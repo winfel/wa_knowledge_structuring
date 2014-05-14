@@ -77,7 +77,7 @@ global.config = config;
 // if an error occured and log the error
 if (!config.debugMode) {
 	process.on('uncaughtException', function (err) {
-		console.log('##### UNCAUGHT EXCEPTION');
+		console.log('##### UNCAUGHT EXCEPTION ' + new Date());
 		console.log(err.stack);
 	});
 }
@@ -93,7 +93,8 @@ Modules.Config = config;
 
 Modules.ObjectManager   = require('./Server/ObjectManager.js');
 Modules.Dispatcher      = require('./Server/Dispatcher.js');
-Modules.WebServer       = require('./Server/WebServer.js');
+//Modules.WebServer       = require('./Server/WebServer.js');
+Modules.WebServer       = require('./Server/WebServerE.js');
 Modules.SocketServer    = require('./Server/SocketServer.js');
 Modules.UserManager     = require('./Server/UserManager.js');
 Modules.Helper          = require('./Server/Helper.js');
@@ -124,6 +125,9 @@ Modules.ServerController    = require('./Server/controllers/ServerController.js'
 Modules.EtherpadController  = require('./Server/controllers/EtherpadController.js');
 
 Modules.InternalDispatcher = require('./Server/apihandler/InternalDispatcher.js');
+
+//DAO (Data Access Object) 
+Modules.UserDAO  = require('./Server/db/UserDAO.js');
 
 // Objects can gain access to the Modules (on the server side) by requireing this file
 module.exports = Modules;

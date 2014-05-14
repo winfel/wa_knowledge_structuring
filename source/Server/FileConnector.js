@@ -649,10 +649,10 @@ fileConnector.getContent=function(roomID,objectID,context,callback){
 *	@param context
 *	
 */
-fileConnector.getContentStream = function(roomID,objectID,context){
-    this.Modules.Log.debug("Get content stream (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
-    var filebase=this.Modules.Config.filebase;
-    var filename=filebase+'/'+roomID+'/'+objectID+'.content';
+fileConnector.getContentStream = function(roomID, objectID, context) {
+    this.Modules.Log.debug("Get content stream (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
+    var filebase = this.Modules.Config.filebase;
+    var filename = filebase + '/' + roomID + '/' + objectID + '.content';
 
     var rds = fs.createReadStream(filename);
     rds.on("error", function(err) {

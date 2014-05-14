@@ -28,6 +28,26 @@ SocketServer.init = function(theModules) {
 	var io = require('socket.io').listen(Modules.WebServer.server);
 	
 	io.set('log level', 1);
+	
+	// http://www.danielbaulig.de/socket-ioexpress/
+	io.set('authorization', function (data, accept) {
+	    var parseCookie = require('cookie-parser')
+	    
+	    // check if there's a cookie header
+	    if (data.headers.cookie) {
+	        // if there is, parse the cookie
+	        data.cookie = parseCookie(data.headers.cookie);
+	        // note that you will need to use the same key to grad the
+	        // session id, as you specified in the Express setup.
+	        data.sessionID = data.cookie['express.sid'];
+	    } else {
+	       // if there isn't, turn down the connection with a message
+	       // and leave the function.
+	       return accept('No cookie transmitted.', false);
+	    }
+	    // accept the incoming connection
+	    accept(null, true);
+	});
 
 	io.sockets.on('connection', function(socket) {
 		UserManager.socketConnect(socket);
@@ -36,6 +56,7 @@ SocketServer.init = function(theModules) {
 		socket.on('message', function(data) {
 			Dispatcher.call(socket, data);
 		});
+		
 		socket.on('disconnect', function() {
 			UserManager.socketDisconnect(socket);
 		});
