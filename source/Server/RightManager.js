@@ -124,7 +124,7 @@ var fillCurrentDbWithTestData = function() {
     "Steven#345",
     "Lisa#123",
     "Mohammad#345",
-    "Alexjandro#345",
+    "Alejandro#345",
     "Sharath#345",
     "Ivan#345",
     "Siby#345",
