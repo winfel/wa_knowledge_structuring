@@ -10,7 +10,7 @@
  */
 "use strict";
 
-var db = require('monk')('localhost/WebArena');
+var db = false;
 var DEBUG_OF_USERMANAGEMENT = false;
 
 var UserManager = {};
@@ -30,6 +30,9 @@ UserManager.connections = {};
  */
 UserManager.init = function(theModules) {
   Modules = theModules;
+  
+  db = require('monk')(Modules.MongoDBConfig.getURI());
+  
   var Dispatcher = Modules.Dispatcher;
   Dispatcher.registerCall('login', UserManager.login);
   Dispatcher.registerCall('enter', UserManager.enterRoom);

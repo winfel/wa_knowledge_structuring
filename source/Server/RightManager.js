@@ -1,5 +1,4 @@
-var db = require('monk')('localhost/WebArena');
-
+var db = false;
 var Modules = false;
 
 var fillWithDefaultRights = function() {
@@ -218,6 +217,8 @@ var RightManager = function() {
   this.init = function(theModules) {
     Modules = theModules;
 
+    db = require('monk')(Modules.MongoDBConfig.getURI());
+    
     var Dispatcher = Modules.Dispatcher;
 
     fillCurrentDbWithTestData();

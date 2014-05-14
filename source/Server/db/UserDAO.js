@@ -3,7 +3,8 @@
 *
 *    @author Felix Winkelnkemper, University of Paderborn, 2012
 *
-*	 @class User
+*	 @class UserDAO
+*    @classdesc DAO Access the User collection
 */
 
 "use strict";
@@ -19,7 +20,7 @@ var UserDAO = {};
  */
 UserDAO.init = function(theModules) {
     Modules = theModules;
-    db = require('monk')(global.config.mongodb.dbname);
+    db = require('monk')(Modules.MongoDBConfig.getURI());
 }
 
 UserDAO.usersByUserName = function(username, callback) {

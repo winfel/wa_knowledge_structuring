@@ -1,5 +1,5 @@
-var db = require('monk')('localhost/WebArena');
-
+//var db = require('monk')('localhost/WebArena');
+var db = false;
 var Modules = false;
 
 var fillCurrentDbWithTestData = function() {
@@ -28,8 +28,6 @@ var fillCurrentDbWithTestData = function() {
 
 
 var TagManager = function() {
-	fillCurrentDbWithTestData();
-	
 	var that = this;
 	
    /**
@@ -38,6 +36,10 @@ var TagManager = function() {
    */
   this.init = function(theModules) {
     Modules = theModules;
+    
+    db = require('monk')(Modules.MongoDBConfig.getURI());
+    fillCurrentDbWithTestData();
+    
     var Dispatcher = Modules.Dispatcher;
 
     Dispatcher.registerCall('getMainTags', function(socket, data, responseID) {

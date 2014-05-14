@@ -91,9 +91,9 @@ Modules.Log = require('./Common/Log.js');
 Modules.config = config;
 Modules.Config = config;
 
+Modules.MongoDBConfig   = require('./Server/db/MongoDBConfig.js');
 Modules.ObjectManager   = require('./Server/ObjectManager.js');
 Modules.Dispatcher      = require('./Server/Dispatcher.js');
-//Modules.WebServer       = require('./Server/WebServer.js');
 Modules.WebServer       = require('./Server/WebServerE.js');
 Modules.SocketServer    = require('./Server/SocketServer.js');
 Modules.UserManager     = require('./Server/UserManager.js');

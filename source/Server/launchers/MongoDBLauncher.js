@@ -42,24 +42,8 @@ MongoDBLauncher.launch = function() {
 }
 
 MongoDBLauncher.isRunning = function(callback) {
-    
-    // URI Format: http://docs.mongodb.org/manual/reference/connection-string/
-    // example 'mongodb://username:password@host:port/database?options...';
-    var createURI = function() {
-        var uri = 'mongodb://';
-        
-        uri += ((global.config.mongodb.user != '') && (global.config.mongodb.password != '')) ? 
-                global.config.mongodb.user + ":" + global.config.mongodb.password + "@" : "";
-        
-        uri += global.config.mongodb.host;
-        uri += (global.config.mongodb.port != '') ? ":" + global.config.mongodb.port : "";
-        uri += (global.config.mongodb.dbname != '') ? "/" + global.config.mongodb.dbname : "";
-        
-        return uri;
-    };
-    
     var running = false; 
-    var uri = createURI();
+    var uri = modules.MongoDBConfig.getURI();
     
     mongoose.connect(uri);
     var db = mongoose.connection;
