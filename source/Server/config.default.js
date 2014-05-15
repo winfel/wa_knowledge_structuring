@@ -58,6 +58,7 @@ module.exports={
               password: "", 
               dbname: "",
               host: "",
-              port: 27017
+              port: 27017,
+              path2bin: "<for local DB only>" // example : C:\Program Files\mongodb-win32-i386-2.4.9\bin\
             }      
 };

@@ -9,8 +9,11 @@
 
 "use strict";
 
+var path = require('path');
+
 var MongoDBConfig = {},
-    uri;
+    uri,
+    path2bin;
 
 /**
  * Init function called in server.js to initialize this module
@@ -19,10 +22,15 @@ var MongoDBConfig = {},
  */
 MongoDBConfig.init = function() {
     uri = createURI();
+    path2bin = path.normalize(global.config.mongodb.path2bin);
 }
 
 MongoDBConfig.getURI = function() {
     return uri; 
+}
+
+MongoDBConfig.getPath2bin = function() {
+    return path2bin; 
 }
 
 //URI Format: http://docs.mongodb.org/manual/reference/connection-string/
