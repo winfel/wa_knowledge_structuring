@@ -1,6 +1,8 @@
 var db = false;
 var Modules = false;
 
+var clearTablesAtStartUp = false;
+
 var fillWithDefaultRights = function() {
   /* one role per default - read only for all users */
   var pushRoles = ['PaperObject#writer#read,write,create',
@@ -138,30 +140,46 @@ var fillCurrentDbWithTestData = function() {
   ];
 
   /* clear tables */
-  db.get('rights').drop();
-  db.get('users').drop();
-  db.get('roles').drop();
+  if(clearTablesAtStartUp){
+    db.get('rights').drop();
+    db.get('users').drop();
+    db.get('roles').drop();
+  }
 
   /* push test rights */
-  var collection = db.get('rights');
+  var collectionRights = db.get('rights');
   pushRights.forEach(function(item) {
     var token = item.split("#");
-    collection.insert({type: String(token[0]), id: String(token[1]), name: String(token[2]), comment: String(token[3])});
 
-    Modules.Log.debug("pushing testright: " + String(token[1]));
+    collectionRights.find({type: String(token[0]), name: String(token[2])}, {}, function(e, docs) {
+      if (typeof docs == 'undefined' || docs.length === 0) {
+        collectionRights.insert({type: String(token[0]), id: String(token[1]), name: String(token[2]), comment: String(token[3])});
+
+        Modules.Log.debug("pushing test right: " + String(token[1]));
+      } else {
+        Modules.Log.debug("test right " + token[1] + " was already included");
+      }
+    });
   });
 
   /* push test users */
-  collection = db.get('users');
+  collectionUser = db.get('users');
   pushUsers.forEach(function(item) {
     var token = item.split("#");
-    collection.insert({username: String(token[0]), password: String(token[1])});
 
-    Modules.Log.debug("pushing testuser: " + String(token[0]));
+    collectionUser.find({username: String(token[0])}, {}, function(e, docs) {
+      if (typeof docs == 'undefined' || docs.length === 0) {
+        collectionUser.insert({username: String(token[0]), password: String(token[1])});
+
+        Modules.Log.debug("pushing test user: " + String(token[0]));
+      } else {
+        Modules.Log.debug("test user " + token[0] + " was already included");
+      }
+    });
   });
 
   /* push test roles */
-  collection = db.get('roles');
+  collectionRoles = db.get('roles');
   pushRoles.forEach(function(item) {
     var token = item.split("#");
 
@@ -172,14 +190,20 @@ var fillCurrentDbWithTestData = function() {
     var aMode = String(token[4]);
     var someUser = String(token[5]).split(",");
 
-    collection.insert({id: aID,
-      contextID: aContextID,
-      name: aName,
-      rights: someRights,
-      mode: aMode,
-      users: someUser});
+    collectionRoles.find({contextID: aContextID, name : aName}, {}, function(e, docs) {
+      if (typeof docs == 'undefined' || docs.length === 0) {
+        collectionRoles.insert({id: aID,
+          contextID: aContextID,
+          name: aName,
+          rights: someRights,
+          mode: aMode,
+          users: someUser});
 
-    Modules.Log.debug("pushing testrole: " + aName);
+        Modules.Log.debug("pushing test role: " + String(aName));
+      } else {
+        Modules.Log.debug("test role " + aName + " was already included");
+      }
+    });
   });
 };
 
@@ -285,15 +309,17 @@ var RightManager = function() {
       collection.find({}, options, function(e2, rightWithMaxID) {
 
         if (typeof docs == 'undefined' || docs.length === 0) {
-          var newID = Number(rightWithMaxID[0].id) + 1;
+          if(typeof rightWithMaxID == 'undefined'){
+            var newID = Number(rightWithMaxID[0].id) + 1;
 
-          collection.insert({
-            type: String(object.type),
-            id: String(newID),
-            name: String(command),
-            comment: "Insert a comment..."});
+            collection.insert({
+              type: String(object.type),
+              id: String(newID),
+              name: String(command),
+              comment: "Insert a comment..."});
 
-          Modules.Log.debug("pushing new right: " + String(command));
+            Modules.Log.debug("pushing new right: " + String(command));
+          }
         } else {
           Modules.Log.debug("right " + command + " was already included and has, " +
                   "thus, not been included to the right list");
