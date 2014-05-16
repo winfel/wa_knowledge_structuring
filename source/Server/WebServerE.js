@@ -156,7 +156,7 @@ app.use(function(req, res, next) {
 });
 
 app.get('/', function(req, res, next) {
-    var filePath = path.resolve(__dirname, '../Client' + Modules.config.homepage);
+    var filePath = path.resolve(__dirname, '../Client/views/' + Modules.config.homepage);
     res.sendfile(filePath);
 });
 

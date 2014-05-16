@@ -33,7 +33,7 @@ MongoDBConfig.getPath2bin = function() {
     return path2bin; 
 }
 
-//URI Format: http://docs.mongodb.org/manual/reference/connection-string/
+// URI Format: http://docs.mongodb.org/manual/reference/connection-string/
 // example 'mongodb://username:password@host:port/database?options...';
 var createURI = function() {
     var uri = 'mongodb://';
