@@ -1,30 +1,20 @@
 "use strict";
 
 /**
- * Show sign up prompt
- */
-GUI.showSignUp = function() {
-    $("#sign_up").css("opacity", 0);
-    $("#sign_up").show();
-    
-    $("#sign_up").animate({
-        opacity: 1
-    }, 1000);
-    
-    //$("#login_submit").click(GUI.login);
-}
-
-/**
  * Show login prompt
  * 
  * @param {bool|String} [err=false] Optional error message 
  */
 GUI.showLogin = function(err) {
+    
+  if (true) {
+      GUI.login();
+  }  
 
   /* check for an external session login request in the URL hash */
-  if (window.location.hash != "" && window.location.hash.indexOf('externalSession') > -1) {
+  /*if (window.location.hash != "" && window.location.hash.indexOf('externalSession') > -1) {
     GUI.login();
-  }
+  }*/
 
   /* true if the login process is active */
   GUI.loginProcessActive = false;
@@ -57,8 +47,6 @@ GUI.showLogin = function(err) {
       GUI.login();
     }
   });
-  
-  GUI.showSignUp();
 
 };
 
@@ -66,8 +54,6 @@ GUI.showLogin = function(err) {
  * Hide the login prompt
  */
 GUI.hideLogin = function() {
-  GUI.hideSignUp();
-
   $("#login").hide();
   $("#login_background").hide();
   $("#login_background").css("opacity", 1);
@@ -75,13 +61,6 @@ GUI.hideLogin = function() {
   GUI.progressBarManager.updateProgress("login", 100);
 
   GUI.loginProcessActive = false;
-};
-
-/**
- * Hide the sign up prompt
- */
-GUI.hideSignUp = function() {
-  $("#sign_up").hide();
 };
 
 /**

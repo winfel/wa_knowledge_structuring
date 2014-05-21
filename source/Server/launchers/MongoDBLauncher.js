@@ -42,24 +42,8 @@ MongoDBLauncher.launch = function() {
 }
 
 MongoDBLauncher.isRunning = function(callback) {
-    
-    // URI Format: http://docs.mongodb.org/manual/reference/connection-string/
-    // example 'mongodb://username:password@host:port/database?options...';
-    var createURI = function() {
-        var uri = 'mongodb://';
-        
-        uri += ((global.config.mongodb.user != '') && (global.config.mongodb.password != '')) ? 
-                global.config.mongodb.user + ":" + global.config.mongodb.password + "@" : "";
-        
-        uri += global.config.mongodb.host;
-        uri += (global.config.mongodb.port != '') ? ":" + global.config.mongodb.port : "";
-        uri += (global.config.mongodb.dbname != '') ? "/" + global.config.mongodb.dbname : "";
-        
-        return uri;
-    };
-    
     var running = false; 
-    var uri = createURI();
+    var uri = modules.MongoDBConfig.getURI();
     
     mongoose.connect(uri);
     var db = mongoose.connection;
@@ -89,18 +73,20 @@ MongoDBLauncher.isRunning = function(callback) {
 // on windows 
 if (os.type().indexOf("Windows") > -1) {
     
-    MongoDBLauncher.launchMongo = function(callback) {
-        var cmd = "mongod";
+    MongoDBLauncher.launchMongo = function(callback) { 
+        var path = modules.MongoDBConfig.getPath2bin(); 
+        var cmd = 'mongod';
         
-        var child = exec(cmd, function (error, stdout, stderr) {
+        console.log("Initializing MongoDB " + path + cmd + "...");
+        
+        var child = exec(cmd, { cwd: path } , function (error, stdout, stderr) {
             console.log('stdout: ' + stdout);
             
             if (error !== null) {
               console.warn('exec error: ' + error);
               console.warn('MongoDB could not be initialized');
-            } else {
-                console.log("Mongo is now running...");
-            }
+            } 
+            
         });
           
          child.unref();
@@ -113,7 +99,7 @@ if (os.type().indexOf("Windows") > -1) {
 } else {
 
     // On any other OS 
-    MongoDBLauncher.launchMongo = function(callback) {
+    MongoDBLauncher.launchMongo = function(callback) {  
         console.warn("MongoDB auto-run is not yet supported for your OS, do it manually!!");
 
         if (!(_.isNull(callback) || _.isUndefined(callback))) {

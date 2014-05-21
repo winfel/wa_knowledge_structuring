@@ -70,13 +70,14 @@ GUI.tagManager= new function() {
 		this.$customMainTag = this.dialogDom.find("#custom-Main-tag");
 	    this.$documentName = this.dialogDom.find("#document-name"); 
 	    
+	    // makes both the container for unassigned and assigned tags droppabale  
 		this.makeContainersDroppable();
 	    
-		// initialization of the pages
+		// initialization of the paging parameters
 		this.currentPage = 1;
 		this.tagsPerPage = 6;
 		
-	
+		//sets the webArena Object
 		this.webarenaObject = webarenaObject;
 		
 		// sets the main tag of the file object
@@ -85,11 +86,16 @@ GUI.tagManager= new function() {
 		Modules.TagManager.getMainTags(this.setMainTags);
 		
 		// sets the assigned secondary tags of the file object	
-		this.assignedSecTags = webarenaObject.getAttribute('secondaryTags');
+		var assignedSecondaryTags = webarenaObject.getAttribute('secondaryTags');
+		if ( assignedSecondaryTags == 0 ) {
+			this.assignedSecTags = [];
+		} else {
+			this.assignedSecTags = webarenaObject.getAttribute('secondaryTags');
+		}
 		this.drawAssignedTags();
 			
 		// gets all existing secondary tags from the database for a specified main tag
-		Modules.TagManager.getSecTags(this.mainTag, this.setSecondaryTags);	
+		Modules.TagManager.getSecTags(this.mainTag, this.setSecondaryTags);
 	   
 		// sets the name of the file object
 	    var documentName = webarenaObject.getAttribute('name');
@@ -111,7 +117,7 @@ GUI.tagManager= new function() {
 			content+= '		<li><a href="#secondaryTags">Secondary Tag</a></li>';
 			content+= '	</ul>';
 			content+= '	<div id="mainTag">';
-			content+= '     <div class="custom-Main-tag-holder">';
+			content+= '     <div class="custom-main-tag-holder">';
 			content+= '     	<label for="custom-Main-tag"><b>Custom tag:</b> </label>';
 		    content+= '			<input id="custom-Main-tag">';
 			content+= '		</div>';
@@ -127,14 +133,15 @@ GUI.tagManager= new function() {
 			content+= '				<button id="btn-previous"><</button>';
 			content+= '				<button id="btn-next">></button>';
 			content+= '			</div>';
-			content+= '     	<div class="custom-Sec-tag-holder">';
+			content+= '     	<div class="custom-sec-tag-holder">';
 			content+= '     		<label for="custom-Sec-tag"><b>Custom tag:</b> </label>';
 		    content+= '				<input id="custom-Sec-tag">';
 			content+= '			</div>';		
 			content+= '			</div>';
 			content+= '			<div id="document" class="ui-widget-content ui-state-default">';
 			content+= '				<h4 class="ui-widget-header"><span id="document-name"></span></h4>';
-			content+= ' 	    	<ul class="tags ui-helper-reset" id="assignedTags">';
+			//content+= ' 	    	<ul class="tags ui-helper-reset" id="assignedTags">';
+			content+= ' 	    	<ul class="tags" id="assignedTags">';
 			content+= ' 	    	</ul>';
 			content+= '     	</div>';
 			content+= '     </div>';
@@ -151,28 +158,45 @@ GUI.tagManager= new function() {
 		
 		//click event handler for the buttons which represent the main tags
 		//sets the main tag of the file object to the clicked main tag
-		$("#mainTag :button").live("click", function(){
+		$("#mainTag :button").die().live("click", function(){
 			
-			// set the main tag
-			that.mainTag = $(this).text();
-			$("#mainTag :button").removeClass('assigned-main-tag');
-			$(this).addClass('assigned-main-tag');
+			var newMainTag = $(this).text();
 			
-			//get the appropriate secondary tags for the chosen main tag
-			Modules.TagManager.getSecTags(that.mainTag, that.setSecondaryTags);
+			if( that.mainTag != "" &&
+				that.mainTag != newMainTag &&
+				that.assignedSecTags.length > 0) {
 			
-			//enable the page with secondary tags and set the current page to the first one
-			$("#tabs").tabs("enable", 1);
-			that.currentPage = 1;
+				var response = confirm("By changing the main tag all previously assigned secondary tags will be removed. Do you want to apply the change?");
+				
+				if (response==false) return;
+				  				  
+				// remove all assigned tags
+				that.assignedSecTags = [];
+				that.drawAssignedTags();				
 			
-			// go to secondary tags page
-			//$( "#tabs" ).tabs( "select", 1 );
+				  
+			} 
+				
+				// set the main tag
+				that.mainTag = newMainTag;
+				$("#mainTag :button").removeClass('assigned-main-tag');
+				$(this).addClass('assigned-main-tag');
+				
+				//get the appropriate secondary tags for the chosen main tag
+				Modules.TagManager.getSecTags(that.mainTag, that.setSecondaryTags);
+				
+				//enable the page with secondary tags and set the current page to the first one
+				$("#tabs").tabs("enable", 1);
+				that.currentPage = 1;
+				
+				// go to secondary tags page
+				//$( "#tabs" ).tabs( "select", 1 );
 			
 		});	
 		
 		// event handler for the input field for creation of custom main tags
 		// creates new main tag and assigns it to the file object		
-		$("#custom-Main-tag").live("keyup", function(event) {
+		$("#custom-Main-tag").die().live("keyup", function(event) {
 			var that = GUI.tagManager;
 			var customMainTagValue = $(this).val();
 			
@@ -184,22 +208,49 @@ GUI.tagManager= new function() {
 					
 						//reset the value of the input field
 						$(this).val("");
-					
+						alert("A main tag with the specified name already exists");
+						
 						return
 					}
 				}
 					
+				if( that.assignedSecTags.length > 0 ) {
+					var response = confirm("By changing the main tag all previously assigned secondary tags will be removed. Do you want to apply the change?");
+					
+					if (response==false) return;
+					
+					// remove all assigned tags
+					that.assignedSecTags = [];
+					that.drawAssignedTags();
+				}
+				
 				//save the newly created tag in the database  
 				Modules.TagManager.updMainTags(customMainTagValue, that.mainTags.length+1);
 					
-				//get the complete list froom mainTags from the Database and set them
+				//get the complete list from mainTags from the Database and set them
 				Modules.TagManager.getMainTags(that.setMainTags);
 
 				//draw the MainTags, including the new Tag
 				that.drawMainTags();
-
+				
+				// set the main tag
+				that.mainTag = customMainTagValue;
+				$("#mainTag :button").removeClass('assigned-main-tag');
+				$("#mainTag :button").last().addClass('assigned-main-tag');
+				that.unassignedSecTags = [];
+				that.updatePagingParameters();
+				
+				//enable the page with secondary tags and set the current page to the first one
+				$("#tabs").tabs("enable", 1);
+				that.currentPage = 1;
+				
+				
+				that.drawUnassignedTags();
+				
 				//reset the value of the input field
 				$(this).val("");
+				  
+				
 					
 			}
 			
@@ -207,7 +258,7 @@ GUI.tagManager= new function() {
 		
 		// event handler for the input field for creation of custom secondary tags
 		// creates new secondary tag and assigns it to the file object		
-		$("#custom-Sec-tag").live("keyup", function(event) {
+		$("#custom-Sec-tag").die().live("keyup", function(event) {
 			var that = GUI.tagManager;
 			var customSecTagValue = $(this).val();
 			
@@ -440,7 +491,7 @@ GUI.tagManager= new function() {
 			$(
 			  '<li class="ui-widget-content" data-sectag="'+value+'">'+
 				  '<h5 class="ui-widget-header tagValue">'+value+'</h5>'+
-			      '<a href="" id="del-tag" title="Delete this tag" class="ui-icon ui-icon-closethick">Delete image</a>'+
+			//      '<a href="" id="del-tag" title="Delete this tag" class="ui-icon ui-icon-closethick">Delete image</a>'+
 			  '</li>'
 			 ).appendTo(container);
 		
@@ -591,7 +642,7 @@ GUI.tagManager= new function() {
 		
 		buttons[GUI.translate("save")] = function(domContent){
 			
-			that.saveChanges();		
+			that.saveChanges();
 			
 		};
 

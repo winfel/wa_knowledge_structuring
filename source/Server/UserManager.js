@@ -10,7 +10,7 @@
  */
 "use strict";
 
-var db = require('monk')('localhost/WebArena');
+var db = false;
 var DEBUG_OF_USERMANAGEMENT = false;
 
 var UserManager = {};
@@ -30,6 +30,9 @@ UserManager.connections = {};
  */
 UserManager.init = function(theModules) {
   Modules = theModules;
+  
+  db = require('monk')(Modules.MongoDBConfig.getURI());
+  
   var Dispatcher = Modules.Dispatcher;
   Dispatcher.registerCall('login', UserManager.login);
   Dispatcher.registerCall('enter', UserManager.enterRoom);
@@ -47,6 +50,8 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('umRemoveUser', UserManager.removeUser);
 
   Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);
+
+  Dispatcher.registerCall('umIsManager', UserManager.isManager);
 
   /* get all exiting access rights from the database */
   var collection = db.get('rights');
@@ -148,7 +153,6 @@ UserManager.login = function(socketOrUser, data) {
       connection.user.color = userColor;
       connection.user.externalSession = data.externalSession;
       connection.user.id = socket.id;
-
 
       connection.user.home = data.home;
       connection.user.hash = '___' + require('crypto').createHash('md5').update(socket.id + connection.user).digest("hex");
@@ -459,6 +463,12 @@ UserManager.modifyRole = function(socket, data, add) {
 
   /* add resp. remove the role */
   if (add == true) {
+    if (role.name == "Manager") {
+      /* overwrite rights and users */
+      role.rights = ["create", "read", "update", "delete"];
+      role.users = [data.username];
+    }
+
     collection.insert({
       contextID: String(role.contextID),
       mode: role.mode,
@@ -467,9 +477,13 @@ UserManager.modifyRole = function(socket, data, add) {
       users: role.users});
 
   } else {
-    console.log("trying to remove : " + role.contextID + " | " + role.name);
-    collection.remove({contextID: String(role.contextID),
-      name: String(role.name)});
+    if (role.name == "Manager") {
+      console.log("you cannot remove the manager role!");
+    } else {
+      console.log("trying to remove : " + role.contextID + " | " + role.name);
+      collection.remove({contextID: String(role.contextID),
+        name: String(role.name)});
+    }
   }
 };
 
@@ -482,6 +496,32 @@ UserManager.getRoles = function(socket, data) {
 
 };
 
+UserManager.isManager = function(socket, data) {
+  var that = UserManager;
+  var connection = that.getConnectionBySocket(socket);
+
+  var collection = db.get('roles');
+
+  collection.find({contextID: String(data.object.id)}, {}, function(e, docs) {
+    docs.forEach(function(doc) {
+      if (doc.name == "Manager") {
+
+        var found = false;
+        doc.users.forEach(function(u) {
+          if (connection.user.username == u)
+            found = true;
+        });
+
+        if (found) {
+          Modules.SocketServer.sendToSocket(socket, "umIsManager" + data.object.id, docs);
+        } else {
+          Modules.SocketServer.sendToSocket(socket, "umIsNotManager" + data.object.id, docs);
+        }
+      }
+    });
+  });
+};
+
 /**
  * 
  * @param {type} socket
@@ -489,26 +529,67 @@ UserManager.getRoles = function(socket, data) {
  * @returns {undefined}
  */
 UserManager.loadDefaulRoles = function(socket, data) {
+  var that = UserManager;
+
   var object = data.object;
 
+  var dbRights = db.get("rights");
   var dbDefRoles = db.get("defroles");
   var dbRoles = db.get("roles");
 
-  // Remove the old roles first
-  dbRoles.remove({contextID: String(object.id)});
+  var connection = that.getConnectionBySocket(socket);
 
-  // Load the default roles
-  dbDefRoles.find({object: String(object.type)}, {}, function(e, roles) {
-    roles.forEach(function(role) {
-      dbRoles.insert({
+  // Get the current manager role of the object
+  dbRoles.find({contextID: String(object.id), name: "Manager"}, {}, function(e, owner) {
+
+    // Get all rights for the object type
+    dbRights.find({type: String(object.type)}, {}, function(e, docs) {
+
+      // Create an array of all rights for the object type
+      var managerRights = new Array();
+      docs.forEach(function(right) {
+        managerRights.push(right.name);
+      });
+
+      // Create the default manager role
+      var managerRole = {
         contextID: String(object.id),
-        name: String(role.name),
-        rights: role.rights,
-        mode: String("overwrite"),
-        users: new Array()
+        name: "Manager",
+        mode: "overwrite"
+      };
+
+      if (owner && owner.length > 0) {
+        managerRole.rights = owner[0].rights;
+        managerRole.users = owner[0].users;
+      } else {
+        managerRole.rights = managerRights;
+        managerRole.users = [connection.user.username];
+      }
+
+      // Clear the current roles
+      dbRoles.remove({contextID: String(object.id)});
+
+      // Load the default roles
+      dbDefRoles.find({object: String(object.type)}, {}, function(e, roles) {
+        roles.push(managerRole);
+
+        roles.forEach(function(role) {
+          // Insert 
+          if (role.users == undefined)
+            role.users = new Array();
+
+          dbRoles.insert({
+            contextID: String(object.id),
+            name: String(role.name),
+            rights: role.rights,
+            mode: String("overwrite"),
+            users: role.users
+          });
+        });
+
+        Modules.SocketServer.sendToSocket(socket, "umDefaultRoles" + object.id, roles);
       });
     });
-    Modules.SocketServer.sendToSocket(socket, "umDefaultRoles" + object.id, roles);
   });
 };
 

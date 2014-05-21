@@ -46,6 +46,10 @@ GUI.rightmanagerDialog = new function() {
         {
           text: "Add users",
           click: function() {
+
+            /* check if user is in manager-role */
+
+            /* If so: */
             openUserDialog(that.activeRole);
           }
         },
@@ -374,7 +378,7 @@ GUI.rightmanagerDialog = new function() {
   function setDefaultRoles() {
     var that = GUI.rightmanagerDialog;
 
-    if (that.activeRole) {
+    if (that.rmdTabs.tabs("length") > 0) {
       $("#confirmDialog").dialog({
         title: "Load default roles",
         resizable: false,
@@ -438,7 +442,7 @@ GUI.rightmanagerDialog = new function() {
   function checkDeleteUsersButton() {
     var that = GUI.rightmanagerDialog;
 
-    if (that.activeRole) {
+    if (that.activeRole && that.checkedSpans[that.activeRole.name]) {
       // Check how many              
       if (that.checkedSpans[that.activeRole.name].length > 0) {
         that.deleteButton.button("enable");

@@ -92,5 +92,16 @@ var TagManager = new function() {
 	});
   };
   
+  /**
+   * 
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.deleteMainTag = function(mainTag) {
+
+    Modules.SocketClient.serverCall('deleteMainTag', {
+		'mainTag': mainTag
+	});
+  };
   
 };

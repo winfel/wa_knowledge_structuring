@@ -1,6 +1,7 @@
-var db = require('monk')('localhost/WebArena');
-
+var db = false;
 var Modules = false;
+
+var clearTablesAtStartUp = false;
 
 var fillWithDefaultRights = function() {
   /* one role per default - read only for all users */
@@ -117,21 +118,21 @@ var fillCurrentDbWithTestData = function() {
     'NumberCreator#8#create#You may create the selected NumberCreater and NumericObjects',
     'NumberCreator#9#update#You may drop something on the PaperObject PaperObject'];
   var pushUsers = [
-    'joerg#12345',
-    'vanessa#xyz',
-    "shari#345",
-    "oliver#345",
-    "steven#345",
-    "lisa#123",
-    "mohammad#345",
-    "alexjandro#345",
-    "sharath#345",
-    "ivan#345",
-    "siby#345",
-    "brice#345",
-    "manasa#345",
-    "nitesh#345",
-    "patrick#234"
+    'Joerg#12345',
+    'Vanessa#xyz',
+    "Shari#345",
+    "Oliver#345",
+    "Steven#345",
+    "Lisa#123",
+    "Mohammad#345",
+    "Alejandro#345",
+    "Sharath#345",
+    "Ivan#345",
+    "Siby#345",
+    "Brice#345",
+    "Manasa#345",
+    "Nitesh#345",
+    "Patrick#234"
   ];
   var pushRoles = [
     '1#1#RandomGuys#create,read#overwrite#',
@@ -139,30 +140,46 @@ var fillCurrentDbWithTestData = function() {
   ];
 
   /* clear tables */
-  db.get('rights').drop();
-  db.get('users').drop();
-  db.get('roles').drop();
+  if(clearTablesAtStartUp){
+    db.get('rights').drop();
+    db.get('users').drop();
+    db.get('roles').drop();
+  }
 
   /* push test rights */
-  var collection = db.get('rights');
+  var collectionRights = db.get('rights');
   pushRights.forEach(function(item) {
     var token = item.split("#");
-    collection.insert({type: String(token[0]), id: String(token[1]), name: String(token[2]), comment: String(token[3])});
 
-    Modules.Log.debug("pushing testright: " + String(token[1]));
+    collectionRights.find({type: String(token[0]), name: String(token[2])}, {}, function(e, docs) {
+      if (typeof docs == 'undefined' || docs.length === 0) {
+        collectionRights.insert({type: String(token[0]), id: String(token[1]), name: String(token[2]), comment: String(token[3])});
+
+        Modules.Log.debug("pushing test right: " + String(token[1]));
+      } else {
+        Modules.Log.debug("test right " + token[1] + " was already included");
+      }
+    });
   });
 
   /* push test users */
-  collection = db.get('users');
+  collectionUser = db.get('users');
   pushUsers.forEach(function(item) {
     var token = item.split("#");
-    collection.insert({username: String(token[0]), password: String(token[1])});
 
-    Modules.Log.debug("pushing testuser: " + String(token[0]));
+    collectionUser.find({username: String(token[0])}, {}, function(e, docs) {
+      if (typeof docs == 'undefined' || docs.length === 0) {
+        collectionUser.insert({username: String(token[0]), password: String(token[1])});
+
+        Modules.Log.debug("pushing test user: " + String(token[0]));
+      } else {
+        Modules.Log.debug("test user " + token[0] + " was already included");
+      }
+    });
   });
 
   /* push test roles */
-  collection = db.get('roles');
+  collectionRoles = db.get('roles');
   pushRoles.forEach(function(item) {
     var token = item.split("#");
 
@@ -173,14 +190,20 @@ var fillCurrentDbWithTestData = function() {
     var aMode = String(token[4]);
     var someUser = String(token[5]).split(",");
 
-    collection.insert({id: aID,
-      contextID: aContextID,
-      name: aName,
-      rights: someRights,
-      mode: aMode,
-      users: someUser});
+    collectionRoles.find({contextID: aContextID, name : aName}, {}, function(e, docs) {
+      if (typeof docs == 'undefined' || docs.length === 0) {
+        collectionRoles.insert({id: aID,
+          contextID: aContextID,
+          name: aName,
+          rights: someRights,
+          mode: aMode,
+          users: someUser});
 
-    Modules.Log.debug("pushing testrole: " + aName);
+        Modules.Log.debug("pushing test role: " + String(aName));
+      } else {
+        Modules.Log.debug("test role " + aName + " was already included");
+      }
+    });
   });
 };
 
@@ -218,6 +241,8 @@ var RightManager = function() {
   this.init = function(theModules) {
     Modules = theModules;
 
+    db = require('monk')(Modules.MongoDBConfig.getURI());
+    
     var Dispatcher = Modules.Dispatcher;
 
     fillCurrentDbWithTestData();
@@ -228,9 +253,9 @@ var RightManager = function() {
 
     // Register RightManager related server calls...
     Dispatcher.registerCall('rmHasAccess', function(socket, data, responseID) {
-      //var context = Modules.UserManager.getConnectionBySocket(socket);
-      //Modules.ObjectController.executeServersideAction(data, context, resultCallbackWrapper(socket, responseID));
-      that.hasAccess(data.command, data.object, data.username, function(result) {
+      var connection = Modules.UserManager.getConnectionBySocket(socket);
+      
+      that.hasAccess(data.command, data.object, connection.user, function(result) {
         if (result === true) {
           Modules.SocketServer.sendToSocket(socket, "rmAccessGranted" + data.object.id);
         } else {
@@ -284,15 +309,17 @@ var RightManager = function() {
       collection.find({}, options, function(e2, rightWithMaxID) {
 
         if (typeof docs == 'undefined' || docs.length === 0) {
-          var newID = Number(rightWithMaxID[0].id) + 1;
+          if(typeof rightWithMaxID == 'undefined'){
+            var newID = Number(rightWithMaxID[0].id) + 1;
 
-          collection.insert({
-            type: String(object.type),
-            id: String(newID),
-            name: String(command),
-            comment: "Insert a comment..."});
+            collection.insert({
+              type: String(object.type),
+              id: String(newID),
+              name: String(command),
+              comment: "Insert a comment..."});
 
-          Modules.Log.debug("pushing new right: " + String(command));
+            Modules.Log.debug("pushing new right: " + String(command));
+          }
         } else {
           Modules.Log.debug("right " + command + " was already included and has, " +
                   "thus, not been included to the right list");
@@ -326,7 +353,7 @@ var RightManager = function() {
    *	
    *	@param {type}       command     The used command (access right), e.g., read, write (CRUD)
    *	@param {type}       object      The object that should be checked
-   *  @param {type}       user        The username of the user
+   *  @param {type}       user        The user object
    *  @param {function}   callback    The callback function with one boolean parameter (the answer)
    */
   this.hasAccess = function(command, object, user, callback) {
@@ -344,7 +371,7 @@ var RightManager = function() {
         var parent = that.getParentOfObject(object);
 
         // call method for parent
-        that.hasAccess(command, parent, user, callback);
+        parent.hasAccess(command, parent, user, callback);
       } else {
         /* (1) get the roles that includes the current command within the context of
          the given object */
@@ -356,7 +383,7 @@ var RightManager = function() {
             Modules.Log.debug("Command is used in Role " + item.name);
 
             /* (2) check if current user is inside of one of these roles */
-            var userIsInUserList = (String(item.users).split(",").indexOf(String(user)) != -1);
+            var userIsInUserList = (String(item.users).split(",").indexOf(String(user.username)) != -1);
 
             /* (2') check if 'all' is included in the user list */
             var userDoesNotMatter = (String(item.users).split(",").indexOf(String("all")) != -1);

@@ -42,12 +42,15 @@ GUI.loadGUI = function(step) {
       GUI.progressBarManager.updateProgress("login", 20);
 
       // We aren't logged in yet and yet we are initializing the chat?
-      if (!GUI.loaded)
+      if (!GUI.loaded) {
         GUI.chat.init();
+      }
+      
       GUI.chat.clear(); //clear chats messages
 
-      if (!GUI.loaded)
+      if (!GUI.loaded) {
         GUI.sidebar.init(); //init sidebar
+      }
 
       // Login to the server
       ObjectManager.login(GUI.username, GUI.password, GUI.externalSession);

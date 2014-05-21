@@ -268,6 +268,13 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
 
 		object.setAttribute('name', type);
 
+		// SciWoAr added owner of an object
+		Modules.UserManager.modifyRole(null,
+										{object : object, 
+										role : {name : "Manager"},
+										username : context.user.username},
+										true);
+
 		for (var key in attributes) {
 			var value = attributes[key];
 			object.setAttribute(key, value);

@@ -1,5 +1,5 @@
-var db = require('monk')('localhost/WebArena');
-
+//var db = require('monk')('localhost/WebArena');
+var db = false;
 var Modules = false;
 
 var fillCurrentDbWithTestData = function() {
@@ -28,8 +28,6 @@ var fillCurrentDbWithTestData = function() {
 
 
 var TagManager = function() {
-	fillCurrentDbWithTestData();
-	
 	var that = this;
 	
    /**
@@ -38,6 +36,10 @@ var TagManager = function() {
    */
   this.init = function(theModules) {
     Modules = theModules;
+    
+    db = require('monk')(Modules.MongoDBConfig.getURI());
+    fillCurrentDbWithTestData();
+    
     var Dispatcher = Modules.Dispatcher;
 
     Dispatcher.registerCall('getMainTags', function(socket, data, responseID) {
@@ -58,6 +60,10 @@ var TagManager = function() {
 	
 	Dispatcher.registerCall('deleteSecTags', function(socket, data, responseID) {
 		that.deleteSecTags(socket, data.mainTag, data.secTag); 
+	});
+	
+	Dispatcher.registerCall('deleteMainTag', function(socket, data, responseID) {
+		that.deleteMainTag(socket, data.mainTag); 
 	});
  
   };
@@ -139,11 +145,28 @@ var TagManager = function() {
 			
 		dbMainTags.insert(
 		   [
-			  { id: newId, name: newMainTag, 
-			    secTags: [] }
+			  { 
+				  id: newId,
+				  name: newMainTag,				  
+			      secTags: [] 
+			  }
 		   ]	
 		);	
 		
+	};
+	
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.deleteMainTag = function(socket, mainTag) {
+
+		var dbMainTags = db.get('MainTags');
+
+		dbMainTags.remove({name: mainTag},{justOne: true});
+
 	};
 	  
 };

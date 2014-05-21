@@ -78,6 +78,6 @@ PaperObject.execute = function(openInNewWindow) {
 PaperObject.register('PaperObject');
 PaperObject.isCreatable = true;
 
-PaperObject.category = 'Rooms';
+PaperObject.category = 'Files';
 
 module.exports = PaperObject;

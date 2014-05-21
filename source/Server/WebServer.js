@@ -82,7 +82,7 @@ WebServer.init = function (theModules) {
 					}
 
 					res.writeHead(200, {'Content-Type': 'text/html', 'Content-Disposition': 'inline'});
-					data = data.replace("##START_ROOM##", roomId);
+					data = data.replace("{{start_room}}", roomId);
 					res.end(data);
 				});
 

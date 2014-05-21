@@ -1,11 +1,14 @@
-var db = require('monk')('localhost/WebArena')
+var db = false;
 var DEBUG_OF_USERMANAGEMENT = false;
 
 var UserManager2 = function() {
 
     var possibleAccessRights = [];
     
-    this.init = function(){
+    this.init = function(theModules) {
+        
+        db = require('monk')(theModules.MongoDBConfig.getURI());
+        
         /* get all exiting access rights from the database */
         var collection = db.get('rights');
         collection.find({},{},function(e,docs){

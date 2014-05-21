@@ -16,7 +16,15 @@
     "json-socket": "~0.1.2",
     "lodash": "",
     "monk": "",
-    "etherpad-lite-client": "",
+    "etherpad-lite-client":"",
+    "express": ">=4.x",
+    "path": "*",
+    "hbs": "*",
+    "validator": "*",
+    "everyauth": "*",
+    "body-parser": "*",
+    "cookie-parser": "*",
+    "express-session": "*",
     "mongoose": "^3.8.8"
   },
   "devDependencies": {
