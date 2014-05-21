@@ -19,7 +19,8 @@ var fileConnector={};
 var fs = require('fs');
 var async = require('async');
 
-// Todo: priority:low should use the same connection if one already exist
+var resumer = require('resumer');
+// Todo: priority:low should use? the same connection if one already exist
 var mongo = require('mongodb');
 var monk = require('monk');
 var db = monk('localhost:27017/test'); // Todo: priority:high must use the database address from config file
@@ -133,8 +134,7 @@ fileConnector.listRooms = function(callback){
         console.log(result);
         callback(null, result);
     });
-    console.log("debug:rooms read from db! Yey!");
-//    return;
+
     //-------------------------------------------^
 //	var filebase = fileConnector.Modules.Config.filebase;
 //	fs.readdir(filebase, function(err, files){
@@ -251,7 +251,7 @@ fileConnector.getInventory=function(roomID,context,callback){
 
 
     //------------------------------------------->
-    // Todo: priority:high implement the sync as well, the following is only async
+    // Todo: priority:medium implement the sync as well (if needed), the following is only async
     console.log("-- get inventory called");
     console.log(typeof roomID);
     var inventoryDb = [];
@@ -510,7 +510,8 @@ fileConnector.saveObjectData=function(roomID,objectID,data,after,context,createI
     console.log(data);
     console.log("end of data");
     dbRooms.update({id:data.id}, data, {upsert:true}, function(err, docs){
-        if(docs ===0) console.log("there is something wrong with saveObjectData");
+        if(docs ===0) console.log("Error: there is something wrong with saveObjectData");
+        if (after) after(objectID);
     });
     //-------------------------------------------^
 
@@ -554,57 +555,57 @@ fileConnector.saveContent=function(roomID,objectID,content,after,context, inputI
 	this.Modules.Log.debug("Save content from string (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
 	var that = this;
 
+    if (!context) this.Modules.Log.error("Missing context");
     //------------------------------------------->
     console.log("-- saveContent called");
     // Todo: veryHigh   inputIsStream mode must be implemented
     dbContents.update({id:objectID}, {id:objectID, /*room:roomID,*/"content":content }, {upsert:true}, function(err, docs){
         if(docs ===0) console.log("there is something wrong with saveContent");
-
+        if (after) after(objectID);
     });
 
-    if (after) after(objectID);
 
     //-------------------------------------------^
 
-    var filebase=this.Modules.Config.filebase;
-    var foldername=filebase+'/'+roomID;
-    try {fs.mkdirSync(foldername)} catch(e){};
-    var filename=filebase+'/'+roomID+'/'+objectID+'.content';
-
-	if (!context) this.Modules.Log.error("Missing context");
-    if(!!inputIsStream){    // Todo: Q? !!?
-        console.log('input stream '+typeof content+' ');console.log(content);
-        var wr = fs.createWriteStream(filename);
-        wr.on("error", function(err) {
-            that.Modules.Log.error("Error writing file: " + err);
-        });
-        content.on("end", function(){
-            if (after) after(objectID);
-        })
-        content.pipe(wr);
-    } else {
-        console.log('returned from NOT input stream '+typeof content+' ');console.log(content);
-        return;// Todo: veryHigh comment out all this stuff after finding out about inputStream
-        if (({}).toString.call(content).match(/\s([a-zA-Z]+)/)[1].toLowerCase() == "string") {
-            /* create byte array */
-
-            var byteArray = [];
-            var contentBuffer = new Buffer(content);
-
-            for (var j = 0; j < contentBuffer.length; j++) {
-                byteArray.push(contentBuffer.readUInt8(j));
-            }
-
-            content = byteArray;
-
-        }
-
-		try {
-			fs.writeFileSync(filename, new Buffer(content));
-		} catch (err) {
-            this.Modules.Log.error("Could not write content to file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
-        }
-		if (after) after(objectID);
+//    var filebase=this.Modules.Config.filebase;
+//    var foldername=filebase+'/'+roomID;
+//    try {fs.mkdirSync(foldername)} catch(e){};
+//    var filename=filebase+'/'+roomID+'/'+objectID+'.content';
+//
+//
+//    if(!!inputIsStream){    // Todo: Q? !!?
+//        console.log('input stream '+typeof content+' ');console.log(content);
+//        var wr = fs.createWriteStream(filename);
+//        wr.on("error", function(err) {
+//            that.Modules.Log.error("Error writing file: " + err);
+//        });
+//        content.on("end", function(){
+//            if (after) after(objectID);
+//        })
+//        content.pipe(wr);
+//    } else {
+//        console.log('returned from NOT input stream '+typeof content+' ');console.log(content);
+//        return;// Todo: veryHigh comment out all this stuff after finding out about inputStream
+//        if (({}).toString.call(content).match(/\s([a-zA-Z]+)/)[1].toLowerCase() == "string") {
+//            /* create byte array */
+//
+//            var byteArray = [];
+//            var contentBuffer = new Buffer(content);
+//
+//            for (var j = 0; j < contentBuffer.length; j++) {
+//                byteArray.push(contentBuffer.readUInt8(j));
+//            }
+//
+//            content = byteArray;
+//
+//        }
+//
+//		try {
+//			fs.writeFileSync(filename, new Buffer(content));
+//		} catch (err) {
+//            this.Modules.Log.error("Could not write content to file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+//        }
+//		if (after) after(objectID);
     
     }
 }
@@ -756,8 +757,11 @@ fileConnector.copyContentFromFile=function(roomID, objectID, sourceFilename, con
 	if (!context) this.Modules.Log.error("Missing context");
 
     //------------------------------------------->
+    // Todo: need to be implemented
     console.log("--- copyContentFromFile called");
-
+    console.log('-- ** Todo sourceFilename is : '); console.log();
+    // figure out what sourceFilename is. is it the .content file?
+    // this.saveContent(roomID,objectID,rds,callback,context, true);
     //-------------------------------------------^
 
     var rds = fs.createReadStream(sourceFilename);
@@ -842,19 +846,23 @@ fileConnector.getContentStream = function(roomID, objectID, context) {
     this.Modules.Log.debug("Get content stream (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
 
     //------------------------------------------->
-    console.log("-- called");
-
+    console.log("-- getContentStream called");
+    dbContents.find({id:objectID}, '-_id', function(err, doc){
+        var content = doc[0].content;
+        var stream = resumer().queue(content).end(); //var stream = resumer().queue('your string').end()
+        return stream;
+    });
     //-------------------------------------------^
 
-    var filebase = this.Modules.Config.filebase;
-    var filename = filebase + '/' + roomID + '/' + objectID + '.content';
-
-    var rds = fs.createReadStream(filename);
-    rds.on("error", function(err) {
-        this.Modules.Log.error("Error reading file: " + filename);
-    });
-
-    return rds;
+//    var filebase = this.Modules.Config.filebase;
+//    var filename = filebase + '/' + roomID + '/' + objectID + '.content';
+//
+//    var rds = fs.createReadStream(filename);
+//    rds.on("error", function(err) {
+//        this.Modules.Log.error("Error reading file: " + filename);
+//    });
+//
+//    return rds;
 }
 
 /**
@@ -905,20 +913,24 @@ fileConnector.remove=function(roomID,objectID,context, callback){
 
     //------------------------------------------->
     console.log("--remove called");
-
+    dbObjects.remove({id:objectID}, function(err, docs){
+    });
+    dbContents.remove({id:objectID}, function(err, docs){
+    });
+    // Todo: .preview files?
     //-------------------------------------------^
 
-
-	var objectBase = this.Modules.Config.filebase + '/' + roomID + "/" + objectID;
-	var files = ['.object.txt', '.content', '.preview'].map(function( ending ){
-		return objectBase + ending;
-	});
-	
-	async.each(files, fs.unlink, function(err, resp){
-		if(callback){
-		callback();
-		}
-	});
+//
+//	var objectBase = this.Modules.Config.filebase + '/' + roomID + "/" + objectID;
+//	var files = ['.object.txt', '.content', '.preview'].map(function( ending ){
+//		return objectBase + ending;
+//	});
+//
+//	async.each(files, fs.unlink, function(err, resp){
+//		if(callback){
+//		callback();
+//		}
+//	});
 }
 
 /**
@@ -1084,55 +1096,86 @@ fileConnector.getObjectData=function(roomID,objectID,context){
 *	@param roomID
 *	@param objectID
 */
-fileConnector.getObjectDataByFile=function(roomID,objectID){
+fileConnector.getObjectDataByFile=function(roomID,objectID, callback){
     //------------------------------------------->
-    console.log("-- called");
+    console.log("-- getObjectDataByFile called");
 
+    dbObjects.find({id:objectID}, '-_id', function(err, docs){
+        var attributes = docs[0];
+
+        var data={};
+
+        //	automatically repair some values which could be wrong due
+        //  to manual file copying.
+
+        data.attributes=attributes;
+        data.type=data.attributes.type;
+        data.id=objectID;
+        data.attributes.id=data.id; // Todo: Q? does it normally happen that object id has not been saved? data.attributes.id already has id value why override it?
+        data.inRoom=roomID;
+        data.attributes.inRoom=roomID;
+        data.attributes.hasContent=false;
+
+        //assure rooms do not loose their type
+        if (roomID==objectID){
+            data.type='Room';
+            data.attributes.type='Room';
+        }
+
+        dbContents.find({id:objectID}, '-_id', function(err, docs){
+            if(docs.length !== 0)
+            {
+                data.attributes.hasContent=true;
+                data.attributes.contentAge=new Date().getTime();
+            }
+            callback(data);
+        });
+    });
     //-------------------------------------------^
 
-	var filebase = this.Modules.Config.filebase;
-	
-	var filename=filebase+'/'+roomID+'/'+objectID+'.object.txt';
-	
-	try {
-		var attributes = fs.readFileSync(filename, 'utf8');
-		attributes=JSON.parse(attributes);
-	} catch (e) {								//if the attribute file does not exist, create an empty one
-	
-		//when an object is not there, false is returned as a sign of an error
-		return false;
-	}
-	
-	var data={};
-	
-	//	automatically repair some values which could be wrong due
-	//  to manual file copying.
-
-	data.attributes=attributes;
-	data.type=data.attributes.type;
-	data.id=objectID;
-	data.attributes.id=data.id; // Todo: Q? does it normally happen that object id has not been saved? data.attributes.id already has id value why override it?
-	data.inRoom=roomID;
-	data.attributes.inRoom=roomID;
-	data.attributes.hasContent=false;
-	
-	//assure rooms do not loose their type
-	if (roomID==objectID){
-		data.type='Room';
-		data.attributes.type='Room';
-	}
-	
-	var path = require('path');
-	
-	filename=filebase+'/'+roomID+'/'+objectID+'.content';
-	
-	if (path.existsSync(filename)) {
-		
-		data.attributes.hasContent=true;
-		data.attributes.contentAge=new Date().getTime();
-	}
-
-	return data;
+//	var filebase = this.Modules.Config.filebase;
+//
+//	var filename=filebase+'/'+roomID+'/'+objectID+'.object.txt';
+//
+//	try {
+//		var attributes = fs.readFileSync(filename, 'utf8');
+//		attributes=JSON.parse(attributes);
+//	} catch (e) {								//if the attribute file does not exist, create an empty one
+//
+//		//when an object is not there, false is returned as a sign of an error
+//		return false;
+//	}
+//
+//	var data={};
+//
+//	//	automatically repair some values which could be wrong due
+//	//  to manual file copying.
+//
+//	data.attributes=attributes;
+//	data.type=data.attributes.type;
+//	data.id=objectID;
+//	data.attributes.id=data.id; // Todo: Q? does it normally happen that object id has not been saved? data.attributes.id already has id value why override it?
+//	data.inRoom=roomID;
+//	data.attributes.inRoom=roomID;
+//	data.attributes.hasContent=false;
+//
+//	//assure rooms do not loose their type
+//	if (roomID==objectID){
+//		data.type='Room';
+//		data.attributes.type='Room';
+//	}
+//
+//	var path = require('path');
+//
+//	filename=filebase+'/'+roomID+'/'+objectID+'.content';
+//
+//	if (path.existsSync(filename)) {
+//
+//		data.attributes.hasContent=true;
+//		data.attributes.contentAge=new Date().getTime();
+//	}
+//
+//	return data;
 }
 
 /**
