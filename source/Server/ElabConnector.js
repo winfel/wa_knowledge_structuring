@@ -128,17 +128,18 @@ elabConnector.mayRead=function(roomID,objectID,connection,callback) {
 		if (exists) {
 		  	callback(null, true);
 		} else {
-			var obj = self.getObjectDataByFile(roomID, roomID);
-			if (obj) {
-				if (obj.attributes.parent !== undefined) {
-					self.mayRead(obj.attributes.parent, null, connection, callback);
-		  		} else {
-		  			callback(null, false);
-		  		}
-		  	} else {
-		  		// subroom, room object does not exist yet (it is created when it is first entered)
-		  		callback(null, true);
-		  	}
+			self.getObjectDataByFile(roomID, roomID, function(obj){
+                if (obj) {
+                    if (obj.attributes.parent !== undefined) {
+                        self.mayRead(obj.attributes.parent, null, connection, callback);
+                    } else {
+                        callback(null, false);
+                    }
+                } else {
+                    // subroom, room object does not exist yet (it is created when it is first entered)
+                    callback(null, true);
+                }
+            });
 		}
 	});
 }

@@ -1101,6 +1101,10 @@ fileConnector.getObjectDataByFile=function(roomID,objectID, callback){
     console.log("-- getObjectDataByFile called");
 
     dbObjects.find({id:objectID}, '-_id', function(err, docs){
+        if (docs.length === 0)
+        {
+            callback(false); // object doesn't exist
+        }
         var attributes = docs[0];
 
         var data={};
@@ -1122,6 +1126,7 @@ fileConnector.getObjectDataByFile=function(roomID,objectID, callback){
             data.attributes.type='Room';
         }
 
+        // look if there is any content for this object
         dbContents.find({id:objectID}, '-_id', function(err, docs){
             if(docs.length !== 0)
             {
