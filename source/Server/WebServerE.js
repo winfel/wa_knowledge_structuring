@@ -162,9 +162,10 @@ app.get('/', function(req, res, next) {
 
 app.get('/room/:id', function(req, res, next) {
     //console.log("user -> " + JSON.stringify(req.user));
+    var userName = (req.user !== undefined) ? req.user.username : "";
     
     var indexFilename = '../Client/guis/desktop/index.html';
-    res.render(path.resolve(__dirname, indexFilename), {start_room: req.params.id, username: req.user.username});
+    res.render(path.resolve(__dirname, indexFilename), {start_room: req.params.id, username: userName});
 });
 
 app.get('/getRoomHierarchy', function(req, res, next) {
