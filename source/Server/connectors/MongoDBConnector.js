@@ -15,9 +15,116 @@ var Modules = false;
 * @function init
 * @param theModules
 */
-mongoConnector.init = function(theModules){
+mongoConnector.init = function(theModules) {
+    console.log("ALEX mongoConnector.init");
     this.Modules = theModules;
 }
+
+/**
+*   logs the user in on the backend. The main purpose of this function is not
+*   necessary a persistent connections but verifying the user's credentials
+*   and in case of a success, return a user object with username, password and
+*   home room for later usage.
+*
+*   If the login was successful, the newly created user object is sent to a
+*   response function.
+*   
+* @function login
+* @param username
+* @param password
+* @param externalSession
+* @param context
+* @param rp
+*
+*/
+mongoConnector.login = function(username, password, externalSession, context, rp) {
+    this.Modules.Log.debug("Login request for user '" + username + "'");
+    
+    var data = {};
+    data.username = username.toLowerCase();
+    data.password = password;
+    data.home = "public";
+    
+    rp(data);
+}
+
+/**
+ * @function isLoggedIn
+ * @param context
+ */
+mongoConnector.isLoggedIn = function(context) {
+    console.log("ALEX mongoConnector.isLoggedIn");
+    return true;
+}
+
+//-------------------------RIGHTS ----------------------------------------------
+// TODO: discuss this with the rightmanager group
+
+/**
+ * About rights
+ * 
+ * @function mayWrite
+ * @param roomID
+ * @param objectID
+ * @param connection
+ * @param callback
+ */
+mongoConnector.mayWrite = function(roomID, objectID, connection, callback) {
+    console.log("ALEX mongoConnector.mayWrite");
+    callback(null, true);
+}
+/**
+ * About rights
+ * 
+ * @function mayRead
+ * @param roomID
+ * @param objectID
+ * @param connection
+ * @param callback
+ */
+mongoConnector.mayRead = function(roomID, objectID, connection, callback) {
+    console.log("ALEX mongoConnector.mayRead");
+    callback(null, true);
+}
+/**
+ * About rights
+ * 
+ * @function mayDelete
+ * @param roomID
+ * @param objectID
+ * @param connection
+ * @param callback
+ */
+mongoConnector.mayDelete = function(roomID, objectID, connection, callback) {
+    console.log("ALEX mongoConnector.mayDelete");
+    callback(null, true);
+}
+
+/**
+ * About rights
+ * 
+ * @function mayEnter
+ * @param roomID
+ * @param connection
+ * @param callback
+ */
+mongoConnector.mayEnter = function(roomID, connection, callback) {
+    console.log("ALEX mongoConnector.mayEnter");
+    callback(null, true);
+}
+
+/**
+ * @function mayInsert
+ * @param roomID
+ * @param connection
+ * @param callback
+ */
+mongoConnector.mayInsert = function(roomID, connection, callback) {
+    console.log("ALEX mongoConnector.mayInsert");
+    callback(null, true);
+}
+
+//-----------------------------------------------------------------
 
 /**
  * @function listRooms
@@ -25,7 +132,6 @@ mongoConnector.init = function(theModules){
  */
 mongoConnector.listRooms = function(callback) {
     console.log("ALEX mongoConnector.listRooms");
-    
 }
 
 /**
@@ -34,8 +140,6 @@ mongoConnector.listRooms = function(callback) {
 * @param roomID
 * @param context
 * @param callback
-*   
-*
 */
 mongoConnector.getInventory = function(roomID, context, callback) {
     console.log("ALEX fileConnector.getInventory");
@@ -53,18 +157,54 @@ mongoConnector.getInventory = function(roomID, context, callback) {
  */
 mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
     console.log("ALEX mongoConnector.getRoomData");
+    
+    this.Modules.Log.debug("Get data for room (roomID: '" + roomID + "', user: '"
+            + this.Modules.Log.getUserFromContext(context) + "')");
+
+    if (!context) this.Modules.Log.error("Missing context");
+    
+    // TODO: implement getObjectData
+    var obj = this.getObjectData(roomID, roomID);
+    
+    if (!obj) {
+        
+        obj = {};
+        obj.id = roomID;
+        obj.name = roomID;
+        
+        if (oldRoomId) {
+            obj.parent = oldRoomId;
+        }
+        
+        var self = this;
+        
+        // TODO: implement saveObjectData
+        this.saveObjectData(roomID, roomID, obj, function() {
+            self.Modules.Log.debug("Created room (roomID: '" + roomID + "', user: '"
+                    + self.Modules.Log.getUserFromContext(context) + "', parent:'" + oldRoomId + "')");
+        }, context, true)
+        
+        return self.getRoomData(roomID, context, callback, oldRoomId);
+    } else {
+        if (callback === undefined) {
+            /* sync */
+            return obj;
+        } else {
+            /* async */
+            callback(obj);
+        }
+    }
 }
 
 /**
-* returns the room hierarchy starting by given roomID as root
-*   @function getRoomHierarchy
+*   returns the attribute set of an object
+*   @function getObjectData
 *   @param roomID
+*   @param objectID
 *   @param context
-*   @param callback
-*
 */
-mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
-    console.log("ALEX mongoConnector.getRoomHierarchy");
+mongoConnector.getObjectData = function(roomID, objectID, context) {
+    console.log("ALEX mongoConnector.getObjectData");
 }
 
 /**
@@ -77,10 +217,20 @@ mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
 *   @param after
 *   @param context
 *   @param {boolean} createIfNotExists
-*
 */
 mongoConnector.saveObjectData = function(roomID, objectID, data, after, context, createIfNotExists) {
     console.log("ALEX mongoConnector.saveObjectData");
+}
+
+/**
+* returns the room hierarchy starting by given roomID as root
+*   @function getRoomHierarchy
+*   @param roomID
+*   @param context
+*   @param callback
+*/
+mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
+    console.log("ALEX mongoConnector.getRoomHierarchy");
 }
 
 /**
@@ -94,7 +244,6 @@ mongoConnector.saveObjectData = function(roomID, objectID, data, after, context,
  * @param after
  * @param context
  * @param inputIsStream
- * 
  */
 mongoConnector.saveContent = function(roomID, objectID, content, after, context, inputIsStream) {
     console.log("ALEX mongoConnector.saveContent");
@@ -167,7 +316,6 @@ mongoConnector.getContentStream = function(roomID, objectID, context) {
 *   @param roomID
 *   @param users
 *   @param context
-*   
 */
 mongoConnector.getPaintingStream = function(roomID, user, context) {
     console.log("ALEX mongoConnector.getPaintingStream");
@@ -182,7 +330,7 @@ mongoConnector.getPaintingStream = function(roomID, user, context) {
 mongoConnector.getTrashRoom = function(context, callback) {
     console.log("ALEX mongoConnector.getTrashRoom");
     
-    return this.getRoomData("trash", context, callback);
+    // return this.getRoomData("trash", context, callback);
 }
 
 /**
@@ -211,7 +359,7 @@ mongoConnector.remove = function(roomID, objectID, context, callback) {
 *	@param callback
 *
 */
-fileConnector.createObject = function(roomID, type, data, context, callback) {
+mongoConnector.createObject = function(roomID, type, data, context, callback) {
 	 console.log("ALEX mongoConnector.createObject");
 }
 
@@ -227,19 +375,8 @@ fileConnector.createObject = function(roomID, type, data, context, callback) {
 *	@param callback
 *
 */
-fileConnector.duplicateObject = function(roomID, toRoom, objectID, context, callback) {
+mongoConnector.duplicateObject = function(roomID, toRoom, objectID, context, callback) {
 	console.log("ALEX mongoConnector.duplicateObject");
-}
-
-/**
-*	returns the attribute set of an object
-* 	@function getObjectData
-*	@param roomID
-*	@param objectID
-*	@param context
-*/
-fileConnector.getObjectData = function(roomID, objectID, context) {
-	console.log("ALEX mongoConnector.getObjectData");
 }
 
 /**
@@ -249,7 +386,7 @@ fileConnector.getObjectData = function(roomID, objectID, context) {
 *	@param roomID
 *	@param objectID
 */
-fileConnector.getObjectDataByFile = function(roomID, objectID) {
+mongoConnector.getObjectDataByFile = function(roomID, objectID) {
 	console.log("ALEX mongoConnector.getObjectDataByFile");
 }
 
@@ -260,15 +397,15 @@ fileConnector.getObjectDataByFile = function(roomID, objectID) {
 *	@param context
 *	@param callback
 */
-fileConnector.trimImage = function(roomID, objectID, context, callback) {
+mongoConnector.trimImage = function(roomID, objectID, context, callback) {
 	console.log("ALEX mongoConnector.trimImage");
-};
+}
 
 /**
 *	@function isInlineDisplayable
 *	@param mimeType
 */
-fileConnector.isInlineDisplayable = function(mimeType) {
+mongoConnector.isInlineDisplayable = function(mimeType) {
 	console.log("ALEX mongoConnector.isInlineDisplayable");
 }
 
@@ -279,7 +416,7 @@ fileConnector.isInlineDisplayable = function(mimeType) {
 *	@param context
 *	@param callback
 */
-fileConnector.getMimeType = function(roomID, objectID, context, callback) {
+mongoConnector.getMimeType = function(roomID, objectID, context, callback) {
 	console.log("ALEX mongoConnector.getMimeType");
 }
 
@@ -288,7 +425,7 @@ fileConnector.getMimeType = function(roomID, objectID, context, callback) {
 *	@function getInlinePreviewProviderName
 *	@param mimeType
 */
-fileConnector.getInlinePreviewProviderName = function(mimeType) {
+mongoConnector.getInlinePreviewProviderName = function(mimeType) {
 	console.log("ALEX mongoConnector.getInlinePreviewProviderName");
 }
 
@@ -296,7 +433,7 @@ fileConnector.getInlinePreviewProviderName = function(mimeType) {
 * SYNC
 *	@function getInlinePreviewMimeTypes
 */
-fileConnector.getInlinePreviewMimeTypes = function() {
+mongoConnector.getInlinePreviewMimeTypes = function() {
 	console.log("ALEX mongoConnector.getInlinePreviewMimeTypes");
 }
 
@@ -304,8 +441,9 @@ fileConnector.getInlinePreviewMimeTypes = function() {
 * SYNC
 *	@function getInlinePreviewProviders
 */
-fileConnector.getInlinePreviewProviders = function() {
+mongoConnector.getInlinePreviewProviders = function() {
 	console.log("ALEX mongoConnector.getInlinePreviewProviders");
+	
 	return {
 		//"application/pdf" : "pdf",
 		"image/jpeg" : "image",
@@ -326,7 +464,7 @@ fileConnector.getInlinePreviewProviders = function() {
 *	@param context
 *	@param callback
 */
-fileConnector.getInlinePreviewDimensions = function(roomID, objectID, mimeType, context, callback) {
+mongoConnector.getInlinePreviewDimensions = function(roomID, objectID, mimeType, context, callback) {
 	console.log("ALEX mongoConnector.getInlinePreviewDimensions");
 }
 
@@ -338,7 +476,7 @@ fileConnector.getInlinePreviewDimensions = function(roomID, objectID, mimeType, 
 *	@param context
 *	@param callback
 */
-fileConnector.getInlinePreview = function(roomID, objectID, mimeType, context, callback) {
+mongoConnector.getInlinePreview = function(roomID, objectID, mimeType, context, callback) {
 	console.log("ALEX mongoConnector.getInlinePreview");
 }
 
@@ -349,16 +487,16 @@ fileConnector.getInlinePreview = function(roomID, objectID, mimeType, context, c
 *	@param context
 *	@param callback
 */
-fileConnector.getInlinePreviewMimeType = function(roomID, objectID, context, callback) {
+mongoConnector.getInlinePreviewMimeType = function(roomID, objectID, context, callback) {
 	console.log("ALEX mongoConnector.getInlinePreviewMimeType");
 }
 
-/**
-* Head function and some subfunctions included, TODO JSDoc
-*	@function inlinePreviewProviders
-*/
-fileConnector.inlinePreviewProviders = {
-		console.log("ALEX mongoConnector.inlinePreviewProviders");
-}
+///**
+//* Head function and some subfunctions included, 
+//* @function inlinePreviewProviders
+//*/
+//mongoConnector.inlinePreviewProviders = {
+//		console.log("ALEX mongoConnector.inlinePreviewProviders");
+//}
 
 module.exports = mongoConnector;
