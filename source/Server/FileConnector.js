@@ -21,19 +21,24 @@ var async = require('async');
 
 var resumer = require('resumer');
 // Todo: priority:low should use? the same connection if one already exist
+var serverAddress = 'localhost:27017';
+var dbName = 'test';
 var mongo = require('mongodb');
 var monk = require('monk');
-var db = monk('localhost:27017/test'); // Todo: priority:high must use the database address from config file
+var db = monk(serverAddress +'/' + dbName); // Todo: priority:high must use the database address from config file
 //var db = monk('ds033257.mongolab.com:33257/waobjects');
 var dbObjects = db.get('objects'); // waObjects is name of collection
 var dbRooms = db.get('rooms');
 var dbContents = db.get('contents');
 
 //var Server = require("mongo-sync").Server;
-//var server = new Server('127.0.0.1');// Todo: priority:high must use the database address from config file
-//var syncDb = server.db("test");// Todo: priority:high must use the database address from config file
+//var server = new Server(serverAddress);// Todo: priority:high must use the database address from config file
+//var syncDb = server.db(dbName);// Todo: priority:high must use the database address from config file
 //var objectsSync = syncDb.getCollection("objects");
 //Todo: priority:high call server.close(); in the right place
+
+var Fiber = require('fibers');
+var Future = require('fibers/future'), wait = Future.wait;
 
 var Q = require('q');
 /**
@@ -256,12 +261,14 @@ fileConnector.getInventory=function(roomID,context,callback){
     console.log(typeof roomID);
     var inventoryDb = [];
 
+    // Todo: needs refactoring
     dbObjects.find({inRoom:roomID}, '-_id', function(err,docs){
         for(var i=0; i<docs.length; i++)
         {
 //            console.log("doc[i] :");
 //            console.log(docs[i]);
-            //following lines are just copied from getObjectDataByFile except one line that changed
+            // following lines are just copied from getObjectDataByFile except one line that changed
+            // refer to refactorin to do
             var data = {};
             data.attributes=docs[i];
             data.type=data.attributes.type;
@@ -273,10 +280,10 @@ fileConnector.getInventory=function(roomID,context,callback){
             if(data.attributes.hasContent) {
                 data.attributes.contentAge=new Date().getTime();
             }
-            else {
-//                console.log("has no content : " + data.id);
-                data.attributes.hasContent=false;
-            }
+//            else { // meaningless
+////                console.log("has no content : " + data.id);
+//                data.attributes.hasContent=false;
+//            }
 //            console.log(i+' '+data.id);
             inventoryDb.push(data);
         }
@@ -285,47 +292,47 @@ fileConnector.getInventory=function(roomID,context,callback){
         callback(inventoryDb);
     });
     //Todo: priority:NoIdea implement sync version with database if (callback === undefined)
-    return;
+
     //-------------------------------------------^
 
-	var filebase=this.Modules.Config.filebase;
-
-	var inventory=[];
-
-	try {fs.mkdirSync(filebase+'/'+roomID)} catch(e){};
-
-	var files=fs.readdirSync(filebase+'/'+roomID);
-
-    files= files || [];
-
-	files.forEach(function(value,index){
-		var position=value.indexOf('.object.txt');
-		if(position == -1) return; //not an object file
-		var filename=value;
-		var objectID=filename.substr(0,position);
-
-		if (roomID==objectID) return; //leave out the room
-
-		try {
-			var obj=self.getObjectDataByFile(roomID,objectID);
-			if (obj) inventory.push(obj);
-//            console.log('obj is:');
-//            console.log(obj);
-//            console.log('end of obj');
-        } catch (e) {
-			console.log(e);
-			self.Modules.Log.error("Cannot load object with id '"+objectID+"' (roomID: '"+roomID+"', user: '"+self.Modules.Log.getUserFromContext(context)+"')");
-		}
-
-	});
-	if (callback === undefined) {
-		/* sync */
-        console.log('**** sync inventory call');
-		return inventory;
-	} else {
-		/* async */
-		callback(inventory);
-	}
+//	var filebase=this.Modules.Config.filebase;
+//
+//	var inventory=[];
+//
+//	try {fs.mkdirSync(filebase+'/'+roomID)} catch(e){};
+//
+//	var files=fs.readdirSync(filebase+'/'+roomID);
+//
+//    files= files || [];
+//
+//	files.forEach(function(value,index){
+//		var position=value.indexOf('.object.txt');
+//		if(position == -1) return; //not an object file
+//		var filename=value;
+//		var objectID=filename.substr(0,position);
+//
+//		if (roomID==objectID) return; //leave out the room
+//
+//		try {
+//			var obj=self.getObjectDataByFile(roomID,objectID);
+//			if (obj) inventory.push(obj);
+////            console.log('obj is:');
+////            console.log(obj);
+////            console.log('end of obj');
+//        } catch (e) {
+//			console.log(e);
+//			self.Modules.Log.error("Cannot load object with id '"+objectID+"' (roomID: '"+roomID+"', user: '"+self.Modules.Log.getUserFromContext(context)+"')");
+//		}
+//
+//	});
+//	if (callback === undefined) {
+//		/* sync */
+//        console.log('**** sync inventory call');
+//		return inventory;
+//	} else {
+//		/* async */
+//		callback(inventory);
+//	}
 	
 }
 
@@ -606,8 +613,8 @@ fileConnector.saveContent=function(roomID,objectID,content,after,context, inputI
 //            this.Modules.Log.error("Could not write content to file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
 //        }
 //		if (after) after(objectID);
-    
-    }
+//
+//    }
 }
 
 /**
@@ -965,7 +972,7 @@ fileConnector.createObject=function(roomID,type,data, context, callback){
 
     //------------------------------------------->
     console.log("--createObject called");
-
+    // Done
     //-------------------------------------------^
 
 	this.saveObjectData(roomID,objectID,data,callback,context,true);
@@ -1077,13 +1084,22 @@ fileConnector.getObjectData=function(roomID,objectID,context){
 	if (!context) this.Modules.Log.error("Missing context");
 
     //------------------------------------------->
-    console.log("-- called");
+    console.log("-- getObjectData called");
+    var obj;
+    var wrappedgetObjectDataByFile = Future.wrap(this.getObjectDataByFile);
 
+    var fiber = Fiber(function() {
+        obj = wrappedgetObjectDataByFile(roomID, objectID).wait();
+    });
+
+    fiber.run();
+
+    return obj;
     //-------------------------------------------^
 
-	var obj = this.getObjectDataByFile(roomID,objectID);
-	
-	return obj;
+//	var obj = this.getObjectDataByFile(roomID,objectID);
+//
+//	return obj;
 	
 }
 
@@ -1280,14 +1296,21 @@ fileConnector.getMimeType=function(roomID,objectID,context,callback) {
 	if (!context) throw new Error('Missing context in getMimeType');
 
     //------------------------------------------->
-    console.log("-- called");
-
+    console.log("-- getMimeType called");
+    dbObjects.find({id:objectID}, '-_id mimeType', function(err, docs){
+        if (docs.length === 0) {
+            callback(false);
+        }
+        else{
+            callback(docs[0].mimeType);
+        }
+    });
     //-------------------------------------------^
 
-	var objectData = this.getObjectData(roomID,objectID,context);
-	var mimeType = objectData.attributes.mimeType;
-	
-	callback(mimeType);
+//	var objectData = this.getObjectData(roomID,objectID,context);
+//	var mimeType = objectData.attributes.mimeType;
+//
+//	callback(mimeType);
 	
 }
 
