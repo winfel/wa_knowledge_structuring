@@ -9,7 +9,7 @@
  *   and the socket. Actual socket connections are handled by SocketServer
  */
 "use strict";
-
+// DEMO TST Comment
 var db = false;
 var DEBUG_OF_USERMANAGEMENT = false;
 
