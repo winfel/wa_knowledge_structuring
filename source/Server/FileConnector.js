@@ -258,17 +258,15 @@ fileConnector.getInventory=function(roomID,context,callback){
     //------------------------------------------->
     // Todo: priority:medium implement the sync as well (if needed), the following is only async
     console.log("-- get inventory called");
-    console.log(typeof roomID);
+
     var inventoryDb = [];
 
     // Todo: needs refactoring
     dbObjects.find({inRoom:roomID}, '-_id', function(err,docs){
         for(var i=0; i<docs.length; i++)
         {
-//            console.log("doc[i] :");
-//            console.log(docs[i]);
             // following lines are just copied from getObjectDataByFile except one line that changed
-            // refer to refactorin to do
+            // refer to refactor in to do
             var data = {};
             data.attributes=docs[i];
             data.type=data.attributes.type;
@@ -354,19 +352,20 @@ fileConnector.getRoomData=function(roomID,context,callback,oldRoomId){
 	if (!context) this.Modules.Log.error("Missing context");
 
     //------------------------------------------->
+    console.log("--getroomdata called");
+
     if (callback === undefined) {
         console.log('sync version called of getroomdata');
     }
-    console.log("--getroomdata called");
-//    console.log("context is: ");
-//    console.log(context);
+
+    if (callback === undefined) console.log("URGENT sync getroomdata called");
+
     var self=this;
-    dbRooms.find({id:roomID}, function(err, docs){
+    dbRooms.find({id:roomID}, '-_id', function(err, docs){
+
         if(err) console.log('Error in getting room data!');
+
         // if room does not exist, create(insert)
-        console.log("getroomdata docs : type "+ typeof docs);
-        console.log(docs);
-        console.log(roomID +' roomID type '+ typeof roomID);
         if (docs.length === 0){
             var roomobj={};
             roomobj.id=roomID;
@@ -374,13 +373,24 @@ fileConnector.getRoomData=function(roomID,context,callback,oldRoomId){
             if (oldRoomId) {
                 roomobj.parent=oldRoomId;
             }
-            dbRooms.insert(roomobj, function(err, doc){
-                console.log(roomobj.id + ' room inserted into db');
-            });  // Todo: is passing function needed here?
-            return self.getRoomData(roomID,context,callback,oldRoomId); // Todo: priority:veryHigh check if it is right, should it go into insert call back?
+
+            var foo = function(cb){
+                dbRooms.insert(roomobj, function(err, doc){
+                });
+            }  // Todo: is passing function needed here?
+
+            var wrappedFoo = Future.wrap(foo);
+
+            var fiber = Fiber(function() {
+                wrappedFoo(roomID, objectID).wait();
+            });
+            fiber.run();
+            // Done using fibers Todo: priority:veryHigh check if it is right, should it go into insert call back?
+            return self.getRoomData(roomID,context,callback,oldRoomId);
         }
         else {  // room exists:
-            callback(docs[0]); //Todo: implement sync version  callback === undefined
+            var data = format(docs[0]);
+            callback(data); //Todo: implement sync version  callback === undefined
         }
     });
     // Todo: sync version if (callback === undefined)
@@ -1084,27 +1094,50 @@ fileConnector.getObjectData=function(roomID,objectID,context){
 	if (!context) this.Modules.Log.error("Missing context");
 
     //------------------------------------------->
-    console.log("-- getObjectData called");
-    var obj;
-    var wrappedgetObjectDataByFile = Future.wrap(this.getObjectDataByFile);
-
-    var fiber = Fiber(function() {
-        obj = wrappedgetObjectDataByFile(roomID, objectID).wait();
-    });
-
-    fiber.run();
-
-    return obj;
+//    console.log("-- getObjectData called");
+//    var obj;
+//    var wrappedgetObjectDataByFile = Future.wrap(this.getObjectDataByFile);
+//
+//    var fiber = Fiber(function() {
+//        obj = wrappedgetObjectDataByFile(roomID, objectID).wait();
+//    });
+//
+//    fiber.run();
+//    console.log("   getObjectData obj: " +obj+ " objID " + objectID);
+//
+//    return obj;
     //-------------------------------------------^
 
-//	var obj = this.getObjectDataByFile(roomID,objectID);
+	var obj = this.getObjectDataByFile(roomID,objectID);
 //
-//	return obj;
+	return obj;
 	
 }
 
 
+function format(obj){
+    var attributes = obj;
 
+    var data={};
+
+    //	automatically repair some values which could be wrong due
+    //  to manual file copying.
+
+    data.attributes=attributes;
+    data.type=data.attributes.type;
+    data.id = obj.id;
+    //data.attributes.id=data.id; // Todo: Q? does it normally happen that object id has not been saved? data.attributes.id already has id value why override it?
+    data.inRoom= obj.inRoom;
+    //data.attributes.inRoom=roomID;
+    data.attributes.hasContent=false;
+
+    //assure rooms do not loose their type
+    if (obj.inRoom==obj.id){
+        data.type='Room';
+        data.attributes.type='Room';
+    }
+    return data;
+}
 /**
 *	internal
 *	read an object file and return the attribute set
@@ -1120,6 +1153,7 @@ fileConnector.getObjectDataByFile=function(roomID,objectID, callback){
         if (docs.length === 0)
         {
             callback(false); // object doesn't exist
+            return; // for fiber thing
         }
         var attributes = docs[0];
 
