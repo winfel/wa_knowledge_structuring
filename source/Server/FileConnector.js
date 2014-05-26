@@ -61,8 +61,6 @@ fileConnector.info=function(){
 *	and in case of a success, return a user object with username, password and
 *	home room for later usage.
 *
-*   why should we have plain password?
-*
 *	If the login was successful, the newly created user object is sent to a
 *	response function.
 * @function login
@@ -117,16 +115,9 @@ fileConnector.listRooms = function(callback){
     //Done Todo: should be replaced by a simple query of rooms
     //Todo: priority:low clean up
     //------------------------------------------->
-    /*
-    monk result is different than below (mongo console) result, it is an array
-     dbRooms.find({name:true, _id:false}));
-     { "name" : "public" }
-     { "name" : 103755411174 }
-     { "name" : 103755324969 }
-     */
     console.log("-- listRooms called");
     var result = [];
-    dbRooms.find({},/*{name:true, _id:false},*/ function(err, docs){
+    dbRooms.find({}, function(err, docs){
         if(err){
             return callback(err, null);
         }
@@ -134,9 +125,6 @@ fileConnector.listRooms = function(callback){
         for(var i=0; i<docs.length; i++){
                 result[i] = docs[i]['name'];
         }
-        console.log(docs);
-        console.log("results are:");
-        console.log(result);
         callback(null, result);
     });
 
@@ -259,78 +247,80 @@ fileConnector.getInventory=function(roomID,context,callback){
     // Todo: priority:medium implement the sync as well (if needed), the following is only async
     console.log("-- get inventory called");
 
-    var inventoryDb = [];
-
-    // Todo: needs refactoring
-    dbObjects.find({inRoom:roomID}, '-_id', function(err,docs){
-        for(var i=0; i<docs.length; i++)
-        {
-            // following lines are just copied from getObjectDataByFile except one line that changed
-            // refer to refactor in to do
-            var data = {};
-            data.attributes=docs[i];
-            data.type=data.attributes.type;
-            data.id=data.attributes.id;
-            data.attributes.id=data.id; // Todo: Q? does it normally happen that object id has not been saved? data.attributes.id already has id value why override it?
-            data.inRoom=roomID;
-            data.attributes.inRoom=roomID;
-            //data.attributes.hasContent=false;
-            if(data.attributes.hasContent) {
-                data.attributes.contentAge=new Date().getTime();
-            }
-//            else { // meaningless
-////                console.log("has no content : " + data.id);
-//                data.attributes.hasContent=false;
-//            }
-//            console.log(i+' '+data.id);
-            inventoryDb.push(data);
-        }
-//        console.log("inventoryDb = ");
-//        console.log(inventoryDb);
-        callback(inventoryDb);
-    });
-    //Todo: priority:NoIdea implement sync version with database if (callback === undefined)
-
-    //-------------------------------------------^
-
-//	var filebase=this.Modules.Config.filebase;
-//
-//	var inventory=[];
-//
-//	try {fs.mkdirSync(filebase+'/'+roomID)} catch(e){};
-//
-//	var files=fs.readdirSync(filebase+'/'+roomID);
-//
-//    files= files || [];
-//
-//	files.forEach(function(value,index){
-//		var position=value.indexOf('.object.txt');
-//		if(position == -1) return; //not an object file
-//		var filename=value;
-//		var objectID=filename.substr(0,position);
-//
-//		if (roomID==objectID) return; //leave out the room
-//
-//		try {
-//			var obj=self.getObjectDataByFile(roomID,objectID);
-//			if (obj) inventory.push(obj);
-////            console.log('obj is:');
-////            console.log(obj);
-////            console.log('end of obj');
-//        } catch (e) {
-//			console.log(e);
-//			self.Modules.Log.error("Cannot load object with id '"+objectID+"' (roomID: '"+roomID+"', user: '"+self.Modules.Log.getUserFromContext(context)+"')");
-//		}
-//
-//	});
-//	if (callback === undefined) {
+//    if (callback === undefined) {
 //		/* sync */
 //        console.log('**** sync inventory call');
 //		return inventory;
-//	} else {
-//		/* async */
-//		callback(inventory);
 //	}
+//    var inventoryDb = [];
+//
+//    // Todo: needs refactoring
+//    dbObjects.find({inRoom:roomID}, '-_id', function(err,docs){
+//        for(var i=0; i<docs.length; i++)
+//        {
+//            // following lines are just copied from getObjectDataByFile except one line that changed
+//            // refer to refactor in to do
+//            var data = {};
+//            data.attributes=docs[i];
+//            data.type=data.attributes.type;
+//            data.id=data.attributes.id;
+//            data.attributes.id=data.id; // Todo: Q? does it normally happen that object id has not been saved? data.attributes.id already has id value why override it?
+//            data.inRoom=roomID;
+//            data.attributes.inRoom=roomID;
+//            //data.attributes.hasContent=false;
+//            if(data.attributes.hasContent) {
+//                data.attributes.contentAge=new Date().getTime();
+//            }
+////            else { // meaningless
+//////                console.log("has no content : " + data.id);
+////                data.attributes.hasContent=false;
+////            }
+////            console.log(i+' '+data.id);
+//            inventoryDb.push(data);
+//        }
+////        console.log("inventoryDb = ");
+////        console.log(inventoryDb);
+//        callback(inventoryDb);
+//    });
+//    //Todo: priority:NoIdea implement sync version with database if (callback === undefined)
+
+    //-------------------------------------------^
+
+	var filebase=this.Modules.Config.filebase;
+
+	var inventory=[];
+
+	try {fs.mkdirSync(filebase+'/'+roomID)} catch(e){};
+
+	var files=fs.readdirSync(filebase+'/'+roomID);
+
+    files= files || [];
+
+	files.forEach(function(value,index){
+		var position=value.indexOf('.object.txt');
+		if(position == -1) return; //not an object file
+		var filename=value;
+		var objectID=filename.substr(0,position);
+
+		if (roomID==objectID) return; //leave out the room
+
+		try {
+			var obj=self.getObjectDataByFile(roomID,objectID);
+			if (obj) inventory.push(obj);
+        } catch (e) {
+			console.log(e);
+			self.Modules.Log.error("Cannot load object with id '"+objectID+"' (roomID: '"+roomID+"', user: '"+self.Modules.Log.getUserFromContext(context)+"')");
+		}
+
+	});
+	if (callback === undefined) {
+		/* sync */
+        console.log('**** sync inventory call');
+		return inventory;
+	} else {
+		/* async */
+		callback(inventory);
+	}
 	
 }
 
@@ -352,76 +342,76 @@ fileConnector.getRoomData=function(roomID,context,callback,oldRoomId){
 	if (!context) this.Modules.Log.error("Missing context");
 
     //------------------------------------------->
-    console.log("--getroomdata called");
-
-    if (callback === undefined) {
-        console.log('sync version called of getroomdata');
-    }
-
-    if (callback === undefined) console.log("URGENT sync getroomdata called");
-
-    var self=this;
-    dbRooms.find({id:roomID}, '-_id', function(err, docs){
-
-        if(err) console.log('Error in getting room data!');
-
-        // if room does not exist, create(insert)
-        if (docs.length === 0){
-            var roomobj={};
-            roomobj.id=roomID;
-            roomobj.name=roomID;
-            if (oldRoomId) {
-                roomobj.parent=oldRoomId;
-            }
-
-            var foo = function(cb){
-                dbRooms.insert(roomobj, function(err, doc){
-                });
-            }  // Todo: is passing function needed here?
-
-            var wrappedFoo = Future.wrap(foo);
-
-            var fiber = Fiber(function() {
-                wrappedFoo(roomID, objectID).wait();
-            });
-            fiber.run();
-            // Done using fibers Todo: priority:veryHigh check if it is right, should it go into insert call back?
-            return self.getRoomData(roomID,context,callback,oldRoomId);
-        }
-        else {  // room exists:
-            var data = format(docs[0]);
-            callback(data); //Todo: implement sync version  callback === undefined
-        }
-    });
-    // Todo: sync version if (callback === undefined)
+//    console.log("--getroomdata called");
+//
+//    if (callback === undefined) {
+//        console.log('sync version called of getroomdata');
+//    }
+//
+//    if (callback === undefined) console.log("URGENT sync getroomdata called");
+//
+//    var self=this;
+//    dbRooms.find({id:roomID}, '-_id', function(err, docs){
+//
+//        if(err) console.log('Error in getting room data!');
+//
+//        // if room does not exist, create(insert)
+//        if (docs.length === 0){
+//            var roomobj={};
+//            roomobj.id=roomID;
+//            roomobj.name=roomID;
+//            if (oldRoomId) {
+//                roomobj.parent=oldRoomId;
+//            }
+//
+//            var foo = function(cb){
+//                dbRooms.insert(roomobj, function(err, doc){
+//                });
+//            }  // Todo: is passing function needed here?
+//
+//            var wrappedFoo = Future.wrap(foo);
+//
+//            var fiber = Fiber(function() {
+//                wrappedFoo(roomID, objectID).wait();
+//            });
+//            fiber.run();
+//            // Done using fibers Todo: priority:veryHigh check if it is right, should it go into insert call back?
+//            return self.getRoomData(roomID,context,callback,oldRoomId);
+//        }
+//        else {  // room exists:
+//            var data = format(docs[0]);
+//            callback(data); //Todo: implement sync version  callback === undefined
+//        }
+//    });
+//    // Todo: sync version if (callback === undefined)
     //-------------------------------------------^
 
-//    var filebase=this.Modules.Config.filebase;
-//	var obj=this.getObjectDataByFile(roomID,roomID);
-//
-//	if (!obj){
-//		obj={};
-//		obj.id=roomID;
-//		obj.name=roomID;
-//		if (oldRoomId) {
-//			obj.parent=oldRoomId;
-//		}
-//		var self=this;
-//		this.saveObjectData(roomID,roomID,obj,function(){
-//			self.Modules.Log.debug("Created room (roomID: '"+roomID+"', user: '"+self.Modules.Log.getUserFromContext(context)+"', parent:'"+oldRoomId+"')");
-//		},context,true)
-//
-//		return self.getRoomData(roomID,context,callback,oldRoomId);
-//
-//	} else {
-//    	if (callback === undefined) {
-//			/* sync */
-//			return obj;
-//		} else {
-//			/* async */
-//			callback(obj);
-//		}
-//	}
+    var filebase=this.Modules.Config.filebase;
+	var obj=this.getObjectDataByFile(roomID,roomID);
+
+	if (!obj){
+		obj={};
+		obj.id=roomID;
+		obj.name=roomID;
+		if (oldRoomId) {
+			obj.parent=oldRoomId;
+		}
+		var self=this;
+		this.saveObjectData(roomID,roomID,obj,function(){
+			self.Modules.Log.debug("Created room (roomID: '"+roomID+"', user: '"+self.Modules.Log.getUserFromContext(context)+"', parent:'"+oldRoomId+"')");
+		},context,true)
+
+		return self.getRoomData(roomID,context,callback,oldRoomId);
+
+	} else {
+    	if (callback === undefined) {
+			/* sync */
+			return obj;
+		} else {
+			/* async */
+			callback(obj);
+		}
+	}
 }
 
 /**
@@ -441,10 +431,10 @@ fileConnector.getRoomHierarchy=function(roomID,context,callback){
 	};
 
     //------------------------------------------->
-    // Todo: checking accessiblity bypassed, it seemed it doesn't do anything
+    // Todo: checking accessiblity bypassed, if needed for spaces, it should be implemented
     console.log("--getRoomHierarchy called");
     dbRooms.find({},'-_id', function(err, docs){
-        for(var i=0; i<docs.length; i++){   // Todo: substitude with forEach
+        for(var i=0; i<docs.length; i++){
             var doc = docs[i];
             result.rooms[doc.name +''] = '' + doc.name;
             if (doc.parent !== undefined) {
@@ -523,34 +513,31 @@ fileConnector.saveObjectData=function(roomID,objectID,data,after,context,createI
 	if (!data) this.Modules.Log.error("Missing data");
 
     //------------------------------------------->
-    console.log("--saveObjectData called");
-    console.log(data);
-    console.log("end of data");
     dbRooms.update({id:data.id}, data, {upsert:true}, function(err, docs){
         if(docs ===0) console.log("Error: there is something wrong with saveObjectData");
-        if (after) after(objectID);
+//        if (after) after(objectID);
     });
     //-------------------------------------------^
 
-//	var filebase=this.Modules.Config.filebase;
-//
-//	var foldername=filebase+'/'+roomID;
-//
-//	try {fs.mkdirSync(foldername)} catch(e){};
-//
-//	var filename=filebase+'/'+roomID+'/'+objectID+'.object.txt';
-//	data=JSON.stringify(data);
-//
-//	//TODO Change to asynchronous access
-//
-//	if (!createIfNotExists){
-//		if (!fs.existsSync(filename)){
-//			this.Modules.Log.error("File does not exist")
-//		}
-//	}
-//
-//	fs.writeFileSync(filename, data,'utf-8');
-//	if (after) after(objectID);
+	var filebase=this.Modules.Config.filebase;
+
+	var foldername=filebase+'/'+roomID;
+
+	try {fs.mkdirSync(foldername)} catch(e){};
+
+	var filename=filebase+'/'+roomID+'/'+objectID+'.object.txt';
+	data=JSON.stringify(data);
+
+	//TODO Change to asynchronous access
+
+	if (!createIfNotExists){
+		if (!fs.existsSync(filename)){
+			this.Modules.Log.error("File does not exist")
+		}
+	}
+
+	fs.writeFileSync(filename, data,'utf-8');
+	if (after) after(objectID);
 	
 }
 
@@ -573,58 +560,57 @@ fileConnector.saveContent=function(roomID,objectID,content,after,context, inputI
 	var that = this;
 
     if (!context) this.Modules.Log.error("Missing context");
+
     //------------------------------------------->
+
     console.log("-- saveContent called");
     // Todo: veryHigh   inputIsStream mode must be implemented
     dbContents.update({id:objectID}, {id:objectID, /*room:roomID,*/"content":content }, {upsert:true}, function(err, docs){
         if(docs ===0) console.log("there is something wrong with saveContent");
-        if (after) after(objectID);
+//        if (after) after(objectID);
     });
-
 
     //-------------------------------------------^
 
-//    var filebase=this.Modules.Config.filebase;
-//    var foldername=filebase+'/'+roomID;
-//    try {fs.mkdirSync(foldername)} catch(e){};
-//    var filename=filebase+'/'+roomID+'/'+objectID+'.content';
-//
-//
-//    if(!!inputIsStream){    // Todo: Q? !!?
-//        console.log('input stream '+typeof content+' ');console.log(content);
-//        var wr = fs.createWriteStream(filename);
-//        wr.on("error", function(err) {
-//            that.Modules.Log.error("Error writing file: " + err);
-//        });
-//        content.on("end", function(){
-//            if (after) after(objectID);
-//        })
-//        content.pipe(wr);
-//    } else {
-//        console.log('returned from NOT input stream '+typeof content+' ');console.log(content);
-//        return;// Todo: veryHigh comment out all this stuff after finding out about inputStream
-//        if (({}).toString.call(content).match(/\s([a-zA-Z]+)/)[1].toLowerCase() == "string") {
-//            /* create byte array */
-//
-//            var byteArray = [];
-//            var contentBuffer = new Buffer(content);
-//
-//            for (var j = 0; j < contentBuffer.length; j++) {
-//                byteArray.push(contentBuffer.readUInt8(j));
-//            }
-//
-//            content = byteArray;
-//
-//        }
-//
-//		try {
-//			fs.writeFileSync(filename, new Buffer(content));
-//		} catch (err) {
-//            this.Modules.Log.error("Could not write content to file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
-//        }
-//		if (after) after(objectID);
-//
-//    }
+    var filebase=this.Modules.Config.filebase;
+    var foldername=filebase+'/'+roomID;
+    try {fs.mkdirSync(foldername)} catch(e){};
+    var filename=filebase+'/'+roomID+'/'+objectID+'.content';
+
+
+    if(!!inputIsStream){    // Todo: Q? !!?
+        var wr = fs.createWriteStream(filename);
+        wr.on("error", function(err) {
+            that.Modules.Log.error("Error writing file: " + err);
+        });
+        content.on("end", function(){
+            if (after) after(objectID);
+        })
+        content.pipe(wr);
+    } else {
+        return;// Todo: veryHigh comment out all this stuff after finding out about inputStream
+        if (({}).toString.call(content).match(/\s([a-zA-Z]+)/)[1].toLowerCase() == "string") {
+            /* create byte array */
+
+            var byteArray = [];
+            var contentBuffer = new Buffer(content);
+
+            for (var j = 0; j < contentBuffer.length; j++) {
+                byteArray.push(contentBuffer.readUInt8(j));
+            }
+
+            content = byteArray;
+
+        }
+
+		try {
+			fs.writeFileSync(filename, new Buffer(content));
+		} catch (err) {
+            this.Modules.Log.error("Could not write content to file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+        }
+		if (after) after(objectID);
+
+    }
 }
 
 /**
@@ -776,7 +762,8 @@ fileConnector.copyContentFromFile=function(roomID, objectID, sourceFilename, con
     //------------------------------------------->
     // Todo: need to be implemented
     console.log("--- copyContentFromFile called");
-    console.log('-- ** Todo sourceFilename is : '); console.log();
+    console.log('-- ** Todo sourceFilename is : ');
+    console.log(sourceFilename);
     // figure out what sourceFilename is. is it the .content file?
     // this.saveContent(roomID,objectID,rds,callback,context, true);
     //-------------------------------------------^
@@ -807,47 +794,47 @@ fileConnector.getContent=function(roomID,objectID,context,callback){
     //------------------------------------------->
     console.log("-- getContent called");
 
-    dbContents.find({id:objectID},'-_id -id',function(err, docs){
-        callback(docs[0].content); // Todo: error handling
-    });
+//    dbContents.find({id:objectID},'-_id -id',function(err, docs){
+//        callback(docs[0].content); // Todo: error handling
+//    });
     // Todo: sync version
     // Draft 1 commited till here
     //-------------------------------------------^
 
-//	var filebase=this.Modules.Config.filebase;
-//
-//	var filename=filebase+'/'+roomID+'/'+objectID+'.content';
-//
-//	try {
-//		var content = fs.readFileSync(filename);
-//
-//		var byteArray = [];
-//		var contentBuffer = new Buffer(content);
-//
-//		for (var j = 0; j < contentBuffer.length; j++) {
-//
-//			byteArray.push(contentBuffer.readUInt8(j));
-//
-//		}
-//
-//		if (callback == undefined) {
-//			//sync
-//			return byteArray;   // Todo: not implemented in db version
-//		} else {
-//			//async
-//			callback(byteArray);
-//		}
-//
-//	} catch (e) {
-//		this.Modules.Log.debug("Could not read content from file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
-//		if (callback == undefined) {
-//			//sync
-//			return false;   // Todo: not implemented in db version
-//		} else {
-//			//async
-//			callback(false);    // Todo: not implemented in db version
-//		}
-//	}
+	var filebase=this.Modules.Config.filebase;
+
+	var filename=filebase+'/'+roomID+'/'+objectID+'.content';
+
+	try {
+		var content = fs.readFileSync(filename);
+
+		var byteArray = [];
+		var contentBuffer = new Buffer(content);
+
+		for (var j = 0; j < contentBuffer.length; j++) {
+
+			byteArray.push(contentBuffer.readUInt8(j));
+
+		}
+
+		if (callback == undefined) {
+			//sync
+			return byteArray;   // Todo: not implemented in db version
+		} else {
+			//async
+			callback(byteArray);
+		}
+
+	} catch (e) {
+		this.Modules.Log.debug("Could not read content from file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+		if (callback == undefined) {
+			//sync
+			return false;   // Todo: not implemented in db version
+		} else {
+			//async
+			callback(false);    // Todo: not implemented in db version
+		}
+	}
 	
 }
 
@@ -863,23 +850,23 @@ fileConnector.getContentStream = function(roomID, objectID, context) {
     this.Modules.Log.debug("Get content stream (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
 
     //------------------------------------------->
-    console.log("-- getContentStream called");
-    dbContents.find({id:objectID}, '-_id', function(err, doc){
-        var content = doc[0].content;
-        var stream = resumer().queue(content).end(); //var stream = resumer().queue('your string').end()
-        return stream;
-    });
+//    console.log("-- getContentStream called");
+//    dbContents.find({id:objectID}, '-_id', function(err, doc){
+//        var content = doc[0].content;
+//        var stream = resumer().queue(content).end(); //var stream = resumer().queue('your string').end()
+//        return stream;
+//    });
     //-------------------------------------------^
 
-//    var filebase = this.Modules.Config.filebase;
-//    var filename = filebase + '/' + roomID + '/' + objectID + '.content';
-//
-//    var rds = fs.createReadStream(filename);
-//    rds.on("error", function(err) {
-//        this.Modules.Log.error("Error reading file: " + filename);
-//    });
-//
-//    return rds;
+    var filebase = this.Modules.Config.filebase;
+    var filename = filebase + '/' + roomID + '/' + objectID + '.content';
+
+    var rds = fs.createReadStream(filename);
+    rds.on("error", function(err) {
+        this.Modules.Log.error("Error reading file: " + filename);
+    });
+
+    return rds;
 }
 
 /**
@@ -931,23 +918,29 @@ fileConnector.remove=function(roomID,objectID,context, callback){
     //------------------------------------------->
     console.log("--remove called");
     dbObjects.remove({id:objectID}, function(err, docs){
+//        if(callback){
+//            callback();
+//        }
     });
     dbContents.remove({id:objectID}, function(err, docs){
+//        if(callback){
+//            callback();
+//        }
     });
-    // Todo: .preview files?
+    // Todo: .preview files? Q? what is .preview
     //-------------------------------------------^
 
-//
-//	var objectBase = this.Modules.Config.filebase + '/' + roomID + "/" + objectID;
-//	var files = ['.object.txt', '.content', '.preview'].map(function( ending ){
-//		return objectBase + ending;
-//	});
-//
-//	async.each(files, fs.unlink, function(err, resp){
-//		if(callback){
-//		callback();
-//		}
-//	});
+
+	var objectBase = this.Modules.Config.filebase + '/' + roomID + "/" + objectID;
+	var files = ['.object.txt', '.content', '.preview'].map(function( ending ){
+		return objectBase + ending;
+	});
+
+	async.each(files, fs.unlink, function(err, resp){
+		if(callback){
+		callback();
+		}
+	});
 }
 
 /**
@@ -1138,6 +1131,7 @@ function format(obj){
     }
     return data;
 }
+
 /**
 *	internal
 *	read an object file and return the attribute set
@@ -1145,92 +1139,92 @@ function format(obj){
 *	@param roomID
 *	@param objectID
 */
-fileConnector.getObjectDataByFile=function(roomID,objectID, callback){
+fileConnector.getObjectDataByFile=function(roomID,objectID){
     //------------------------------------------->
-    console.log("-- getObjectDataByFile called");
-
-    dbObjects.find({id:objectID}, '-_id', function(err, docs){
-        if (docs.length === 0)
-        {
-            callback(false); // object doesn't exist
-            return; // for fiber thing
-        }
-        var attributes = docs[0];
-
-        var data={};
-
-        //	automatically repair some values which could be wrong due
-        //  to manual file copying.
-
-        data.attributes=attributes;
-        data.type=data.attributes.type;
-        data.id=objectID;
-        data.attributes.id=data.id; // Todo: Q? does it normally happen that object id has not been saved? data.attributes.id already has id value why override it?
-        data.inRoom=roomID;
-        data.attributes.inRoom=roomID;
-        data.attributes.hasContent=false;
-
-        //assure rooms do not loose their type
-        if (roomID==objectID){
-            data.type='Room';
-            data.attributes.type='Room';
-        }
-
-        // look if there is any content for this object
-        dbContents.find({id:objectID}, '-_id', function(err, docs){
-            if(docs.length !== 0)
-            {
-                data.attributes.hasContent=true;
-                data.attributes.contentAge=new Date().getTime();
-            }
-            callback(data);
-        });
-    });
+//    console.log("-- getObjectDataByFile called");
+//
+//    dbObjects.find({id:objectID}, '-_id', function(err, docs){
+//        if (docs.length === 0)
+//        {
+//            callback(false); // object doesn't exist
+//            return; // for fiber thing
+//        }
+//        var attributes = docs[0];
+//
+//        var data={};
+//
+//        //	automatically repair some values which could be wrong due
+//        //  to manual file copying.
+//
+//        data.attributes=attributes;
+//        data.type=data.attributes.type;
+//        data.id=objectID;
+//        data.attributes.id=data.id; // Todo: Q? does it normally happen that object id has not been saved? data.attributes.id already has id value why override it?
+//        data.inRoom=roomID;
+//        data.attributes.inRoom=roomID;
+//        data.attributes.hasContent=false;
+//
+//        //assure rooms do not loose their type
+//        if (roomID==objectID){
+//            data.type='Room';
+//            data.attributes.type='Room';
+//        }
+//
+//        // look if there is any content for this object
+//        dbContents.find({id:objectID}, '-_id', function(err, docs){
+//            if(docs.length !== 0)
+//            {
+//                data.attributes.hasContent=true;
+//                data.attributes.contentAge=new Date().getTime();
+//            }
+//            callback(data);
+//        });
+//    });
     //-------------------------------------------^
 
-//	var filebase = this.Modules.Config.filebase;
-//
-//	var filename=filebase+'/'+roomID+'/'+objectID+'.object.txt';
-//
-//	try {
-//		var attributes = fs.readFileSync(filename, 'utf8');
-//		attributes=JSON.parse(attributes);
-//	} catch (e) {								//if the attribute file does not exist, create an empty one
-//
-//		//when an object is not there, false is returned as a sign of an error
-//		return false;
-//	}
-//
-//	var data={};
-//
-//	//	automatically repair some values which could be wrong due
-//	//  to manual file copying.
-//
-//	data.attributes=attributes;
-//	data.type=data.attributes.type;
-//	data.id=objectID;
-//	data.attributes.id=data.id; // Todo: Q? does it normally happen that object id has not been saved? data.attributes.id already has id value why override it?
-//	data.inRoom=roomID;
-//	data.attributes.inRoom=roomID;
-//	data.attributes.hasContent=false;
-//
-//	//assure rooms do not loose their type
-//	if (roomID==objectID){
-//		data.type='Room';
-//		data.attributes.type='Room';
-//	}
-//
-//	var path = require('path');
-//
-//	filename=filebase+'/'+roomID+'/'+objectID+'.content';
-//
-//	if (path.existsSync(filename)) {
-//
-//		data.attributes.hasContent=true;
-//		data.attributes.contentAge=new Date().getTime();
-//	}
-//
-//	return data;
+	var filebase = this.Modules.Config.filebase;
+
+	var filename=filebase+'/'+roomID+'/'+objectID+'.object.txt';
+
+	try {
+		var attributes = fs.readFileSync(filename, 'utf8');
+		attributes=JSON.parse(attributes);
+	} catch (e) {								//if the attribute file does not exist, create an empty one
+
+		//when an object is not there, false is returned as a sign of an error
+		return false;
+	}
+
+	var data={};
+
+	//	automatically repair some values which could be wrong due
+	//  to manual file copying.
+
+	data.attributes=attributes;
+	data.type=data.attributes.type;
+	data.id=objectID;
+	data.attributes.id=data.id; // Todo: Q? does it normally happen that object id has not been saved? data.attributes.id already has id value why override it?
+	data.inRoom=roomID;
+	data.attributes.inRoom=roomID;
+	data.attributes.hasContent=false;
+
+	//assure rooms do not loose their type
+	if (roomID==objectID){
+		data.type='Room';
+		data.attributes.type='Room';
+	}
+
+	var path = require('path');
+
+	filename=filebase+'/'+roomID+'/'+objectID+'.content';
+
+	if (path.existsSync(filename)) {
+
+		data.attributes.hasContent=true;
+		data.attributes.contentAge=new Date().getTime();
+	}
+
+	return data;
 }
 
 /**
@@ -1330,21 +1324,21 @@ fileConnector.getMimeType=function(roomID,objectID,context,callback) {
 	if (!context) throw new Error('Missing context in getMimeType');
 
     //------------------------------------------->
-    console.log("-- getMimeType called");
-    dbObjects.find({id:objectID}, '-_id mimeType', function(err, docs){
-        if (docs.length === 0) {
-            callback(false);
-        }
-        else{
-            callback(docs[0].mimeType);
-        }
-    });
+//    console.log("-- getMimeType called");
+//    dbObjects.find({id:objectID}, '-_id mimeType', function(err, docs){
+//        if (docs.length === 0) {
+//            callback(false);
+//        }
+//        else{
+//            callback(docs[0].mimeType);
+//        }
+//    });
     //-------------------------------------------^
 
-//	var objectData = this.getObjectData(roomID,objectID,context);
-//	var mimeType = objectData.attributes.mimeType;
-//
-//	callback(mimeType);
+	var objectData = this.getObjectData(roomID,objectID,context);
+	var mimeType = objectData.attributes.mimeType;
+
+	callback(mimeType);
 	
 }
 
