@@ -72,10 +72,9 @@ RoomController.createRoom = function (data, context, callback) {
 */
 RoomController.roomExists = function (data, context, callback) {
     var roomID = data.roomID;
-    Modules.Connector.getObjectDataByFile(roomID,roomID, function(obj){
-        callback(null, !!obj);
-    });
+    var obj= Modules.Connector.getObjectDataByFile(roomID,roomID);
 
+    callback(null, !!obj);
 };
 /**
 * @function duplicateRoom
