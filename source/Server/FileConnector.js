@@ -19,6 +19,18 @@ var fs = require('fs');
 var async = require('async');
 
 var Q = require('q');
+
+var serverAddress = 'localhost:27017';
+var dbName = 'test';
+var dbURI = serverAddress +'/' + dbName;
+
+var mongo = require('mongodb');
+var monk = require('monk');
+var db = monk(dbURI);
+var dbObjects = db.get('objects'); // waObjects is name of collection
+var dbRooms = db.get('rooms');
+var dbContents = db.get('contents');
+
 /**
  * @function init
  * @param theModules
@@ -360,6 +372,12 @@ fileConnector.saveObjectData=function(roomID,objectID,data,after,context,createI
     if (!context) this.Modules.Log.error("Missing context");
     if (!data) this.Modules.Log.error("Missing data");
 
+    // ==== added code for saving objects data into DB ===
+    dbRooms.update({id:data.id}, data, {upsert:true}, function(err, docs){
+        if(docs ===0) console.log("Error: there is something wrong with saveObjectData");
+    });
+    // ^^^ End of added code for saving objects data into DB ^^^
+
     var filebase=this.Modules.Config.filebase;
 
     var foldername=filebase+'/'+roomID;
@@ -398,6 +416,12 @@ fileConnector.saveObjectData=function(roomID,objectID,data,after,context,createI
 fileConnector.saveContent=function(roomID,objectID,content,after,context, inputIsStream){
     this.Modules.Log.debug("Save content from string (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
     var that = this;
+
+    // ==== added code for saving objects content into DB ===
+    dbContents.update({id:objectID}, {id:objectID, /*room:roomID,*/"content":content }, {upsert:true}, function(err, docs){
+        if(docs ===0) console.log("there is something wrong with saving Content in DB");
+    });
+    // ^^^ End of added code for saving objects content into DB ^^^
 
     var filebase=this.Modules.Config.filebase;
     var foldername=filebase+'/'+roomID;
@@ -449,6 +473,7 @@ fileConnector.saveContent=function(roomID,objectID,content,after,context, inputI
  *	@param context
  */
 fileConnector.savePainting=function(roomID,content,after,context){
+    // Q?
     if (!context) this.Modules.Log.error("Missing context");
 
     this.Modules.Log.debug("Save painting (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
@@ -702,6 +727,13 @@ fileConnector.remove=function(roomID,objectID,context, callback){
 
     if (!context) this.Modules.Log.error("Missing context");
 
+    // ==== added code for db
+    dbObjects.remove({id:objectID}, function(err, docs){
+    });
+    dbContents.remove({id:objectID}, function(err, docs){
+    });
+    // ^^^ end of added code
+
     var objectBase = this.Modules.Config.filebase + '/' + roomID + "/" + objectID;
     var files = ['.object.txt', '.content', '.preview'].map(function( ending ){
         return objectBase + ending;
@@ -771,6 +803,10 @@ fileConnector.duplicateObject=function(roomID,toRoom, objectID, context,  callba
 
     var uuid = require('node-uuid');
     var newObjectID = uuid.v4();
+
+    // ==== added code for DB
+        // Todo: to be implemented
+    // ====
 
     var filebase=this.Modules.Config.filebase;
 
