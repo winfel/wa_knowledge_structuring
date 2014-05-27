@@ -10,6 +10,8 @@
  *	 @requires Node.js/imagemagick
  *    @requires Config
  *	 @requires ./Common/Log
+ *	 @requires Node.js/monk
+ *	 @requires Node.js/mongodb
  *
  */
 "use strict";
