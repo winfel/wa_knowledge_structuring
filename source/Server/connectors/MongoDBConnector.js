@@ -20,7 +20,7 @@ var rooms;
 */
 mongoConnector.init = function(theModules) {
     this.Modules = theModules;
-    db = require('monk')(Modules.MongoDBConfig.getURI());
+    db = require('monk')(theModules.MongoDBConfig.getURI());
     
     var rooms = db.get('rooms');
 }
