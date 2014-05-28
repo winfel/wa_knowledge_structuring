@@ -150,7 +150,7 @@ function buildObjectFromObjectData(objectData, roomID, type) {
  *
  *  @return object the now created object
  */
-ObjectManager.getObject = function (roomID, objectID, context) {
+ObjectManager.getObject = function (roomID, objectID, context, callback) {
 
 	if (!context) throw new Error('Missing context in ObjectManager.getObject');
 
@@ -158,12 +158,13 @@ ObjectManager.getObject = function (roomID, objectID, context) {
 
 	if (!objectData) return false;
 
-	var object = buildObjectFromObjectData(objectData, roomID);
+	var object = buildObjectFromObjectData(objectData, roomID, function() {
+		
+		object.context = context;
 
-	object.context = context;
-
-	return object;
-
+		callback(object);
+		
+	});
 }
 
 /**
@@ -257,35 +258,36 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
 	var proto = this.getPrototypeFor(type);
 
 	Modules.Connector.createObject(roomID, type, proto.standardData, context, function (id) {
-		var object = ObjectManager.getObject(roomID, id, context);
+		ObjectManager.getObject(roomID, id, context, function (object) {
 
-		//set default attributes
-		var defaultAttributes = object.standardData;
-		for (var key in defaultAttributes) {
-			var value = defaultAttributes[key];
-			object.setAttribute(key, value);
-		}
-
-		object.setAttribute('name', type);
-
-		// SciWoAr added owner of an object
-		Modules.UserManager.modifyRole(null,
-										{object : object, 
-										role : {name : "Manager"},
-										username : context.user.username},
-										true);
-
-		for (var key in attributes) {
-			var value = attributes[key];
-			object.setAttribute(key, value);
-		}
-
-		if (content) {
-			object.setContent(content);
-		}
-
-		Modules.EventBus.emit("room::" + roomID + "::action::createObject", {objectID: id});
-		callback(false, object);
+			//set default attributes
+			var defaultAttributes = object.standardData;
+			for (var key in defaultAttributes) {
+				var value = defaultAttributes[key];
+				object.setAttribute(key, value);
+			}
+	
+			object.setAttribute('name', type);
+	
+			// SciWoAr added owner of an object
+			Modules.UserManager.modifyRole(null,
+											{object : object, 
+											role : {name : "Manager"},
+											username : context.user.username},
+											true);
+	
+			for (var key in attributes) {
+				var value = attributes[key];
+				object.setAttribute(key, value);
+			}
+	
+			if (content) {
+				object.setContent(content);
+			}
+	
+			Modules.EventBus.emit("room::" + roomID + "::action::createObject", {objectID: id});
+			callback(false, object);
+		});
 	});
 }
 
