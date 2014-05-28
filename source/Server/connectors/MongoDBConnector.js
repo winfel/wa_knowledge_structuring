@@ -22,7 +22,7 @@ mongoConnector.init = function(theModules) {
     this.Modules = theModules;
     db = require('monk')(theModules.MongoDBConfig.getURI());
     
-    var rooms = db.get('rooms');
+    rooms = db.get('rooms');
 }
 
 /**
@@ -204,11 +204,17 @@ mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
 *   @param objectID
 *   @param callback
 */
-function getObjectDataFromDB (roomID, objectID, callback) {
+function getObjectDataFromDB (roomID, id, callback) {
     console.log("ALEX mongoConnector.getObjectDataFromDB");
+    
+    console.log("roomID: " + roomID);
+    console.log("id: " + id);
 
-    // TODO: get objet from DB
-    callback(false);
+    rooms.find({id: id}, {}, function(err, doc) {
+        if (err || doc === null || doc === undefined) callback(false);
+        if (doc.length === 0) callback(false);
+        else callback(doc[0]);
+    });
 }
 
 
@@ -238,9 +244,7 @@ mongoConnector.saveObjectData = function(roomID, objectID, data, after, context,
     console.log("objectID: " + objectID);
     
     // saved the room data
-    rooms.insert({id: newUserAttr.login, password: newUserAttr.password, e_mail: newUserAttr.e_mail }, callback);
-    
-    after();
+    rooms.insert(data, after);
 }
 
 /**
