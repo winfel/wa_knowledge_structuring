@@ -30,13 +30,17 @@ GUI.sidebar.elementConfig = {
     order: 1,
     title: GUI.translate("Right Manager"),
   },
-  "chat": {
+  "tabs": {
     order: 2,
+    title: GUI.translate("System Tabs"),
+  },
+  "chat": {
+    order: 3,
     title: GUI.translate("Chat"),
     onOpen: GUI.chat.opened
   },
   "bug": {
-    order: 3,
+    order: 4,
     title: GUI.translate("Bugreport"),
   },
 };
