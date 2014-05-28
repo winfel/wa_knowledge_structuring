@@ -104,6 +104,7 @@ GUI.loadGUI = function(step) {
         
         GUI.rightmanager.init();
         GUI.rightmanagerDialog.init();
+        GUI.tabs.init();
       }
 
       // Adjust svg area
