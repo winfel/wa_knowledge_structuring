@@ -45,6 +45,13 @@ PaperObject.register = function(type) {
 
   }, true);
 
+  this.registerAction('Store in Tab-List', function(object) {
+
+    GUI.tabs.addTab(object.getAttribute('name')+" (PaperObject)",object.getAttribute('destination'));
+    GUI.tabs.redrawTabContent();
+
+  }, true);
+
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
   this.registerAttribute('bigIcon', {hidden: true});
 }

@@ -49,6 +49,12 @@ Room.register=function(type){
 	this.registerAttribute('group',{hidden:true});
 	this.registerAttribute('showUserPaintings',{type:"boolean", standard:true, changedFunction: function(object, value) {object.showUserPaintings(value);}});
     
+    this.registerAction('Store in Tab-List', function(object) {
+
+    GUI.tabs.addTab(object.getAttribute('name')+" (Room)",object.getAttribute('destination'));
+    GUI.tabs.redrawTabContent();
+
+  }, true);
 }
 
 /**
