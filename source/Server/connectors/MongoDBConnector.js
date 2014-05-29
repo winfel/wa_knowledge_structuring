@@ -60,7 +60,6 @@ mongoConnector.login = function(username, password, externalSession, context, rp
  * @param context
  */
 mongoConnector.isLoggedIn = function(context) {
-    console.log("ALEX mongoConnector.isLoggedIn");
     return true;
 }
 
@@ -77,7 +76,6 @@ mongoConnector.isLoggedIn = function(context) {
  * @param callback
  */
 mongoConnector.mayWrite = function(roomID, objectID, connection, callback) {
-    console.log("ALEX mongoConnector.mayWrite");
     callback(null, true);
 }
 /**
@@ -90,7 +88,6 @@ mongoConnector.mayWrite = function(roomID, objectID, connection, callback) {
  * @param callback
  */
 mongoConnector.mayRead = function(roomID, objectID, connection, callback) {
-    console.log("ALEX mongoConnector.mayRead");
     callback(null, true);
 }
 /**
@@ -103,7 +100,6 @@ mongoConnector.mayRead = function(roomID, objectID, connection, callback) {
  * @param callback
  */
 mongoConnector.mayDelete = function(roomID, objectID, connection, callback) {
-    console.log("ALEX mongoConnector.mayDelete");
     callback(null, true);
 }
 
@@ -116,7 +112,6 @@ mongoConnector.mayDelete = function(roomID, objectID, connection, callback) {
  * @param callback
  */
 mongoConnector.mayEnter = function(roomID, connection, callback) {
-    console.log("ALEX mongoConnector.mayEnter");
     callback(null, true);
 }
 
@@ -127,7 +122,6 @@ mongoConnector.mayEnter = function(roomID, connection, callback) {
  * @param callback
  */
 mongoConnector.mayInsert = function(roomID, connection, callback) {
-    console.log("ALEX mongoConnector.mayInsert");
     callback(null, true);
 }
 
@@ -149,7 +143,7 @@ mongoConnector.listRooms = function(callback) {
 * @param callback
 */
 mongoConnector.getInventory = function(roomID, context, callback) {
-    console.log("ALEX fileConnector.getInventory");
+    console.log("ALEX mongoConnector.getInventory");
 
     var self = this;
     this.Modules.Log.debug("Request inventory (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
@@ -160,13 +154,27 @@ mongoConnector.getInventory = function(roomID, context, callback) {
         this.Modules.Log.error("User is not logged in (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
     }
     
-    if (callback === undefined) {
-        return console.warn('ERROR: callback muss not be undefined');
-    }
-    
     var inventory = [];
     
-    callback(inventory);
+    var promise = getObjectsByRoom(roomID);
+    promise.on('complete', function(err, objects) {
+       
+       if (err && objects !== undefined && objects.length > 0) {    
+           for (var obj in objects) {
+               var data = {};
+               
+               data.attributes = JSON.stringify(obj);
+               data.type = data.attributes.type;
+               data.id = obj.id;
+               data.inRoom = roomID;
+               data.attributes.hasContent = false;
+               
+               inventory.push(data);
+           }
+       }
+        
+       callback(inventory); 
+    });
 }
 
 /**
@@ -180,147 +188,59 @@ mongoConnector.getInventory = function(roomID, context, callback) {
  * @returns {*}
  */
 mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
-    console.log("ALEX mongoConnector.getRoomData");
-    
     this.Modules.Log.debug("Get data for room (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
 
     if (!context) this.Modules.Log.error("Missing context");
     
     if (callback === undefined) {
-        console.warn('ERROR: callback muss not be undefined');
+        console.warn('ERROR: callback muss be defined');
     }
     
     var self = this;
-    var obj = getRoomDataFromDB(roomID, function (obj) {
+    var promise = getRoomFromDB(roomID);
+    promise.on('success', function(obj) {
         
-        if (!obj) {
-            
+        if (!obj) {    
             obj = {};
             obj.id = roomID;
             obj.name = roomID;
             obj.type = "Room";
             
-            console.log("roomID: " +id);
+            console.log("roomID: " + roomID);
             
             if (oldRoomId) {
                 obj.parent = oldRoomId;
             }
             
-            self.saveObjectData(roomID, roomID, obj, function(id) {
+            var promise = self.saveRoom(roomID, obj, context);
+            promise.on('success', function(doc) {
                 self.Modules.Log.debug("Created room (roomID: '" + roomID + "', user: '" + self.Modules.Log.getUserFromContext(context) + "', parent:'" + oldRoomId + "')");
                 
                 self.getRoomData(roomID, context, callback, oldRoomId);
-            }, context, true)
+            });
         } else {
             callback(obj);
-        }
-         
+        } 
     });
 }
 
 /**
-*   internal
-*   read an object file and return the attribute set
-*   @function getObjectDataByFile
-*   @param roomID
-*   @param objectID
-*   @param callback
-*/
-function getRoomDataFromDB (roomID, callback) {
-    console.log("ALEX mongoConnector.getRoomDataFromDB");
-    
-    console.log("roomID: " + roomID);
-
-    rooms.findOne({id: roomID}, {}, function(err, room) {
-        if (err || room === null || room === undefined) {
-        	callback(false);
-        } else {
-        	callback(room);
-        }
-    });
-}
-
-/**
-*   internal
-*   read an object file and return the attribute set
-*   @function getObjectDataByFile
-*   @param roomID
-*   @param objectID
-*   @param callback
-*/
-function getObjectDataFromDB (roomID, id, callback) {
-    console.log("ALEX mongoConnector.getObjectDataFromDB");
-    
-    console.log("roomID: " + roomID);
-    console.log("id: " + id);
-
-    objects.findOne({roomID: roomID, id: id}, {}, function(err, obj) {
-        if (err || obj === null || obj === undefined) {
-        	callback(false);
-        } else {
-        	callback(obj);
-        }
-    });
-}
-
-
-/**
- * save the object (by given data) if an "after" function is specified, it is
- * called after saving
+ * save the object (by given data) 
  * 
  * @function saveObjectData
  * @param roomID
  * @param objectID
  * @param data
- * @param after
  * @param context
- * @param {boolean} createIfNotExists
  */
-mongoConnector.saveObjectData = function(roomID, objectID, data, callback, context, createIfNotExists) {
-    console.log("ALEX mongoConnector.saveObjectData");
-
+mongoConnector.saveObjectData = function(roomID, objectID, data, context) {
     this.Modules.Log.debug("Save object data (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '"
             + this.Modules.Log.getUserFromContext(context) + "')");
 
     if (!context) this.Modules.Log.error("Missing context");
     if (!data)    this.Modules.Log.error("Missing data");
-    
-    var auxFunc = function (err, doc) {
-        if (err || doc === null || doc === undefined) return after(false);
-        
-        after(objectID);
-    };
-    
-    console.log("Data to be saved: " + JSON.stringify(data));
-    console.log("roomID: " + roomID);
-    console.log("objectID: " + objectID);
-    
-    if (data.type == "Room") {
-        rooms.insert(data, auxFunc);
-    } else {
-        objects.insert(data, auxFunc);
-    }
-}
-
-/**, 
-*   internal
-*   read an object file and return the attribute set
-*   @function getObjectDataByFile
-*   @param roomID
-*   @param objectID
-*   @param callback
-*/
-function getObjectDataFromDB (roomID, id, callback) {
-    console.log("ALEX mongoConnector.getObjectDataFromDB");
-    
-    console.log("roomID: " + roomID);
-    console.log("id: " + id);
-
-    rooms.find({id: id}, {}, function(err, doc) {
-        if (err || doc === null || doc === undefined) callback(false);
-        if (doc.length === 0) callback(false);
-        else callback(doc[0]);
-    });
+  
+    return objects.insert(data);
 }
 
 /**
@@ -336,23 +256,28 @@ function getObjectDataFromDB (roomID, id, callback) {
 *
 */
 mongoConnector.createObject = function(roomID, type, data, context, callback) {
-     console.log("ALEX mongoConnector.createObject");
-     
-     this.Modules.Log.debug("Create object (roomID: '" + roomID + "', type: '" + type + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
-        
      if (!context) this.Modules.Log.error("Missing context");
+     this.Modules.Log.debug("Create object (roomID: '" + roomID + "', type: '" + type + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
         
      var uuid = require('node-uuid');
      var objectID = uuid.v4();
         
      data.type = type;
+     data.id = objectID;
+     data.inRoom = roomID;
         
      if (type == "Paint" || type == "Highlighter") {
          data.mimeType = 'image/png';
          data.hasContent = false;   
      }
         
-     this.saveObjectData(roomID, objectID, data, callback, context, true);
+     var promise = this.saveObjectData(roomID, objectID, data, context);
+     promise.on('complete', function(err, doc) {
+         if (err || doc === undefined || doc.length === 0) {
+             console.warn("ERROR: " + err);
+             callback(false);
+         } else callback(objectID);
+     });
 }
 
 /**
@@ -363,20 +288,71 @@ mongoConnector.createObject = function(roomID, type, data, context, callback) {
 *   @param objectID
 *   @param context
 */
-mongoConnector.getObjectData = function(roomID, objectID, context,callback) {
-    console.log("ALEX mongoConnector.getObjectData");
-
+mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
     this.Modules.Log.debug("Get object data (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '"
             + this.Modules.Log.getUserFromContext(context) + "')");
 
     if (!context) this.Modules.Log.error("Missing context");
 
-    var obj = getObjectDataFromDB(roomID, objectID, callback(obj));
-
+    var promise = getObjectDataFromDB(objectID, callback);
+    promise.on('complete', function(err, obj) {
+        
+        if (err || obj === undefined || obj === null) {
+            console.warn("ERROR: " + err);
+            callback(false);
+        } else callback(obj);
+    });
 }
 
+/**
+ * Save the object (by given data) if an "callback" function is specified, it is
+ * called after saving
+ * 
+ * @function saveObjectData
+ * @param roomID
+ * @param data
+ * @param context
+ */
+mongoConnector.saveRoom = function(roomID, data, context) {
+    this.Modules.Log.debug("Save object data (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
 
+    if (!context) this.Modules.Log.error("Missing context");
+    if (!data)    this.Modules.Log.error("Missing data");
+    
+    return rooms.insert(data);
+}
 
+/**
+*   internal
+*   read an object file and return the attribute set
+*   @function getObjectDataByFile
+*   @param id
+*   @param callback
+*/
+function getObjectDataFromDB (id, callback) {
+    return objects.findOne({id: id}); // return a promise
+}
+
+/**
+*   internal
+*   read an object file and return the attribute set
+*   @function getObjectDataByFile
+*   @param roomID
+*   @param objectID
+*   @param callback
+*/
+function getRoomFromDB (roomID) {
+    return rooms.findOne({id: roomID}); // return a promise
+}
+
+/**
+*   internal
+*   Get the objects associated to a room
+*   @param roomID
+*/
+function getObjectsByRoom (roomID) {
+    return objects.find({inRoom: roomID});
+}
 
 /**
 * returns the room hierarchy starting by given roomID as root

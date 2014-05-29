@@ -170,7 +170,7 @@ app.get('/room/:id', function(req, res, next) {
 
 app.get('/getRoomHierarchy', function(req, res, next) {
     var roomId = req.query.id;
-    var hierarchy = Modules.Connector.getRoomHierarchy(roomId, false, function(hierarchy) {
+    Modules.Connector.getRoomHierarchy(roomId, false, function(hierarchy) {
         var result = [];
 
         if (roomId === "") {

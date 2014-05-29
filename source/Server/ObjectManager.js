@@ -151,19 +151,13 @@ function buildObjectFromObjectData(objectData, roomID, type) {
  *  @return object the now created object
  */
 ObjectManager.getObject = function (roomID, objectID, context, callback) {
-
 	if (!context) throw new Error('Missing context in ObjectManager.getObject');
 
-	var objectData = Modules.Connector.getObjectData(roomID, objectID, context);
-
-	if (!objectData) return false;
-
-	var object = buildObjectFromObjectData(objectData, roomID, function() {
-		
-		object.context = context;
-
-		callback(object);
-		
+	Modules.Connector.getObjectData(roomID, objectID, context, function (objectData) {
+	    var object = buildObjectFromObjectData(objectData, roomID);
+	    object.context = context;
+	    
+	    callback(object);
 	});
 }
 
@@ -208,22 +202,18 @@ ObjectManager.getObjects = function (roomID, context, callback) {
 		return inventory;
 
 	} else {
-		//async.
+		// async.
 
 		Modules.Connector.getInventory(roomID, context, function (objectsData) {
 
 			for (var i in objectsData) {
 				var objectData = objectsData[i];
-
 				var object = buildObjectFromObjectData(objectData, roomID);
-
 				object.context = context;
-
 				inventory.push(object);
 			}
 
 			callback(inventory);
-
 		});
 	}
 }
@@ -247,17 +237,15 @@ ObjectManager.getInventory = ObjectManager.getObjects;
  *  @param  content
  *  @param  context     user credentials
  *  @param  callback    the callback function
- *
- *
  **/
 ObjectManager.createObject = function (roomID, type, attributes, content, context, callback) {
-
-
-	//TODO send error to client if there is a rights issue here
-
+	
+    // TODO send error to client if there is a rights issue here
 	var proto = this.getPrototypeFor(type);
-
 	Modules.Connector.createObject(roomID, type, proto.standardData, context, function (id) {
+	    
+	    
+	    
 		ObjectManager.getObject(roomID, id, context, function (object) {
 
 			//set default attributes
@@ -288,6 +276,10 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
 			Modules.EventBus.emit("room::" + roomID + "::action::createObject", {objectID: id});
 			callback(false, object);
 		});
+		
+		
+		
+		
 	});
 }
 
