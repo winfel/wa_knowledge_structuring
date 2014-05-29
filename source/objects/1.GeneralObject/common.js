@@ -184,6 +184,7 @@ GeneralObject.register = function(type) {
   this.registerAttribute('id', {type: 'number', readonly: true});
   this.registerAttribute('type', {type: 'text', readonly: true});
   this.registerAttribute('name', {type: 'text', changedFunction: function(object, value) {
+      GUI.tabs.updateCache(object);
       GUI.tabs.redrawTabContent();
     }});
 

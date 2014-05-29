@@ -61,8 +61,6 @@ GUI.tabs = new function() {
   *
   **/
   this.createCacheEntry = function(id, isPO, name, dest){
-    console.log("writing object with id "+id+" to cache");
-
     var found = false;
     cache.forEach(function(entry){
       if(entry.id == id){
@@ -79,12 +77,37 @@ GUI.tabs = new function() {
   };
 
   /**
+  *  The function updates the cache if an object has been changed from the outside (i.e., 
+  *   the name has been changed)-
+  *
+  **/
+  this.updateCache = function(object){
+   console.log("update!");
+   var objectIsUsedInCache = false;
+   var index = -1;
+   cache.forEach(function(entry){
+      if(entry == object.id){
+         objectIsUsedInCache = true;
+         index = cache.indexOf(entry);
+      }
+   });
+
+   if(objectIsUsedInCache){
+     var newObject = {id:object.id,
+      isPO:(object.type == 'PaperObject'),
+      name:object.name,
+      dest:object.getAttribute('destination')};
+
+      cache[index] = newObject;  
+   }
+
+  };
+
+  /**
   *  Loads important object data from the cache
   *
   **/
   this.getFromCache = function(id){
-    console.log("loading object with id "+id+" from cache");
-
     var returnVal;
     cache.forEach(function(entryInCache){
       if(entryInCache.id == id){
@@ -135,6 +158,9 @@ GUI.tabs = new function() {
         dest = getCurrentObject.getAttribute('destination');
 
         that.createCacheEntry(getCurrentObject.id,isPaperObject,currentName,dest);
+
+        // if possible: update
+        that.updateCache(getCurrentObject);
      } 
 
       // now: data is loaded in any case
