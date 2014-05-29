@@ -46,8 +46,7 @@ PaperObject.register = function(type) {
   }, true);
 
   this.registerAction('Store in Tab-List', function(object) {
-
-    GUI.tabs.addTab(object.getAttribute('name')+" (PaperObject)",object.getAttribute('destination'));
+    GUI.tabs.addTab(object.getAttribute('name')+" (PaperObject)",object.getAttribute('destination'),object.id);
     GUI.tabs.redrawTabContent();
 
   }, true);

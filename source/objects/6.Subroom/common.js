@@ -47,7 +47,7 @@ Subroom.register=function(type){
 	
 	this.registerAction('Store in Tab-List', function(object) {
 
-    GUI.tabs.addTab(object.getAttribute('name')+" (Room)",object.getAttribute('destination'));
+    GUI.tabs.addTab(object.getAttribute('name')+" (Room)",object.getAttribute('destination'),object.id);
     GUI.tabs.redrawTabContent();
 
   }, true);
