@@ -93,6 +93,26 @@ GUI.tabs = new function() {
     }
   };
 
+  this.updateNameOfTabWithID = function(id, name){
+   cache.forEach(function(tab){
+      if(tab.id == id){
+         var newtab = {id:id,
+            isPO: tab.isPO,
+            name: name,
+            dest: tab.dest};
+
+         var getIndex = cache.indexOf(tab);
+
+         cache[getIndex] = newtab;
+      }
+   });
+
+   this.redrawTabContent();
+
+   /* FIXME: this is the atm. lazy solution -> write a completely new cash to db*/
+   this.storeCacheInDB();
+  };
+
   /**
   *  The function updates the cache if an object has been changed from the outside (i.e., 
   *   the name has been changed)-

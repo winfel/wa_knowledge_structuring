@@ -17,6 +17,10 @@ var RightManager = new function() {
    */
   this.init = function(theModules) {
     Dispatcher = theModules.Dispatcher;
+
+    Dispatcher.registerCall("umBroadcastNameChange", function(data){
+      GUI.tabs.updateNameOfTabWithID(data.object.id, data.object.name);
+    });
   };
 
   /**

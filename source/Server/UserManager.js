@@ -30,7 +30,8 @@ UserManager.connections = {};
  */
 UserManager.init = function(theModules) {
   Modules = theModules;
-  
+  var that = this;
+
   db = require('monk')(Modules.MongoDBConfig.getURI());
   
   var Dispatcher = Modules.Dispatcher;
@@ -52,6 +53,16 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);
 
   Dispatcher.registerCall('umIsManager', UserManager.isManager);
+
+  Dispatcher.registerCall('umBroadcastNameChange', function(socket, data){
+    var object = data;
+
+    for (var i in that.connections) {
+      Modules.SocketServer.sendToSocket(that.connections[i].socket, "umBroadcastNameChange", data);
+    }
+
+  });
+
 
   Dispatcher.registerCall('umGetTabCache', function(socket, data){
     var responseObject = {};

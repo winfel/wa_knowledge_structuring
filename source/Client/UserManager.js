@@ -51,7 +51,6 @@ UserManager.storeTabCache = function(objectList, cache) {
   // get current user -- FIXME
   var username = GUI.username;
 
-  console.log("username: "+GUI.username);
   //send data to server
   Modules.SocketClient.serverCall('umStoreTabCache', {
     'objectlist': objectList,
@@ -63,8 +62,6 @@ UserManager.storeTabCache = function(objectList, cache) {
 UserManager.getTabCache = function(callback) {
   // get current user -- FIXME
   var username = GUI.username;
-
-  console.log("username: "+GUI.username);
 
   Dispatcher.registerCall("umGetTabCache" + username, function(data) {
     // call the callback
@@ -78,6 +75,16 @@ UserManager.getTabCache = function(callback) {
     'username': username
   });
 };
+
+/**
+* broadcasts a change of a name to all other users. 
+* They might need that information for their tab-bar
+**/
+UserManager.broadcastNameChange = function(object){
+  Modules.SocketClient.serverCall('umBroadcastNameChange', {
+    'object': object
+  });
+}
 
 /**
  * 
