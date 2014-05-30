@@ -78,11 +78,8 @@ UserManager.init = function(theModules) {
                 dest:docs[0].dest
               });
 
-              console.log("list: " + responseObject.objectlist.length + "cache:" + responseObject.cache.length);
-
               if(runs == responseObject.objectlist.length){
                 // data has been gathered: send it back
-                console.log("send data back");
                 Modules.SocketServer.sendToSocket(socket, "umGetTabCache" + data.username, responseObject);
               }
               runs++;

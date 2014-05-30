@@ -214,7 +214,7 @@ GUI.tabs = new function() {
 
 
   if(!namesWithoutDeletePermission.indexOf(currentName) == 0){
-   var delToken = $("<i>").html("<img src='/guis.common/images/oxygen/16x16/actions/edit-delete.png'>").on( "click", function (e) {
+   var delToken = $("<i>").html("<img src='/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png'>").on( "click", function (e) {
     e.stopPropagation();
     that.removeTab(item)
   }).appendTo(currentLi);
