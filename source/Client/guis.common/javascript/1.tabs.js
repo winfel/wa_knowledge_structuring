@@ -127,7 +127,7 @@ GUI.tabs = new function() {
     
     var that = this;
 
-    var upperUl = $("<ul>").appendTo( "#tabs_content" );
+    var upperUl = $("<ul style='list-style-type:none;'>").appendTo( "#tabs_content" );
     defaultTabs.forEach(function(item){
     	var token = item.split("#");
     	var currentLi = $("<li>"+token[0]+"</li>").on( "click", function () {
@@ -179,12 +179,16 @@ GUI.tabs = new function() {
       }
    }
 
+   $("<hr>").appendTo(upperUl);
+
   var currentLi = $("<li>"+drawName+"</li>").on( "click", function () {
    ObjectManager.loadRoom(dest, false, 'left');
  }).appendTo( upperUl );
 
+
+
   if(!namesWithoutDeletePermission.indexOf(currentName) == 0){
-   var delToken = $("<i>").html(" [X]").on( "click", function (e) {
+   var delToken = $("<i>").html("<img src='/guis.common/images/oxygen/16x16/actions/edit-delete.png'>").on( "click", function (e) {
     e.stopPropagation();
     that.removeTab(item)
   }).appendTo(currentLi);
