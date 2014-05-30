@@ -19,9 +19,18 @@ GUI.tabs = new function() {
    */
   this.init = function() {
     console.log("GUI.tabs initialized");
-    internalID = 0;
-
     var that = this;
+
+    /* try to load the tab data from db */
+    Modules.UserManager.getTabCache(function(data){
+      currentlyStoredTab = data.objectlist;
+      cache = data.cache;
+
+      that.redrawTabContent();
+    });
+
+    /* init the remaining stuff */
+    internalID = 0;
 
     this.tabs = $("#tabs");
     this.tabsContent = $("#tabs_content");
@@ -38,6 +47,11 @@ GUI.tabs = new function() {
     }else{
         currentlyStoredTab.push(id);
     }
+
+    // Note: we need to draw first because the cache gets updated in the drawing process
+    this.redrawTabContent();
+
+    this.storeCacheInDB();
   };
 
   /** 
@@ -49,10 +63,13 @@ GUI.tabs = new function() {
   	findID = currentlyStoredTab.indexOf(id);
 
   	if(findID > -1){
-  		delete currentlyStoredTab[findID];
+      currentlyStoredTab.splice(findID,1);
   	}
 
+    // Note: we need to draw first because the cache gets updated in the drawing process
   	this.redrawTabContent();
+
+    this.storeCacheInDB();
   };
 
   /** 
@@ -117,6 +134,15 @@ GUI.tabs = new function() {
 
     return returnVal;
   }
+
+  /**
+  *   This function stores the tabs for the current user with the cache
+  *   in the database
+  *
+  */
+  this.storeCacheInDB = function(){
+   Modules.UserManager.storeTabCache(currentlyStoredTab,cache);
+  };
 
   /**
   * Redraws the content of the tab sidebar

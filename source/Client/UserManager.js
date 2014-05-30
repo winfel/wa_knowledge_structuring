@@ -47,6 +47,38 @@ UserManager.modifyRole = function(object, role, grant) {
   });
 };
 
+UserManager.storeTabCache = function(objectList, cache) {
+  // get current user -- FIXME
+  var username = GUI.username;
+
+  console.log("username: "+GUI.username);
+  //send data to server
+  Modules.SocketClient.serverCall('umStoreTabCache', {
+    'objectlist': objectList,
+    'cache': cache,
+    'username': username
+  });
+};
+
+UserManager.getTabCache = function(callback) {
+  // get current user -- FIXME
+  var username = GUI.username;
+
+  console.log("username: "+GUI.username);
+
+  Dispatcher.registerCall("umGetTabCache" + username, function(data) {
+    // call the callback
+    callback(data);
+
+    // deregister
+    Dispatcher.removeCall("umGetTabCache" + username);
+  });
+
+  Modules.SocketClient.serverCall('umGetTabCache', {
+    'username': username
+  });
+};
+
 /**
  * 
  * @param {type} object

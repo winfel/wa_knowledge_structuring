@@ -53,6 +53,72 @@ UserManager.init = function(theModules) {
 
   Dispatcher.registerCall('umIsManager', UserManager.isManager);
 
+  Dispatcher.registerCall('umGetTabCache', function(socket, data){
+    var responseObject = {};
+
+    var tabsDB = db.get('tabs');
+    tabsDB.find({username:data.username}, {}, function(e, docs){
+      if(typeof docs != 'undefined' && docs.length > 0){
+        responseObject.username   = data.username;
+        responseObject.objectlist = docs[0].objectlist;
+        responseObject.cache      = [];
+
+        var runs = 1;
+        var objectCache = db.get('objectCache');
+        responseObject.objectlist.forEach(function(entryInCache){
+
+          /* for each entry in cache: get important data and store it in the
+          response object */
+          objectCache.find({id:entryInCache},{},function(e,docs){
+            if(typeof docs != 'undefined'){
+
+              responseObject.cache.push({id:docs[0].id,
+                isPO:docs[0].isPO,
+                name:docs[0].name,
+                dest:docs[0].dest
+              });
+
+              console.log("list: " + responseObject.objectlist.length + "cache:" + responseObject.cache.length);
+
+              if(runs == responseObject.objectlist.length){
+                // data has been gathered: send it back
+                console.log("send data back");
+                Modules.SocketServer.sendToSocket(socket, "umGetTabCache" + data.username, responseObject);
+              }
+              runs++;
+            } // end of if
+
+          }); // end of objectCache.find
+        }); // end of objectlist.foreach
+
+        } /* end of if */ else{
+          console.log("No tabs were saved for this username");
+        }
+      }); // end of tabsDb.find
+  });
+
+  Dispatcher.registerCall('umStoreTabCache', function(socket, data){
+      var tabsDB = db.get('tabs');
+
+      // drop old objectlist
+      tabsDB.remove({username:data.username});
+
+      // push new objectlist
+      tabsDB.insert({username:data.username, objectlist:data.objectlist});
+
+      // update objectcache
+      var objectCache = db.get('objectCache');
+      data.cache.forEach(function(cacheEntry){
+        objectCache.remove({id:cacheEntry.id});
+
+        objectCache.insert({id:cacheEntry.id,
+          isPO:cacheEntry.isPO,
+          name:cacheEntry.name,
+          dest:cacheEntry.dest
+        });
+      });
+  });
+
   /* get all exiting access rights from the database */
   var collection = db.get('rights');
   collection.find({}, {}, function(e, docs) {
