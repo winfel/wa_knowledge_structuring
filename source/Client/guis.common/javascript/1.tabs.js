@@ -8,8 +8,8 @@ GUI.tabs = new function() {
 
   /* Content of tabs sidebar*/
   var currentlyStoredTab = [];
-  var defaultTabs = ["Public#public"];
-  var namesWithoutDeletePermission = ["Public"];
+  var defaultTabs = [];
+  var namesWithoutDeletePermission = ["Public","Private Space"];
 
   var internalID;
 
@@ -20,6 +20,8 @@ GUI.tabs = new function() {
   this.init = function() {
     console.log("GUI.tabs initialized");
     var that = this;
+
+    defaultTabs = ["Public#public","Private Space#PrivateSpace"+GUI.username];
 
     /* try to load the tab data from db */
     Modules.UserManager.getTabCache(function(data){
