@@ -12,8 +12,8 @@
 var path = require('path');
 
 var MongoDBConfig = {},
-    uri,
-    path2bin;
+    uri = "",
+    path2bin = "";
 
 /**
  * Init function called in server.js to initialize this module
@@ -22,7 +22,12 @@ var MongoDBConfig = {},
  */
 MongoDBConfig.init = function() {
     uri = createURI();
-    path2bin = path.normalize(global.config.mongodb.path2bin);
+    
+    try {
+        path2bin = path.normalize(global.config.mongodb.path2bin);
+    } catch(Ex) {
+        console.log("MongoDBConfig.init ex: " + err);
+    }
 }
 
 MongoDBConfig.getURI = function() {
