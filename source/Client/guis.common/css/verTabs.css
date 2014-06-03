@@ -1,6 +1,6 @@
       .ui-tabs-vertical { width: 55em; }
        .ui-tabs-vertical hr{ margin: 0px; margin-left: -25px;}
-      .ui-tabs-vertical li{ width: 55em; margin-left: -25px; height: 25px; padding-left: 5px;}
+      .ui-tabs-vertical li{ width: 216px; margin-left: -25px; height: 25px; padding-left: 5px;}
       .ui-tabs-vertical li:hover{background-color: #a6c0f7;}
       .ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 12em; }
       .ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
