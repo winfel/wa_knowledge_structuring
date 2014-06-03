@@ -143,8 +143,6 @@ mongoConnector.listRooms = function(callback) {
 * @param callback
 */
 mongoConnector.getInventory = function(roomID, context, callback) {
-    console.log("ALEX mongoConnector.getInventory");
-
     var self = this;
     this.Modules.Log.debug("Request inventory (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
 
@@ -161,20 +159,59 @@ mongoConnector.getInventory = function(roomID, context, callback) {
        
        if (err && objects !== undefined && objects.length > 0) {    
            for (var obj in objects) {
-               var data = {};
-               
-               data.attributes = JSON.stringify(obj);
-               data.type = data.attributes.type;
-               data.id = obj.id;
-               data.inRoom = roomID;
-               data.attributes.hasContent = false;
-               
+               var data = buildObjectFromDBObject(roomID, obj);
                inventory.push(data);
            }
        }
+       
+       // we also return the room data as part of the inventory
+       var promise2 = getRoomFromDB(roomID);
+       promise2.on('complete', function(err, room) {
+           
+           if (!err && room) {  
+               var data = buildObjectFromDBObject(roomID, room);
+               inventory.push(data);
+           }
+           
+           callback(inventory); 
+       });
         
-       callback(inventory); 
     });
+}
+
+
+/**
+*   internal
+*   Builds a data object from the database data
+*   
+*   @param roomID
+*   @param attributes
+*/
+function buildObjectFromDBObject (roomID, attributes) {
+    var data = {};
+    
+    data.attributes = attributes;
+    
+    data.type = data.attributes.type;
+    data.id = attributes.id;                           
+    data.attributes.id = data.id;
+    data.inRoom = roomID;
+    data.attributes.inRoom = roomID;
+    data.attributes.hasContent = false;
+    
+    // assure rooms do not loose their type
+    if (roomID == data.id){
+        data.type = 'Room';
+        data.attributes.type = 'Room';
+    }
+    
+    // TODO: Check this
+    if (false) {
+        data.attributes.hasContent = true;
+        data.attributes.contentAge = new Date().getTime();
+    }
+    
+    return data;
 }
 
 /**
