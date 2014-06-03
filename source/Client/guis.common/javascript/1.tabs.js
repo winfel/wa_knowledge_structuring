@@ -172,16 +172,26 @@ GUI.tabs = new function() {
   **/
   this.redrawTabContent = function(){
     $("#tabs_content").html(""); // clear
-    
     var that = this;
+
+    var destFromURL = document.URL.substring(document.URL.lastIndexOf("/")+1,document.URL.length);
 
     var upperUl = $("<ul style='list-style-type:none;'>").appendTo( "#tabs_content" );
     defaultTabs.forEach(function(item){
     	var token = item.split("#");
+      var isActive = (token[1] == destFromURL); // boolean value if this tab is the active one
     	var currentLi = $("<li>"+token[0]+"</li>").on( "click", function () {
-    		ObjectManager.loadRoom(token[1], false, 'left');
+    		if(token[0].indexOf('(PO)') > 0){
+          ObjectManager.loadPaperWriter(token[1], false, 'left');
+        }else{
+          ObjectManager.loadRoom(token[1], false, 'left');
+        }
     	}).appendTo( upperUl );
       currentLi.addClass("ui-state-default ui-corner-top");
+
+      if(isActive){
+        currentLi.addClass("ui-tabs-active");
+      }
 
       currentLi.hover(function() {
         currentLi.addClass("ui-state-hover");
@@ -220,6 +230,8 @@ GUI.tabs = new function() {
      } 
 
       // now: data is loaded in any case
+      var isActive = (dest == destFromURL); // boolean value if this tab is the active one
+
       var drawName = ""; 
       if(currentName.replace("(PaperObject)","").replace("(Room)","").length > 15){
         if(isPaperObject){
@@ -232,33 +244,37 @@ GUI.tabs = new function() {
          drawName = currentName + " (PO)";
       }else{
          drawName = currentName + " (Room)";
-      }
-   }
+       }
+     }
 
+     var currentLi = $("<li>"+drawName+"</li>").on( "click", function () {
 
+        if(drawName.indexOf('(PO)') > 0){
+          ObjectManager.loadPaperWriter(dest, false, 'left');
+        }else{
+          ObjectManager.loadRoom(dest, false, 'left');
+        }
 
-  var currentLi = $("<li>"+drawName+"</li>").on( "click", function () {
-   ObjectManager.loadRoom(dest, false, 'left');
+     }).appendTo( upperUl );
+      currentLi.addClass("ui-state-default ui-corner-top");
+     if(isActive){
+        currentLi.addClass("ui-tabs-active");
+     }
 
- }).appendTo( upperUl );
-  currentLi.addClass("ui-state-default ui-corner-top");
+     currentLi.hover(function() {
+      currentLi.addClass("ui-state-hover");
+    }, function() {
+      currentLi.removeClass("ui-state-hover");
+    });
 
-      currentLi.hover(function() {
-        currentLi.addClass("ui-state-hover");
-      }, function() {
-        currentLi.removeClass("ui-state-hover");
-      });
+     if(!namesWithoutDeletePermission.indexOf(currentName) == 0 && !isActive){
+       var delToken = $("<i>").html("<img src='/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png'>").on( "click", function (e) {
+        e.stopPropagation();
+        that.removeTab(item)
+      }).appendTo(currentLi);
+     }
 
-
-
-  if(!namesWithoutDeletePermission.indexOf(currentName) == 0){
-   var delToken = $("<i>").html("<img src='/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png'>").on( "click", function (e) {
-    e.stopPropagation();
-    that.removeTab(item)
-  }).appendTo(currentLi);
- }
-
- internalID++;
+     internalID++;
 
 });
 };
