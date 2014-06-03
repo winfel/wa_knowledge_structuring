@@ -181,6 +181,14 @@ GUI.tabs = new function() {
     	var currentLi = $("<li>"+token[0]+"</li>").on( "click", function () {
     		ObjectManager.loadRoom(token[1], false, 'left');
     	}).appendTo( upperUl );
+      currentLi.addClass("ui-state-default ui-corner-top");
+
+      currentLi.hover(function() {
+        currentLi.addClass("ui-state-hover");
+      }, function() {
+        currentLi.removeClass("ui-state-hover");
+      });
+
     });
 
     currentlyStoredTab.forEach(function(item){
@@ -213,7 +221,7 @@ GUI.tabs = new function() {
 
       // now: data is loaded in any case
       var drawName = ""; 
-      if(currentName.replace("(PaperObject)","").replace("(Room)","").length > 10){
+      if(currentName.replace("(PaperObject)","").replace("(Room)","").length > 15){
         if(isPaperObject){
           drawName = currentName.substring(0,10)+ "... (PO)";
        }else{
@@ -227,11 +235,19 @@ GUI.tabs = new function() {
       }
    }
 
-   $("<hr>").appendTo(upperUl);
+
 
   var currentLi = $("<li>"+drawName+"</li>").on( "click", function () {
    ObjectManager.loadRoom(dest, false, 'left');
+
  }).appendTo( upperUl );
+  currentLi.addClass("ui-state-default ui-corner-top");
+
+      currentLi.hover(function() {
+        currentLi.addClass("ui-state-hover");
+      }, function() {
+        currentLi.removeClass("ui-state-hover");
+      });
 
 
 

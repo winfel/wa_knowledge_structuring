@@ -162,7 +162,7 @@ GUI.rightmanagerDialog = new function() {
       var deleteImg = $("<img>");
       deleteImg.attr({
         alt: "Delete",
-        src: "/guis.common/images/oxygen/16x16/actions/edit-delete.png"
+        src: "/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png"
       });
       deleteImg.on("click", function(event) {
         listItem.remove(); // Remove the tab 
