@@ -37,6 +37,20 @@ Container.updateInnerHeight = function() {
 
 	$(rep).find("body").css("height", ($(rep).attr("height"))+"px");
 	
+	$(rep).find("body").css("width", ($(rep).attr("width"))+"px");
+	
+	$(rep).css("height", ($(rep).attr("height"))+"px");
+	
+	$(rep).css("width", ($(rep).attr("width"))+"px");
+	
+	var h = parseInt($(rep).attr("height"));
+	
+	var w = parseInt($(rep).attr("width"));
+	
+	$(rep).find("div").css("height", h-25+"px");
+	
+	$(rep).find("div").css("width", w-25+"px");
+	
 }
 
 
@@ -113,6 +127,6 @@ Container.drawContent = function(rep){
 	$(rep).find("#containment-wrapper").css("height", "300px");
 	$(rep).find("#containment-wrapper").css("border", "2px solid #ccc");
 	$(rep).find("#containment-wrapper").css("padding", "10px");
-	$(rep).find("#containment-wrapper").css("overflow", "scroll");
+	$(rep).find("#containment-wrapper").css("overflow", "auto");
 
 }
