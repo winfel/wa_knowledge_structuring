@@ -54,9 +54,14 @@ UserManager.init = function(theModules) {
 
   Dispatcher.registerCall('umIsManager', UserManager.isManager);
 
-  Dispatcher.registerCall('umBroadcastNameChange', function(socket, data){
-    var object = data;
+  Dispatcher.registerCall('umDeleteObjectFromTabs', function(socket, data){
+    for (var i in that.connections) {
+      Modules.SocketServer.sendToSocket(that.connections[i].socket, "umBroadcastDeleteObjectFromTabs", data);
+    }
 
+  });
+
+  Dispatcher.registerCall('umBroadcastNameChange', function(socket, data){
     for (var i in that.connections) {
       Modules.SocketServer.sendToSocket(that.connections[i].socket, "umBroadcastNameChange", data);
     }

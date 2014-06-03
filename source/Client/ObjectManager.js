@@ -351,6 +351,10 @@ ObjectManager.remove = function(object) {
     'transactionId': that.transactionId,
     'userId': GUI.userid
   });
+
+  Modules.SocketClient.serverCall('umDeleteObjectFromTabs',{
+    'objectID' : object.getID()
+  });
 };
 
 ObjectManager.removeLocally = function(data) {

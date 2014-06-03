@@ -21,6 +21,10 @@ var RightManager = new function() {
     Dispatcher.registerCall("umBroadcastNameChange", function(data){
       GUI.tabs.updateNameOfTabWithID(data.object.id, data.object.name);
     });
+
+    Dispatcher.registerCall("umBroadcastDeleteObjectFromTabs", function(data){
+      GUI.tabs.removeTab(data.objectID);
+    });
   };
 
   /**
