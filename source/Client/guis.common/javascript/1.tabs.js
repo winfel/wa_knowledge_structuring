@@ -121,7 +121,6 @@ GUI.tabs = new function() {
   *
   **/
   this.updateCache = function(object){
-   console.log("update!");
    var objectIsUsedInCache = false;
    var index = -1;
    cache.forEach(function(entry){
@@ -217,7 +216,6 @@ GUI.tabs = new function() {
         isPaperObject = getCurrentObject.isPO;
         currentName = getCurrentObject.name;
         dest = getCurrentObject.dest;
-        console.log(dest);
      }else{
         // load directly from the object and update the interal cache
         isPaperObject = (getCurrentObject.type == 'PaperObject');
