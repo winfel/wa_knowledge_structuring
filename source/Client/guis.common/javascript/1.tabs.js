@@ -178,7 +178,7 @@ GUI.tabs = new function() {
     var upperUl = $("<ul style='list-style-type:none;'>").appendTo( "#tabs_content" );
     defaultTabs.forEach(function(item){
     	var token = item.split("#");
-    	var currentLi = $("<li>"+token[0]+"</li>").on( "click", function () {
+    	var currentLi = $("<li><a href='#' title='"+token[0]+"'>"+token[0]+"</a></li>").on( "click", function () {
     		ObjectManager.loadRoom(token[1], false, 'left');
     	}).appendTo( upperUl );
       currentLi.addClass("ui-state-default ui-corner-top");
@@ -237,7 +237,7 @@ GUI.tabs = new function() {
 
 
 
-  var currentLi = $("<li>"+drawName+"</li>").on( "click", function () {
+  var currentLi = $("<li><a href='#' title='"+ currentName+"'>"+drawName+"</a></li>").on( "click", function () {
    ObjectManager.loadRoom(dest, false, 'left');
 
  }).appendTo( upperUl );
