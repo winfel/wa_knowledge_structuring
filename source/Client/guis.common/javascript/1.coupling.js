@@ -124,7 +124,7 @@ GUI.enterCouplingMode = function() {
 		$('#couplingNavigation').dialog({ 
 			draggable: false,
 			resizable: false,
-			position: [($(window).width() / 2) - 100, 30],
+			position: [($(window).width() / 2) - 100, 70],
 			height: 'auto',
 			width: 200
 		});
@@ -136,8 +136,8 @@ GUI.enterCouplingMode = function() {
 			json_data : {
 				"ajax" : {
 					"url" : "/getRoomHierarchy",
-					"data" : function (n) {
-						return { id : n.attr ? n.attr("id") : "" };
+					"data" : function (node) {
+						return { id : node.attr ? node.attr("id") : "" };
 					}
 				},
 				"ui" : {
