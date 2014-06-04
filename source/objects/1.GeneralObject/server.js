@@ -260,8 +260,11 @@ theObject.getAttributeSet = function() {
  *	send a message to a client (identified by its socket)
  */
 theObject.updateClient = function(socket, mode) {
-  if (!mode)
+    
+  if (!mode) {
     mode = 'objectUpdate';
+  }
+  
   var object = this;
   process.nextTick(function() {
     var SocketServer = Modules.SocketServer;
@@ -293,8 +296,9 @@ theObject.persist = function() {
  */
 theObject.updateClients = function(mode) {
 
-  if (!mode)
+  if (!mode) {
     mode = 'objectUpdate';
+  }
 
   var connections = Modules.UserManager.getConnectionsForRoom(this.inRoom);
 
@@ -468,14 +472,10 @@ theObject.evaluatePositionInt = function(data) {
 
 }
 
-
 theObject.getRoom = function(callback) {
+  if (!this.context) return;
 
-  if (!this.context)
-    return;
-
-  //search the room in the context and return the room this object is in
-
+  // search the room in the context and return the room this object is in
   for (var index in this.context.rooms) {
     var test = this.context.rooms[index];
     if (test && test.hasObject && test.hasObject(this)) {

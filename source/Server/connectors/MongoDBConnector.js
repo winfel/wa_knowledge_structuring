@@ -8,6 +8,8 @@
 */
 "use strict";
 
+var _ = require('underscore');
+
 var mongoConnector = {};
 var Modules = false;
 var db = null;
@@ -256,7 +258,8 @@ mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
                 self.getRoomData(roomID, context, callback, oldRoomId);
             });
         } else {
-            callback(obj);
+            var room = buildObjectFromDBObject(roomID, obj);
+            callback(room);
         } 
     });
 }
@@ -268,16 +271,33 @@ mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
  * @param roomID
  * @param objectID
  * @param data
+ * @param cb not use, left hier for compatibility reasons 
  * @param context
  */
-mongoConnector.saveObjectData = function(roomID, objectID, data, context) {
+mongoConnector.saveObjectData = function(roomID, objectID, data, cb, context) {
     this.Modules.Log.debug("Save object data (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '"
             + this.Modules.Log.getUserFromContext(context) + "')");
 
     if (!context) this.Modules.Log.error("Missing context");
     if (!data)    this.Modules.Log.error("Missing data");
-  
-    return objects.insert(data);
+    
+    if (roomID == objectID) {
+        var promise = updateRoom(objectID, data);
+        promise.on('complete', function(err, objects) {
+            if (err) {
+                console.warn("mongoConnector.saveObjectData error: " + err);
+            }
+        });
+    } 
+    
+    if (roomID != objectID) {
+        var promise = updateObject(objectID, data);
+        promise.on('complete', function(err, objects) {
+            if (err) {
+                console.warn("mongoConnector.saveObjectData error: " + err);
+            }
+        });
+    } 
 }
 
 /**
@@ -308,7 +328,7 @@ mongoConnector.createObject = function(roomID, type, data, context, callback) {
          data.hasContent = false;   
      }
         
-     var promise = this.saveObjectData(roomID, objectID, data, context);
+     var promise = saveObject(data);
      promise.on('complete', function(err, doc) {
          if (err || doc === undefined || doc.length === 0) {
              console.warn("ERROR: " + err);
@@ -330,22 +350,41 @@ mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
             + this.Modules.Log.getUserFromContext(context) + "')");
 
     if (!context) this.Modules.Log.error("Missing context");
-
-    var promise = getObjectDataFromDB(objectID, callback);
-    promise.on('complete', function(err, obj) {
+    
+    if (roomID == objectID) {
         
-        if (err || obj === undefined || obj === null) {
-            console.warn("ERROR: " + err);
-            callback(false);
-        } else callback(obj);
-    });
+        // This is a room
+        var promise = getRoomFromDB(objectID);
+        promise.on('complete', function(err, room) {
+            
+            if (err || !room) {
+                console.warn("ERROR: mongoConnector.getObjectData object not found " + err);
+                callback(false);
+            } else { 
+                var data = buildObjectFromDBObject(objectID, room);
+                callback(data);
+            }
+        });
+        
+    } else {
+        var promise = getObjectDataFromDB(objectID);
+        promise.on('complete', function(err, obj) {
+            
+            if (err || !obj) {
+                console.warn("ERROR: mongoConnector.getObjectData object not found " + err);
+                callback(false);
+            } else {
+                var data = buildObjectFromDBObject(objectID, obj);
+                callback(data);
+            }
+        });
+    }
 }
 
 /**
  * Save the object (by given data) if an "callback" function is specified, it is
  * called after saving
  * 
- * @function saveObjectData
  * @param roomID
  * @param data
  * @param context
@@ -366,19 +405,52 @@ mongoConnector.saveRoom = function(roomID, data, context) {
 *   @param id
 *   @param callback
 */
-function getObjectDataFromDB (id, callback) {
-    return objects.findOne({id: id}); // return a promise
+function saveObject(data) {
+    return objects.findOne(data); // return a promise
 }
 
 /**
 *   internal
 *   read an object file and return the attribute set
 *   @function getObjectDataByFile
-*   @param roomID
-*   @param objectID
+*   @param id
 *   @param callback
 */
-function getRoomFromDB (roomID) {
+function getObjectDataFromDB(id) {
+    return objects.findOne({id: id}); // return a promise
+}
+
+/**
+*   internal
+*   Updates a room
+*   @function getObjectDataByFile
+*   @param roomID
+*   @param data
+*/
+function updateRoom(roomID, data) {
+    var aux = _.omit(data, '_id');
+    return rooms.findAndModify({id: roomID}, { $set: aux });
+}
+
+/**
+*   internal
+*   Updates an object
+*   @function getObjectDataByFile
+*   @param id
+*   @param data
+*/
+function updateObject(id, data) {
+    var aux = _.omit(data, '_id');
+    return objects.findAndModify({id: roomID}, { $set: aux });
+}
+
+/**
+*   internal
+*   Gets a room
+*   @function getObjectDataByFile
+*   @param roomID
+*/
+function getRoomFromDB(roomID) {
     return rooms.findOne({id: roomID}); // return a promise
 }
 
@@ -576,8 +648,6 @@ mongoConnector.getInlinePreviewProviderName = function(mimeType) {
 * @function getInlinePreviewMimeTypes
 */
 mongoConnector.getInlinePreviewMimeTypes = function() {
-	console.log("ALEX mongoConnector.getInlinePreviewMimeTypes");
-	
 	var mimeTypes = this.getInlinePreviewProviders();
     var list = {};
     
@@ -593,7 +663,6 @@ mongoConnector.getInlinePreviewMimeTypes = function() {
 *	@function getInlinePreviewProviders
 */
 mongoConnector.getInlinePreviewProviders = function() {
-	console.log("ALEX mongoConnector.getInlinePreviewProviders");
 	
 	return {
 		//"application/pdf" : "pdf",

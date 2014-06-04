@@ -106,17 +106,15 @@ function buildObjectFromObjectData(objectData, roomID, type) {
 	}
 
 	var type = type || objectData.type;
-
-	//get the object's prototype
-
+	
+	// get the object's prototype
 	var proto = ObjectManager.getPrototypeFor(type);
 
-	//build a new object
-
+	// build a new object
 	var obj = Object.create(proto);
 	obj.init(objectData.id);
 
-	//set the object's attributes and rights
+	// set the object's attributes and rights
 	obj.setAll(objectData.attributes);
 	obj.rights = objectData.rights;
 	obj.id = objectData.id;
@@ -124,11 +122,11 @@ function buildObjectFromObjectData(objectData, roomID, type) {
 	obj.inRoom = roomID;
 	obj.set('type', type);
 
-	if (!runtimeData[obj.id])runtimeData[obj.id] = {}; //create runtime data for this object if there is none
+	if (!runtimeData[obj.id]) runtimeData[obj.id] = {}; // create runtime data for this object if there is none
 
 	obj.runtimeData = runtimeData[obj.id];
 
-    if(typeof obj.afterCreation == "function"){
+    if (typeof obj.afterCreation == "function") {
         obj.afterCreation();
     }
 
@@ -141,22 +139,22 @@ function buildObjectFromObjectData(objectData, roomID, type) {
  *  gets an Object by a given id and its context (context is user credentials)
  *
  *  Attention. EVERY call of getObject returns a different object on every call.
- *   The consequence of this is, that you cannot add properties to the object!
- *   If you want to save runtime data, use the runtimeData property.
+ *  The consequence of this is, that you cannot add properties to the object!
+ *  If you want to save runtime data, use the runtimeData property.
  *
  *  @param  roomID  the roomID of the chosen room
- *  @param  objectID    the objectID of the chosen object
- *  @param  context user credentials
- *
+ *  @param  objectID the objectID of the chosen object
+ *  @param  context  user credentials
+ *  @param  callback 
  *  @return object the now created object
  */
 ObjectManager.getObject = function (roomID, objectID, context, callback) {
-	if (!context) throw new Error('Missing context in ObjectManager.getObject');
+	if (!context)  throw new Error('Missing context in ObjectManager.getObject');
+	if (!callback) throw new Error('Missing callback in ObjectManager.getObject');
 
 	Modules.Connector.getObjectData(roomID, objectID, context, function (objectData) {
 	    var object = buildObjectFromObjectData(objectData, roomID);
 	    object.context = context;
-	    
 	    callback(object);
 	});
 }
