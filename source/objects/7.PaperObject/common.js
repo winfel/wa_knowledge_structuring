@@ -74,6 +74,7 @@ PaperObject.execute = function(openInNewWindow) {
     destination = random;
   }
 
+  // open
   if (openInNewWindow) {
     window.open(destination);
   } else {

@@ -72,6 +72,7 @@ UserManager.init = function(theModules) {
       if(typeof docs != 'undefined' && docs.length > 0){
         responseObject.username   = data.username;
         responseObject.objectlist = docs[0].objectlist;
+        responseObject.initTabs   = docs[0].initTabs;
         responseObject.cache      = [];
 
         var runs = 1;
@@ -107,12 +108,11 @@ UserManager.init = function(theModules) {
 
   Dispatcher.registerCall('umStoreTabCache', function(socket, data){
       var tabsDB = db.get('tabs');
-
       // drop old objectlist
       tabsDB.remove({username:data.username});
 
       // push new objectlist
-      tabsDB.insert({username:data.username, objectlist:data.objectlist});
+      tabsDB.insert({username:data.username, objectlist:data.objectlist, initTabs:data.initTabs});
 
       // update objectcache
       var objectCache = db.get('objectCache');

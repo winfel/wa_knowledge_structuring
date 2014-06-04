@@ -8,6 +8,7 @@ GUI.tabs = new function() {
 
   /* Content of tabs sidebar*/
   var currentlyStoredTab = [];
+  var initTabs = [];
   var defaultTabs = [];
   var namesWithoutDeletePermission = ["Public","Private Space"];
 
@@ -25,6 +26,12 @@ GUI.tabs = new function() {
 
     /* try to load the tab data from db */
     Modules.UserManager.getTabCache(function(data){
+      initTabs = data.initTabs;
+
+      if(typeof initTabs == 'undefined'){
+        initTabs = [];
+      }
+
       currentlyStoredTab = data.objectlist;
       cache = data.cache;
 
@@ -40,6 +47,12 @@ GUI.tabs = new function() {
 
     $("<p>").html("Add new tabs to the tab-bar with the help of the context menu of sub-rooms and paperobjects").appendTo("#tabs-room");
     
+    this.redrawTabContent();
+  };
+
+  this.setAsInitialised = function(destination){
+    initTabs.push(destination);
+
     this.redrawTabContent();
   };
 
@@ -162,7 +175,18 @@ GUI.tabs = new function() {
   *
   */
   this.storeCacheInDB = function(){
-   Modules.UserManager.storeTabCache(currentlyStoredTab,cache);
+   Modules.UserManager.storeTabCache(currentlyStoredTab,cache,initTabs);
+  };
+
+  /**
+  * This function is called to check if the current room is now  a newly
+  * initialised one
+  */
+  this.checkIfNowInitialised = function(dest){
+    if(initTabs.indexOf(dest) == -1){
+     // set to initialised in tab-view
+     GUI.tabs.setAsInitialised(dest);
+    }
   };
 
   /**
@@ -174,6 +198,8 @@ GUI.tabs = new function() {
     var that = this;
 
     var destFromURL = document.URL.substring(document.URL.lastIndexOf("/")+1,document.URL.length);
+
+    this.checkIfNowInitialised(destFromURL);
 
     var upperUl = $("<ul style='list-style-type:none;'>").appendTo( "#tabs_content" );
     defaultTabs.forEach(function(item){
@@ -230,6 +256,13 @@ GUI.tabs = new function() {
 
       // now: data is loaded in any case
       var isActive = (dest == destFromURL); // boolean value if this tab is the active one
+      var isInitialised = false; // boolean value is true iff the tab has been initialised yet
+
+      initTabs.forEach(function(entry){
+        if(entry == dest){
+          isInitialised = true;
+        }
+      });
 
       var drawName = ""; 
       if(currentName.replace("(PaperObject)","").replace("(Room)","").length > 15){
@@ -247,13 +280,19 @@ GUI.tabs = new function() {
        }
      }
 
-     var currentLi = $("<li><a href='#' title='"+ currentName+"'>"+drawName+"</a></li>").on( "click", function () {
+     if(!isInitialised){
+      drawName = drawName.substring(0,8);
+      drawName += "[Not initialised]";
+     }
 
+     var currentLi = $("<li><a href='#' title='"+ currentName+"'>"+drawName+"</a></li>").on( "click", function () {
+      if(isInitialised){
         if(drawName.indexOf('(PO)') > 0){
           ObjectManager.loadPaperWriter(dest, false, 'left');
         }else{
           ObjectManager.loadRoom(dest, false, 'left');
         }
+      }
 
      }).appendTo( upperUl );
       currentLi.addClass("ui-state-default ui-corner-top");
