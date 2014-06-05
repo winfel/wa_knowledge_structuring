@@ -154,13 +154,14 @@ mongoConnector.getInventory = function(roomID, context, callback) {
         this.Modules.Log.error("User is not logged in (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
     }
     
-    var inventory = [];
-    
     var promise = getObjectsByRoom(roomID);
     promise.on('complete', function(err, objects) {
+        
+       var inventory = [];
        
-       if (err && objects !== undefined && objects.length > 0) {    
-           for (var obj in objects) {
+       if (!err && objects !== undefined && objects.length > 0) {    
+           for (var i in objects) {
+               var obj = objects[i];
                var data = buildObjectFromDBObject(roomID, obj);
                inventory.push(data);
            }
@@ -323,7 +324,7 @@ mongoConnector.createObject = function(roomID, type, data, context, callback) {
      data.id = objectID;
      data.inRoom = roomID;
         
-     if (type == "Paint" || type == "Highlighter") {
+     if (type == "Paint" || type == "Highlighter") {
          data.mimeType = 'image/png';
          data.hasContent = false;   
      }
@@ -400,13 +401,12 @@ mongoConnector.saveRoom = function(roomID, data, context) {
 
 /**
 *   internal
-*   read an object file and return the attribute set
-*   @function getObjectDataByFile
-*   @param id
-*   @param callback
+*   Saves and object
+*   
+*   @param obj to be saved
 */
-function saveObject(data) {
-    return objects.findOne(data); // return a promise
+function saveObject(obj) {
+    return objects.insert(obj); // return a promise
 }
 
 /**
@@ -441,7 +441,7 @@ function updateRoom(roomID, data) {
 */
 function updateObject(id, data) {
     var aux = _.omit(data, '_id');
-    return objects.findAndModify({id: roomID}, { $set: aux });
+    return objects.findAndModify({id: id}, { $set: aux });
 }
 
 /**
