@@ -14,8 +14,11 @@ var mongoConnector = {};
 var Modules = false;
 var db = null;
 
+var async = require('async');
+
 var rooms;
 var objects;
+var paintings;
 
 /**
 * @function init
@@ -27,6 +30,7 @@ mongoConnector.init = function(theModules) {
  
     rooms   = db.get('rooms');
     objects = db.get('objects');
+    paintings = db.get('paintings');
 }
 
 /**
@@ -135,10 +139,20 @@ mongoConnector.mayInsert = function(roomID, connection, callback) {
  */
 mongoConnector.listRooms = function(callback) {
     console.log("ALEX mongoConnector.listRooms");
+    
+    var promise =  rooms.find(); // return a promise
+    promise.on('complete', function(err, rooms){
+    	if (err || rooms === undefined || rooms.length === 0) {
+            console.warn("ERROR: " + err);
+            callback(false);
+        } else {
+        	callback(null, rooms);
+        }    	
+    });
 }
 
 /**
-* returns all objects in a room (no actual objects, just their attributeset)
+* returns all objects in a room (no actual objects, just their attribute set)
 * @function getInventory
 * @param roomID
 * @param context
@@ -472,6 +486,49 @@ function getObjectsByRoom (roomID) {
 */
 mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
     console.log("ALEX mongoConnector.getRoomHierarchy");
+    var self=this;
+	var result = {
+		'rooms' : {},
+		'relation' : {},
+		'roots' : []
+	};
+
+	//filter only "accessible" rooms
+	var filter = function(rooms, cb){
+		async.filter(rooms,
+			//Filter function
+			function(room, cb1){
+				self.mayEnter(room, context, function(err, res){
+					if(err) cb1(false);
+					else cb1(res);
+				});
+			},
+			//Response function
+			function(results){
+				cb(null, results);
+			}
+		);
+	}
+
+	var buildTree = function(rooms, cb){
+		rooms.forEach(function(room){
+			result.rooms[room.name] = '' + room.name;
+				if (room.parent !== undefined) {
+					if (result.relation[room.parent] === undefined) {
+						result.relation[room.parent] = new Array('' + room.name);
+					} else {
+						result.relation[room.parent].push('' + room.name);
+					}
+				} else {
+					result.roots.push('' + room.name);
+				}
+			});
+		cb(null, result);
+	}
+
+	async.waterfall([self.listRooms, filter, buildTree], function(err, res){
+		callback(res);
+	});
 }
 
 /**
@@ -488,6 +545,9 @@ mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
  */
 mongoConnector.saveContent = function(roomID, objectID, content, after, context, inputIsStream) {
     console.log("ALEX mongoConnector.saveContent");
+    var that = this;
+    this.Modules.Log.debug("Save content from string (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context)+"')");	
+	if (!context) this.Modules.Log.error("Missing context");
 }
 
 /**
@@ -501,6 +561,62 @@ mongoConnector.saveContent = function(roomID, objectID, content, after, context,
 */
 mongoConnector.savePainting = function(roomID, content, after, context) {
     console.log("ALEX mongoConnector.savePainting");
+    if (!context) this.Modules.Log.error("Missing context");
+	
+	this.Modules.Log.debug("Save painting (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+	var that = this;
+	var username = this.Modules.Log.getUserFromContext(context);
+	
+	var painting = {};
+	painting.inRoom = roomID;
+	painting.name = username;
+	
+	
+	if (({}).toString.call(content).match(/\s([a-zA-Z]+)/)[1].toLowerCase() == "string") {
+	    /* create byte array */
+	
+	    var byteArray = [];
+	    var contentBuffer = new Buffer(content);
+	
+	    for (var j = 0; j < contentBuffer.length; j++) {
+	
+	        byteArray.push(contentBuffer.readUInt8(j));
+	
+	    }
+	
+	    content = byteArray;	   
+	    painting.content = new Buffer(content);	    
+	}
+	
+	var promise = that.savePaintingInDB(roomID, painting, context);
+	
+	promise.on('complete', function(err) {
+		 
+		if (err) {
+			that.Modules.Log.error("Could not write painting to file (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+			after(false);
+	    } else { 
+	    	 after();
+	    }
+	});
+	
+}
+
+/**
+ * Saves the painting (given by data), if an "callback" function is specified, it is
+ * called after saving
+ * 
+ * @param roomID
+ * @param data
+ * @param context
+ */
+mongoConnector.savePaintingInDB = function(roomID, painting, context) {
+    this.Modules.Log.debug("Save object data (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
+
+    if (!context) this.Modules.Log.error("Missing context");
+    if (!painting) this.Modules.Log.error("Missing data");
+    
+    return paintings.insert(painting);
 }
 
 /**
@@ -513,6 +629,20 @@ mongoConnector.savePainting = function(roomID, content, after, context) {
  */
 mongoConnector.deletePainting = function(roomID, callback, context) {
     console.log("ALEX mongoConnector.deletePainting");
+    
+	if (!context) this.Modules.Log.error("Missing context");
+	var username = this.Modules.Log.getUserFromContext(context);
+	
+	this.Modules.Log.debug("Delete painting (roomID: '"+roomID+"', user: '" + this.Modules.Log.getUserFromContext(context)+"')");
+
+	paintings.remove({ name : username}, function (err) {
+		if(err) {
+			this.Modules.Log.error("Could not delete painting (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context)+"')");
+			callback(false);
+		} else {
+			callback();
+		}
+	});
 }
 
 /**
@@ -525,6 +655,24 @@ mongoConnector.deletePainting = function(roomID, callback, context) {
 */
 mongoConnector.getPaintings = function(roomID, context, callback) {
     console.log("ALEX mongoConnector.getPaintings");
+    var self = this;
+
+	this.Modules.Log.debug("Request paintings (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+	
+	if (!context) throw new Error('Missing context in getInventory');
+	
+	if (!this.isLoggedIn(context)) this.Modules.Log.error("User is not logged in (roomID: '"+roomID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+	
+	var promise = paintings.find( {}, ["name"] );
+	promise.on('complete', function(err, paintings) {         
+		if (err) {
+            console.warn("ERROR: mongoConnector.getPaintings: " + err);
+            callback(false);
+        } else {            
+            callback(paintings);
+        }
+    });   
+	
 }
 
 /**
