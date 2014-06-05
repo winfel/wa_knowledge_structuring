@@ -198,7 +198,16 @@ app.get('/getRoomHierarchy', function(req, res, next) {
     });
 });
 
+// p3 might specify a content age
 app.get('/getContent/:roomID/:objectID/:p3/:hash', function(req, res, next) {
+	var objectAdditionalContent = req.params.objectID.match(/(.+?)\.(.+)/);
+	if(objectAdditionalContent) {
+		res.set('Content-Type', 'text/html');
+		res.set('Content-Disposition', 'inline; filename="preview.html"');
+		var data = Modules.Connector.getContent(req.params.roomID, req.params.objectID, context);
+		res.send(200, new Buffer(data));
+		return;
+	}
     var object = Modules.ObjectManager.getObject(req.params.roomID, req.params.objectID, context);
 
     if (!object) {
@@ -407,6 +416,11 @@ app.post('/setContent/:roomID/:objectID/:hash', function(req, res, next) {
                 res.send(200);
             }
         });
+
+        // convert pdf to html if neccessary
+        if(files.file.type == 'application/pdf') {
+			Modules.EventBus.emit('pdfAdded', { object : object , file : files.file });
+        }
     });
 });
 

@@ -101,6 +101,7 @@ Modules.Helper          = require('./Server/Helper.js');
 Modules.EventBus        = require("./Server/EventBus.js");
 Modules.BuildTool       = require('./Server/BuildTool.js');
 //Modules.TokenChecker  = require("./Server/TokenChecker");
+Modules.PdfEdit         = require('./Server/PdfEdit.js');
 
 // These object exist for every object type or every single object. They shall not be
 // modified directly but inherited (e.g. this.attributeManager=Object.create(AttributeManager));
