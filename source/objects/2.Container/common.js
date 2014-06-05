@@ -73,14 +73,6 @@ Container.intelligentRename=function(newValue){
 	});
 }
 
-/**
- * Returns always false.
- *
- * @return {boolean} false
- */
-Container.isResizable=function(){
-	return false;
-}
 
 Container.register('Container');
 Container.isCreatable=true;
