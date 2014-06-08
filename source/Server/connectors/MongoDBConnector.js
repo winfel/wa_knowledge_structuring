@@ -8,6 +8,8 @@
 */
 "use strict";
 
+var ROOM_TYPE = 'Room';
+
 var _ = require('underscore');
 
 var mongoConnector = {};
@@ -138,12 +140,10 @@ mongoConnector.mayInsert = function(roomID, connection, callback) {
  * @param callback
  */
 mongoConnector.listRooms = function(callback) {
-    console.log("ALEX mongoConnector.listRooms");
-    
     var promise =  rooms.find(); // return a promise
     promise.on('complete', function(err, rooms){
     	if (err || rooms === undefined || rooms.length === 0) {
-            console.warn("ERROR: " + err);
+            console.warn("ERROR mongoConnector.listRooms err : " + err);
             callback(false);
         } else {
         	callback(null, rooms);
@@ -204,7 +204,10 @@ mongoConnector.getInventory = function(roomID, context, callback) {
 *   @param roomID
 *   @param attributes
 */
-function buildObjectFromDBObject (roomID, attributes) {
+function buildObjectFromDBObject (roomID, attr) {
+    // Remove the internal DB _id field
+    var attributes = _.omit(attr, '_id');
+    
     var data = {};
     
     data.attributes = attributes;
@@ -215,12 +218,6 @@ function buildObjectFromDBObject (roomID, attributes) {
     data.inRoom = roomID;
     data.attributes.inRoom = roomID;
     data.attributes.hasContent = false;
-    
-    // assure rooms do not loose their type
-    if (roomID == data.id){
-        data.type = 'Room';
-        data.attributes.type = 'Room';
-    }
     
     // TODO: Check this
     if (false) {
@@ -258,9 +255,7 @@ mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
             obj = {};
             obj.id = roomID;
             obj.name = roomID;
-            obj.type = "Room";
-            
-            console.log("roomID: " + roomID);
+            obj.type = ROOM_TYPE;
             
             if (oldRoomId) {
                 obj.parent = oldRoomId;
@@ -296,16 +291,14 @@ mongoConnector.saveObjectData = function(roomID, objectID, data, cb, context) {
     if (!context) this.Modules.Log.error("Missing context");
     if (!data)    this.Modules.Log.error("Missing data");
     
-    if (roomID == objectID) {
+    if (data.type == ROOM_TYPE) {
         var promise = updateRoom(objectID, data);
         promise.on('complete', function(err, objects) {
             if (err) {
                 console.warn("mongoConnector.saveObjectData error: " + err);
             }
         });
-    } 
-    
-    if (roomID != objectID) {
+    } else {
         var promise = updateObject(objectID, data);
         promise.on('complete', function(err, objects) {
             if (err) {
@@ -346,7 +339,7 @@ mongoConnector.createObject = function(roomID, type, data, context, callback) {
      var promise = saveObject(data);
      promise.on('complete', function(err, doc) {
          if (err || doc === undefined || doc.length === 0) {
-             console.warn("ERROR: " + err);
+             console.warn("ERROR mongoConnector.createObject : " + err);
              callback(false);
          } else callback(objectID);
      });
@@ -373,10 +366,10 @@ mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
         promise.on('complete', function(err, room) {
             
             if (err || !room) {
-                console.warn("ERROR: mongoConnector.getObjectData object not found " + err);
+                console.warn("ERROR: mongoConnector.getObjectData room with id: " + objectID + " in room " + roomID + " not found: " + err);
                 callback(false);
             } else { 
-                var data = buildObjectFromDBObject(objectID, room);
+                var data = buildObjectFromDBObject(roomID, room);
                 callback(data);
             }
         });
@@ -386,10 +379,10 @@ mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
         promise.on('complete', function(err, obj) {
             
             if (err || !obj) {
-                console.warn("ERROR: mongoConnector.getObjectData object not found " + err);
+                console.warn("ERROR: mongoConnector.getObjectData object with id: " + objectID + " in room " + roomID + " not found: " + err);
                 callback(false);
             } else {
-                var data = buildObjectFromDBObject(objectID, obj);
+                var data = buildObjectFromDBObject(roomID, obj);
                 callback(data);
             }
         });
@@ -485,8 +478,7 @@ function getObjectsByRoom (roomID) {
 *   @param callback
 */
 mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
-    console.log("ALEX mongoConnector.getRoomHierarchy");
-    var self=this;
+    var self = this;
 	var result = {
 		'rooms' : {},
 		'relation' : {},
@@ -494,24 +486,24 @@ mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
 	};
 
 	//filter only "accessible" rooms
-	var filter = function(rooms, cb){
+	var filter = function(rooms, cb) {
 		async.filter(rooms,
 			//Filter function
-			function(room, cb1){
-				self.mayEnter(room, context, function(err, res){
+			function(room, cb1) {
+				self.mayEnter(room, context, function(err, res) {
 					if(err) cb1(false);
 					else cb1(res);
 				});
 			},
 			//Response function
-			function(results){
+			function(results) {
 				cb(null, results);
 			}
 		);
 	}
 
-	var buildTree = function(rooms, cb){
-		rooms.forEach(function(room){
+	var buildTree = function(rooms, cb) {
+		rooms.forEach(function(room) {
 			result.rooms[room.name] = '' + room.name;
 				if (room.parent !== undefined) {
 					if (result.relation[room.parent] === undefined) {
@@ -526,7 +518,7 @@ mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
 		cb(null, result);
 	}
 
-	async.waterfall([self.listRooms, filter, buildTree], function(err, res){
+	async.waterfall([self.listRooms, filter, buildTree], function(err, res) {
 		callback(res);
 	});
 }

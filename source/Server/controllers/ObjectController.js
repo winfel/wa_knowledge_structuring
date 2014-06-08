@@ -43,7 +43,7 @@ ObjectController.createObject = function(data, context, callback) {
 };
 
 ObjectController.executeServersideAction = function(data, context, cb) {
-    console.log("ObjectController.executeServersideAction " + JSON.stringify(data));
+    // console.log("ObjectController.executeServersideAction " + JSON.stringify(data));
     
     var roomID = data.roomID;
     var objectID = data.objectID;
@@ -68,7 +68,7 @@ ObjectController.executeServersideAction = function(data, context, cb) {
     };
 
     ObjectManager.getObject(roomID, objectID, context, function(object) {
-        
+         
         serverFunctionParams.push(responseCallback);
 
         var fn = object[serverFunction];

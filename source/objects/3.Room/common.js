@@ -71,12 +71,13 @@ Room.execute=function(){
  * @param {object} obj
  * @return {boolean} 
  */
-Room.hasObject=function(obj){
-	var inventory=this.getInventory();
-	for (var i in inventory){
-		if (inventory[i].id==obj.id) return true;
-	}
-	return false;
+Room.hasObject = function(obj) {
+    this.getInventoryAsync(function (inventory) {
+        for (var i in inventory) {
+            if (inventory[i].id == obj.id) return true;
+        }
+        return false;
+    });
 }
 
 /**
