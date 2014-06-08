@@ -413,7 +413,8 @@ mongoConnector.saveRoom = function(roomID, data, context) {
 *   @param obj to be saved
 */
 function saveObject(obj) {
-    return objects.insert(obj); // return a promise
+    var aux = _.omit(obj, '_id');
+    return objects.insert(aux); // return a promise
 }
 
 /**
