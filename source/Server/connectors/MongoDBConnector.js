@@ -16,8 +16,11 @@ var _ = require('underscore');
 var mongoConnector = {};
 var Modules = false;
 var db = null;
+var monk = null;
 
 var async = require('async');
+//var Grid = require('gridfs-stream');
+//var gfs;
 
 var rooms;
 var objects;
@@ -29,8 +32,10 @@ var paintings;
 */
 mongoConnector.init = function(theModules) {
     this.Modules = theModules;
-    db = require('monk')(theModules.MongoDBConfig.getURI());
- 
+    monk = require('monk'); 
+    db = monk(theModules.MongoDBConfig.getURI());
+    //gfs = Grid(db, monk);
+    
     rooms   = db.get('rooms');
     objects = db.get('objects');
     paintings = db.get('paintings');
@@ -509,6 +514,15 @@ function removeObjectFromDB(id) {
 
 /**
 *   internal
+*   moves an object to the trash room
+*   @param id
+*/
+function moveObjectToTrashRoom(id) {
+    return objects.update({id: id},{ $set: { inRoom : TRASH_ROOM }});
+}
+
+/**
+*   internal
 *   Gets a room
 *   @function getObjectDataByFile
 *   @param roomID
@@ -754,9 +768,24 @@ mongoConnector.getContentStream = function(roomID, objectID, context) {
 *   @param users
 *   @param context
 */
-mongoConnector.getPaintingStream = function(roomID, user, context) {
+/*mongoConnector.getPaintingStream = function(roomID, user, context) {
     console.log("ALEX mongoConnector.getPaintingStream");
-}
+    this.Modules.Log.debug("Get painting stream (roomID: '"+roomID+"', user: '"+user+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");    
+    var filename = user+'.painting';    
+    
+    // streaming from gridfs
+    var rds = gfs.createReadStream({
+      filename: 'ivan.painting'
+    });
+    	
+    
+    var that=this;
+    rds.on("error", function(err) {
+        that.Modules.Log.error("Error reading file: " + filename);
+    });
+    
+    return rds;
+}*/
 
 /**
  * @function getTrashRoom
@@ -782,11 +811,16 @@ mongoConnector.remove = function(roomID, objectID, context, callback) {
     
     if (!context) this.Modules.Log.error("Missing context");
     
-    var promise = removeObjectFromDB(objectID);
+    var promise;
+    if(roomID == TRASH_ROOM){
+    	promise = removeObjectFromDB(objectID);
+    } else {
+    	promise = moveObjectToTrashRoom(objectID);
+    }
     
     promise.on('complete', function(err, obj) {         
         if (err) {
-            console.warn("ERROR: mongoConnector.remove: Error trying to remove objet " + objectID + " in room " + roomID + " : " + err);
+            console.warn("ERROR: mongoConnector.remove: Error trying to remove object " + objectID + " in room " + roomID + " : " + err);
             if (!_.isUndefined(callback)) callback(false);
         } else {            
             if (!_.isUndefined(callback)) callback(true);

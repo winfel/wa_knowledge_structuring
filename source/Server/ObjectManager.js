@@ -16,6 +16,9 @@
 
 "use strict";
 
+
+var TRASH_ROOM  = 'trash';
+
 var fs = require('fs');
 var _ = require('lodash');
 var tokenChecker = require("./TokenChecker.js");
@@ -708,7 +711,9 @@ ObjectManager.duplicateNew = function (data, context, cbo) {
 }
 
 
-//deleteObject
+// Deletes an object:
+//  1) If the object is in the trash room it is deleted completely from the database
+//  2) If it is in any other room it is moved to the trash room
 ObjectManager.deleteObject = function (data, context, callback) {
 	var that = this;
 
@@ -730,22 +735,16 @@ ObjectManager.deleteObject = function (data, context, callback) {
 	                var historyEntry = {
 	                    'oldRoomID': roomID,
 	                    'oldObjectId': objectID,
-	                    'roomID': 'trash',
+	                    'roomID': TRASH_ROOM,
 	                    'action': 'delete'
 	                }
-				    
-	                Modules.Connector.getTrashRoom(context, function (toRoom) {
-	                    Modules.Connector.duplicateObject(roomID, toRoom.id, objectID, context, function (err, newId, oldId) {
-	                        object.remove();
-	                        historyEntry["objectID"] = newId;
-
-	                        var transactionId = data.transactionId;
-
-	                        that.history.add(transactionId, data.userId, historyEntry);
-	                    });
-
-	                });
 	                
+	                object.remove();             
+	                
+                    var transactionId = data.transactionId;
+
+                    that.history.add(transactionId, data.userId, historyEntry);
+	                              
 				});
 			} else {
 				callback(new Error('No rights to delete object: ' + objectID), null);
