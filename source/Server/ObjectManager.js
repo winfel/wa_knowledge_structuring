@@ -55,11 +55,10 @@ ObjectManager.registerType = function (type, constr) {
  */
 ObjectManager.remove = function (obj) {
 
-	//Send remove to connector
-
+	// Send remove to connector
 	Modules.Connector.remove(obj.inRoom, obj.id, obj.context);
 
-	//Inform clients about remove.
+	// Inform clients about remove.
 	obj.updateClients('objectDelete');
 
 }
@@ -100,7 +99,7 @@ ObjectManager.getPrototypeFor = ObjectManager.getPrototype;
  *
  */
 function buildObjectFromObjectData(objectData, roomID, type) {
-
+    
 	if (!objectData) {
 		Modules.Log.error('No object data!');
 	}
@@ -153,7 +152,7 @@ ObjectManager.getObject = function (roomID, objectID, context, callback) {
 	if (!callback) throw new Error('Missing callback in ObjectManager.getObject');
 
 	Modules.Connector.getObjectData(roomID, objectID, context, function (objectData) {
-	    var object = buildObjectFromObjectData(objectData, roomID);
+	    var object = buildObjectFromObjectData(objectData, roomID, objectData.type);
 	    object.context = context;
 	    callback(object);
 	});
@@ -206,7 +205,7 @@ ObjectManager.getObjects = function (roomID, context, callback) {
 
 			for (var i in objectsData) {
 				var objectData = objectsData[i];
-				var object = buildObjectFromObjectData(objectData, roomID);
+				var object = buildObjectFromObjectData(objectData, roomID, objectData.type);
 				object.context = context;
 				inventory.push(object);
 			}
@@ -242,16 +241,14 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
 	var proto = this.getPrototypeFor(type);
 	Modules.Connector.createObject(roomID, type, proto.standardData, context, function (id) {
 	    
-	    
-	    
 		ObjectManager.getObject(roomID, id, context, function (object) {
-
-			//set default attributes
-			var defaultAttributes = object.standardData;
-			for (var key in defaultAttributes) {
-				var value = defaultAttributes[key];
-				object.setAttribute(key, value);
-			}
+		    
+		    // set default attributes
+            var defaultAttributes = object.standardData;
+            for (var key in defaultAttributes) {
+                var value = defaultAttributes[key];
+                object.setAttribute(key, value);
+            }
 	
 			object.setAttribute('name', type);
 	
@@ -261,11 +258,11 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
 											role : {name : "Manager"},
 											username : context.user.username},
 											true);
-	
+			
 			for (var key in attributes) {
-				var value = attributes[key];
-				object.setAttribute(key, value);
-			}
+                var value = attributes[key];
+                object.setAttribute(key, value);
+            }
 	
 			if (content) {
 				object.setContent(content);
@@ -273,11 +270,7 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
 	
 			Modules.EventBus.emit("room::" + roomID + "::action::createObject", {objectID: id});
 			callback(false, object);
-		});
-		
-		
-		
-		
+		});		
 	});
 }
 
@@ -726,32 +719,34 @@ ObjectManager.deleteObject = function (data, context, callback) {
 		if (err) callback(err, null);
 		else {
 			if (hasRights) {
-				var object = ObjectManager.getObject(roomID, objectID, context);
-				if (!object) {
-					callback(new Error('Object not found ' + objectID), null);
-					return;
-				}
+				ObjectManager.getObject(roomID, objectID, context, function(object) {
+				    
+				    if (!object) {
+	                    callback(new Error('Object not found ' + objectID), null);
+	                    return;
+	                }
 
-				Modules.EventBus.emit("room::" + roomID + "::" + objectID + "::delete", data);
-				var historyEntry = {
-					'oldRoomID': roomID,
-					'oldObjectId': objectID,
-					'roomID': 'trash',
-					'action': 'delete'
-				}
+	                Modules.EventBus.emit("room::" + roomID + "::" + objectID + "::delete", data);
+	                var historyEntry = {
+	                    'oldRoomID': roomID,
+	                    'oldObjectId': objectID,
+	                    'roomID': 'trash',
+	                    'action': 'delete'
+	                }
+				    
+	                Modules.Connector.getTrashRoom(context, function (toRoom) {
+	                    Modules.Connector.duplicateObject(roomID, toRoom.id, objectID, context, function (err, newId, oldId) {
+	                        object.remove();
+	                        historyEntry["objectID"] = newId;
 
-				Modules.Connector.getTrashRoom(context, function (toRoom) {
-					Modules.Connector.duplicateObject(roomID, toRoom.id, objectID, context, function (err, newId, oldId) {
-						object.remove();
-						historyEntry["objectID"] = newId;
+	                        var transactionId = data.transactionId;
 
-						var transactionId = data.transactionId;
+	                        that.history.add(transactionId, data.userId, historyEntry);
+	                    });
 
-						that.history.add(transactionId, data.userId, historyEntry);
-					});
-
+	                });
+	                
 				});
-
 			} else {
 				callback(new Error('No rights to delete object: ' + objectID), null);
 			}

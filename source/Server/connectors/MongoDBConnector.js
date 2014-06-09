@@ -8,7 +8,8 @@
 */
 "use strict";
 
-var ROOM_TYPE = 'Room';
+var ROOM_TYPE   = 'Room';
+var TRASH_ROOM  = 'trash';
 
 var _ = require('underscore');
 
@@ -346,6 +347,51 @@ mongoConnector.createObject = function(roomID, type, data, context, callback) {
 }
 
 /**
+*   duplicate an object on the persistence layer
+*   to directly work on the new object, specify an after function
+*   after(objectID)
+*   @function duplicateObject
+*   @param roomID
+*   @param toRoom
+*   @param objectID
+*   @param context
+*   @param callback
+*
+*/
+mongoConnector.duplicateObject = function(roomID, toRoom, objectID, context, callback) {
+    this.Modules.Log.debug("Duplicate object (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "', toRoom: '" + toRoom + "')");
+    
+    if (!context) this.Modules.Log.error("Missing context");
+    
+    var promise = getObjectDataFromDB(objectID);
+    promise.on('complete', function(err, obj) {
+        
+        if (err || !obj) {
+            console.warn("ERROR: mongoConnector.duplicateObject object with id: " + objectID + " in room " + roomID + " not found: " + err);
+            callback(err, false, false);
+        } else {
+            var uuid = require('node-uuid');
+            var newID = uuid.v4();
+            
+            // modify the object
+            obj.id = newID;
+            obj.inRoom = toRoom;
+            
+            // TODO: check what about with .content and .preview
+            //       what are these files for?
+            
+            var promise2 = saveObject(obj);
+            promise2.on('complete', function(err, doc) {
+                if (err || doc === undefined || doc.length === 0) {
+                    console.warn("ERROR mongoConnector.duplicateObject : " + err);
+                    callback(err, false, false);
+                } else callback(null, newID, objectID);
+            });
+        }
+    });
+}
+
+/**
 *   Returns the attribute set of an object
 *   
 *   @function getObjectData
@@ -450,6 +496,15 @@ function updateRoom(roomID, data) {
 function updateObject(id, data) {
     var aux = _.omit(data, '_id');
     return objects.findAndModify({id: id}, { $set: aux });
+}
+
+/**
+*   internal
+*   removes an object
+*   @param id
+*/
+function removeObjectFromDB(id) {
+    return objects.remove({id: id});
 }
 
 /**
@@ -710,9 +765,7 @@ mongoConnector.getPaintingStream = function(roomID, user, context) {
  * @returns {*}
  */
 mongoConnector.getTrashRoom = function(context, callback) {
-    console.log("ALEX mongoConnector.getTrashRoom");
-    
-    // return this.getRoomData("trash", context, callback);
+    this.getRoomData(TRASH_ROOM, context, callback);
 }
 
 /**
@@ -723,26 +776,22 @@ mongoConnector.getTrashRoom = function(context, callback) {
  * @param objectID
  * @param context
  * @param callback
- * 
  */
 mongoConnector.remove = function(roomID, objectID, context, callback) {
-    console.log("ALEX mongoConnector.remove");
-}
-
-/**
-*	duplicate an object on the persistence layer
-*	to directly work on the new object, specify an after function
-*	after(objectID)
-* 	@function duplicateObject
-*	@param roomID
-*	@param toRoom
-*	@param objectID
-*	@param context
-*	@param callback
-*
-*/
-mongoConnector.duplicateObject = function(roomID, toRoom, objectID, context, callback) {
-	console.log("ALEX mongoConnector.duplicateObject");
+    this.Modules.Log.debug("Remove object (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
+    
+    if (!context) this.Modules.Log.error("Missing context");
+    
+    var promise = removeObjectFromDB(objectID);
+    
+    promise.on('complete', function(err, obj) {         
+        if (err) {
+            console.warn("ERROR: mongoConnector.remove: Error trying to remove objet " + objectID + " in room " + roomID + " : " + err);
+            if (!_.isUndefined(callback)) callback(false);
+        } else {            
+            if (!_.isUndefined(callback)) callback(true);
+        }
+    }); 
 }
 
 /**
@@ -851,13 +900,5 @@ mongoConnector.getInlinePreview = function(roomID, objectID, mimeType, context, 
 mongoConnector.getInlinePreviewMimeType = function(roomID, objectID, context, callback) {
 	console.log("ALEX mongoConnector.getInlinePreviewMimeType");
 }
-
-///**
-//* Head function and some subfunctions included, 
-//* @function inlinePreviewProviders
-//*/
-//mongoConnector.inlinePreviewProviders = {
-//		console.log("ALEX mongoConnector.inlinePreviewProviders");
-//}
 
 module.exports = mongoConnector;
