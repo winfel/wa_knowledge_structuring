@@ -345,6 +345,11 @@ ObjectManager.remove = function(object) {
     }, this.transactionTimeout);
   }
 
+
+  Modules.SocketClient.serverCall('umDeleteObjectFromTabs',{
+    'objectID' : object.getID()
+  });
+
   Modules.SocketClient.serverCall('deleteObject', {
     'roomID': object.getRoomID(),
     'objectID': object.getID(),
