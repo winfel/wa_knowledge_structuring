@@ -167,7 +167,7 @@ ObjectManager.getObject = function (roomID, objectID, context, callback) {
  *  gets an inventory of all objects in a room by roomID and context. Context
  *  is user credentials.
  *
- *  This function can either be called synchronous or asyncronous.
+ *  This function can either be called synchronous or asynchronous.
  *
  * @param roomID    The roomID of the room that should be used to gather the inventory
  * @param context   The user credentials

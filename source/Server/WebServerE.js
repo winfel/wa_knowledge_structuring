@@ -219,7 +219,7 @@ app.get('/getContent/:roomID/:objectID/:p3/:hash', function(req, res, next) {
                 try {
                     res.send(200);
                 } catch(Ex) {
-                 // console.log("paintings ex: " + err);
+                // console.log("paintings ex: " + err);
                 }
             })
         } else {
@@ -356,61 +356,67 @@ app.post('/setContent/:roomID/:objectID/:hash', function(req, res, next) {
     var roomID = req.params.roomID
     var objectID = req.params.objectID
     
-    var object = Modules.ObjectManager.getObject(roomID, objectID, context);
+   
     var historyEntry = {
         'objectID' : roomID,
         'roomID' : roomID,
         'action' : 'setContent'
     }
-    Modules.ObjectManager.history.add(
-            new Date().toDateString(), context.user.username, historyEntry)
+    Modules.ObjectManager.history.add(new Date().toDateString(), context.user.username, historyEntry)
 
-    if (!object) {
-        Modules.Log.warn('Object not found (roomID: ' + roomID + ' objectID: ' + objectID + ')');
-        return res.send(404, 'Object not found');
-    }
+  
     
     var formidable = require('formidable');
     var form = new formidable.IncomingForm();
     
     form.parse(req, function (err, fields, files) {
 
-        object.copyContentFromFile(files.file.path, function () {
-
-            object.set('hasContent', true);
-            object.set('contentAge', new Date().getTime());
-            object.set('mimeType', files.file.type);
-
-            /* check if content is inline displayable */
-            if (Modules.Connector.isInlineDisplayable(files.file.type)) {
-
-                object.set('preview', true);
-                object.persist();
-
-                /* get dimensions */
-                Modules.Connector.getInlinePreviewDimensions(roomID, objectID, files.file.type, true, function (width, height) {
-
-                    if (width != false)  object.setAttribute("width", width);
-                    if (height != false) object.setAttribute("height", height);
-
-                    //send object update to all listeners
-                    object.persist();
-                    object.updateClients('contentUpdate');
-
-                    res.send(200);
-                });
-
-            } else {
-                object.set('preview', false);
-
-                //send object update to all listeners
-                object.persist();
-                object.updateClients('contentUpdate');
-
-                res.send(200);
-            }
-        });
-    });
+    	Modules.ObjectManager.getObject(roomID, objectID, context, function(object){ 
+		    if (!object) {
+		        Modules.Log.warn('Object not found (roomID: ' + roomID + ' objectID: ' + objectID + ')');
+		        return res.send(404, 'Object not found');
+		    }   		
+	    	
+	    	
+	    	
+	        object.copyContentFromFile(files.file.path, function () {
+	
+	            object.set('hasContent', true);
+	            object.set('contentAge', new Date().getTime());
+	            object.set('mimeType', files.file.type);
+	
+	            /* check if content is inline displayable */
+	            if (Modules.Connector.isInlineDisplayable(files.file.type)) {
+	
+	                object.set('preview', true);
+	                object.persist();
+	
+	                /* get dimensions */
+	                Modules.Connector.getInlinePreviewDimensions(roomID, objectID, files.file.type, true, function (width, height) {
+	
+	                    if (width != false)  object.setAttribute("width", width);
+	                    if (height != false) object.setAttribute("height", height);
+	
+	                    //send object update to all listeners
+	                    object.persist();
+	                    object.updateClients('contentUpdate');
+	
+	                    res.send(200);
+	                });
+	
+	            } else {
+	                object.set('preview', false);
+	
+	                //send object update to all listeners
+	                object.persist();
+	                object.updateClients('contentUpdate');
+	
+	                res.send(200);
+	            }
+	        });
+    	});
+    });    
+    
 });
 
 app.get('/paintings/:roomID/:user/:picID/:hash', function(req, res, next) {
