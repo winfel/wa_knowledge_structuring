@@ -11,13 +11,13 @@
 var ROOM_TYPE   = 'Room';
 var TRASH_ROOM  = 'trash';
 
-var _ = require('underscore');
-
 var mongoConnector = {};
 var Modules = false;
 var db = null;
 var monk = null;
 
+var _ = require('underscore');
+var fs = require('fs');
 var async = require('async');
 //var Grid = require('gridfs-stream');
 //var gfs;
@@ -225,13 +225,16 @@ function buildObjectFromDBObject (roomID, attr) {
     data.attributes.inRoom = roomID;
     data.attributes.hasContent = false;
     
-    // TODO: Check this
-    if (false) {
+    if (hastContentByType(data.type)) {
         data.attributes.hasContent = true;
         data.attributes.contentAge = new Date().getTime();
     }
     
     return data;
+}
+
+function hastContentByType(type) {
+    return (_.indexOf(["SimpleText", "File"], type) > 0);
 }
 
 /**
@@ -594,25 +597,6 @@ mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
 }
 
 /**
- * save the object's content if an "after" function is specified, it is called
- * after saving
- * 
- * @function saveContent
- * @param roomID
- * @param objectID
- * @param content
- * @param after
- * @param context
- * @param inputIsStream
- */
-mongoConnector.saveContent = function(roomID, objectID, content, after, context, inputIsStream) {
-    console.log("ALEX mongoConnector.saveContent");
-    var that = this;
-    this.Modules.Log.debug("Save content from string (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context)+"')");	
-	if (!context) this.Modules.Log.error("Missing context");
-}
-
-/**
 *   save a users painting
 *   if an "after" function is specified, it is called after saving
 *   @function savePainting
@@ -745,10 +729,36 @@ mongoConnector.getPaintings = function(roomID, context, callback) {
  * @param objectID
  * @param context
  * @param callback
- * 
  */
 mongoConnector.getContent = function(roomID, objectID, context, callback) {
     console.log("ALEX mongoConnector.getContent");
+    
+    this.Modules.Log.debug("Get content (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
+    
+    var byteArray = [];
+    
+    // TODO: something
+    
+    callback(byteArray);
+}
+
+/**
+ * save the object's content if an "after" function is specified, it is called
+ * after saving
+ * 
+ * @function saveContent
+ * @param roomID
+ * @param objectID
+ * @param content
+ * @param after
+ * @param context
+ * @param inputIsStream
+ */
+mongoConnector.saveContent = function(roomID, objectID, content, after, context, inputIsStream) {
+    console.log("ALEX mongoConnector.saveContent");
+    var that = this;
+    this.Modules.Log.debug("Save content from string (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context)+"')");    
+    if (!context) this.Modules.Log.error("Missing context");
 }
 
 /**
@@ -836,7 +846,90 @@ mongoConnector.remove = function(roomID, objectID, context, callback) {
 *	@param callback
 */
 mongoConnector.trimImage = function(roomID, objectID, context, callback) {
-	console.log("ALEX mongoConnector.trimImage");
+    var self = this;
+    
+    if (!context) this.Modules.Log.error("Missing context");
+
+    /* save content to temp. file */
+    var filename = __dirname + "/tmp/trim_" + roomID + "_" + objectID;
+
+    this.getContent(roomID, objectID, context, function(content) {
+
+        fs.writeFile(filename, new Buffer(content), function (err) {
+            if (err) throw err;
+            /* temp. file saved */
+
+            var im = require('imagemagick');
+
+            //output: test.png PNG 192x154 812x481+226+131 8-bit DirectClass 0.010u 0:00.000
+            im.convert([filename, '-trim', 'info:-'], function(err, out, err2) {
+
+                if (!err) {
+
+                    var results = out.split(" ");
+
+                    var dimensions = results[2];
+                    var dimensionsA = dimensions.split("x");
+
+                    var newWidth = dimensionsA[0];
+                    var newHeight = dimensionsA[1];
+
+                    var d = results[3];
+                    var dA = d.split("+");
+
+                    var dX = dA[1];
+                    var dY = dA[2];
+
+                    im.convert([filename, '-trim', filename], function(err,out,err2) {
+
+                        if (!err) {
+
+                            // save new content:
+                            self.copyContentFromFile(roomID, objectID, filename, context, function() {
+                            
+                                // delete temp. file
+                                fs.unlink(filename);
+                            
+                                callback(dX, dY, newWidth, newHeight);
+                            });
+                            
+                        } else {
+                            //TODO: delete temp. file
+                            self.Modules.Log.error("Error while trimming " + roomID + "/" + objectID);
+                        }
+                    });
+                } else {
+                    console.log(err);
+                    self.Modules.Log.error("Error getting trim information of " + roomID + "/" + objectID);
+                }
+            });
+        });
+    });
+}
+
+/**
+*   get the the object's content from a file and save it
+*   if a callback function is specified, it is called after saving
+*   @function copyContentFromFile
+*   @param roomID
+*   @param objectID
+*   @param sourceFilename
+*   @param context
+*   @param callback
+*/
+mongoConnector.copyContentFromFile=function(roomID, objectID, sourceFilename, context, callback) {
+    var that = this
+    this.Modules.Log.debug("Copy content from file (roomID: '" + roomID + "', objectID: '" + objectID +
+            "', user: '" + this.Modules.Log.getUserFromContext(context) + "', source: '" + sourceFilename + "')");
+    
+    if (!context) this.Modules.Log.error("Missing context");
+
+    var rds = fs.createReadStream(sourceFilename);
+    rds.on("error", function(err) {
+        that.Modules.Log.error("Error reading file");
+    });
+
+    this.saveContent(roomID, objectID, rds, callback, context, true);
 }
 
 /**
@@ -844,7 +937,7 @@ mongoConnector.trimImage = function(roomID, objectID, context, callback) {
 *	@param mimeType
 */
 mongoConnector.isInlineDisplayable = function(mimeType) {
-	console.log("ALEX mongoConnector.isInlineDisplayable");
+    return !(this.getInlinePreviewProviderName(mimeType) == false); 
 }
 
 /**
@@ -855,16 +948,25 @@ mongoConnector.isInlineDisplayable = function(mimeType) {
 *	@param callback
 */
 mongoConnector.getMimeType = function(roomID, objectID, context, callback) {
-	console.log("ALEX mongoConnector.getMimeType");
+	if (!context) throw new Error('Missing context in getMimeType');
+
+    this.getObjectData(roomID, objectID, context, function(objectData) {
+        var mimeType = objectData.attributes.mimeType;
+        callback(mimeType);
+    });
 }
 
 /**
-* SYNC
+*   SYNC
 *	@function getInlinePreviewProviderName
 *	@param mimeType
 */
 mongoConnector.getInlinePreviewProviderName = function(mimeType) {
-	console.log("ALEX mongoConnector.getInlinePreviewProviderName");
+    if (!mimeType) return false;
+    
+    var inlinePreProv = this.getInlinePreviewProviders()[mimeType];
+
+    return (inlinePreProv != undefined) ? inlinePreProv : false;
 }
 
 /**
@@ -909,7 +1011,33 @@ mongoConnector.getInlinePreviewProviders = function() {
 *	@param callback
 */
 mongoConnector.getInlinePreviewDimensions = function(roomID, objectID, mimeType, context, callback) {
-	console.log("ALEX mongoConnector.getInlinePreviewDimensions");
+    var self = this;
+    
+    if (!context) throw new Error('Missing context in getInlinePreviewDimensions');
+    
+    function mimeTypeDetected(mimeType) {
+        
+        /* find provider for inline content: */
+        var generatorName = self.getInlinePreviewProviderName(mimeType);
+
+        if (generatorName == false) {
+            self.Modules.Log.warn("no generator name for mime type '" + mimeType + "' found!");
+            callback(false, false); //do not set width and height (just send update to clients)
+        } else {
+            self.inlinePreviewProviders[generatorName].dimensions(roomID, objectID, context, callback);
+        }
+        
+    }
+    
+    if (!mimeType) {
+        
+        self.getMimeType(roomID, objectID, context, function(mimeType) {
+            mimeTypeDetected(mimeType);
+        });
+        
+    } else {
+        mimeTypeDetected(mimeType);
+    }
 }
 
 /**
@@ -921,7 +1049,36 @@ mongoConnector.getInlinePreviewDimensions = function(roomID, objectID, mimeType,
 *	@param callback
 */
 mongoConnector.getInlinePreview = function(roomID, objectID, mimeType, context, callback) {
-	console.log("ALEX mongoConnector.getInlinePreview");
+    var self = this;
+
+    if (!context) throw new Error('Missing context in getInlinePreview');
+    
+    function mimeTypeDetected(mimeType) {
+        
+        if (!mimeType) {
+            callback(false);
+        } else {
+
+            /* find provider for inline content: */
+            var generatorName = self.getInlinePreviewProviderName(mimeType);
+
+            if (generatorName == false) {
+                self.Modules.Log.warn("no generator name for mime type '"+mimeType+"' found!");
+                callback(false); // do not set width and height (just send update to clients)
+            } else {
+                self.inlinePreviewProviders[generatorName].preview(roomID, objectID, context, callback);
+            }
+        }
+    }
+    
+    if (!mimeType) {
+        self.getMimeType(roomID, objectID, context, function(mimeType) {
+            mimeTypeDetected(mimeType);
+        });
+        
+    } else {
+        mimeTypeDetected(mimeType);
+    }
 }
 
 /**
@@ -932,7 +1089,89 @@ mongoConnector.getInlinePreview = function(roomID, objectID, mimeType, context, 
 *	@param callback
 */
 mongoConnector.getInlinePreviewMimeType = function(roomID, objectID, context, callback) {
-	console.log("ALEX mongoConnector.getInlinePreviewMimeType");
+	var self = this;
+	
+    if (!context) throw new Error('Missing context in getInlinePreviewMimeType');
+    
+    this.getMimeType(roomID, objectID, context, function(mimeType) {
+        
+        if (!mimeType) {
+            callback(false);
+        }
+
+        /* find provider for inline content: */
+        var generatorName = self.getInlinePreviewProviderName(mimeType);
+
+        if (generatorName == false) {
+            self.Modules.Log.warn("no generator name for mime type '" + mimeType + "' found!");
+            callback(false);
+        } else {
+            callback(self.inlinePreviewProviders[generatorName].mimeType(roomID, objectID, mimeType, context));
+        }
+        
+    });
+}
+
+/**
+*   Head function and some subfunctions included, TODO JSDoc
+*   @function inlinePreviewProviders
+*/
+mongoConnector.inlinePreviewProviders = {
+    
+    'image': {
+        'mimeType' : function(roomID, objectID, mimeType, context) {
+            
+            if (!context) throw new Error('Missing context in mimeType for image');
+            
+            return mimeType;
+        },
+        'dimensions' : function(roomID, objectID, context, callback) {
+            
+            if (!context) throw new Error('Missing context in dimensions for image');
+            
+            var filename = __dirname + "/tmp/image_preview_dimensions_" + roomID + "_" + objectID;
+
+            mongoConnector.getContent(roomID, objectID, context, function(content) {
+                fs.writeFile(filename, Buffer(content), function (err) {
+                    if (err) throw err;
+                    /* temp. file saved */
+
+                    var im = require('imagemagick');
+
+                    im.identify(filename, function(err, features) {
+
+                        if (err) throw err;
+
+                        var width = features.width;
+                        var height = features.height;
+
+                        if (width > fileConnector.Modules.config.imageUpload.maxDimensions) {
+                            height = height * (fileConnector.Modules.config.imageUpload.maxDimensions / width);
+                            width = fileConnector.Modules.config.imageUpload.maxDimensions;
+                        }
+
+                        if (height > fileConnector.Modules.config.imageUpload.maxDimensions) {
+                            width = width * (fileConnector.Modules.config.imageUpload.maxDimensions / height);
+                            height = fileConnector.Modules.config.imageUpload.maxDimensions;
+                        }
+
+                        //delete temp. file
+                        fs.unlink(filename);
+                        callback(width, height);
+                    });
+                });
+            });
+        },
+        'preview' : function(roomID, objectID, context, callback) {
+            
+            if (!context) throw new Error('Missing context in preview for image');
+            
+            // TODO: change image orientation
+            mongoConnector.getContent(roomID, objectID, context, function(content) {
+                callback(content);
+            });
+        }
+    }
 }
 
 module.exports = mongoConnector;

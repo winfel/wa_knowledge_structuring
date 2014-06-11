@@ -324,7 +324,6 @@ theObject.hasContent = function() {
  *	it is decoded first.
  */
 theObject.setContent = function(content, callback) {
-
   console.log(content);
 
   if ((typeof content) != "object" && content.substr(0, 22) == 'data:image/png;base64,') {
@@ -342,6 +341,7 @@ theObject.setContent = function(content, callback) {
   this.persist();
   this.updateClients('contentUpdate');
 }
+
 theObject.setContent.public = true;
 theObject.setContent.neededRights = {
   write: true
@@ -373,17 +373,15 @@ theObject.getCurrentUserName = function() {
  *	get the object's content
  */
 theObject.getContent = function(callback) {
-  if (!this.context)
+  if (!this.context) {
     throw new Error('Missing context in GeneralObject.getContent');
+  }
 
-  var content = Modules.Connector.getContent(this.inRoom, this.id, this.context);
-
-  if (_.isFunction(callback))
-    callback(content);
-  else
-    return content;
-
+  Modules.Connector.getContent(this.inRoom, this.id, this.context, function(content) {
+      callback(content);
+  });
 }
+
 theObject.getContent.public = true;
 theObject.getContent.neededRights = {
   read: true
