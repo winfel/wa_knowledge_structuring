@@ -34,6 +34,10 @@ File.draw = function(external) {
 		$(rep).find("rect").attr("stroke-width", this.getAttribute('linesize'));
 	}
 	
+	var l = 64 * Math.sqrt(2) * Math.PI,
+		percent = this.getAttribute('progress') || 0.0;
+	$(rep).find("circle").animate({svgStrokeDashOffset:l-l*percent}, 1000);
+	
 	this.createPixelMap();
 }
 
@@ -91,4 +95,47 @@ File.getIconText = function() {
 
 File.setTag = function() {
 	GUI.tagManager.open(this, 600, 600, false);	
+}
+
+File.createRepresentation = function(parent) {
+
+	var rep = IconObject.createRepresentation.call(this, parent);
+
+	var size = 32;
+	if (this.getAttribute("bigIcon")) {
+		size = 64;
+	}
+/*	var percent = 0.10,
+		a = (90 - 360 * percent) * Math.PI / 180,
+		r = size / Math.sqrt(2),
+		x = size/2 + r * Math.cos(a),
+		y = size/2 - r * Math.sin(a);
+	var progressCircle = GUI.svg.path(rep, GUI.svg
+		.createPath()
+		.move(size / 2, size / 2 - r)
+		.arc(r, r, 0, percent > 0.5, true, x,y)
+	, {
+		fill: 'transparent',
+		stroke: 'orange',
+		strokeWidth: 5,
+	});*/
+	var r = size / Math.sqrt(2),
+		l = 2 * Math.PI * r;
+	var progressCircle = GUI.svg.circle(rep, size/2,size/2, r
+	, {
+		fill: 'transparent',
+		stroke: 'orange',
+		strokeWidth: 5,
+		'stroke-dasharray': l,
+		'stroke-dashoffset': l,
+		transform: 'rotate(-90,'+(size/2)+','+(size/2)+')'
+	});
+	//$(progressCircle).attr("fill", "transparent");
+	//$(progressCircle).animate({svgStrokeDashOffset:l-l*percent}, 5000);
+	//$(progressCircle).addClass("borderCircle");
+
+	//this.initGUI(rep);
+	
+	return rep;
+	
 }

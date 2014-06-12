@@ -55,7 +55,8 @@ var PdfEdit = {
 		});
 
 		converter.progress(function(ret) {
-		  console.log ((ret.current*100.0)/ret.total + " %");
+			//console.log ((ret.current*100.0)/ret.total + " %");
+			data.object.setAttribute('progress', ret.current/ret.total);
 		});
 
 		converter.convert();
