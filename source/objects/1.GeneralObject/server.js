@@ -323,25 +323,27 @@ theObject.hasContent = function() {
  *	set a new content. If the content is base64 encoded png data,
  *	it is decoded first.
  */
-theObject.setContent = function(content, callback) {
+theObject.setContent = function(content, callback) {	
+	var that = this;
+	if ((typeof content) != "object" && content.substr(0, 22) == 'data:image/png;base64,') {
+	
+	var base64Data = content.replace(/^data:image\/png;base64,/, ""),
+		content = new Buffer(base64Data, 'base64');
+	}
+	
+	Modules.Connector.saveContent(this.inRoom, this.id, content, function(){
+		that.set('hasContent', !!content);
+		that.set('contentAge', new Date().getTime());
 
-  console.log(content);
-
-  if ((typeof content) != "object" && content.substr(0, 22) == 'data:image/png;base64,') {
-
-    var base64Data = content.replace(/^data:image\/png;base64,/, ""),
-            content = new Buffer(base64Data, 'base64');
-  }
-
-  Modules.Connector.saveContent(this.inRoom, this.id, content, callback, this.context);
-
-  this.set('hasContent', !!content);
-  this.set('contentAge', new Date().getTime());
-
-  //send object update to all listeners
-  this.persist();
-  this.updateClients('contentUpdate');
+		//send object update to all listeners
+		that.persist();
+		that.updateClients('contentUpdate');
+		callback();
+	}, this.context);
+	
+	
 }
+
 theObject.setContent.public = true;
 theObject.setContent.neededRights = {
   write: true
@@ -373,16 +375,16 @@ theObject.getCurrentUserName = function() {
  *	get the object's content
  */
 theObject.getContent = function(callback) {
-  if (!this.context)
-    throw new Error('Missing context in GeneralObject.getContent');
+	if (!this.context)
+		throw new Error('Missing context in GeneralObject.getContent');
 
-  var content = Modules.Connector.getContent(this.inRoom, this.id, this.context);
-
-  if (_.isFunction(callback))
-    callback(content);
-  else
-    return content;
-
+	Modules.Connector.getContent(this.inRoom, this.id, this.context, function(content){
+		if (_.isFunction(callback)) {
+			callback(content);
+		} else {
+			return content;
+		}
+	});
 }
 theObject.getContent.public = true;
 theObject.getContent.neededRights = {

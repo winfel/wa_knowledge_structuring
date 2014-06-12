@@ -13,6 +13,7 @@ var TRASH_ROOM  = 'trash';
 
 var mongoConnector = {};
 var Modules = false;
+var dbmonk = null;
 var db = null;
 var monk = null;
 
@@ -33,19 +34,21 @@ var paintings;
 * @param theModules
 */
 mongoConnector.init = function(theModules) {
-    this.Modules = theModules;
+	var that = this;
+    that.Modules = theModules;
     monk = require('monk'); 
     console.log();
-    db = monk(theModules.MongoDBConfig.getURI());
+    dbmonk = monk(theModules.MongoDBConfig.getURI());
        
     mongo.MongoClient.connect(theModules.MongoDBConfig.getURI(), function (err, db) {
-    	if (err) { console.log("err"+ err); }
+    	if (err) { console.log("err"+ err); } 
+    	that.db = db;
     	gfs = Grid(db, mongo);
     });
         
-    rooms   = db.get('rooms');
-    objects = db.get('objects');
-    paintings = db.get('paintings');
+    rooms   = dbmonk.get('rooms');
+    objects = dbmonk.get('objects');
+    paintings = dbmonk.get('paintings');
 }
 
 /**
@@ -239,7 +242,7 @@ function buildObjectFromDBObject (roomID, attr) {
 }
 
 function hasContentByType(type) {
-    return (_.indexOf(["File"], type) > 0);
+    return (_.indexOf(["File"], type) != -1);
 }
 
 /**
@@ -295,7 +298,7 @@ mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
  * @param roomID
  * @param objectID
  * @param data
- * @param cb not use, left hier for compatibility reasons 
+ * @param cb not use, left here for compatibility reasons 
  * @param context
  */
 mongoConnector.saveObjectData = function(roomID, objectID, data, cb, context) {
@@ -522,6 +525,15 @@ function removeObjectFromDB(id) {
 
 /**
 *   internal
+*   removes an object
+*   @param id
+*/
+function removeObjectsContentFromDB(id) {
+	GridStore.unlink(mongoConnector.db, id, function(err, gridStore) { });
+}
+
+/**
+*   internal
 *   moves an object to the trash room
 *   @param id
 */
@@ -613,13 +625,17 @@ mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
  * @param context
  * @param inputIsStream
  */
-mongoConnector.saveContent = function(roomID, objectID, content, after, context, inputIsStream) {
-    this.Modules.Log.debug("Save content from string (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
+mongoConnector.saveContent = function(roomID, objectID, content, callback, context, inputIsStream) {
 	var that = this;
+	
+    this.Modules.Log.debug("Save content from string (roomID: '" + roomID
+		+ "', objectID: '" + objectID + "', user: '"
+		+ this.Modules.Log.getUserFromContext(context) + "')");
+    
+    if (!context) this.Modules.Log.error("Missing context");
+	
+	var filename = objectID;
 
-    var filename = objectID;
-
-	if (!context) this.Modules.Log.error("Missing context");
     if (!!inputIsStream) {
     	
     	// streaming to gridfs
@@ -632,9 +648,8 @@ mongoConnector.saveContent = function(roomID, objectID, content, after, context,
         });
         
         content.on("end", function() {
-            if (after) after(objectID);
-        })
-        
+            if(callback) { callback(objectID); }
+        });        
         content.pipe(wr);
     } else {
         if (({}).toString.call(content).match(/\s([a-zA-Z]+)/)[1].toLowerCase() == "string") {
@@ -652,29 +667,33 @@ mongoConnector.saveContent = function(roomID, objectID, content, after, context,
 
 		try {
 			// Create a new instance of the gridstore
-			var gridStore = new GridStore(db, filename, 'w');
+			var gridStore = new GridStore(that.db, filename, 'w', {});
 			
 			// Open the file
-			gridStore.open(function(err, gridStore) {
+			gridStore.open(function(err, gridStore) { 
+				if (err) {throw err;}
 				// Write some data to the file
 			    gridStore.write(new Buffer(content), function(err, gridStore) {
+			    	if (err) {throw err;}
 			    	// Close (Flushes the data to MongoDB)
 			        gridStore.close(function(err, result) {
+			        	if (err) {throw err;}
 			        	// Verify that the file exists
-			            GridStore.exist(db, fileId, function(err, result) {
-			              
+			            GridStore.exist(that.db, filename, function(err, result) {
+			            	if (err) {throw err;}
+			            	if(result){
+			            		//console.log("File was written in the DB");
+			            	}
 			            });
 			        });
 			    });
-			});
-			  
-			//fs.writeFileSync(filename, new Buffer(content));
+			});			  
 		} catch (err) {
-            this.Modules.Log.error("Could not write content to file (roomID: '" + roomID + "', objectID: '" + objectID
-                    + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
-        }
-        
-		if (after) after(objectID);
+            this.Modules.Log.error("Could not write content to file (roomID: '" 
+            		+ roomID + "', objectID: '" + objectID + "', user: '"
+            		+ this.Modules.Log.getUserFromContext(context) +":  " + err + "')");
+        }        
+		if(callback) { callback(objectID); }
     }
 }
 
@@ -819,6 +838,7 @@ mongoConnector.copyContentFromFile = function(roomID, objectID, sourceFilename, 
 	this.Modules.Log.debug("Copy content from file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"', source: '"+sourceFilename+"')");
 	
 	if (!context) this.Modules.Log.error("Missing context");
+	if (!callback) this.Modules.Log.error("Missing callback");
 	
     var rds = fs.createReadStream(sourceFilename);
     rds.on("error", function(err) {
@@ -838,38 +858,53 @@ mongoConnector.copyContentFromFile = function(roomID, objectID, sourceFilename, 
  * @param callback
  * 
  */
-mongoConnector.getContent = function(roomID, objectID, context, callback) {
-    console.log("ALEX mongoConnector.getContent");
+mongoConnector.getContent = function(roomID, objectID, context, callback) {    
+
+    this.Modules.Log.debug("Get content (roomID: '" + roomID + "', objectID: '"
+		+ objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
     
-    this.Modules.Log.debug("Get content (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
+    if (!context) this.Modules.Log.error("Missing context");
+	if (!callback) this.Modules.Log.error("Missing callback");
 	
 	var filename = objectID;
 	
-	try {
-		// streaming to gridfs
-    	var readStream = gfs.createReadStream({
-    	    filename: filename
-    	});
-    	
-    	readStream.on("data", function (chunk) {
-    		content += chunk;
-	    });
+	gfs.exist({ filename : filename	}, function(err, found) {
 	
-	    readStream.on("end", function () {
-    		console.log("contents of file:\n\n", content);
-    		var byteArray = [];
-    		var contentBuffer = new Buffer(content);
-    		
-    		for (var j = 0; j < contentBuffer.length; j++) {
-    			byteArray.push(contentBuffer.readUInt8(j));
-    		}
+	    if (err) {
+	    	this.Modules.Log.debug("Could not read content from file (roomID: '"
+	    		+ roomID + "', objectID: '" + objectID + "', user: '" + 
+	    		this.Modules.Log.getUserFromContext(context) + "')");
+	 		callback(false);
+	    } else {
+			if (found) {
+				//console.log(filename + ' exists');
+				var content = "";
+				// streaming from gridfs
+				var readStream = gfs.createReadStream({
+					filename : filename
+				});
 
-    		callback(byteArray);
-        });		
-	} catch (e) {
-		this.Modules.Log.debug("Could not read content from file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
-		callback(false);
-	}
+				readStream.on("data", function(chunk) {
+					content += chunk;
+				});
+
+				readStream.on("end", function() {
+					//console.log("contents of file:\n\n", content);
+					var byteArray = [];
+					var contentBuffer = new Buffer(content);
+
+					for (var j = 0; j < contentBuffer.length; j++) {
+						byteArray.push(contentBuffer.readUInt8(j));
+					}
+
+					callback(byteArray);
+				});
+			} else {
+				//console.log(filename + ' does not exist');
+				callback(false);
+			}
+		}
+	});
 }
 
 /**
@@ -880,8 +915,7 @@ mongoConnector.getContent = function(roomID, objectID, context, callback) {
 *   
 */
 mongoConnector.getContentStream = function(roomID, objectID, context) {
-    console.log("ALEX mongoConnector.getContentStream");
-    
+    var that = this;
     this.Modules.Log.debug("Get content stream (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
     
     var filename = objectID;
@@ -889,9 +923,8 @@ mongoConnector.getContentStream = function(roomID, objectID, context) {
     var readStream = gfs.createReadStream({
 	    filename: filename
 	});
-    //var rds = fs.createReadStream(filename);
     readStream.on("error", function(err) {
-        this.Modules.Log.error("Error reading file: " + filename);
+    	that.Modules.Log.error("Error reading file: " + filename);
     });
 
     return readStream;
@@ -904,7 +937,6 @@ mongoConnector.getContentStream = function(roomID, objectID, context) {
 *   @param context
 */
 /*mongoConnector.getPaintingStream = function(roomID, user, context) {
-    console.log("ALEX mongoConnector.getPaintingStream");
     this.Modules.Log.debug("Get painting stream (roomID: '"+roomID+"', user: '"+user+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");    
     var filename = user+'.painting';    
     
@@ -949,15 +981,18 @@ mongoConnector.remove = function(roomID, objectID, context, callback) {
     var promise;
     if(roomID == TRASH_ROOM){
     	promise = removeObjectFromDB(objectID);
-    } else {
-    	promise = moveObjectToTrashRoom(objectID);
+    } else {    	
+    	promise = moveObjectToTrashRoom(objectID);    	
     }
     
     promise.on('complete', function(err, obj) {         
         if (err) {
             console.warn("ERROR: mongoConnector.remove: Error trying to remove object " + objectID + " in room " + roomID + " : " + err);
             if (!_.isUndefined(callback)) callback(false);
-        } else {            
+        } else {
+        	if(roomID == TRASH_ROOM){
+        		removeObjectsContentFromDB(objectID); 
+        	}
             if (!_.isUndefined(callback)) callback(true);
         }
     }); 
