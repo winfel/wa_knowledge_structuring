@@ -415,7 +415,6 @@ GUI.initToolbar = function() {
 	
 	}
 	
-	
 /* add Right Manager toggle */
 	
 	if (!Modules.Config.presentationMode) {
