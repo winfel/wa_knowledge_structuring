@@ -50,6 +50,7 @@ File.register=function(type){
 	this.registerAttribute('fillcolor',{hidden: true});
 	this.registerAttribute('width',{hidden: true});
 	this.registerAttribute('height',{hidden: true});
+	this.registerAttribute('progress',{hiddhen: true, standard:0.0});
 	this.registerAttribute('mainTag',{type:'text', standard:""});
 	this.registerAttribute('secondaryTags',{type: 'list', multiple: true});
 
