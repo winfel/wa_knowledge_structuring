@@ -47,34 +47,31 @@ theObject.makeSensitive = function() {
       newData[field] = changeData['new'][field] || this.getAttribute(field);
     }
 
-    var inventory = this.getRoom().getInventory();
+    var self = this;
+    this.getRoom(function (room) {
+        room.getInventoryAsync(function(inventory) {
+            
+            for (var i in inventory) {
+                var object = inventory[i];
 
-    for (var i in inventory) {
+                if (object.id == self.id) {
+                  continue;
+                }
 
-      var object = inventory[i];
+                var bbox = object.getBoundingBox();
 
-      if (object.id == this.id)
-        continue;
+                // determine intersections
+                var oldIntersects = self.bBoxIntersects(oldData.x, oldData.y, oldData.width, oldData.height, bbox.x, bbox.y, bbox.width, bbox.height);
+                var newIntersects = self.bBoxIntersects(newData.x, newData.y, newData.width, newData.height, bbox.x, bbox.y, bbox.width, bbox.height);
 
-      var bbox = object.getBoundingBox();
-
-      //determine intersections
-
-      var oldIntersects = this.bBoxIntersects(oldData.x, oldData.y, oldData.width, oldData.height, bbox.x, bbox.y, bbox.width, bbox.height);
-      var newIntersects = this.bBoxIntersects(newData.x, newData.y, newData.width, newData.height, bbox.x, bbox.y, bbox.width, bbox.height);
-
-      //handle move
-
-      if (oldIntersects && newIntersects)
-        this.onMoveWithin(object, newData);
-      if (!oldIntersects && !newIntersects)
-        this.onMoveOutside(object, newData);
-      if (oldIntersects && !newIntersects)
-        this.onLeave(object, newData);
-      if (!oldIntersects && newIntersects)
-        this.onEnter(object, newData);
-    }
-
+                // handle move
+                if (oldIntersects && newIntersects)   self.onMoveWithin(object, newData);
+                if (!oldIntersects && !newIntersects) self.onMoveOutside(object, newData);
+                if (oldIntersects && !newIntersects)  self.onLeave(object, newData);
+                if (!oldIntersects && newIntersects)  self.onEnter(object, newData);
+              }     
+        });
+    });
   }
 
 
@@ -338,10 +335,8 @@ theObject.setContent = function(content, callback) {
 		//send object update to all listeners
 		that.persist();
 		that.updateClients('contentUpdate');
-		callback();
+		if (callback != undefined) callback();
 	}, this.context);
-	
-	
 }
 
 theObject.setContent.public = true;
@@ -464,28 +459,27 @@ theObject.evaluatePosition = function(key, value, oldvalue) {
 }
 
 theObject.evaluatePositionInt = function(data) {
-
-  var room = this.getRoom();
-
-  if (!room)
-    return;
-
-  room.evaluatePositionFor(this, data);
-
+    var self = this;
+    this.getRoom(function (room) {
+      
+    if (!room) {
+        return;
+    }
+    
+    room.evaluatePositionFor(self, data); 
+  });
 }
 
 theObject.getRoom = function(callback) {
-  if (!this.context) return;
+  if (callback == undefined) return console.warn("GeneralObject/server.js getRoom callback is undefined!!");
+    
+  if (!this.context) return callback(false);
 
-  // search the room in the context and return the room this object is in
-  for (var index in this.context.rooms) {
-    var test = this.context.rooms[index];
-    if (test && test.hasObject && test.hasObject(this)) {
-      return test;
-    }
-  }
-
-  return false;
+  Modules.ObjectManager.getRoom(this.getAttribute('inRoom'), this.context, function(room) {
+      if (room) callback(room);
+      else callback(false);
+  }, false); 
+  
 }
 
 theObject.getBoundingBox = function() {

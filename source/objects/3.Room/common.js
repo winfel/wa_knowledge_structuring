@@ -58,8 +58,8 @@ Room.register=function(type){
  * @see Client/ObjectManager.js
  * @see objects/1.GeneralObject/common.js
  */
-Room.execute=function(){
-	var destination=this.getAttribute('id');	
+Room.execute = function() {
+	var destination = this.getAttribute('id');	
 	ObjectManager.loadRoom(destination);
 }
 

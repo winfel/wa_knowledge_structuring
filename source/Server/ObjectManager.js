@@ -457,9 +457,9 @@ ObjectManager.getRoom = function (roomID, context, callback, oldRoomId) {
 	if (!context) throw new Error('Missing context in ObjectManager.getRoom');
 
 	Modules.Connector.getRoomData(roomID, context, function (data) {
-		var obj = buildObjectFromObjectData(data, roomID, 'Room');
-		obj.context = context;
-		callback(obj);
+		var room = buildObjectFromObjectData(data, roomID, 'Room');
+		room.context = context;
+		callback(room);
 	}, oldRoomId);
 
 }
@@ -739,11 +739,11 @@ ObjectManager.deleteObject = function (data, context, callback) {
 	                    'action': 'delete'
 	                }
 	                
-	                object.remove();             
-	                
-                    var transactionId = data.transactionId;
-
-                    that.history.add(transactionId, data.userId, historyEntry);
+	                Modules.Connector.getTrashRoom(context, function (toRoom) {
+    	                object.remove();             
+                        var transactionId = data.transactionId;
+                        that.history.add(transactionId, data.userId, historyEntry);
+	                });
 	                              
 				});
 			} else {

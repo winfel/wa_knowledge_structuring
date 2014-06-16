@@ -22,15 +22,14 @@ theObject.evaluatePositionFor = function(object, data) {
     // let the moved object be evaluated by every structuring or sensitive
     // object in the room
 
-    var inventory = this.getInventory();
-
-    for ( var i in inventory) {
-        var obj = inventory[i];
-        if (obj.isStructuring() || obj.isSensitive()) {
-            obj.evaluateObject(object, data);
+    this.getInventoryAsync(function(inventory) {
+        for ( var i in inventory) {
+            var obj = inventory[i];
+            if (obj.isStructuring() || obj.isSensitive()) {
+                obj.evaluateObject(object, data);
+            }
         }
-    }
-
+    });
 }
 
 //sets active objects to their positions
@@ -160,7 +159,7 @@ theObject.placeActiveObjects = function() {
 }
 
 theObject.getInventory = function() {
-    // console.warn("Depricated!! use the Async version");
+    console.warn("Depricated!! use the Async version");
     
     throw new Error("Depricated!! use the Async version");
     return Modules.ObjectManager.getObjects(this.id, this.context);
