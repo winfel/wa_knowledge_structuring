@@ -13,7 +13,7 @@ Container.draw=function(external){
 	
 	this.setViewWidth(this.getAttribute('width'));
 	this.setViewHeight(this.getAttribute('height'));
-			
+
 	$(rep).attr("layer", this.getAttribute('layer'));
 	
 	if (!$(rep).hasClass("webarena_ghost")) {
@@ -25,9 +25,9 @@ Container.draw=function(external){
 	}
 	
 	var that=this;
-		
+
 	this.updateInnerHeight();
-    this.adjustControls();
+	this.adjustControls();
 }
 
 
@@ -77,38 +77,35 @@ Container.drawContent = function(rep){
 
 	//delete old content	
 	$(rep).find("#containment-wrapper").remove();
-		
+
 	//create new content
-	$(	'<p font-size="24px">Name of container<img src="/guis.common/images/icon-lupe.png" width="30" height="30"></p>'+
-		'<form action="select.htm"><select name="ordering">'+
-		      '<option>alphabetic asc.</option>'+
-		      '<option>alphabetic desc.</option>'+
-		      '<option>size asc.</option>'+
-		      '<option>size desc.</option>'+
-		      '<option>type</option>'+
-    		'</select></form>'+
-			'<div id="containment-wrapper">'+
-				'<ul id="sortablefiles">'+
-					'<li class="ui-state-default">1</li>'+
-					'<li class="ui-state-default">2</li>'+
-					'<li class="ui-state-default">3</li>'+
-					'<li class="ui-state-default">4</li>'+
-					'<li class="ui-state-default">5</li>'+
-					'<li class="ui-state-default">6</li>'+
-					'<li class="ui-state-default">7</li>'+
-					'<li class="ui-state-default">8</li>'+
-					'<li class="ui-state-default">9</li>'+
-					'<li class="ui-state-default">10</li>'+
-					'<li class="ui-state-default">11</li>'+
-					'<li class="ui-state-default">12</li>'+
-					'<li class="ui-state-default">13</li>'+
-					'<li class="ui-state-default">14</li>'+
-				'</ul>'+
-			'</div>'
-	).appendTo($(rep).children());
+	$(	'<table class="headline" bgcolor=#CCFFFF><tr>'+
+		'<th id ="containername" width="100"><h3>Containername</h3></th>'+
+		'<th id ="tableimage" width="35"></th>'+
+		'<th id ="sortingcriterion" width="100"></th>'+
+		'</tr></table>'+
+		'<div id="containment-wrapper">'+
+		'<ul id="sortablefiles">'+
+		'<li class="ui-state-default">1</li>'+
+		'<li class="ui-state-default">2</li>'+
+		'<li class="ui-state-default">3</li>'+
+		'<li class="ui-state-default">4</li>'+
+		'<li class="ui-state-default">5</li>'+
+		'<li class="ui-state-default">6</li>'+
+		'<li class="ui-state-default">7</li>'+
+		'<li class="ui-state-default">8</li>'+
+		'<li class="ui-state-default">9</li>'+
+		'<li class="ui-state-default">10</li>'+
+		'<li class="ui-state-default">11</li>'+
+		'<li class="ui-state-default">12</li>'+
+		'<li class="ui-state-default">13</li>'+
+		'<li class="ui-state-default">14</li>'+
+		'</ul>'+
+		'</div>'
+		).appendTo($(rep).children());
 
 	//$(rep).find("#sortablefiles").sortable({ containment: "#containment-wrapper" });
-    $(rep).find("#sortablefiles").disableSelection();
+	$(rep).find("#sortablefiles").disableSelection();
 
 	$(rep).find("#sortablefiles").css("list-style-type", "none");
 	$(rep).find("#sortablefiles").css("margin", "10px");
@@ -123,14 +120,48 @@ Container.drawContent = function(rep){
 	$(rep).find("#sortablefiles li").css("font-size", "4em");
 	$(rep).find("#sortablefiles li").css("text-align", "center");
 	$(rep).find("#sortablefiles li").css("vertical-align", "middle");
- 
+
 	$(rep).find("#containment-wrapper").css("width", "450px");
 	$(rep).find("#containment-wrapper").css("height", "300px");
 	$(rep).find("#containment-wrapper").css("border", "2px solid #ccc");
 	$(rep).find("#containment-wrapper").css("padding", "10px");
 	$(rep).find("#containment-wrapper").css("overflow", "auto");
-	$(rep).find("#containername").css("background", "red !important");
+	$(rep).find("#sortingcriterion").append('<form action="select.htm"><select name="ordering">'+
+		'<option>alphabetic asc.</option>'+
+		'<option>alphabetic desc.</option>'+
+		'<option>size asc.</option>'+
+		'<option>size desc.</option>'+
+		'<option>type</option>'+
+		'</select></form>');
 	
-	
+
+	var newCategoryIcon = document.createElement("img");
+	$(newCategoryIcon).attr("src", "/guis.common/images/icon-lupe.png").attr("alt", "");
+	$(newCategoryIcon).attr("width", "30").attr("height", "30");
+
+
+	$("#tableimage").append(newCategoryIcon);
+
+	/* add Popover */
+
+	$(newCategoryIcon).jPopover({
+                //positionOffsetY : $("#containment-wrapper").height()-7,
+                onSetup : function(domEl, popover) {
+
+                	var page = popover.addPage(GUI.translate('Search/Filter'));
+                	var section = page.addSection();
+
+                	var element = section.addElement('<input type="text" /><p>Search by:</p>'+
+                		'<p>'+
+                		'<input type="checkbox" > Name &nbsp &nbsp '+
+                		'<input type="checkbox"> Tag <br><br>'+
+                		'<p>Search for:</p>'+
+                		'<input type="checkbox"> PDF<br>'+
+                		'<input type="checkbox"> HTML<br>'+
+                		'<input type="checkbox"> Bilddateien'+
+                		'</p><br>'+
+                		'<button type="submit" height="30"><img src="/guis.common/images/icon-lupe.png" alt="Suchen" width="22" height="22"></button>'
+                		);
+                }}); 	
 
 }
