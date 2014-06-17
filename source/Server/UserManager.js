@@ -52,6 +52,8 @@ UserManager.init = function(theModules) {
 
   Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);
 
+  Dispatcher.registerCall('enterPrivateSpace', UserManager.enterPrivateSpace);
+
   Dispatcher.registerCall('umIsManager', UserManager.isManager);
 
   Dispatcher.registerCall('umDeleteObjectFromTabs', function(socket, data){
@@ -273,6 +275,70 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
       //Modules.Log.debug(obj);
     });
   });
+};
+
+UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, responseID, shouldInclude){
+  UserManager.enterRoom(socketOrUser, data, responseID);
+  var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
+  var context = UserManager.connections[userID];
+
+  Modules.ObjectManager.getObjects(data.roomID, context, function(inventory) {
+
+    shouldInclude.forEach(function(item){
+      var token = item.split('#');
+
+      var oType = token[0];
+      var oName = token[1];
+      var oX    = token[2];
+      var oY    = token[3];
+      var oWidth= token[4];
+      var oAttsL= token[5];
+      var oAtts = [];
+
+      var oContent = "ERROR - Content not defined";
+
+      var attr = {x: oX, y: oY, width: oWidth, name: oName , paper: data.roomID};
+      for(var i = 6; i < oAttsL+6-1; i++){
+        if(typeof token[i] != 'undefined'){
+          var attToken = token[i].split(';');
+
+          var attName   = attToken[0];
+          var attValue  = attToken[1];
+
+          if(attName.indexOf("content") > -1){
+            oContent = attValue;
+          }else{
+            attr.attName  = attValue;
+          }
+        }
+      }
+
+      var found = false;
+      /* it it already there? */
+      for (var aux in inventory) {
+      var obj = inventory[aux];
+
+        if(obj.getAttribute('name').indexOf(oName) > -1){
+          found = true;
+        }
+      }
+
+      /* if not found: create it */
+      if(!found){
+        Modules.ObjectManager.createObject(data.roomID, oType, attr, oContent, context, function(error, obj) {
+        //Modules.Log.debug(obj);
+      });
+      }
+
+    });
+  });
+};
+
+UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
+  //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
+  var shouldInclude = ["Textarea#T1#20#45#100#1#content;bla","Textarea#T2#60#120#100#1#content;HalloWelt"];
+
+  UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 
 /**
