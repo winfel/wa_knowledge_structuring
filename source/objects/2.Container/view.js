@@ -79,9 +79,15 @@ Container.drawContent = function(rep){
 	$(rep).find("#containment-wrapper").remove();
 		
 	//create new content
-	$(
+	$(	'<p font-size="24px">Name of container<img src="/guis.common/images/icon-lupe.png" width="30" height="30"></p>'+
+		'<form action="select.htm"><select name="ordering">'+
+		      '<option>alphabetic asc.</option>'+
+		      '<option>alphabetic desc.</option>'+
+		      '<option>size asc.</option>'+
+		      '<option>size desc.</option>'+
+		      '<option>type</option>'+
+    		'</select></form>'+
 			'<div id="containment-wrapper">'+
-				'<input type="text" size="10" value="name of container"/>'+ 
 				'<ul id="sortablefiles">'+
 					'<li class="ui-state-default">1</li>'+
 					'<li class="ui-state-default">2</li>'+
@@ -98,8 +104,7 @@ Container.drawContent = function(rep){
 					'<li class="ui-state-default">13</li>'+
 					'<li class="ui-state-default">14</li>'+
 				'</ul>'+
-			'</div>'+
-		'</div>'
+			'</div>'
 	).appendTo($(rep).children());
 
 	//$(rep).find("#sortablefiles").sortable({ containment: "#containment-wrapper" });

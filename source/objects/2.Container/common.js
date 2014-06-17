@@ -50,7 +50,7 @@ Container.register=function(type){
  * @see objects/2.Container/view.js
  */
 Container.execute=function(){
-	
+
 }
 
 /**

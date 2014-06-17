@@ -273,27 +273,6 @@ GUI.initToolbar = function() {
 		$(parentButton).bind("mousedown", click);
 	}
 	
-	/*add home button*/
-	var homeButton = document.createElement("img");
-	$(homeButton).attr("src", "../../guis.common/images/home.png").attr("alt", "");
-	$(homeButton).attr("width", "24").attr("height", "24");
-
-	$(homeButton).attr("id", "bug_button");
-	$(homeButton).addClass("sidebar_button");
-	
-	$(homeButton).attr("title", GUI.translate("Home"));
-
-	$("#header > .header_right").append(homeButton);
-	
-	var click = function() {
-		Modules.ObjectManager.goHome();
-	}
-	
-	if (GUI.isTouchDevice) {
-		$(homeButton).bind("touchstart", click);
-	} else {
-		$(homeButton).bind("mousedown", click);
-	}
 	
 	/*add paint button*/
 	var homeButton = document.createElement("img");
