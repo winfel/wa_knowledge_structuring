@@ -102,8 +102,6 @@ GUI.sidebar.openPage = function(element, button) {
 
   }
 
-  console.log("openpage: " + left);
-
   GUI.sidebar.transformX($("#sidebar_content").children("div"), left);
 
   // Change the sidebar title
