@@ -80,23 +80,25 @@ Container.drawContent = function(rep){
 		
 	//create new content
 	$(
-		'<div id="containment-wrapper">'+
-		'<ul id="sortablefiles">'+
-		'<li class="ui-state-default">1</li>'+
-		'<li class="ui-state-default">2</li>'+
-		'<li class="ui-state-default">3</li>'+
-		'<li class="ui-state-default">4</li>'+
-		'<li class="ui-state-default">5</li>'+
-		'<li class="ui-state-default">6</li>'+
-		'<li class="ui-state-default">7</li>'+
-		'<li class="ui-state-default">8</li>'+
-		'<li class="ui-state-default">9</li>'+
-		'<li class="ui-state-default">10</li>'+
-		'<li class="ui-state-default">11</li>'+
-		'<li class="ui-state-default">12</li>'+
-		'<li class="ui-state-default">13</li>'+
-		'<li class="ui-state-default">14</li>'+
-		'</ul>'+
+			'<div id="containment-wrapper">'+
+				'<input type="text" size="10" value="name of container"/>'+ 
+				'<ul id="sortablefiles">'+
+					'<li class="ui-state-default">1</li>'+
+					'<li class="ui-state-default">2</li>'+
+					'<li class="ui-state-default">3</li>'+
+					'<li class="ui-state-default">4</li>'+
+					'<li class="ui-state-default">5</li>'+
+					'<li class="ui-state-default">6</li>'+
+					'<li class="ui-state-default">7</li>'+
+					'<li class="ui-state-default">8</li>'+
+					'<li class="ui-state-default">9</li>'+
+					'<li class="ui-state-default">10</li>'+
+					'<li class="ui-state-default">11</li>'+
+					'<li class="ui-state-default">12</li>'+
+					'<li class="ui-state-default">13</li>'+
+					'<li class="ui-state-default">14</li>'+
+				'</ul>'+
+			'</div>'+
 		'</div>'
 	).appendTo($(rep).children());
 
@@ -122,5 +124,8 @@ Container.drawContent = function(rep){
 	$(rep).find("#containment-wrapper").css("border", "2px solid #ccc");
 	$(rep).find("#containment-wrapper").css("padding", "10px");
 	$(rep).find("#containment-wrapper").css("overflow", "auto");
+	$(rep).find("#containername").css("background", "red !important");
+	
+	
 
 }
