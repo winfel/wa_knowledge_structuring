@@ -52,6 +52,7 @@ UserManager.init = function(theModules) {
 
   Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);
 
+  Dispatcher.registerCall('enterPublicSpace', UserManager.enterPublicSpace);
   Dispatcher.registerCall('enterPrivateSpace', UserManager.enterPrivateSpace);
 
   Dispatcher.registerCall('umIsManager', UserManager.isManager);
@@ -334,9 +335,16 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
   });
 };
 
+UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
+  //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
+  var shouldInclude = ["Textarea#PrivateSpaceInfo#20#45#100#1#content;This is the public space"];
+
+  UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
+};
+
 UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
-  var shouldInclude = ["Textarea#T1#20#45#100#1#content;bla","Textarea#T2#60#120#100#1#content;HalloWelt"];
+  var shouldInclude = ["Textarea#PublicSpaceInfo#20#45#100#1#content;This is the private space of user "+UserManager.getConnectionBySocket(socketOrUser).user.username];
 
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };

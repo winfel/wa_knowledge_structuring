@@ -10,7 +10,7 @@ GUI.tabs = new function() {
   var currentlyStoredTab = [];
   var initTabs = [];
   var defaultTabs = [];
-  var namesWithoutDeletePermission = ["Public","Private Space"];
+  var namesWithoutDeletePermission = ["Public Space","Private Space"];
 
   var internalID;
 
@@ -22,7 +22,7 @@ GUI.tabs = new function() {
     console.log("GUI.tabs initialized");
     var that = this;
 
-    defaultTabs = ["Public#public","Private Space#PrivateSpace"+GUI.username];
+    defaultTabs = ["Public Space#public","Private Space#PrivateSpace"+GUI.username];
 
     /* try to load the tab data from db */
     Modules.UserManager.getTabCache(function(data){
@@ -208,7 +208,9 @@ GUI.tabs = new function() {
       var isActive = (token[1] == destFromURL); // boolean value if this tab is the active one
     	var currentLi = $("<li><a href='#' title='"+token[0]+"'>"+token[0]+"</a></li>").on( "click", function () {
         if(token[0].indexOf('Private Space') > -1){
-          ObjectManager.loadPrivateSpace(token[1], false, 'left');
+          ObjectManager.loadSpecificSpace(token[1], false, 'left', 'enterPrivateSpace');
+        }else if(token[0].indexOf('Public Space') > -1){
+          ObjectManager.loadSpecificSpace(token[1], false, 'left', 'enterPublicSpace');
         }else{
           if(token[0].indexOf('(PO)') > 0){
             ObjectManager.loadPaperWriter(token[1], false, 'left');

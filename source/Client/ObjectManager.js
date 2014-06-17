@@ -482,7 +482,7 @@ ObjectManager.loadPaperWriter = function(roomid, byBrowserNav, index, callback) 
   }
 }
 
-ObjectManager.loadPrivateSpace = function(roomid, byBrowserNav, index, callback) {
+ObjectManager.loadSpecificSpace = function(roomid, byBrowserNav, index, space, callback) {
   var self = this;
 
   // in coupling mode: do not load room on both sides
@@ -492,7 +492,7 @@ ObjectManager.loadPrivateSpace = function(roomid, byBrowserNav, index, callback)
   }
 
   if (proceed) {
-    Modules.Dispatcher.query('enterPrivateSpace', {'roomID': roomid, 'index': index}, function(error) {
+    Modules.Dispatcher.query(space, {'roomID': roomid, 'index': index}, function(error) {
 
       if (error !== true) {
         var objects = self.getObjects(index);
