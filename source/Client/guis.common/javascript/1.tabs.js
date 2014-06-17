@@ -194,17 +194,17 @@ GUI.tabs = new function() {
   *
   **/
   this.redrawTabContent = function(){
-    $("#tabs_content").html(""); // clear
     var that = this;
 
     var destFromURL = document.URL.substring(document.URL.lastIndexOf("/")+1,document.URL.length);
 
     this.checkIfNowInitialised(destFromURL);
 
+    $("#tabs_content").html(""); // clear
     var upperUl = $("<ul style='list-style-type:none;'>").appendTo( "#tabs_content" );
     defaultTabs.forEach(function(item){
     	var token = item.split("#");
-
+      
       var isActive = (token[1] == destFromURL); // boolean value if this tab is the active one
     	var currentLi = $("<li><a href='#' title='"+token[0]+"'>"+token[0]+"</a></li>").on( "click", function () {
         if(token[0].indexOf('Private Space') > -1){
