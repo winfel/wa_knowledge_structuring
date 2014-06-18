@@ -234,18 +234,17 @@ function buildObjectFromDBObject (roomID, attr) {
     data.attributes.inRoom = roomID;
     data.attributes.hasContent = false;
     
-    if (hasContentByType(data.type)) {
-        data.attributes.hasContent = true;
-        data.attributes.contentAge = new Date().getTime();
-    }
+    GridStore.exist(mongoConnector.db, attributes.id, function(err, result) {
+    	if(err) { throw err; }
+    	if(result){
+    		//console.log ("File " + attributes.id + "  exist");
+    		data.attributes.hasContent = true;
+            data.attributes.contentAge = new Date().getTime();	
+    	}
+    });
     
     return data;
 }
-
-function hasContentByType(type) {
-    return (_.indexOf(["File", "SimpleText"], type) != -1);
-}
-
 /**
  *  Get room data or create room, if doesn't exist yet.
  *  @function getRoomData
