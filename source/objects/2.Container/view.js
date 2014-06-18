@@ -42,7 +42,7 @@ Container.updateInnerHeight = function() {
 
 	var h = parseInt($(rep).attr("height"));
 	var w = parseInt($(rep).attr("width"));
-	$(rep).find("div").css("height", h-25+"px");
+	$(rep).find("div").css("height", h-85+"px");
 	$(rep).find("div").css("width", w-25+"px");
 	
 }
@@ -59,6 +59,8 @@ Container.createRepresentation = function(parent) {
 	$(rep).append(body);
 
 	$(rep).attr("id", this.getAttribute('id'));
+	
+	this.setAttribute("name", "Sample Container");
 
 	this.initGUI(rep);
 	
@@ -80,7 +82,7 @@ Container.drawContent = function(rep){
 
 	//create new content
 	$(	'<table class="headline" bgcolor=#CCFFFF><tr>'+
-		'<th id ="containername" width="100"><h3>Containername</h3></th>'+
+		'<th id ="containername" width="100"><h3>Sample Container</h3></th>'+
 		'<th id ="tableimage" width="35"></th>'+
 		'<th id ="sortingcriterion" width="100"></th>'+
 		'</tr></table>'+
@@ -145,13 +147,13 @@ Container.drawContent = function(rep){
 	/* add Popover */
 
 	$(newCategoryIcon).jPopover({
-                //positionOffsetY : $("#containment-wrapper").height()-7,
-                onSetup : function(domEl, popover) {
+         //positionOffsetY : $("#containment-wrapper").height()-7,
+         onSetup : function(domEl, popover) {
 
-                	var page = popover.addPage(GUI.translate('Search/Filter'));
-                	var section = page.addSection();
+             var page = popover.addPage(GUI.translate('Search/Filter'));
+             var section = page.addSection();
 
-                	var element = section.addElement('<input type="text" /><p>Search by:</p>'+
+		     var element = section.addElement('<input type="text" /><p>Search by:</p>'+
                 		'<p>'+
                 		'<input type="checkbox" > Name &nbsp &nbsp '+
                 		'<input type="checkbox"> Tag <br><br>'+
@@ -161,7 +163,16 @@ Container.drawContent = function(rep){
                 		'<input type="checkbox"> Bilddateien'+
                 		'</p><br>'+
                 		'<button type="submit" height="30"><img src="/guis.common/images/icon-lupe.png" alt="Suchen" width="22" height="22"></button>'
-                		);
-                }}); 	
+             );
+         }
+	}); 	
 
+}
+
+
+Container.rename = function(newName){
+
+	var rep=this.getRepresentation();
+
+	$(rep).find("#containername").html(newName);
 }

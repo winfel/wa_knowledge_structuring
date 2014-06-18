@@ -34,6 +34,11 @@ Container.register=function(type){
     this.standardData.width=475;
     this.standardData.height=325;
 
+	this.registerAttribute('name', {type: 'text', changedFunction: function(object, value) {
+		var obj = {id:object.id, name:value}; 
+		object.rename(value);
+		
+    }});
 	
 	this.registerAction('Edit',function(){
 		$.each(ObjectManager.getSelected(), function(key, object) {
