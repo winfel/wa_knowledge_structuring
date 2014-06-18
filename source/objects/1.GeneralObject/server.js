@@ -335,8 +335,8 @@ theObject.setContent = function(content, callback) {
 		//send object update to all listeners
 		that.persist();
 		that.updateClients('contentUpdate');
-		if (callback != undefined) callback();
-	}, this.context);
+		if (callback) { callback(); }
+	}, this.context, false);
 }
 
 theObject.setContent.public = true;
