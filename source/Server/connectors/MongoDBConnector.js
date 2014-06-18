@@ -17,14 +17,15 @@ var dbmonk = null;
 var db = null;
 var monk = null;
 
-var _ = require('underscore');
-var async = require('async');
-var fs = require('fs');
-var mongo = require('mongodb');
+var path    = require('path');
+var _       = require('underscore');
+var async   = require('async');
+var fs      = require('fs');
+var mongo   = require('mongodb');
 var GridStore = require('mongodb').GridStore;
-var Grid = require('gridfs-stream');
-var gfs;
+var Grid    = require('gridfs-stream');
 
+var gfs;
 var rooms;
 var objects;
 var paintings;
@@ -242,7 +243,7 @@ function buildObjectFromDBObject (roomID, attr) {
 }
 
 function hasContentByType(type) {
-    return (_.indexOf(["File"], type) != -1);
+    return (_.indexOf(["File", "SimpleText"], type) != -1);
 }
 
 /**
@@ -358,7 +359,10 @@ mongoConnector.createObject = function(roomID, type, data, context, callback) {
          if (err || doc === undefined || doc.length === 0) {
              console.warn("ERROR mongoConnector.createObject : " + err);
              callback(false);
-         } else callback(objectID);
+         } else {
+             // console.log("mongoConnector.createObject: Object " + objectID + " was successfully created");
+             callback(objectID);
+         }
      });
 }
 
@@ -647,9 +651,10 @@ mongoConnector.saveContent = function(roomID, objectID, content, callback, conte
             that.Modules.Log.error("Error writing file to database: " + err);
         });
         
-        content.on("end", function() {
-            if(callback) { callback(objectID); }
-        });        
+        wr.on("close", function(file) {
+            if (callback) { callback(objectID); }
+        });   
+        
         content.pipe(wr);
     } else {
         if (({}).toString.call(content).match(/\s([a-zA-Z]+)/)[1].toLowerCase() == "string") {
@@ -692,7 +697,8 @@ mongoConnector.saveContent = function(roomID, objectID, content, callback, conte
             this.Modules.Log.error("Could not write content to file (roomID: '" 
             		+ roomID + "', objectID: '" + objectID + "', user: '"
             		+ this.Modules.Log.getUserFromContext(context) +":  " + err + "')");
-        }        
+        }      
+		
 		if(callback) { callback(objectID); }
     }
 }
@@ -835,9 +841,10 @@ mongoConnector.getPaintings = function(roomID, context, callback) {
 */
 mongoConnector.copyContentFromFile = function(roomID, objectID, sourceFilename, context, callback) {
 	var that = this
-	this.Modules.Log.debug("Copy content from file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"', source: '"+sourceFilename+"')");
-	
-	if (!context) this.Modules.Log.error("Missing context");
+	this.Modules.Log.debug("Copy content from file (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '"
+            + this.Modules.Log.getUserFromContext(context) + "', source: '" + sourceFilename + "')");
+
+    if (!context)  this.Modules.Log.error("Missing context");
 	if (!callback) this.Modules.Log.error("Missing callback");
 	
     var rds = fs.createReadStream(sourceFilename);
@@ -858,16 +865,16 @@ mongoConnector.copyContentFromFile = function(roomID, objectID, sourceFilename, 
  * @param callback
  * 
  */
-mongoConnector.getContent = function(roomID, objectID, context, callback) {    
-
+mongoConnector.getContent = function(roomID, objectID, context, callback) {  
     this.Modules.Log.debug("Get content (roomID: '" + roomID + "', objectID: '"
 		+ objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
     
-    if (!context) this.Modules.Log.error("Missing context");
+    if (!context)  this.Modules.Log.error("Missing context");
 	if (!callback) this.Modules.Log.error("Missing callback");
 	
 	var filename = objectID;
 	
+	var that = this;
 	gfs.exist({ filename : filename	}, function(err, found) {
 	
 	    if (err) {
@@ -877,30 +884,18 @@ mongoConnector.getContent = function(roomID, objectID, context, callback) {
 	 		callback(false);
 	    } else {
 			if (found) {
-				//console.log(filename + ' exists');
-				var content = "";
-				// streaming from gridfs
-				var readStream = gfs.createReadStream({
-					filename : filename
-				});
+			    GridStore.read(that.db, filename, function(err, content) {
+                    var byteArray = [];
+                    var contentBuffer = new Buffer(content);
 
-				readStream.on("data", function(chunk) {
-					content += chunk;
-				});
+                    for (var j = 0; j < contentBuffer.length; j++) {
+                        byteArray.push(contentBuffer.readUInt8(j));
+                    }
 
-				readStream.on("end", function() {
-					//console.log("contents of file:\n\n", content);
-					var byteArray = [];
-					var contentBuffer = new Buffer(content);
-
-					for (var j = 0; j < contentBuffer.length; j++) {
-						byteArray.push(contentBuffer.readUInt8(j));
-					}
-
-					callback(byteArray);
-				});
+                    callback(byteArray);                  
+                });
 			} else {
-				//console.log(filename + ' does not exist');
+				// console.log("mongoConnector.getContent " + filename + " does not exist");
 				callback(false);
 			}
 		}
@@ -1260,12 +1255,14 @@ mongoConnector.inlinePreviewProviders = {
             return mimeType;
         },
         'dimensions' : function(roomID, objectID, context, callback) {
-            
             if (!context) throw new Error('Missing context in dimensions for image');
             
-            var filename = __dirname + "/tmp/image_preview_dimensions_" + roomID + "_" + objectID;
+            var filename =  path.resolve(__dirname, "../tmp/image_preview_dimensions_" + roomID + "_" + objectID);
 
             mongoConnector.getContent(roomID, objectID, context, function(content) {
+                
+                if (!content) throw new Error('Missing content in dimensions for image ' + objectID);
+                
                 fs.writeFile(filename, Buffer(content), function (err) {
                     if (err) throw err;
                     /* temp. file saved */
@@ -1279,14 +1276,14 @@ mongoConnector.inlinePreviewProviders = {
                         var width = features.width;
                         var height = features.height;
 
-                        if (width > fileConnector.Modules.config.imageUpload.maxDimensions) {
-                            height = height * (fileConnector.Modules.config.imageUpload.maxDimensions / width);
-                            width = fileConnector.Modules.config.imageUpload.maxDimensions;
+                        if (width > mongoConnector.Modules.config.imageUpload.maxDimensions) {
+                            height = height * (mongoConnector.Modules.config.imageUpload.maxDimensions / width);
+                            width = mongoConnector.Modules.config.imageUpload.maxDimensions;
                         }
 
-                        if (height > fileConnector.Modules.config.imageUpload.maxDimensions) {
-                            width = width * (fileConnector.Modules.config.imageUpload.maxDimensions / height);
-                            height = fileConnector.Modules.config.imageUpload.maxDimensions;
+                        if (height > mongoConnector.Modules.config.imageUpload.maxDimensions) {
+                            width = width * (mongoConnector.Modules.config.imageUpload.maxDimensions / height);
+                            height = mongoConnector.Modules.config.imageUpload.maxDimensions;
                         }
 
                         //delete temp. file
