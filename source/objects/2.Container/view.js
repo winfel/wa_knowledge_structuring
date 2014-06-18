@@ -145,7 +145,6 @@ Container.drawContent = function(rep){
 	$("#tableimage").append(newCategoryIcon);
 
 	/* add Popover */
-
 	$(newCategoryIcon).jPopover({
          //positionOffsetY : $("#containment-wrapper").height()-7,
          onSetup : function(domEl, popover) {
@@ -153,19 +152,59 @@ Container.drawContent = function(rep){
              var page = popover.addPage(GUI.translate('Search/Filter'));
              var section = page.addSection();
 
-		     var element = section.addElement('<input type="text" /><p>Search by:</p>'+
+		     var element = section.addElement('<input id = "textName" type="text" /><p>Search by:</p>'+
                 		'<p>'+
-                		'<input type="checkbox" > Name &nbsp &nbsp '+
-                		'<input type="checkbox"> Tag <br><br>'+
+                		'<input id = "checkName" type="checkbox"> Name &nbsp &nbsp '+
+                		'<input id = "checkTag" type="checkbox"> Tag <br><br>'+
                 		'<p>Search for:</p>'+
-                		'<input type="checkbox"> PDF<br>'+
-                		'<input type="checkbox"> HTML<br>'+
-                		'<input type="checkbox"> Bilddateien'+
+                		'<input id = "checkPDF" type="checkbox"> PDF<br>'+
+                		'<input id = "checkHTML" type="checkbox"> HTML<br>'+
+                		'<input id = "checkBild" type="checkbox"> Bilddateien'+
                 		'</p><br>'+
-                		'<button type="submit" height="30"><img src="/guis.common/images/icon-lupe.png" alt="Suchen" width="22" height="22"></button>'
-             );
-         }
-	}); 	
+                		'<button id= "searchButton" type="submit" height="30"><img src="/guis.common/images/icon-lupe.png" alt="Suchen" width="22" height="22"></button>'
+             ); 
+
+            }    
+
+        /* Clear textfield and uncheck checkboxes */
+        /*
+         onClose: function(domEl, popover){         	
+         	$('#textName').val('');
+         	$("#checkName").prop("checked", false);
+         	$("#checkTag").prop("checked", false);
+         	$("#checkTag").prop("checked", false);
+         	$("#checkHTML").prop("checked", false);
+         	$("#checkBild").prop("checked", false);
+         };
+		*/
+
+	});
+
+
+
+	/* Click event for search button in popover */
+	$('#searchButton').on("click",function(){
+		console.log("Button pressed");
+
+		/* Get value from textfield and selected checkboxes */
+		var textfieldValue = $('#textName').val();
+		var checkboxName = $('#checkName').prop('checked');
+		var checkboxTag = $('#checkTag').prop('checked');
+		var checkboxPDF = $('#checkPDF').prop('checked');
+		var checkboxHTML = $('#checkHTML').prop('checked');
+		var checkboxBild = $('#checkBild').prop('checked');
+		
+		/* Output values */
+		console.log(textfieldValue);
+		console.log(checkboxName);
+		console.log(checkboxTag);
+		console.log(checkboxPDF);
+		console.log(checkboxHTML);
+		console.log(checkboxBild);
+
+		/* TODO: Use values as input for search/filter */
+
+	}) 	
 
 }
 
