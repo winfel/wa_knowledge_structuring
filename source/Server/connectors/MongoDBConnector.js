@@ -657,50 +657,59 @@ mongoConnector.saveContent = function(roomID, objectID, content, callback, conte
         
         content.pipe(wr);
     } else {
-        if (({}).toString.call(content).match(/\s([a-zA-Z]+)/)[1].toLowerCase() == "string") {
-            
-            /* create byte array */
-            var byteArray = [];
-            var contentBuffer = new Buffer(content);
+    	writeFileInDB(filename, content, callback, objectID);		
+    }
+}
 
-            for (var j = 0; j < contentBuffer.length; j++) {
-                byteArray.push(contentBuffer.readUInt8(j));
-            }
+function writeFileInDB(filename, content, callback, callbackParam, metaData) {
+	var that = this;
+	if (({}).toString.call(content).match(/\s([a-zA-Z]+)/)[1].toLowerCase() == "string") {
+        
+        /* create byte array */
+        var byteArray = [];
+        var contentBuffer = new Buffer(content);
 
-            content = byteArray;
+        for (var j = 0; j < contentBuffer.length; j++) {
+            byteArray.push(contentBuffer.readUInt8(j));
         }
 
-		try {
-			// Create a new instance of the gridstore
-			var gridStore = new GridStore(that.db, filename, 'w', {});
-			
-			// Open the file
-			gridStore.open(function(err, gridStore) { 
-				if (err) {throw err;}
-				// Write some data to the file
-			    gridStore.write(new Buffer(content), function(err, gridStore) {
-			    	if (err) {throw err;}
-			    	// Close (Flushes the data to MongoDB)
-			        gridStore.close(function(err, result) {
-			        	if (err) {throw err;}
-			        	// Verify that the file exists
-			            GridStore.exist(that.db, filename, function(err, result) {
-			            	if (err) {throw err;}
-			            	if(result){
-			            		//console.log("File was written in the DB");
-			            	}
-			            });
-			        });
-			    });
-			});			  
-		} catch (err) {
-            this.Modules.Log.error("Could not write content to file (roomID: '" 
-            		+ roomID + "', objectID: '" + objectID + "', user: '"
-            		+ this.Modules.Log.getUserFromContext(context) +":  " + err + "')");
-        }      
-		
-		if(callback) { callback(objectID); }
+        content = byteArray;
     }
+
+	try {
+		// Create a new instance of the gridstore
+		var gridStore = new GridStore(mongoConnector.db, filename, 'w', {metadata: metaData});
+		
+		// Open the file
+		gridStore.open(function(err, gridStore) { 
+			if(err) { throw err; }
+			// Write some data to the file
+		    gridStore.write(new Buffer(content), function(err, gridStore) {
+		    	if (err) {throw err;}
+		    	// Close (Flushes the data to MongoDB)
+		        gridStore.close(function(err, result) {
+		        	if (err) {throw err;}
+		        	// Verify that the file exists
+		            GridStore.exist(mongoConnector.db, filename, function(err, result) {
+		            	if(err) { throw err; }
+		            	if(result){
+		            		//console.log("File was written in the DB");
+		            		if(callbackParam) {
+		            			callback(callbackParam);
+		            		} else {
+		            			callback();
+		            		}
+		            	}
+		            });
+		        });
+		    });
+		});			  
+	} catch (err) {
+		Modules.Log.error("Error in writing the file: "+ filename +
+				Modules.Log.getUserFromContext(context) +":  " + err + "')");
+        callback(false);
+    }
+	
 }
 
 /**
@@ -712,46 +721,18 @@ mongoConnector.saveContent = function(roomID, objectID, content, callback, conte
 *   @param after
 *   @param context
 */
-mongoConnector.savePainting = function(roomID, content, after, context) {
+mongoConnector.savePainting = function(roomID, content, callback, context) {
     if (!context) this.Modules.Log.error("Missing context");
 	
     this.Modules.Log.debug("Save painting (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
-	var that = this;
-	var username = this.Modules.Log.getUserFromContext(context);
 	
-	var painting = {};
-	painting.inRoom = roomID;
-	painting.name = username;
+	var filename = this.Modules.Log.getUserFromContext(context);
 	
-	if (({}).toString.call(content).match(/\s([a-zA-Z]+)/)[1].toLowerCase() == "string") {
-	    /* create byte array */
+	var paintingMetaData = {};
+	paintingMetaData.inRoom = roomID;
+	paintingMetaData.name = filename;
 	
-	    var byteArray = [];
-	    var contentBuffer = new Buffer(content);
-	
-	    for (var j = 0; j < contentBuffer.length; j++) {
-	
-	        byteArray.push(contentBuffer.readUInt8(j));
-	
-	    }
-	
-	    content = byteArray;	   
-	    painting.content = new Buffer(content);	    
-	}
-	
-	var promise = that.savePaintingInDB(roomID, painting, context);
-	
-	promise.on('complete', function(err) {
-		 
-		if (err) {
-            that.Modules.Log.error("Could not write painting to file (roomID: '" + roomID + "', user: '"
-                    + this.Modules.Log.getUserFromContext(context) + "')");
-            after(false);
-	    } else { 
-	    	 after();
-	    }
-	});
-	
+	writeFileInDB(filename, content, callback, null, paintingMetaData);	
 }
 
 /**
@@ -791,6 +772,7 @@ mongoConnector.deletePainting = function(roomID, callback, context) {
                     + this.Modules.Log.getUserFromContext(context) + "')");
 			callback(false);
 		} else {
+			removeObjectsContentFromDB(username);
 			callback();
 		}
 	});
@@ -817,12 +799,16 @@ mongoConnector.getPaintings = function(roomID, context, callback) {
                 + this.Modules.Log.getUserFromContext(context) + "')");
 	}
 	
+	var paintingsArray = [];
 	var promise = paintings.find( {}, ["name"] );
 	promise.on('complete', function(err, paintings) {         
 		if (err) {
             console.warn("ERROR: mongoConnector.getPaintings: " + err);
             callback(false);
-        } else {            
+        } else {   
+        	paintings.forEach(function(painting, index){        		        		
+        		paintings.push(painting.name);
+            });        	
             callback(paintings);
         }
     });   
@@ -865,12 +851,15 @@ mongoConnector.copyContentFromFile = function(roomID, objectID, sourceFilename, 
  * @param callback
  * 
  */
-mongoConnector.getContent = function(roomID, objectID, context, callback) {  
+mongoConnector.getContent = function(roomID, objectID, context, callback) {   
+    
     this.Modules.Log.debug("Get content (roomID: '" + roomID + "', objectID: '"
 		+ objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
     
     if (!context)  this.Modules.Log.error("Missing context");
 	if (!callback) this.Modules.Log.error("Missing callback");
+	
+	var that = this;
 	
 	var filename = objectID;
 	
@@ -884,16 +873,18 @@ mongoConnector.getContent = function(roomID, objectID, context, callback) {
 	 		callback(false);
 	    } else {
 			if (found) {
-			    GridStore.read(that.db, filename, function(err, content) {
-                    var byteArray = [];
-                    var contentBuffer = new Buffer(content);
 
-                    for (var j = 0; j < contentBuffer.length; j++) {
-                        byteArray.push(contentBuffer.readUInt8(j));
-                    }
+				// Read in the whole file
+		        GridStore.read(that.db, filename, function(err, content) {
+		        	var byteArray = [];
+					var contentBuffer = new Buffer(content);
 
-                    callback(byteArray);                  
-                });
+					for (var j = 0; j < contentBuffer.length; j++) {
+						byteArray.push(contentBuffer.readUInt8(j));
+					}
+
+					callback(byteArray);		          
+		        });
 			} else {
 				// console.log("mongoConnector.getContent " + filename + " does not exist");
 				callback(false);
@@ -931,23 +922,21 @@ mongoConnector.getContentStream = function(roomID, objectID, context) {
 *   @param users
 *   @param context
 */
-/*mongoConnector.getPaintingStream = function(roomID, user, context) {
+mongoConnector.getPaintingStream = function(roomID, user, context) {
+	var that = this;
     this.Modules.Log.debug("Get painting stream (roomID: '"+roomID+"', user: '"+user+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");    
-    var filename = user+'.painting';    
-    
-    // streaming from gridfs
-    var rds = gfs.createReadStream({
-      filename: 'ivan.painting'
+    var filename = user;
+           
+    var readStream = gfs.createReadStream({
+	    filename: filename
+	});
+    readStream.on("error", function(err) {
+    	that.Modules.Log.error("Error reading file: " + filename);
     });
-    	
+
+    return readStream;
     
-    var that=this;
-    rds.on("error", function(err) {
-        that.Modules.Log.error("Error reading file: " + filename);
-    });
-    
-    return rds;
-}*/
+}
 
 /**
  * @function getTrashRoom
