@@ -184,31 +184,43 @@ mongoConnector.getInventory = function(roomID, context, callback) {
         this.Modules.Log.error("User is not logged in (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
     }
     
-    var promise = getObjectsByRoom(roomID);
-    promise.on('complete', function(err, objects) {
+    var inventory = [];
+    
+    // we also return the room data as part of the inventory
+    var promise2 = getRoomFromDB(roomID);
+    promise2.on('complete', function(err, room) {
         
-       var inventory = [];
-       
-       if (!err && objects !== undefined && objects.length > 0) {    
-           for (var i in objects) {
-               var obj = objects[i];
-               var data = buildObjectFromDBObject(roomID, obj);
-               inventory.push(data);
-           }
-       }
-       
-       // we also return the room data as part of the inventory
-       var promise2 = getRoomFromDB(roomID);
-       promise2.on('complete', function(err, room) {
-           
-           if (!err && room) {  
-               var data = buildObjectFromDBObject(roomID, room);
-               inventory.push(data);
-           }
-           
-           callback(inventory); 
-       });
-      
+        if (!err && room) {  
+            buildObjectFromDBObject(roomID, room, function(roomData) {
+                inventory.push(roomData);
+                
+                var promise = getObjectsByRoom(roomID);
+                promise.on('complete', function(err, objects) {
+                    
+                   function pushToInventory(i) {
+                       if (i < objects.length) {
+                           buildObjectFromDBObject(roomID, objects[i], function(data) {
+                               inventory.push(data);
+                               pushToInventory(i+1);
+                           });
+                       } else {
+                           callback(inventory);
+                       }
+                   }
+                   
+                   if (!err && objects !== undefined && objects.length > 0) { 
+                       pushToInventory(0);
+                   } else {
+                       callback(inventory);
+                   }
+                   
+                });
+                
+            });
+        } else {
+            console.warn("mongoConnector.getInventory err " + err);
+            callback(false);
+        }
     });
 }
 
@@ -217,9 +229,10 @@ mongoConnector.getInventory = function(roomID, context, callback) {
 *   Builds a data object from the database data
 *   
 *   @param roomID
-*   @param attributes
+*   @param attr
+*   @param callback
 */
-function buildObjectFromDBObject (roomID, attr) {
+function buildObjectFromDBObject (roomID, attr, callback) {
     // Remove the internal DB _id field
     var attributes = _.omit(attr, '_id');
     
@@ -235,15 +248,15 @@ function buildObjectFromDBObject (roomID, attr) {
     data.attributes.hasContent = false;
     
     GridStore.exist(mongoConnector.db, attributes.id, function(err, result) {
-    	if(err) { throw err; }
-    	if(result){
+    	if (err) { throw err; }
+    	if (result) {
     		//console.log ("File " + attributes.id + "  exist");
     		data.attributes.hasContent = true;
             data.attributes.contentAge = new Date().getTime();	
     	}
+    	
+    	callback(data);
     });
-    
-    return data;
 }
 /**
  *  Get room data or create room, if doesn't exist yet.
@@ -285,8 +298,9 @@ mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
                 self.getRoomData(roomID, context, callback, oldRoomId);
             });
         } else {
-            var room = buildObjectFromDBObject(roomID, obj);
-            callback(room);
+            buildObjectFromDBObject(roomID, obj, function(room) {
+                callback(room);
+            });
         } 
     });
 }
@@ -434,8 +448,9 @@ mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
                 console.warn("ERROR: mongoConnector.getObjectData room with id: " + objectID + " in room " + roomID + " not found: " + err);
                 callback(false);
             } else { 
-                var data = buildObjectFromDBObject(roomID, room);
-                callback(data);
+                buildObjectFromDBObject(roomID, room, function(data) {
+                    callback(data);
+                });
             }
         });
         
@@ -447,8 +462,9 @@ mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
                 console.warn("ERROR: mongoConnector.getObjectData object with id: " + objectID + " in room " + roomID + " not found: " + err);
                 callback(false);
             } else {
-                var data = buildObjectFromDBObject(roomID, obj);
-                callback(data);
+                buildObjectFromDBObject(roomID, obj, function(data) {
+                    callback(data);
+                });
             }
         });
     }
