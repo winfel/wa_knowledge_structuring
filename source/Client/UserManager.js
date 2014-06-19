@@ -47,7 +47,7 @@ UserManager.modifyRole = function(object, role, grant) {
   });
 };
 
-UserManager.storeTabCache = function(objectList, cache, initTabs) {
+UserManager.storeTabCache = function(objectList, cache) {
   // get current user -- FIXME
   var username = GUI.username;
 
@@ -55,7 +55,6 @@ UserManager.storeTabCache = function(objectList, cache, initTabs) {
   Modules.SocketClient.serverCall('umStoreTabCache', {
     'objectlist': objectList,
     'cache': cache,
-    'initTabs': initTabs,
     'username': username
   });
 };

@@ -46,6 +46,15 @@ PaperObject.register = function(type) {
   }, true);
 
   this.registerAction('Store in Tab-List', function(object) {
+    var destination = object.getAttribute('destination');
+
+    if (!destination) {
+      var random = new Date().getTime() - 1296055327011;
+
+      object.setAttribute('destination', random);
+      destination = random;
+    }
+    
     GUI.tabs.addTab(object.getAttribute('name')+" (PaperObject)",object.getAttribute('destination'),object.id);
     GUI.tabs.redrawTabContent();
 

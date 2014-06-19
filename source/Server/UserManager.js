@@ -91,7 +91,7 @@ UserManager.init = function(theModules) {
           /* for each entry in cache: get important data and store it in the
           response object */
           objectCache.find({id:entryInCache},{},function(e,docs){
-            if(typeof docs != 'undefined'){
+            if(typeof docs != 'undefined' && docs.length > 0){
 
               responseObject.cache.push({id:docs[0].id,
                 isPO:docs[0].isPO,
