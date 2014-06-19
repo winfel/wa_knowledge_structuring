@@ -52,7 +52,7 @@ Viewer.createRepresentation = function(parent) {
   $rep.attr({id: this.getAttribute('id')});
   $rep.append(body);
 
-  var $viewer = $(body).addClass('paperWriter');
+  var $viewer = $(body).addClass('paperViewer');
   
   var moveArea = $("<div>");
   moveArea.addClass("moveArea");
@@ -77,8 +77,32 @@ Viewer.createRepresentation = function(parent) {
 
   request.done(function(html) {
     //$rep.append($(html).find("body").html());
-    var $tmp = $(html.replace(/^[\s\S]*<body.*?>|<\/body>[\s\S]*$/g, ''));
-    $viewer.append($tmp);
+    //$('head').append('<link rel="stylesheet" href="style2.css" type="text/css" />');
+    var $html = $.parseHTML( html );
+    
+    var $head = $("head");
+    $.each( $html, function( i, el ) {
+      
+      // Rename the sidebar id
+      if(el.id == "sidebar") {
+        el.id = "sidebar-pdf";
+      }
+      
+      // Rename the sidebar id from the style sheets...
+      if(el.nodeName.toLowerCase() == "style") {
+        var innerhtml = el.innerHTML.replace(/#sidebar/g, "#sidebar-pdf");
+        el.innerHTML = innerhtml;
+        $head.append(el);
+      }
+      
+      // Append the document content...
+      if(el.id == "page-container") {
+        $viewer.append(el);
+      }
+    });
+    
+//    var $tmp = $(html.replace(/^[\s\S]*<body.*?>|<\/body>[\s\S]*$/g, ''));
+//    $viewer.append($tmp);
   });
 
   request.fail(function(jqXHR, textStatus) {
