@@ -198,6 +198,15 @@ app.get('/getRoomHierarchy', function(req, res, next) {
     });
 });
 
+app.get("/getPaper/:roomID/:objectID/", function(req, res, next) {
+  var context = {username: "dummy"};
+  res.set('Content-Type', 'text/html');
+  res.set('Content-Disposition', 'inline; filename="paper.html"');
+  var data = Modules.Connector.getContent(req.params.roomID, req.params.objectID, context);
+  res.send(200, new Buffer(data));
+  return;
+});
+
 // p3 might specify a content age
 app.get('/getContent/:roomID/:objectID/:p3/:hash', function(req, res, next) {
 	var objectAdditionalContent = req.params.objectID.match(/(.+?)\.(.+)/);
