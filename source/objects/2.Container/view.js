@@ -139,10 +139,13 @@ Container.drawContent = function(rep){
 
 	var newCategoryIcon = document.createElement("img");
 	$(newCategoryIcon).attr("src", "/guis.common/images/icon-lupe.png").attr("alt", "");
-	$(newCategoryIcon).attr("width", "30").attr("height", "30");
+	$(newCategoryIcon).attr("width", "30").attr("height", "30");	
+	$('#tableimage').append(newCategoryIcon);
+
+	var newID = "tableimage"+rep.id;
+	$('#tableimage').attr('id',newID);
 
 
-	$("#tableimage").append(newCategoryIcon);
 
 	/* add Popover */
 	$(newCategoryIcon).jPopover({
@@ -164,25 +167,8 @@ Container.drawContent = function(rep){
                 		'<button id= "searchButton" type="submit" height="30"><img src="/guis.common/images/icon-lupe.png" alt="Suchen" width="22" height="22"></button>'
              ); 
 
-            }    
 
-        /* Clear textfield and uncheck checkboxes */
-        /*
-         onClose: function(domEl, popover){         	
-         	$('#textName').val('');
-         	$("#checkName").prop("checked", false);
-         	$("#checkTag").prop("checked", false);
-         	$("#checkTag").prop("checked", false);
-         	$("#checkHTML").prop("checked", false);
-         	$("#checkBild").prop("checked", false);
-         };
-		*/
-
-	});
-
-
-
-	/* Click event for search button in popover */
+		           /* Click event for search button in popover */
 	$('#searchButton').on("click",function(){
 		console.log("Button pressed");
 
@@ -204,7 +190,35 @@ Container.drawContent = function(rep){
 
 		/* TODO: Use values as input for search/filter */
 
-	}) 	
+
+		/* Close popover */
+		popover.hide();
+
+		/* Clear textfield and uncheck checkboxes */ 
+         	$('#textName').val('');
+         	$("#checkName").prop("checked", false);
+         	$("#checkTag").prop("checked", false);
+         	$("#checkTag").prop("checked", false);
+         	$("#checkPDF").prop("checked", false);
+         	$("#checkHTML").prop("checked", false);
+         	$("#checkBild").prop("checked", false);
+         
+		
+
+	}) 
+
+
+            }
+
+
+
+
+
+	});
+
+
+
+	
 
 }
 
