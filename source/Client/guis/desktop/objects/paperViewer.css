@@ -8,11 +8,27 @@ and open the template in the editor.
     Author     : Patrick
 */
 
+.paperViewer {
+  height: 100%;
+}
+
 .paperViewer .moveArea {
-  height: 20px;
+  height: 40px;
   background-color: purple;
+}
+
+.paperViewer #page-container {
+  top: 40px !important;
 }
 
 .paperViewer #sidebar {
   
+}
+
+/* IFRAME solution... */
+.paperViewer iframe {
+	 width: 100%;
+	 height: 100%;
+	 padding: 0;
+	 border: 0;
 }

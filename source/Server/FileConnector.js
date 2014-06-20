@@ -602,7 +602,7 @@ fileConnector.copyContentFromFile=function(roomID, objectID, sourceFilename, con
 */
 fileConnector.getContent=function(roomID,objectID,context,callback){
 	
-	this.Modules.Log.debug("Get content (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+	//this.Modules.Log.debug("Get content (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
 
 	var filebase=this.Modules.Config.filebase;
 	
@@ -629,7 +629,7 @@ fileConnector.getContent=function(roomID,objectID,context,callback){
 		}
 		
 	} catch (e) {
-		this.Modules.Log.debug("Could not read content from file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+		//this.Modules.Log.debug("Could not read content from file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
 		if (callback == undefined) {
 			//sync
 			return false;
