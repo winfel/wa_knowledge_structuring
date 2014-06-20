@@ -149,7 +149,7 @@ GUI.loadGUI = function(step) {
       GUI.loaded = true;
       GUI.hideLogin();
       
-      ObjectManager.paintingUpdate();
+      //ObjectManager.paintingUpdate();
       break;
 
     default:

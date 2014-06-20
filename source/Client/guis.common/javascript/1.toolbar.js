@@ -296,6 +296,7 @@ GUI.initToolbar = function() {
 	}
 	
 	/*add paint button*/
+	/*
 	var homeButton = document.createElement("img");
 	$(homeButton).attr("src", "../../guis.common/images/painting.png").attr("alt", "");
 	$(homeButton).attr("width", "24").attr("height", "24");
@@ -316,6 +317,7 @@ GUI.initToolbar = function() {
 	} else {
 		$(homeButton).bind("mousedown", click);
 	}
+	*/
 
 	/*add paste button*/
 	var pasteButton = document.createElement("img");
