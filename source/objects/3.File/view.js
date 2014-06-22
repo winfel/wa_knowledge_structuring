@@ -36,8 +36,13 @@ File.draw = function(external) {
 	
 	var l = 64 * Math.sqrt(2) * Math.PI,
 		percent = this.getAttribute('progress') || 0.0;
-	$(rep).find("circle").animate({svgStrokeDashOffset:l-l*percent}, 1000);
-	
+	if(percent<1) {
+		$(rep).find("circle").attr('stroke-opacity', 1);
+	}
+	$(rep).find("circle").animate({svgStrokeDashOffset:l-l*percent}, 1500);
+	if(percent==1) {
+		$(rep).find("circle").animate({svgStrokeOpacity: 0}, 1500);
+	}
 	this.createPixelMap();
 }
 
@@ -128,6 +133,7 @@ File.createRepresentation = function(parent) {
 		strokeWidth: 5,
 		'stroke-dasharray': l,
 		'stroke-dashoffset': l,
+		'stroke-opacity' : this.getAttribute('progress')==1?0:1,
 		transform: 'rotate(-90,'+(size/2)+','+(size/2)+')'
 	});
 	//$(progressCircle).attr("fill", "transparent");
