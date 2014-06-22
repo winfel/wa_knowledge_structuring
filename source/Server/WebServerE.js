@@ -389,6 +389,12 @@ app.post('/setContent/:roomID/:objectID/:hash', function(req, res, next) {
     var form = new formidable.IncomingForm();
     
     form.parse(req, function (err, fields, files) {
+		if(files.file.type=='application/x-octet-stream') {
+			// firefox does not specify mime type, so guess from file ending
+			if(files.file.name.match(/\.pdf$/i)) {
+				files.file.type = 'application/pdf';
+			}
+		}
 
         object.copyContentFromFile(files.file.path, function () {
 
