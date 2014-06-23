@@ -582,13 +582,15 @@ ObjectManager.duplicateNew = function (data, context, cbo) {
 		//find all unique objects - als traverse the linked objects
 		var uniqueObjects = {};
 		var findUniqueRelatedObjectsIds = function (objectId) {
-			var object = ObjectManager.getObject(fromRoom, objectId, context);
-			if (!object) return;
-			if (! (objectId in uniqueObjects)) {
-				uniqueObjects[objectId] = object;
-				var linkedObjects = object.getObjectsToDuplicate();
-				linkedObjects.forEach(findUniqueRelatedObjectsIds);
-			}
+			ObjectManager.getObject(fromRoom, objectId, context, function(object){
+				if (!object) return;
+				if (! (objectId in uniqueObjects)) {
+					uniqueObjects[objectId] = object;
+					var linkedObjects = object.getObjectsToDuplicate();
+					linkedObjects.forEach(findUniqueRelatedObjectsIds);
+				}
+			});
+			
 		}
 		objectKeys.forEach(findUniqueRelatedObjectsIds);
 

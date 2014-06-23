@@ -802,7 +802,7 @@ mongoConnector.deletePainting = function(roomID, callback, context) {
 *   @param callback
 */
 mongoConnector.getPaintings = function(roomID, context, callback) {
-    var self = this;
+    var that = this;
 
 	this.Modules.Log.debug("Request paintings (roomID: '" + roomID + "', user: '"
             + this.Modules.Log.getUserFromContext(context) + "')");
@@ -812,22 +812,17 @@ mongoConnector.getPaintings = function(roomID, context, callback) {
 	if (!this.isLoggedIn(context)) {
         this.Modules.Log.error("User is not logged in (roomID: '" + roomID + "', user: '"
                 + this.Modules.Log.getUserFromContext(context) + "')");
-	}
+	}   
 	
-	var paintingsArray = [];
-	var promise = paintings.find( {}, ["name"] );
-	promise.on('complete', function(err, paintings) {         
-		if (err) {
+	// List the existing paintings (return only filenames)
+    GridStore.list(that.db, {filename : true}, function(err, paintings) {
+    	if (err) {
             console.warn("ERROR: mongoConnector.getPaintings: " + err);
             callback(false);
-        } else {   
-        	paintings.forEach(function(painting, index){        		        		
-        		paintings.push(painting.name);
-            });        	
+        } else {    	
             callback(paintings);
-        }
-    });   
-	
+        }    	
+    });	
 }
 
 /**
@@ -939,14 +934,25 @@ mongoConnector.getContentStream = function(roomID, objectID, context) {
 */
 mongoConnector.getPaintingStream = function(roomID, user, context) {
 	var that = this;
-    this.Modules.Log.debug("Get painting stream (roomID: '"+roomID+"', user: '"+user+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");    
+    this.Modules.Log.debug("Get painting stream (roomID: '" + roomID+"', user: '" + 
+    			user + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");    
     var filename = user;
            
     var readStream = gfs.createReadStream({
 	    filename: filename
 	});
+    
+    
+    readStream.on('data', function(data) {
+    	console.log("Reading data from file -- " + filename);
+    });
+    
+    readStream.on('end', function() { 
+    	console.log("Read stream for file -- " + filename + " -- ended!!"); 
+    });
+    
     readStream.on("error", function(err) {
-    	that.Modules.Log.error("Error reading file: " + filename);
+    	that.Modules.Log.error("Error reading file: " + filename + " error type: " + err);
     });
 
     return readStream;
