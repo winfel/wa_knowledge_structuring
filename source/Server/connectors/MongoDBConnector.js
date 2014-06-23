@@ -9,6 +9,7 @@
 "use strict";
 
 var ROOM_TYPE   = 'Room';
+var SUBROOM_TYPE   = 'Subroom';
 var TRASH_ROOM  = 'trash';
 
 var mongoConnector = {};
@@ -156,7 +157,7 @@ mongoConnector.mayInsert = function(roomID, connection, callback) {
  * @param callback
  */
 mongoConnector.listRooms = function(callback) {
-    var promise =  rooms.find(); // return a promise
+    var promise =  objects.find({type: ROOM_TYPE}); // return a promise
     promise.on('complete', function(err, rooms){
     	if (err || rooms === undefined || rooms.length === 0) {
             console.warn("ERROR mongoConnector.listRooms err : " + err);
@@ -291,12 +292,13 @@ mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
                 obj.parent = oldRoomId;
             }
             
-            var promise = self.saveRoom(roomID, obj, context);
+            var promise = saveObject(obj);
             promise.on('success', function(doc) {
                 self.Modules.Log.debug("Created room (roomID: '" + roomID + "', user: '" + self.Modules.Log.getUserFromContext(context) + "', parent:'" + oldRoomId + "')");
                 
                 self.getRoomData(roomID, context, callback, oldRoomId);
-            });
+            });            
+            
         } else {
             buildObjectFromDBObject(roomID, obj, function(room) {
                 callback(room);
@@ -322,21 +324,12 @@ mongoConnector.saveObjectData = function(roomID, objectID, data, cb, context) {
     if (!context) this.Modules.Log.error("Missing context");
     if (!data)    this.Modules.Log.error("Missing data");
     
-    if (data.type == ROOM_TYPE) {
-        var promise = updateRoom(objectID, data);
-        promise.on('complete', function(err, objects) {
-            if (err) {
-                console.warn("mongoConnector.saveObjectData error: " + err);
-            }
-        });
-    } else {
-        var promise = updateObject(objectID, data);
-        promise.on('complete', function(err, objects) {
-            if (err) {
-                console.warn("mongoConnector.saveObjectData error: " + err);
-            }
-        });
-    } 
+    var promise = updateObject(objectID, data);
+    promise.on('complete', function(err, objects) {
+        if (err) {
+            console.warn("mongoConnector.saveObjectData error: " + err);
+        }
+    });
 }
 
 /**
@@ -366,7 +359,7 @@ mongoConnector.createObject = function(roomID, type, data, context, callback) {
          data.mimeType = 'image/png';
          data.hasContent = false;   
      }
-        
+     
      var promise = saveObject(data);
      promise.on('complete', function(err, doc) {
          if (err || doc === undefined || doc.length === 0) {
@@ -376,7 +369,7 @@ mongoConnector.createObject = function(roomID, type, data, context, callback) {
              // console.log("mongoConnector.createObject: Object " + objectID + " was successfully created");
              callback(objectID);
          }
-     });
+     });    
 }
 
 /**
@@ -438,36 +431,18 @@ mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
 
     if (!context) this.Modules.Log.error("Missing context");
     
-    if (roomID == objectID) {
+    var promise = getObjectDataFromDB(objectID);
+    promise.on('complete', function(err, obj) {
         
-        // This is a room
-        var promise = getRoomFromDB(objectID);
-        promise.on('complete', function(err, room) {
-            
-            if (err || !room) {
-                console.warn("ERROR: mongoConnector.getObjectData room with id: " + objectID + " in room " + roomID + " not found: " + err);
-                callback(false);
-            } else { 
-                buildObjectFromDBObject(roomID, room, function(data) {
-                    callback(data);
-                });
-            }
-        });
-        
-    } else {
-        var promise = getObjectDataFromDB(objectID);
-        promise.on('complete', function(err, obj) {
-            
-            if (err || !obj) {
-                console.warn("ERROR: mongoConnector.getObjectData object with id: " + objectID + " in room " + roomID + " not found: " + err);
-                callback(false);
-            } else {
-                buildObjectFromDBObject(roomID, obj, function(data) {
-                    callback(data);
-                });
-            }
-        });
-    }
+        if (err || !obj) {
+            console.warn("ERROR: mongoConnector.getObjectData object with id: " + objectID + " in room " + roomID + " not found: " + err);
+            callback(false);
+        } else {
+            buildObjectFromDBObject(roomID, obj, function(data) {
+                callback(data);
+            });
+        }
+    });
 }
 
 /**
@@ -480,7 +455,8 @@ mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
  */
 mongoConnector.saveRoom = function(roomID, data, context) {
     this.Modules.Log.debug("Save object data (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
-
+    console.log("Save object data (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
+    
     if (!context) this.Modules.Log.error("Missing context");
     if (!data)    this.Modules.Log.error("Missing data");
     
@@ -518,7 +494,7 @@ function getObjectDataFromDB(id) {
 */
 function updateRoom(roomID, data) {
     var aux = _.omit(data, '_id');
-    return rooms.findAndModify({id: roomID}, { $set: aux });
+    return objects.findAndModify({id: roomID}, { $set: aux });
 }
 
 /**
@@ -567,7 +543,7 @@ function moveObjectToTrashRoom(id) {
 *   @param roomID
 */
 function getRoomFromDB(roomID) {
-    return rooms.findOne({id: roomID}); // return a promise
+	return objects.findOne({id: roomID}); // return a promise
 }
 
 /**
@@ -780,17 +756,16 @@ mongoConnector.deletePainting = function(roomID, callback, context) {
 	var username = this.Modules.Log.getUserFromContext(context);
 
     this.Modules.Log.debug("Delete painting (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
-
-	paintings.remove({ name : username}, function (err) {
-		if(err) {
+    
+    GridStore.unlink(this.db, username, function(err, gridStore) { 
+    	if(err) {
             this.Modules.Log.error("Could not delete painting (roomID: '" + roomID + "', user: '"
                     + this.Modules.Log.getUserFromContext(context) + "')");
 			callback(false);
 		} else {
-			removeObjectsContentFromDB(username);
 			callback();
 		}
-	});
+    });
 }
 
 /**
@@ -944,11 +919,11 @@ mongoConnector.getPaintingStream = function(roomID, user, context) {
     
     
     readStream.on('data', function(data) {
-    	console.log("Reading data from file -- " + filename);
+    	//console.log("Reading data from file -- " + filename);
     });
     
     readStream.on('end', function() { 
-    	console.log("Read stream for file -- " + filename + " -- ended!!"); 
+    	//console.log("Read stream for file -- " + filename + " -- ended!!"); 
     });
     
     readStream.on("error", function(err) {
@@ -995,10 +970,20 @@ mongoConnector.remove = function(roomID, objectID, context, callback) {
             console.warn("ERROR: mongoConnector.remove: Error trying to remove object " + objectID + " in room " + roomID + " : " + err);
             if (!_.isUndefined(callback)) callback(false);
         } else {
-        	if(roomID == TRASH_ROOM){
-        		removeObjectsContentFromDB(objectID); 
+        	if(roomID == TRASH_ROOM){ // if the object is in the trash room, delete its content as well
+        		GridStore.unlink(mongoConnector.db, objectID, function(err, gridStore) { 
+        			if(err) {
+        				 this.Modules.Log.error("Could not delete object's content (roomID: '" + roomID + "', user: '"
+        		                    + this.Modules.Log.getUserFromContext(context) + "')");
+        				 if (!_.isUndefined(callback)) callback(false);
+        			} else {
+       				 	if (!_.isUndefined(callback)) callback(true);
+        			}
+        		});
+        	} else {
+        		if (!_.isUndefined(callback)) callback(true);	
         	}
-            if (!_.isUndefined(callback)) callback(true);
+        	
         }
     }); 
 }
