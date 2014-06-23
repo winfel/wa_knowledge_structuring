@@ -24,8 +24,6 @@ Container.draw=function(external){
 		}
 	}
 	
-	var that=this;
-
 	this.updateInnerHeight();
 	this.adjustControls();
 }
@@ -35,14 +33,17 @@ Container.updateInnerHeight = function() {
 	
 	var rep=this.getRepresentation();
 
-	$(rep).find("body").css("height", ($(rep).attr("height"))+"px");
-	$(rep).find("body").css("width", ($(rep).attr("width"))+"px");
 	$(rep).css("height", ($(rep).attr("height"))+"px");
 	$(rep).css("width", ($(rep).attr("width"))+"px");
 
 	var h = parseInt($(rep).attr("height"));
 	var w = parseInt($(rep).attr("width"));
-	$(rep).find("div").css("height", h-85+"px");
+	
+	$(rep).find("body").css("height", h-5+"px");
+	$(rep).find("body").css("width", w-5+"px");
+	$(rep).find("body").css("border", "2px solid #ccc");
+	
+	$(rep).find("div").css("height", h-55+"px");
 	$(rep).find("div").css("width", w-25+"px");
 	
 }
@@ -54,15 +55,9 @@ Container.createRepresentation = function(parent) {
 
 	rep.dataObject=this;
 	
-	var body = document.createElement("body");
-
-	$(rep).append(body);
-
 	$(rep).attr("id", this.getAttribute('id'));
 	
 	this.setAttribute("name", "Sample Container");
-
-	this.initGUI(rep);
 	
 	Container.drawContent(rep);
 	
@@ -77,35 +72,47 @@ Container.adjustControls = function() {
 
 Container.drawContent = function(rep){
 
-	//delete old content	
-	$(rep).find("#containment-wrapper").remove();
+	var that = this;
 
-	//create new content
-	$(	'<table class="headline" bgcolor=#CCFFFF><tr>'+
-		'<th id ="containername" width="100"><h3>Sample Container</h3></th>'+
-		'<th id ="tableimage" width="35"></th>'+
-		'<th id ="sortingcriterion" width="100"></th>'+
-		'</tr></table>'+
-		'<div id="containment-wrapper">'+
-		'<ul id="sortablefiles">'+
-		'<li class="ui-state-default">1</li>'+
-		'<li class="ui-state-default">2</li>'+
-		'<li class="ui-state-default">3</li>'+
-		'<li class="ui-state-default">4</li>'+
-		'<li class="ui-state-default">5</li>'+
-		'<li class="ui-state-default">6</li>'+
-		'<li class="ui-state-default">7</li>'+
-		'<li class="ui-state-default">8</li>'+
-		'<li class="ui-state-default">9</li>'+
-		'<li class="ui-state-default">10</li>'+
-		'<li class="ui-state-default">11</li>'+
-		'<li class="ui-state-default">12</li>'+
-		'<li class="ui-state-default">13</li>'+
-		'<li class="ui-state-default">14</li>'+
-		'</ul>'+
-		'</div>'
-		).appendTo($(rep).children());
+	var body = document.createElement("body");
 
+	var compiled = _.template($( "script#container-template" ).html());
+
+	 var heading = "Sample Container";
+
+    var templateData = {
+        heading : heading
+    }
+
+
+    $(body).append(
+        compiled(templateData)
+    );
+	
+	
+	for(var i = 1; i<15; i++){
+		$(body).find("#sortablefiles").append('<li class="ui-state-default">'+i+'</li>');
+	}
+	
+	   
+    $(body).find( "button:first" ).button({
+      icons: {
+        primary: "ui-icon-search"
+      },
+      text: false
+    }).next().button({
+      icons: {
+        primary: "ui-icon-arrowthick-2-n-s",
+        secondary: "ui-icon-triangle-1-s"
+      },
+      text: false
+    });
+  
+	
+	$(rep).append(body);
+	
+	this.initGUI(rep);
+				
 	//$(rep).find("#sortablefiles").sortable({ containment: "#containment-wrapper" });
 	$(rep).find("#sortablefiles").disableSelection();
 
@@ -125,30 +132,12 @@ Container.drawContent = function(rep){
 
 	$(rep).find("#containment-wrapper").css("width", "450px");
 	$(rep).find("#containment-wrapper").css("height", "300px");
-	$(rep).find("#containment-wrapper").css("border", "2px solid #ccc");
-	$(rep).find("#containment-wrapper").css("padding", "10px");
+	$(rep).find("#containment-wrapper").css("padding", "9px");
 	$(rep).find("#containment-wrapper").css("overflow", "auto");
-	$(rep).find("#sortingcriterion").append('<form action="select.htm"><select name="ordering">'+
-		'<option>alphabetic asc.</option>'+
-		'<option>alphabetic desc.</option>'+
-		'<option>size asc.</option>'+
-		'<option>size desc.</option>'+
-		'<option>type</option>'+
-		'</select></form>');
 	
 
-	var newCategoryIcon = document.createElement("img");
-	$(newCategoryIcon).attr("src", "/guis.common/images/icon-lupe.png").attr("alt", "");
-	$(newCategoryIcon).attr("width", "30").attr("height", "30");	
-	$('#tableimage').append(newCategoryIcon);
-
-	var newID = "tableimage"+rep.id;
-	$('#tableimage').attr('id',newID);
-
-
-
-	/* add Popover */
-	$(newCategoryIcon).jPopover({
+	/* add Search/Filter-Popover */
+	$(body).find( "button:first" ).jPopover({
          //positionOffsetY : $("#containment-wrapper").height()-7,
          onSetup : function(domEl, popover) {
 
@@ -165,36 +154,35 @@ Container.drawContent = function(rep){
                 		'<input id = "checkBild" type="checkbox"> Bilddateien'+
                 		'</p><br>'+
                 		'<button id= "searchButton" type="submit" height="30"><img src="/guis.common/images/icon-lupe.png" alt="Suchen" width="22" height="22"></button>'
-             ); 
+            ); 
 
 
-		           /* Click event for search button in popover */
-	$('#searchButton').on("click",function(){
-		console.log("Button pressed");
+		    /* Click event for search button in popover */
+			$('#searchButton').on("click",function(){
+			console.log("Button pressed");
 
-		/* Get value from textfield and selected checkboxes */
-		var textfieldValue = $('#textName').val();
-		var checkboxName = $('#checkName').prop('checked');
-		var checkboxTag = $('#checkTag').prop('checked');
-		var checkboxPDF = $('#checkPDF').prop('checked');
-		var checkboxHTML = $('#checkHTML').prop('checked');
-		var checkboxBild = $('#checkBild').prop('checked');
+			/* Get value from textfield and selected checkboxes */
+			var textfieldValue = $('#textName').val();
+			var checkboxName = $('#checkName').prop('checked');
+			var checkboxTag = $('#checkTag').prop('checked');
+			var checkboxPDF = $('#checkPDF').prop('checked');
+			var checkboxHTML = $('#checkHTML').prop('checked');
+			var checkboxBild = $('#checkBild').prop('checked');
 		
-		/* Output values */
-		console.log(textfieldValue);
-		console.log(checkboxName);
-		console.log(checkboxTag);
-		console.log(checkboxPDF);
-		console.log(checkboxHTML);
-		console.log(checkboxBild);
+			/* Output values */
+			console.log(textfieldValue);
+			console.log(checkboxName);
+			console.log(checkboxTag);
+			console.log(checkboxPDF);
+			console.log(checkboxHTML);
+			console.log(checkboxBild);
 
-		/* TODO: Use values as input for search/filter */
+			/* TODO: Use values as input for search/filter */
 
+			/* Close popover */
+			popover.hide();
 
-		/* Close popover */
-		popover.hide();
-
-		/* Clear textfield and uncheck checkboxes */ 
+			/* Clear textfield and uncheck checkboxes */ 
          	$('#textName').val('');
          	$("#checkName").prop("checked", false);
          	$("#checkTag").prop("checked", false);
@@ -203,23 +191,79 @@ Container.drawContent = function(rep){
          	$("#checkHTML").prop("checked", false);
          	$("#checkBild").prop("checked", false);
          
-		
-
-	}) 
-
-
-            }
-
-
-
-
-
-	});
-
-
-
+			});
+		}
+	});	
 	
+	/* add Sort-Popover */
+	$(body).find( "button:first" ).next().jPopover({
+         //positionOffsetY : $("#containment-wrapper").height()-7,
+         onSetup : function(domEl, popover) {
 
+             var page = popover.addPage(GUI.translate('Sort'));
+             var section = page.addSection();
+
+		     var element = section.addElement(
+                		'<p>Criterion</p>'+
+						'<select id="criterion">'+
+						'<option value="name">By Name</option>'+
+						'<option value="date">By Date</option>'+
+						'</select>'+
+						'<p>Order</p>'+
+						'<select id="order">'+
+						'<option value="AZ">From A to Z</option>'+
+						'<option value="ZA">From Z to A</option>'+
+						'</select>'+
+						'<button id= "submitButton">Submit</button>'
+            ); 
+			
+			var sel = document.getElementById('criterion');
+			sel.onchange = function() {
+			
+				console.log(this.value);
+				
+				var order = document.getElementById('order');
+				order.innerHTML = '';
+				
+				if(this.value=="name"){	
+					$('<option value="AZ">From A to Z</option><option value="ZA">From Z to A</option>').appendTo(order);
+					
+				}
+				else{
+					$('<option value="newold">From new to old</option><option value="oldnew">From old to new</option>').appendTo(order);
+				}
+			}
+
+			/* Click event for search button in popover */
+			$('#submitButton').on("click",function(){
+				console.log("Button pressed");
+
+					/* Get value from textfield and selected checkboxes */
+					/*
+					var textfieldValue = $('#textName').val();
+					var checkboxName = $('#checkName').prop('checked');
+					var checkboxTag = $('#checkTag').prop('checked');
+					var checkboxPDF = $('#checkPDF').prop('checked');
+					var checkboxHTML = $('#checkHTML').prop('checked');
+					var checkboxBild = $('#checkBild').prop('checked');
+				*/
+					/* Output values */
+					/*
+					console.log(textfieldValue);
+					console.log(checkboxName);
+					console.log(checkboxTag);
+					console.log(checkboxPDF);
+					console.log(checkboxHTML);
+					console.log(checkboxBild);
+				*/
+					/* TODO: Use values as input for search/filter */
+			
+				/* Close popover */
+				popover.hide();
+			});				
+		}
+	});	
+	
 }
 
 

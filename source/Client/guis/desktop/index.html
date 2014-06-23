@@ -405,6 +405,21 @@
       <input class="discussion-input" placeholder=Texteingabe>
       </div>
     </script>
+	
+	  <script type="text/template" id="container-template">
+	  	<table class="headline" bgcolor=#CCFFFF><tr>
+		<th id ="containername" width="350"><%- heading %></th>
+		<th id ="buttons" width="100">
+		<button>Search/Filter</button>
+		<button>Sort</button>
+		</th>
+		</tr></table>
+		<div id="containment-wrapper">
+		<ul id="sortablefiles">
+		</ul>
+		</div>
+    </script>
+	
     <!-- END: Underscore Template Definition. -->
 
   </body>
