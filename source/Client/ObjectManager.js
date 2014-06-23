@@ -460,8 +460,8 @@ ObjectManager.loadPaperWriter = function(roomid, byBrowserNav, index, callback) 
           ObjectManager.removeLocally(obj);
         }
 
-        if (!roomid)
-          roomid = 'public';
+        if (!roomid) roomid = 'public';
+        
         self.currentRoomID[index] = roomid;
 
         if (!byBrowserNav && index === 'left') {
@@ -472,8 +472,7 @@ ObjectManager.loadPaperWriter = function(roomid, byBrowserNav, index, callback) 
           GUI.defaultZoomPanState(index, true);
         }
 
-        if (callback)
-          setTimeout(callback, 1200);
+        if (callback) setTimeout(callback, 1200);
       }
 
     });

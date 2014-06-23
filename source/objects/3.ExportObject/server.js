@@ -31,10 +31,10 @@ theObject.onEnter = function(object, oldData, newData) {
             
             // read the html from etherpad
             Modules.EtherpadController.pad.getHTML({
-                padID : object.getAttribute('destination')
+                padID : object.getAttribute('padID')
             }, function(error, data) {
                 if (error) {
-                    console.error("Error pad.getText", error.message);
+                    console.error("Error pad.getText: ", error.message);
                     return;
                 }
 
@@ -45,10 +45,10 @@ theObject.onEnter = function(object, oldData, newData) {
             
             // first read the html from etherpad
             Modules.EtherpadController.pad.getHTML({
-                padID : object.getAttribute('destination')
+                padID : object.getAttribute('padID')
             }, function(error, data) {
                 if (error) {
-                    console.error("Error pad.getText", error.message);
+                    console.error("Error pad.getText: ", error.message);
                     return;
                 }
 
@@ -64,11 +64,11 @@ theObject.onEnter = function(object, oldData, newData) {
             
             // first read the html from etherpad
             Modules.EtherpadController.pad.getHTML({
-                padID : object.getAttribute('destination')
+                padID : object.getAttribute('padID')
             }, function(error, data) {
                 
                 if (error) {
-                    console.error("Error pad.getText", error.message);
+                    console.error("Error pad.getText: ", error.message);
                     return;
                 }
 
@@ -81,10 +81,10 @@ theObject.onEnter = function(object, oldData, newData) {
             });
         } else {
             Modules['EtherpadController'].pad.getText({
-                padID : object.getAttribute('destination')
+                padID : object.getAttribute('padID')
             }, function(error, data) {
                 if (error) {
-                    console.error("Error pad.getText", error.message);
+                    console.error("Error pad.getText: ", error.message);
                     return;
                 }
 
