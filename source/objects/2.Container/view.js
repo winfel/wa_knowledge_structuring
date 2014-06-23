@@ -102,8 +102,7 @@ Container.drawContent = function(rep){
       text: false
     }).next().button({
       icons: {
-        primary: "ui-icon-arrowthick-2-n-s",
-        secondary: "ui-icon-triangle-1-s"
+        primary: "ui-icon-arrowthick-2-n-s"
       },
       text: false
     });
@@ -159,37 +158,36 @@ Container.drawContent = function(rep){
 
 		    /* Click event for search button in popover */
 			$('#searchButton').on("click",function(){
-			console.log("Button pressed");
 
-			/* Get value from textfield and selected checkboxes */
-			var textfieldValue = $('#textName').val();
-			var checkboxName = $('#checkName').prop('checked');
-			var checkboxTag = $('#checkTag').prop('checked');
-			var checkboxPDF = $('#checkPDF').prop('checked');
-			var checkboxHTML = $('#checkHTML').prop('checked');
-			var checkboxBild = $('#checkBild').prop('checked');
-		
-			/* Output values */
-			console.log(textfieldValue);
-			console.log(checkboxName);
-			console.log(checkboxTag);
-			console.log(checkboxPDF);
-			console.log(checkboxHTML);
-			console.log(checkboxBild);
+				/* Get value from textfield and selected checkboxes */
+				var textfieldValue = $('#textName').val();
+				var checkboxName = $('#checkName').prop('checked');
+				var checkboxTag = $('#checkTag').prop('checked');
+				var checkboxPDF = $('#checkPDF').prop('checked');
+				var checkboxHTML = $('#checkHTML').prop('checked');
+				var checkboxBild = $('#checkBild').prop('checked');
+			
+				/* Output values */
+				console.log(textfieldValue);
+				console.log(checkboxName);
+				console.log(checkboxTag);
+				console.log(checkboxPDF);
+				console.log(checkboxHTML);
+				console.log(checkboxBild);
 
-			/* TODO: Use values as input for search/filter */
+				/* TODO: Use values as input for search/filter */
 
-			/* Close popover */
-			popover.hide();
+				/* Close popover */
+				popover.hide();
 
-			/* Clear textfield and uncheck checkboxes */ 
-         	$('#textName').val('');
-         	$("#checkName").prop("checked", false);
-         	$("#checkTag").prop("checked", false);
-         	$("#checkTag").prop("checked", false);
-         	$("#checkPDF").prop("checked", false);
-         	$("#checkHTML").prop("checked", false);
-         	$("#checkBild").prop("checked", false);
+				/* Clear textfield and uncheck checkboxes */ 
+				$('#textName').val('');
+				$("#checkName").prop("checked", false);
+				$("#checkTag").prop("checked", false);
+				$("#checkTag").prop("checked", false);
+				$("#checkPDF").prop("checked", false);
+				$("#checkHTML").prop("checked", false);
+				$("#checkBild").prop("checked", false);
          
 			});
 		}
@@ -223,6 +221,7 @@ Container.drawContent = function(rep){
 				console.log(this.value);
 				
 				var order = document.getElementById('order');
+				
 				order.innerHTML = '';
 				
 				if(this.value=="name"){	
@@ -236,34 +235,27 @@ Container.drawContent = function(rep){
 
 			/* Click event for search button in popover */
 			$('#submitButton').on("click",function(){
-				console.log("Button pressed");
 
-					/* Get value from textfield and selected checkboxes */
-					/*
-					var textfieldValue = $('#textName').val();
-					var checkboxName = $('#checkName').prop('checked');
-					var checkboxTag = $('#checkTag').prop('checked');
-					var checkboxPDF = $('#checkPDF').prop('checked');
-					var checkboxHTML = $('#checkHTML').prop('checked');
-					var checkboxBild = $('#checkBild').prop('checked');
-				*/
-					/* Output values */
-					/*
-					console.log(textfieldValue);
-					console.log(checkboxName);
-					console.log(checkboxTag);
-					console.log(checkboxPDF);
-					console.log(checkboxHTML);
-					console.log(checkboxBild);
-				*/
-					/* TODO: Use values as input for search/filter */
+				/* Get value from the selection boxes */				
+				var select1 = document.getElementById("criterion");
+				var select1Value = select1.options[select1.selectedIndex].text;
+					
+				var select2 = document.getElementById("order");
+				var select2Value = select2.options[select2.selectedIndex].text;
+					
+
+				/* Output values */
+				console.log(select1Value);
+				console.log(select2Value);
+
+					
+				/* TODO: Use values as input for sort */
 			
 				/* Close popover */
 				popover.hide();
 			});				
 		}
 	});	
-	
 }
 
 
