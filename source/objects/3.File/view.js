@@ -37,11 +37,11 @@ File.draw = function(external) {
 	var l = 64 * Math.sqrt(2) * Math.PI,
 		percent = this.getAttribute('progress') || 0.0;
 	if(percent<1) {
-		$(rep).find("circle").attr('stroke-opacity', 1);
+		$(rep).find("circle.progress").attr('stroke-opacity', 1);
 	}
-	$(rep).find("circle").animate({svgStrokeDashOffset:l-l*percent}, 1500);
+	$(rep).find("circle.progress").animate({svgStrokeDashOffset:l-l*percent}, 1500);
 	if(percent==1) {
-		$(rep).find("circle").animate({svgStrokeOpacity: 0}, 1500);
+		$(rep).find("circle.progress").animate({svgStrokeOpacity: 0}, 1500);
 	}
 	this.createPixelMap();
 }
@@ -128,13 +128,14 @@ File.createRepresentation = function(parent) {
 		l = 2 * Math.PI * r;
 	var progressCircle = GUI.svg.circle(rep, size/2,size/2, r
 	, {
+		class: 'progress',
 		fill: 'transparent',
 		stroke: 'orange',
 		strokeWidth: 5,
 		'stroke-dasharray': l,
 		'stroke-dashoffset': l,
 		'stroke-opacity' : this.getAttribute('progress')==1?0:1,
-		transform: 'rotate(-90,'+(size/2)+','+(size/2)+')'
+		transform: 'rotate(-90,'+(size/2)+','+(size/2)+')',
 	});
 	//$(progressCircle).attr("fill", "transparent");
 	//$(progressCircle).animate({svgStrokeDashOffset:l-l*percent}, 5000);
