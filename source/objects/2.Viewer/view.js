@@ -41,16 +41,45 @@ Viewer.draw = function(external) {
  };*/
 
 Viewer.initGUI = function(rep) {
+	var self = this;
+
 	var initializeTextHighlighter = function() {
+
+		//get the iframe contents and apply the textHighlighter
 		var frameDocument = $(rep).find('iframe').contents();
 		frameDocument.textHighlighter({
+			// register a function to call after each highlight process
 			onAfterHighlight: function(highlights, range) {
+				// TODO: maybe postprocess highlights here, set different style and transmit to server
 				console.log('selected "' + range + '" and created ' + highlights.length + ' highlight(s)!');
+				// save highlights to server
+				//var jsonStr = highlighter.serializeHighlights();
+				//self.setAttribute('highlights', jsonStr);
 			}
 		});
 		console.log('highlighting for object ' + rep.id + ' activated');
+
+		// get the highlighter object
+		var highlighter = frameDocument.getHighlighter();
+
+		// add function to button for testing loading of highlights
+		$(rep).find('.loadHighlightings').click(function(){
+			var jsonStr = self.getAttribute('highlights');
+			if(jsonStr != undefined && jsonStr != '')
+				highlighter.deserializeHighlights(jsonStr);
+		});
+		// add function to button for testing saving of highlights
+		$(rep).find('.saveHighlightings').click(function(){
+			var jsonStr = highlighter.serializeHighlights();
+			self.setAttribute('highlights', jsonStr);
+		});
+		// add function to button for testing removage of highlights
+		$(rep).find('.resetHighlightings').click(function(){
+			highlighter.removeHighlights();
+		});
 	};
 
+	// activate highlighter for iframe when iframe document is loaded
 	$(rep).find('iframe').load(initializeTextHighlighter);  // Non-IE
 	$(rep).find('iframe').ready(initializeTextHighlighter); // IE
 };
@@ -69,6 +98,9 @@ Viewer.createRepresentation = function(parent) {
   var moveArea = $("<div>");
   moveArea.addClass("moveArea");
   $viewer.append(moveArea);
+  moveArea.html('<input type="button" class="loadHighlightings" value="load highlightings" />' +
+		'<input type="button" class="saveHighlightings" value="save highlightings" />' +
+		'<input type="button" class="resetHighlightings" value="reset highlightings" />');
 
   /* IFRAME */
   $viewer.append("<iframe></iframe>");
