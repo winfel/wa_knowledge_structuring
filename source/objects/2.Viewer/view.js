@@ -64,7 +64,7 @@ Viewer.createRepresentation = function(parent) {
     iframe_loaded = true;
   });
 
-  iFrame.attr('src', 'http://' + window.location.hostname + ':8080/getPaper/public/cd7e6155-3a12-49c7-9bbd-a8e3098bd65d.html/');
+  iFrame.attr('src', 'http://' + window.location.hostname + ':8080/getPaper/public/' + this.getAttribute('file') + '.html/');
 
   /* IN HTML */
 //  var request = $.ajax({
