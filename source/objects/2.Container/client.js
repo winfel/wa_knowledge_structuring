@@ -18,3 +18,25 @@ Container.afterSetAttribute=function(){
 
 }
 */
+
+
+Container.getFiles = function(){
+	
+	var o = new Array();
+	
+	var objects = ObjectManager.getObjects();
+	
+	var key;
+	for (key in objects) {
+		
+		if(objects[key].type == "File"){
+		
+			o.push(objects[key]);
+			
+		}
+		
+	}
+	
+	return o;
+	
+}

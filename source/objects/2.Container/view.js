@@ -49,7 +49,7 @@ Container.updateInnerHeight = function() {
 }
 
 
-Container.createRepresentation = function(parent) {
+Container.createRepresentation = function(parent) { 	
 	
 	var rep = GUI.svg.other(parent,"foreignObject");
 
@@ -60,6 +60,8 @@ Container.createRepresentation = function(parent) {
 	this.setAttribute("name", "Sample Container");
 	
 	Container.drawContent(rep);
+	
+	window.setTimeout(this.addFiles(this.getFiles()), 500);
 	
 	return rep;
 	
@@ -88,14 +90,9 @@ Container.drawContent = function(rep){
     $(body).append(
         compiled(templateData)
     );
-	
-	
-	for(var i = 1; i<15; i++){
-		$(body).find("#sortablefiles").append('<li class="ui-state-default">'+i+'</li>');
-	}
-	
-	   
-    $(body).find( "button:first" ).button({
+	 
+		  
+	$(body).find( "button:first" ).button({
       icons: {
         primary: "ui-icon-search"
       },
@@ -111,23 +108,13 @@ Container.drawContent = function(rep){
 	$(rep).append(body);
 	
 	this.initGUI(rep);
-				
+	
 	//$(rep).find("#sortablefiles").sortable({ containment: "#containment-wrapper" });
 	$(rep).find("#sortablefiles").disableSelection();
 
 	$(rep).find("#sortablefiles").css("list-style-type", "none");
 	$(rep).find("#sortablefiles").css("margin", "10px");
 	$(rep).find("#sortablefiles").css("padding", "10px");
-
-	$(rep).find("#sortablefiles li").css("margin", "3px 3px 3px 0");
-	$(rep).find("#sortablefiles li").css("padding", "1px");
-	$(rep).find("#sortablefiles li").css("float", "left");
-	$(rep).find("#sortablefiles li").css("width", "90px");
-	$(rep).find("#sortablefiles li").css("height", "90px");
-	$(rep).find("#sortablefiles li").css("line-height", "90px");
-	$(rep).find("#sortablefiles li").css("font-size", "4em");
-	$(rep).find("#sortablefiles li").css("text-align", "center");
-	$(rep).find("#sortablefiles li").css("vertical-align", "middle");
 
 	$(rep).find("#containment-wrapper").css("width", "450px");
 	$(rep).find("#containment-wrapper").css("height", "300px");
@@ -264,4 +251,34 @@ Container.rename = function(newName){
 	var rep=this.getRepresentation();
 
 	$(rep).find("#containername").html(newName);
+		
+}
+
+Container.addFiles = function(files){
+
+	var rep=this.getRepresentation();
+	
+	$(rep).find("#sortablefiles").html("");
+	
+	var key;
+	for(key in files){
+		var name = files[key].getAttribute('name');
+		var type = name.split('.')[1];
+		
+		if(name.length>9){
+			name = name.substring(0,8)+ "..." + type;
+		}
+	
+		$(rep).find("#sortablefiles").append('<li class="ui-state-default">'+name+'</li>');
+	
+		$(rep).find("#sortablefiles li").css("margin", "3px 3px 3px 0");
+		$(rep).find("#sortablefiles li").css("padding", "1px");
+		$(rep).find("#sortablefiles li").css("float", "left");
+		$(rep).find("#sortablefiles li").css("width", "90px");
+		$(rep).find("#sortablefiles li").css("height", "90px");
+		$(rep).find("#sortablefiles li").css("line-height", "90px");
+		$(rep).find("#sortablefiles li").css("font-size", "1em");
+		$(rep).find("#sortablefiles li").css("text-align", "center");
+		$(rep).find("#sortablefiles li").css("vertical-align", "middle");
+	}	
 }
