@@ -898,12 +898,16 @@ GeneralObject.saveMoveStartPosition = function() {
  * @param {DomEvent} event The DOM event
  */
 GeneralObject.moveStart = function(event) {
-
+	var self;
   if (!this.id || this.id == "") {
-    var self = ObjectManager.getObject($(this).closest("svg>*").attr("id"));
+    self = ObjectManager.getObject($(this).closest("svg>*").attr("id"));
   } else {
-    var self = ObjectManager.getObject(this.id);
+    self = ObjectManager.getObject(this.id);
   }
+
+	if(self == undefined) { // rescue: try first parent with id attribute
+		self = ObjectManager.getObject($(this).parents('[id]').attr("id"));
+	}
 
   if (!self.selected)
     self.select();
