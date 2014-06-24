@@ -40,6 +40,21 @@ Viewer.draw = function(external) {
  
  };*/
 
+Viewer.initGUI = function(rep) {
+	var initializeTextHighlighter = function() {
+		var frameDocument = $(rep).find('iframe').contents();
+		frameDocument.textHighlighter({
+			onAfterHighlight: function(highlights, range) {
+				console.log('selected "' + range + '" and created ' + highlights.length + ' highlight(s)!');
+			}
+		});
+		console.log('highlighting for object ' + rep.id + ' activated');
+	};
+
+	$(rep).find('iframe').load(initializeTextHighlighter);  // Non-IE
+	$(rep).find('iframe').ready(initializeTextHighlighter); // IE
+};
+
 Viewer.createRepresentation = function(parent) {
   var rep = GUI.svg.other(parent, "foreignObject");
   rep.dataObject = this;
