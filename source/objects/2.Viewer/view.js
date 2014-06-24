@@ -66,6 +66,9 @@ Viewer.createRepresentation = function(parent) {
 
   iFrame.attr('src', 'http://' + window.location.hostname + ':8080/getPaper/public/' + this.getAttribute('file') + '.html/');
 
+  //$(rep).attr('transform', 'scale(0.75)'); // scales this object: caution, selection of text works buggy then! maybe test viewBox
+  // or use pdf2htmlEx's function Viewer.rescale(ratio)
+
   /* IN HTML */
 //  var request = $.ajax({
 //    url: 'http://' + window.location.hostname + ':8080/getPaper/public/cd7e6155-3a12-49c7-9bbd-a8e3098bd65d.html/',
