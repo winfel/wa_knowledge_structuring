@@ -57,11 +57,9 @@ Container.createRepresentation = function(parent) {
 	
 	$(rep).attr("id", this.getAttribute('id'));
 	
-	this.setAttribute("name", "Sample Container");
+	this.drawContent(rep);
 	
-	Container.drawContent(rep);
-	
-	window.setTimeout(this.addFiles(this.getFiles()), 500);
+	this.upd();
 	
 	return rep;
 	
@@ -80,19 +78,31 @@ Container.drawContent = function(rep){
 
 	var compiled = _.template($( "script#container-template" ).html());
 
-	 var heading = "Sample Container";
+	 var heading = "Container";
 
     var templateData = {
         heading : heading
     }
-
+	
 
     $(body).append(
         compiled(templateData)
     );
+	
+	$(rep).append(body);
+	
+	this.initGUI(rep);
 	 
-		  
 	$(body).find( "button:first" ).button({
+      icons: {
+        primary: "ui-icon-refresh"
+      },
+      text: false
+	  })
+	  .click(function() {
+		that.upd()
+      })
+	  .next().button({
       icons: {
         primary: "ui-icon-search"
       },
@@ -103,11 +113,7 @@ Container.drawContent = function(rep){
       },
       text: false
     });
-  
 	
-	$(rep).append(body);
-	
-	this.initGUI(rep);
 	
 	//$(rep).find("#sortablefiles").sortable({ containment: "#containment-wrapper" });
 	$(rep).find("#sortablefiles").disableSelection();
@@ -123,7 +129,7 @@ Container.drawContent = function(rep){
 	
 
 	/* add Search/Filter-Popover */
-	$(body).find( "button:first" ).jPopover({
+	$(body).find( "button:first" ).next().jPopover({
          //positionOffsetY : $("#containment-wrapper").height()-7,
          onSetup : function(domEl, popover) {
 
@@ -181,7 +187,7 @@ Container.drawContent = function(rep){
 	});	
 	
 	/* add Sort-Popover */
-	$(body).find( "button:first" ).next().jPopover({
+	$(body).find( "button:first" ).next().next().jPopover({
          //positionOffsetY : $("#containment-wrapper").height()-7,
          onSetup : function(domEl, popover) {
 
@@ -204,9 +210,7 @@ Container.drawContent = function(rep){
 			
 			var sel = document.getElementById('criterion');
 			sel.onchange = function() {
-			
-				console.log(this.value);
-				
+							
 				var order = document.getElementById('order');
 				
 				order.innerHTML = '';
@@ -229,15 +233,12 @@ Container.drawContent = function(rep){
 					
 				var select2 = document.getElementById("order");
 				var select2Value = select2.options[select2.selectedIndex].text;
-					
-
-				/* Output values */
-				console.log(select1Value);
-				console.log(select2Value);
-
-					
-				/* TODO: Use values as input for sort */
-			
+										
+				that.setAttribute('sortingCriterion', select1Value);
+				that.setAttribute('sortingOrder', select2Value);
+				
+				that.addFiles(that.sortFiles(that.getFiles()));
+							
 				/* Close popover */
 				popover.hide();
 			});				
@@ -259,17 +260,20 @@ Container.addFiles = function(files){
 	var rep=this.getRepresentation();
 	
 	$(rep).find("#sortablefiles").html("");
-	
+		
 	var key;
 	for(key in files){
 		var name = files[key].getAttribute('name');
 		var type = name.split('.')[1];
 		
 		if(name.length>9){
+			name = name.split('.')[0];
 			name = name.substring(0,8)+ "..." + type;
 		}
 	
-		$(rep).find("#sortablefiles").append('<li class="ui-state-default">'+name+'</li>');
+		var c = 'file'+key;
+	
+		$(rep).find("#sortablefiles").append('<li id='+c+' class=ui-state-default tabindex="-1">'+name+'</li>');
 	
 		$(rep).find("#sortablefiles li").css("margin", "3px 3px 3px 0");
 		$(rep).find("#sortablefiles li").css("padding", "1px");
@@ -279,6 +283,18 @@ Container.addFiles = function(files){
 		$(rep).find("#sortablefiles li").css("line-height", "90px");
 		$(rep).find("#sortablefiles li").css("font-size", "1em");
 		$(rep).find("#sortablefiles li").css("text-align", "center");
-		$(rep).find("#sortablefiles li").css("vertical-align", "middle");
+		$(rep).find("#sortablefiles li").css("vertical-align", "middle");	
+					
+		/*			
+		$(rep).find('#'+c).click(function(){
+			$(rep).find('#'+c).focus();
+		});
+		*/
 	}	
+}
+
+Container.upd = function(){
+
+	this.addFiles(this.sortFiles(this.getFiles()));
+
 }

@@ -34,11 +34,17 @@ Container.register=function(type){
     this.standardData.width=475;
     this.standardData.height=325;
 
-	this.registerAttribute('name', {type: 'text', changedFunction: function(object, value) {
+	this.registerAttribute('name', {type: 'text', standard: 'Container', changedFunction: function(object, value) {
 		var obj = {id:object.id, name:value}; 
 		object.rename(value);
 		
     }});
+	
+	this.registerAttribute('sortingCriterion', {type: 'text', standard: 'By Name', hidden: true});
+	this.registerAttribute('sortingOrder', {type: 'text', standard: 'From A to Z', hidden: true});
+	this.registerAttribute('searchString', {type: 'text', hidden: true});
+	this.registerAttribute('searchBy', {type: 'text', hidden: true});
+	this.registerAttribute('searchFor', {type: 'text', hidden: true});
 	
 	this.registerAction('Edit',function(){
 		$.each(ObjectManager.getSelected(), function(key, object) {
