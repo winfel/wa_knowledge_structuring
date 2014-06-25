@@ -60,7 +60,7 @@ ObjectManager.registerType = function (type, constr) {
 ObjectManager.remove = function (obj) {
 
 	// Send remove to connector
-	Modules.Connector.remove(obj.inRoom, obj.id, obj.context);
+	Modules.Connector.removeObject(obj.inRoom, obj.id, obj.context);
 
 	// Inform clients about remove.
 	obj.updateClients('objectDelete');
