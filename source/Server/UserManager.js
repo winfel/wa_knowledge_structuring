@@ -50,6 +50,10 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('umAddUser', UserManager.addUser);
   Dispatcher.registerCall('umRemoveUser', UserManager.removeUser);
 
+  Dispatcher.registerCall('umSetDataOfSpaceWithDest', UserManager.setDataOfSpaceWithDest);
+  Dispatcher.registerCall('umGetDataOfSpaceWithDest', UserManager.getDataOfSpaceWithDest);
+  Dispatcher.registerCall('umRemoveDataOfSpaceWithDest', UserManager.removeDataOfSpaceWithDest);
+
   Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);
 
   Dispatcher.registerCall('enterPublicSpace', UserManager.enterPublicSpace);
@@ -347,6 +351,34 @@ UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
   var shouldInclude = ["Textarea#PublicSpaceInfo#20#45#100#1#content;This is the private space of user "+UserManager.getConnectionBySocket(socketOrUser).user.username];
 
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
+};
+
+UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID){
+     var ss = db.get('SpaceStorage');
+
+     // if data is not included: store it
+    ss.find({'destination':data.destination,'key':data.key}, {}, function(e, docs){
+        if(typeof docs == 'undefined' || docs.length == 0){
+            ss.insert({'destination':data.destination, 'key':data.key, 'value':data.value});
+        }
+    });
+};
+
+UserManager.removeDataOfSpaceWithDest = function(socketOrUser, data, responseID){
+     var ss = db.get('SpaceStorage');
+
+     ss.remove({'destination': data.destination, 'key':data.key});
+};
+
+UserManager.getDataOfSpaceWithDest = function(socketOrUser, data, responseID){
+     var ss = db.get('SpaceStorage');
+    ss.find({'destination':data.destination, 'key':data.key}, {}, function(e, docs){
+      if(typeof docs != 'undefined' && docs.length > 0){
+        Modules.SocketServer.sendToSocket(socketOrUser, "umGetDataOfSpaceWithDest" + data.destination + data.key, docs);
+      }else{
+        Modules.SocketServer.sendToSocket(socketOrUser, "umGetDataOfSpaceWithDest" + data.destination + data.key, 'error');
+      }
+    });
 };
 
 /**

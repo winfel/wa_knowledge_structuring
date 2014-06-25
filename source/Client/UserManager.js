@@ -76,6 +76,36 @@ UserManager.getTabCache = function(callback) {
   });
 };
 
+UserManager.setDataOfSpaceWithDest = function(dest,key,value){
+  Modules.SocketClient.serverCall('umSetDataOfSpaceWithDest', {
+    'destination': dest,
+    'key':key,
+    'value':value
+  });
+};
+
+UserManager.removeDataOfSpaceWithDest = function(dest,key){
+  Modules.SocketClient.serverCall('umRemoveDataOfSpaceWithDest', {
+    'destination': dest,
+    'key':key,
+  });
+};
+
+UserManager.getDataOfSpaceWithDest = function(dest,key,callback){
+  Dispatcher.registerCall("umGetDataOfSpaceWithDest" + dest + key, function(data) {
+    // call the callback
+    callback(data);
+
+    // deregister
+    Dispatcher.removeCall("umGetDataOfSpaceWithDest" + dest + key);
+  });
+
+  Modules.SocketClient.serverCall('umGetDataOfSpaceWithDest', {
+    'destination': dest,
+    'key':key
+  });
+};
+
 /**
 * broadcasts a change of a name to all other users. 
 * They might need that information for their tab-bar
