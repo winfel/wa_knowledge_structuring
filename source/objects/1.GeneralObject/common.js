@@ -181,7 +181,7 @@ GeneralObject.register = function(type) {
   this.actionManager.init(this);
 
 
-  this.registerAttribute('id', {type: 'number', readonly: true});
+  this.registerAttribute('id', {type: 'text', readonly: true});
   this.registerAttribute('type', {type: 'text', readonly: true});
   this.registerAttribute('name', {type: 'text'});
 

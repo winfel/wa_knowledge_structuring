@@ -66,6 +66,7 @@ ObjectManager.getPrototype = function(objType) {
  * @returns {string} 
  */
 ObjectManager.getIndexOfObject = function(objectID) {
+    
   // room?
   for (var index in this.currentRoomID) {
     if (this.currentRoomID[index] === objectID) {
@@ -78,7 +79,8 @@ ObjectManager.getIndexOfObject = function(objectID) {
       return index;
     }
   }
-  return false;
+  
+  return 'left';
 }
 
 /**

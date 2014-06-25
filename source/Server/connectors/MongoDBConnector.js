@@ -178,6 +178,7 @@ mongoConnector.listRooms = function(callback) {
 * @param callback
 */
 mongoConnector.getInventory = function(roomID, context, callback) {
+    roomID = roomID.toString();
     var self = this;
     this.Modules.Log.debug("Request inventory (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
 
@@ -238,7 +239,7 @@ mongoConnector.getInventory = function(roomID, context, callback) {
 function buildObjectFromDBObject (roomID, attr, callback) {
     // Remove the internal DB _id field
     var attributes = _.omit(attr, '_id');
-    
+    roomID = roomID.toString();
     var data = {};
     
     data.attributes = attributes;
@@ -272,6 +273,7 @@ function buildObjectFromDBObject (roomID, attr, callback) {
  * @returns {*}
  */
 mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
+    roomID = roomID.toString();
     this.Modules.Log.debug("Get data for room (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
 
     if (!context) this.Modules.Log.error("Missing context");
@@ -298,7 +300,7 @@ mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
             promise.on('success', function(doc) {
                 self.Modules.Log.debug("Created room (roomID: '" + roomID + "', user: '" + self.Modules.Log.getUserFromContext(context) + "', parent:'" + oldRoomId + "')");
                 
-                self.getRoomData(roomID, context, callback, oldRoomId);
+                self.getRoomData(obj.id, context, callback, oldRoomId);
             });            
             
         } else {
@@ -320,6 +322,7 @@ mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
  * @param context
  */
 mongoConnector.saveObjectData = function(roomID, objectID, data, cb, context) {
+    roomID = roomID.toString();
     this.Modules.Log.debug("Save object data (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '"
             + this.Modules.Log.getUserFromContext(context) + "')");
 
@@ -347,46 +350,50 @@ mongoConnector.saveObjectData = function(roomID, objectID, data, cb, context) {
 *
 */
 mongoConnector.createObject = function(roomID, type, data, context, callback) {
-     if (!context) this.Modules.Log.error("Missing context");
-     this.Modules.Log.debug("Create object (roomID: '" + roomID + "', type: '" + type + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
-        
-     var uuid = require('node-uuid');
-     var objectID = uuid.v4();
-        
-     data.type = type;
-     data.id = objectID;
-     data.inRoom = roomID;
-        
-     if (type == "Paint" || type == "Highlighter") {
-         data.mimeType = 'image/png';
-         data.hasContent = false;   
-     }
-     
-     var promise = saveObject(data);
-     promise.on('complete', function(err, doc) {
-         if (err || doc === undefined || doc.length === 0) {
-             console.warn("ERROR mongoConnector.createObject : " + err);
-             callback(false);
-         } else {
-             // console.log("mongoConnector.createObject: Object " + objectID + " was successfully created");
-             callback(objectID);
-         }
-     });    
+    roomID = roomID.toString();
+    if (!context) this.Modules.Log.error("Missing context");
+    this.Modules.Log.debug("Create object (roomID: '" + roomID + "', type: '" + type + "', user: '"
+            + this.Modules.Log.getUserFromContext(context) + "')");
+
+    var uuid = require('node-uuid');
+    var objectID = uuid.v4();
+
+    data.type = type;
+    data.id = objectID;
+    data.inRoom = roomID;
+
+    if (type == "Paint" || type == "Highlighter") {
+        data.mimeType = 'image/png';
+        data.hasContent = false;
+    }
+
+    var promise = saveObject(data);
+    promise.on('complete', function(err, doc) {
+        if (err || doc === undefined || doc.length === 0) {
+            console.warn("ERROR mongoConnector.createObject : " + err);
+            callback(false);
+        } else {
+            // console.log("mongoConnector.createObject: Object " + objectID + "
+            // was successfully created");
+            callback(objectID);
+        }
+    });
 }
 
 /**
-*   duplicate an object on the persistence layer
-*   to directly work on the new object, specify an after function
-*   after(objectID)
-*   @function duplicateObject
-*   @param roomID
-*   @param toRoom
-*   @param objectID
-*   @param context
-*   @param callback
-*
-*/
+ * duplicate an object on the persistence layer to directly work on the new
+ * object, specify an after function after(objectID)
+ * 
+ * @function duplicateObject
+ * @param roomID
+ * @param toRoom
+ * @param objectID
+ * @param context
+ * @param callback
+ * 
+ */
 mongoConnector.duplicateObject = function(roomID, toRoom, objectID, context, callback) {
+    roomID = roomID.toString();
     this.Modules.Log.debug("Duplicate object (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "', toRoom: '" + toRoom + "')");
     
     if (!context) this.Modules.Log.error("Missing context");
@@ -428,6 +435,7 @@ mongoConnector.duplicateObject = function(roomID, toRoom, objectID, context, cal
 *   @param context
 */
 mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
+    roomID = roomID.toString();
     this.Modules.Log.debug("Get object data (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '"
             + this.Modules.Log.getUserFromContext(context) + "')");
 
@@ -456,6 +464,7 @@ mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
  * @param context
  */
 mongoConnector.saveRoom = function(roomID, data, context) {
+    roomID = roomID.toString();
     this.Modules.Log.debug("Save object data (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
     console.log("Save object data (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
     
@@ -574,6 +583,7 @@ function getObjectsByRoom (roomID) {
 *   @param callback
 */
 mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
+    roomID = roomID.toString();
     var self = this;
 	var result = {
 		'rooms' : {},
@@ -632,6 +642,7 @@ mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
  * @param inputIsStream
  */
 mongoConnector.saveContent = function(roomID, objectID, content, callback, context, inputIsStream) {
+    roomID = roomID.toString();
 	var that = this;
 	
     this.Modules.Log.debug("Save content from string (roomID: '" + roomID
@@ -788,6 +799,7 @@ mongoConnector.deletePainting = function(roomID, callback, context) {
 *   @param callback
 */
 mongoConnector.getPaintings = function(roomID, context, callback) {
+    roomID = roomID.toString();
     var that = this;
 
 	this.Modules.Log.debug("Request paintings (roomID: '" + roomID + "', user: '"
@@ -848,7 +860,7 @@ mongoConnector.copyContentFromFile = function(roomID, objectID, sourceFilename, 
  * 
  */
 mongoConnector.getContent = function(roomID, objectID, context, callback) {   
-    
+    roomID = roomID.toString();
     this.Modules.Log.debug("Get content (roomID: '" + roomID + "', objectID: '"
 		+ objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
     
@@ -897,6 +909,7 @@ mongoConnector.getContent = function(roomID, objectID, context, callback) {
 *   
 */
 mongoConnector.getContentStream = function(roomID, objectID, context) {
+    roomID = roomID.toString();
     var that = this;
     this.Modules.Log.debug("Get content stream (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
     
@@ -965,6 +978,7 @@ mongoConnector.getTrashRoom = function(context, callback) {
  * @param callback
  */
 mongoConnector.removeObject = function(roomID, objectID, context, callback) {
+    roomID = roomID.toString();
 	this.Modules.Log.debug("Remove object (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '"
 			+ this.Modules.Log.getUserFromContext(context) + "')");
 	
@@ -980,8 +994,8 @@ mongoConnector.removeObject = function(roomID, objectID, context, callback) {
 }
 
 mongoConnector.moveObjectToTrashRoom = function(roomID, objectID, context, callback) {
-	
-	 this.getObjectData(roomID, objectID, context, function(objectData) {        
+    roomID = roomID.toString();
+	this.getObjectData(roomID, objectID, context, function(objectData) {        
         
 		var promise = moveObjectToTrashRoom(objectID);
 		promise.on('complete', function(err, obj) {         
@@ -1014,7 +1028,7 @@ mongoConnector.moveObjectToTrashRoom = function(roomID, objectID, context, callb
 }
 
 mongoConnector.removeObjectFromDB = function(roomID, objectID, context, callback) {
-	
+    roomID = roomID.toString();
 	this.getObjectData(roomID, objectID, context, function(objectData) {        
 		var objectType = objectData.attributes.type;
 		
@@ -1123,6 +1137,7 @@ mongoConnector.removeObjectFromDB = function(roomID, objectID, context, callback
 *	@param callback
 */
 mongoConnector.trimImage = function(roomID, objectID, context, callback) {
+    roomID = roomID.toString();
     var self = this;
     
     if (!context) this.Modules.Log.error("Missing context");
@@ -1262,6 +1277,7 @@ mongoConnector.getInlinePreviewProviders = function() {
 *	@param callback
 */
 mongoConnector.getInlinePreviewDimensions = function(roomID, objectID, mimeType, context, callback) {
+    roomID = roomID.toString();
     var self = this;
     
     if (!context) throw new Error('Missing context in getInlinePreviewDimensions');
@@ -1300,6 +1316,7 @@ mongoConnector.getInlinePreviewDimensions = function(roomID, objectID, mimeType,
 *	@param callback
 */
 mongoConnector.getInlinePreview = function(roomID, objectID, mimeType, context, callback) {
+    roomID = roomID.toString();
     var self = this;
 
     if (!context) throw new Error('Missing context in getInlinePreview');
@@ -1340,6 +1357,7 @@ mongoConnector.getInlinePreview = function(roomID, objectID, mimeType, context, 
 *	@param callback
 */
 mongoConnector.getInlinePreviewMimeType = function(roomID, objectID, context, callback) {
+    roomID = roomID.toString();
 	var self = this;
 	
     if (!context) throw new Error('Missing context in getInlinePreviewMimeType');
