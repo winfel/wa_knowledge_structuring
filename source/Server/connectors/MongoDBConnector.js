@@ -10,6 +10,7 @@
 
 var ROOM_TYPE   = 'Room';
 var SUBROOM_TYPE   = 'Subroom';
+var FILE_TYPE   = 'File';
 var PUBLIC_ROOM  = 'public';
 var TRASH_ROOM  = 'trash';
 
@@ -580,23 +581,6 @@ mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
 		'roots' : []
 	};
 	
-	var descendants=[];
-	var stack=[];
-	var root = objects.findOne({id:'107588685161'});
-	descendants.push(root.id);
-	stack.push(root);
-	
-	while (stack.length > 0){
-	    var currentnode = stack.pop();
-	    objects.find({parent:currentnode.id}, function(err, children){
-		    children.forEach(function(child) {
-		    	descendants.push(child.id);
-		        stack.push(child);
-		    });
-	    });
-	}
-	
-	
 	//filter only "accessible" rooms
 	var filter = function(rooms, cb) {
 		async.filter(rooms,
@@ -971,25 +955,6 @@ mongoConnector.getTrashRoom = function(context, callback) {
     this.getRoomData(TRASH_ROOM, context, callback);
 }
 
-
-//function used to recursively delete all objects in a room
-function recursiveDeletionObjectFromDB(i, callback) {
-	if (i < objects.length) {
-		var promise3 = removeObjectFromDB(objects[i].objectID);
-		promise3.on('complete', function(err, objects) {									        		
-	        if (err) {
-	            console.warn("ERROR: mongoConnector.remove: Error trying to remove object " + objectID + " in room " + roomID + " : " + err);
-	            if (!_.isUndefined(callback)) callback(false);
-	        } else {
-	        	recursiveDeletionObjectFromDB(i+1);
-	        }
-	    });
-    } else {
-    	if (!_.isUndefined(callback)) callback(true);	
-    }
-}
-
-
 /**
  * remove an object from the persistence layer
  * 
@@ -1005,15 +970,14 @@ mongoConnector.removeObject = function(roomID, objectID, context, callback) {
 	
     if (!context) this.Modules.Log.error("Missing context");
     
-    if(roomID == TRASH_ROOM){
-    	//delete completely from the DB
+    if (roomID == TRASH_ROOM) {
+    	// delete completely from the DB
     	this.removeObjectFromDB(roomID, objectID, context, callback);
     } else {    	
-    	//just move to the trash room
+    	// just move to the trash room
     	this.moveObjectToTrashRoom(roomID, objectID, context, callback);    	
     }	 
 }
-
 
 mongoConnector.moveObjectToTrashRoom = function(roomID, objectID, context, callback) {
 	
@@ -1030,7 +994,7 @@ mongoConnector.moveObjectToTrashRoom = function(roomID, objectID, context, callb
 	        	// find the corresponding Room object and set the 'parent' attribute to 'trash'
 	        	
 	        	var objectType = objectData.attributes.type;	        	
-	        	if (roomID == PUBLIC_ROOM && objectType == SUBROOM_TYPE){
+	        	if (roomID == PUBLIC_ROOM && objectType == SUBROOM_TYPE) {
 	        		var roomObjectID = objectData.attributes.destination; 
 	        		objects.update({id: roomObjectID},{ $set: { parent : TRASH_ROOM }}, function(err, doc){
 	        			if (err) {
@@ -1049,13 +1013,12 @@ mongoConnector.moveObjectToTrashRoom = function(roomID, objectID, context, callb
 	});
 }
 
-
 mongoConnector.removeObjectFromDB = function(roomID, objectID, context, callback) {
 	
 	this.getObjectData(roomID, objectID, context, function(objectData) {        
 		var objectType = objectData.attributes.type;
 		
-		if(objectType != ROOM_TYPE) { // if the object to delete is not a Room
+		if (objectType != SUBROOM_TYPE) { // if the object to delete is not a Room
 			var promise = removeObjectFromDB(objectID);
 			promise.on('complete', function(err, obj) {         
 		        if (err) {
@@ -1066,9 +1029,9 @@ mongoConnector.removeObjectFromDB = function(roomID, objectID, context, callback
 		        	// if the object has content, delete its content as well
 		        	
 		        	var objectHasContent = objectData.attributes.hasContent;		        	
-		        	if(objectHasContent != undefined && objectHasContent == true) {
+		        	if (objectHasContent != undefined && objectHasContent == true) {
 	        			GridStore.unlink(mongoConnector.db, objectID, function(err, gridStore) { 
-		        			if(err) {
+		        			if (err) {
 		        				 this.Modules.Log.error("Could not delete object's content (roomID: '" + roomID + "', user: '"
 		        		                    + this.Modules.Log.getUserFromContext(context) + "')");
 		        				 if (!_.isUndefined(callback)) callback(false);
@@ -1083,100 +1046,74 @@ mongoConnector.removeObjectFromDB = function(roomID, objectID, context, callback
 		        }
 		    });
 		} else { // if the object to delete is a Room			
-			/*var descendants=[]
-			var stack=[];
-			var item = objects.findOne({_id:'107588685161'});
-			stack.push(item);
-			while (stack.length>0){
-			    var currentnode = stack.pop();
-			    var children = objects.find({parent:currentnode._id});
-			    while(true === children.hasNext()) {
-			        var child = children.next();
-			        descendants.push(child._id);
-			        stack.push(child);
-			    }
-			}
-			console.log(stack);
-			*/
+		    var roomObjectID = objectData.attributes.destination;
+		    var descendants = [];
+		    var stack = [];
+		    objects.findOne({id: roomObjectID}, function (err, root) {
+		        descendants.push(root.id);
+		        stack.push(root);
+		        
+		        function pushToDescendants() {
+		            var currentnode = stack.pop();
+		            
+		            objects.find({parent:currentnode.id}, function(err, children) {
+		                children.forEach(function(child) {
+		                    descendants.push(child.id);
+		                    stack.push(child);
+		                });
+		                
+		                if (stack.length > 0) pushToDescendants();
+		                else {
+		                    // console.log("Rooms: " + JSON.stringify(descendants));
+		                    objects.find( { inRoom: { $in: descendants }, hasContent: true }, function (err, objectsArray) {
+		                        if (err) {
+                                    this.Modules.Log.error("Could not delete object's content (roomID: '" + roomID + "', user: '"
+                                               + this.Modules.Log.getUserFromContext(context) + "')");
+                                    if (!_.isUndefined(callback)) callback(false);
+                               } else {
+                                    // console.log("objectsArray: " + JSON.stringify(objectsArray));
+    		                        objects.remove( { inRoom: { $in: descendants } }, function (err, data) {
+    	                                if (err) {
+    	                                     this.Modules.Log.error("Could not delete object's content (roomID: '" + roomID + "', user: '"
+    	                                                + this.Modules.Log.getUserFromContext(context) + "')");
+    	                                     if (!_.isUndefined(callback)) callback(false);
+    	                                } else {
+    	                                    
+    	                                    var objectsIDs = [];
+    	                                    objectsArray.forEach(function(obj) {
+    	                                        objectsIDs.push(obj.id);
+    	                                    });
+    	                                    
+    	                                    GridStore.unlink(mongoConnector.db, objectsIDs, function(err, gridStore) {
+    	                                        if (err) {
+    	                                            console.log("unlink err: " + err);
+    	                                        }else {
+    	                                            // console.log("unlink done :) ");
+    	                                        } 
+    	                                    });
+    	                                    
+    	                                    objects.remove( { destination: { $in: descendants } }, function (err, data) {
+    	                                        if (err) {
+    	                                             this.Modules.Log.error("Could not delete object's content (roomID: '" + roomID + "', user: '"
+    	                                                        + this.Modules.Log.getUserFromContext(context) + "')");
+    	                                             if (!_.isUndefined(callback)) callback(false);
+    	                                        } else {
+    	                                            if (!_.isUndefined(callback)) callback(true);
+    	                                        } 
+    	                                    });
+    	                                } 
+    	                            });
+                               }
+		                    });
+		                }
+		            });
+		        }
+		        
+		        pushToDescendants();
+		    });
 		}
-		
-			
 	});	
 }
-
-/*mongoConnector.removeObject1 = function(roomID, objectID, context, callback) {
-    this.Modules.Log.debug("Remove object (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
-    
-    if (!context) this.Modules.Log.error("Missing context");
-    
-    this.getObjectData(roomID, objectID, context, function(objectData) {
-        var objectType = objectData.attributes.type;
-        var objectHasContent = objectData.attributes.hasContent;
-      
-	    var promise;
-	    if(roomID == TRASH_ROOM){
-	    	promise = removeObjectFromDB(objectID);
-	    } else {    	
-	    	promise = moveObjectToTrashRoom(objectID);    	
-	    }
-	    
-	    
-	    
-	    
-	    promise.on('complete', function(err, obj) {         
-	        if (err) {
-	            console.warn("ERROR: mongoConnector.remove: Error trying to remove object " + objectID + " in room " + roomID + " : " + err);
-	            if (!_.isUndefined(callback)) callback(false);
-	        } else {
-	        	if(roomID == TRASH_ROOM){
-	        		if(objectHasContent != undefined && objectHasContent == true) { // if the object has content, delete its content as well
-	        			GridStore.unlink(mongoConnector.db, objectID, function(err, gridStore) { 
-		        			if(err) {
-		        				 this.Modules.Log.error("Could not delete object's content (roomID: '" + roomID + "', user: '"
-		        		                    + this.Modules.Log.getUserFromContext(context) + "')");
-		        				 if (!_.isUndefined(callback)) callback(false);
-		        			} else {
-		       				 	if (!_.isUndefined(callback)) callback(true);
-		        			}
-		        		});
-	        		}
-	        		if(objectType != undefined && objectType == SUBROOM_TYPE) { // if the object is a Subroom delete the Room object as well
-	        			var roomId = objectData.attributes.destination;
-		        		var promise1 = removeRoomFromDB(roomId);		        		
-		        		promise1.on('complete', function(err, obj) {         
-					        if (err) {
-					            console.warn("ERROR: mongoConnector.remove: Error trying to remove object " + objectID + " in room " + roomID + " : " + err);
-					            if (!_.isUndefined(callback)) callback(false);
-					        } else {
-					        	// TODO
-					        	// delete all objects inside the room 
-					        	var promise2 = getObjectsByRoom(roomID);
-					        	
-					        	promise2.on('complete', function(err, objects) {
-					        		
-							        if (err) {
-							            console.warn("ERROR: mongoConnector.remove: Error trying to remove object " + objectID + " in room " + roomID + " : " + err);
-							            if (!_.isUndefined(callback)) callback(false);
-							        } else {							        	
-							        	recursiveDeletionObjectFromDB(0, callback);
-							        } 
-					        	});
-					        		
-					        	if (!_.isUndefined(callback)) callback(true);	
-					        }
-					    });
-	        		}
-	        		
-	        	} else {
-	        		if (!_.isUndefined(callback)) callback(true);	
-	        	}
-	        	
-	        }
-	    });
-    
-    });
-    
-}*/
 
 /**
 *	@function trimImage
