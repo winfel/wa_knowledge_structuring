@@ -42,7 +42,7 @@ Viewer.draw = function(external) {
 
 Viewer.initGUI = function(rep) {
 	var self = this;
-
+	var highlighter;
 	var initializeTextHighlighter = function() {
 
 		//get the iframe contents and apply the textHighlighter
@@ -60,28 +60,28 @@ Viewer.initGUI = function(rep) {
 		console.log('highlighting for object ' + rep.id + ' activated');
 
 		// get the highlighter object
-		var highlighter = frameDocument.getHighlighter();
-
-		// add function to button for testing loading of highlights
-		$(rep).find('.loadHighlightings').click(function(){
-			var jsonStr = self.getAttribute('highlights');
-			if(jsonStr != undefined && jsonStr != '')
-				highlighter.deserializeHighlights(jsonStr);
-		});
-		// add function to button for testing saving of highlights
-		$(rep).find('.saveHighlightings').click(function(){
-			var jsonStr = highlighter.serializeHighlights();
-			self.setAttribute('highlights', jsonStr);
-		});
-		// add function to button for testing removage of highlights
-		$(rep).find('.resetHighlightings').click(function(){
-			highlighter.removeHighlights();
-		});
+		highlighter = frameDocument.getHighlighter();
 	};
 
 	// activate highlighter for iframe when iframe document is loaded
 	$(rep).find('iframe').load(initializeTextHighlighter);  // Non-IE
 	$(rep).find('iframe').ready(initializeTextHighlighter); // IE
+
+	// add function to button for testing loading of highlights
+	$(rep).find('.loadHighlightings').click(function(){
+		var jsonStr = self.getAttribute('highlights');
+		if(jsonStr != undefined && jsonStr != '')
+			highlighter.deserializeHighlights(jsonStr);
+	});
+	// add function to button for testing saving of highlights
+	$(rep).find('.saveHighlightings').click(function(){
+		var jsonStr = highlighter.serializeHighlights();
+		self.setAttribute('highlights', jsonStr);
+	});
+	// add function to button for testing removage of highlights
+	$(rep).find('.resetHighlightings').click(function(){
+		highlighter.removeHighlights();
+	});
 };
 
 Viewer.createRepresentation = function(parent) {
