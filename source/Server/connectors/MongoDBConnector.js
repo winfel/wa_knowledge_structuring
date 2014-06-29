@@ -318,11 +318,11 @@ mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
  * @param roomID
  * @param objectID
  * @param data
- * @param cb not use, left here for compatibility reasons 
+ * @param callback 
  * @param context
  */
-mongoConnector.saveObjectData = function(roomID, objectID, data, cb, context) {
-    roomID = roomID.toString();
+mongoConnector.saveObjectData = function(roomID, objectID, data, callback, context) {
+	roomID = roomID.toString();
     this.Modules.Log.debug("Save object data (roomID: '" + roomID + "', objectID: '" + objectID + "', user: '"
             + this.Modules.Log.getUserFromContext(context) + "')");
 
@@ -333,6 +333,9 @@ mongoConnector.saveObjectData = function(roomID, objectID, data, cb, context) {
     promise.on('complete', function(err, objects) {
         if (err) {
             console.warn("mongoConnector.saveObjectData error: " + err);
+           // if (!_.isUndefined(callback)) callback();
+        } else {
+        	 //if (!_.isUndefined(callback)) callback();
         }
     });
 }
@@ -422,6 +425,33 @@ mongoConnector.duplicateObject = function(roomID, toRoom, objectID, context, cal
                     callback(err, false, false);
                 } else callback(null, newID, objectID);
             });
+        }
+    });
+}
+
+/**
+*   move object/objects from one room to another
+*   @function moveObjects
+*   @param roomID
+*   @param toRoom
+*   @param objectIDs
+*   @param context
+*   @param callback
+*
+*/
+mongoConnector.moveObjects = function(roomID, toRoom, objectIDs, objectAttributes, context, callback) {
+    this.Modules.Log.debug("Move object(s) (roomID: '" + roomID + "', objectIDs: '" + objectIDs + "', user: '" + this.Modules.Log.getUserFromContext(context) + "', toRoom: '" + toRoom + "')");
+    
+    if (!context) this.Modules.Log.error("Missing context");
+    
+    var promise = updateObjectRoom(objectIDs, objectAttributes, toRoom);
+    promise.on('complete', function(err, obj) {        
+        if (err || !obj) {
+            console.warn("ERROR: mongoConnector.move object with id: " + objectID + " in room " + roomID + " not found: " + err);
+            callback(err, null);
+        } else {
+        	console.log(JSON.stringify(obj));
+        	callback(null, objectIDs);
         }
     });
 }
@@ -554,6 +584,16 @@ function removeObjectsContentFromDB(id) {
 */
 function moveObjectToTrashRoom(id) {
     return objects.update({id: id},{ $set: { inRoom : TRASH_ROOM }});
+}
+
+/**
+*   internal
+*   moves an object to the trash room
+*   @param id
+*/
+function updateObjectRoom(objectIDs, objectAttributes, toRoom) {    
+	//return objects.update({id: objectIDs[0]},{ $set: { inRoom : toRoom, x: objectAttributes[objectIDs[0]].x, y: objectAttributes[objectIDs[0]].y  }} );
+	return objects.update({id: { $in: objectIDs}},{ $set: { inRoom : toRoom }}, { multi: true });
 }
 
 /**

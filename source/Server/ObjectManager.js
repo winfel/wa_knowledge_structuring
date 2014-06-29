@@ -555,6 +555,15 @@ var mayReadMultiple = function (fromRoom, files, context, cb) {
  * 5. Update object link targets
  */
 ObjectManager.duplicateNew = function (data, context, cbo) {
+	var fromRoom = data.fromRoom;
+	var toRoom = data.toRoom;
+	var objectIDs = data.objects;
+	var objectAttributes = data.attributes;
+	//console.log(JSON.stringify(data));
+	Modules.Connector.moveObjects(fromRoom, toRoom, objectIDs, objectAttributes, context, cbo);
+}
+
+ObjectManager.duplicateNew2 = function (data, context, cbo) {
 	var cut = data.cut;
 
 	var attributes = data.attributes || {};
