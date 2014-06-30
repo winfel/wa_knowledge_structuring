@@ -348,7 +348,8 @@ UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
 
 UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
-  var shouldInclude = ["Textarea#PublicSpaceInfo#20#45#100#1#content;This is the private space of user "+UserManager.getConnectionBySocket(socketOrUser).user.username];
+  var shouldInclude = ["Textarea#PublicSpaceInfo#20#45#100#1#content;This is the private space of user "+UserManager.getConnectionBySocket(socketOrUser).user.username,
+                       "Container#DefaultContainer#300#45#450#0"];
 
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
