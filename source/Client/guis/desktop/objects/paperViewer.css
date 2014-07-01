@@ -19,10 +19,16 @@ and open the template in the editor.
 
 .paperViewer #page-container {
   top: 40px !important;
+  overflow-x: hidden !important;
+  overflow-y: scroll !important;
 }
 
-.paperViewer #sidebar {
-  
+.paperViewer #sidebar-paper {
+  display: none;
+}
+
+.paperViewer .pd {
+  margin: 0 !important;
 }
 
 /* IFRAME solution... */
