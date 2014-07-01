@@ -139,12 +139,14 @@ Container.drawContent = function(rep){
              var section = page.addSection();
 
              var searchFor;
-             if(that.getAttribute('searchBy').indexOf('Tag') > -1){
-				searchFor = '<input id = "checkName" type="checkbox"> Name &nbsp &nbsp '+
-                			'<input id = "checkTag" type="checkbox" checked> Tag <br><br>';             	
-             }else if(that.getAttribute('searchBy').indexOf('Name') > -1){
-                searchFor = '<input id = "checkName" type="checkbox" checked> Name &nbsp &nbsp '+
-                			'<input id = "checkTag" type="checkbox"> Tag <br><br>';  
+             if(typeof that.getAttribute('searchBy') != 'undefined'){
+             	if(String(that.getAttribute('searchBy')).indexOf('Tag') > -1){
+             		searchFor = '<input id = "checkName" type="checkbox"> Name &nbsp &nbsp '+
+             		'<input id = "checkTag" type="checkbox" checked> Tag <br><br>';             	
+             	}else if(String(that.getAttribute('searchBy')).indexOf('Name') > -1){
+             		searchFor = '<input id = "checkName" type="checkbox" checked> Name &nbsp &nbsp '+
+             		'<input id = "checkTag" type="checkbox"> Tag <br><br>';  
+             	}
              }
 
 		     var element = section.addElement('<input id = "textName" type="text" placeholder="'+that.getAttribute('searchString')+'"/><p>Search by:</p>'+
