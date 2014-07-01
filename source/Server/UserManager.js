@@ -303,6 +303,7 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
       var oContent = "ERROR - Content not defined";
 
       var attr = {x: oX, y: oY, width: oWidth, name: oName , paper: data.roomID};
+      var additionalAtts = []; 
       for(var i = 6; i < oAttsL+6-1; i++){
         if(typeof token[i] != 'undefined'){
           var attToken = token[i].split(';');
@@ -310,10 +311,10 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
           var attName   = attToken[0];
           var attValue  = attToken[1];
 
-          if(attName.indexOf("content") > -1){
+          if(attName.indexOf('content') > -1){
             oContent = attValue;
           }else{
-            attr.attName  = attValue;
+            additionalAtts.push(attName+";"+attValue);
           }
         }
       }
@@ -330,26 +331,40 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
 
       /* if not found: create it */
       if(!found){
-        Modules.ObjectManager.createObject(data.roomID, oType, attr, oContent, context, function(error, obj) {
-        //Modules.Log.debug(obj);
-      });
+        Modules.ObjectManager.createObject(data.roomID, oType, attr, oContent, context, function(error, obj, addAtts) {
+
+          addAtts.forEach(function(item){
+
+            if(typeof item != 'undefined'){
+              var attToken2   = item.split(';');
+
+              var attName2    = attToken2[0];
+              var attValue2   = attToken2[1];
+
+              obj.setAttribute(attName2,attValue2); 
+            }
+          });
+          },additionalAtts);
       }
+      });
 
     });
-  });
-};
+  };
 
 UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
-  var shouldInclude = ["Textarea#PrivateSpaceInfo#20#45#100#1#content;This is the public space"];
+  var shouldInclude = [ "Container#HMI#60#45#500#4#searchBy;Tag#name;HMI#locked;true#searchString;HMI",
+                        "Container#ESS#600#45#500#4#searchBy;Tag#name;ESS#locked;true#searchString;ESS",
+                        "Container#MaA#60#400#500#4#searchBy;Tag#name;MaA#locked;true#searchString;MaA",
+                        "Container#SWT#600#400#500#4#searchBy;Tag#name;SWT#locked;true#searchString;SWT"];
 
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 
 UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
-  var shouldInclude = ["Textarea#PublicSpaceInfo#20#45#100#1#content;This is the private space of user "+UserManager.getConnectionBySocket(socketOrUser).user.username,
-                       "Container#DefaultContainer#300#45#450#0"];
+  var shouldInclude = ["Textarea#PublicSpaceInfo#20#45#100#1#content;This is the private space of user "+
+                          UserManager.getConnectionBySocket(socketOrUser).user.username];
 
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };

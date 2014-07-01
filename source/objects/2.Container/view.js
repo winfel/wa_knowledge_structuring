@@ -3,12 +3,14 @@
 *
 *    University of Paderborn, 2014
 *
-*/
+*/	
 
 Container.draw=function(external){
-
 	var rep=this.getRepresentation();
 	
+	/* manual check for a changed name - we need to save time ;-)*/
+	$(rep).find("#containername").html(this.getAttribute('name'));
+
 	this.drawDimensions(external);
 	
 	this.setViewWidth(this.getAttribute('width'));
@@ -136,10 +138,18 @@ Container.drawContent = function(rep){
              var page = popover.addPage(GUI.translate('Search/Filter'));
              var section = page.addSection();
 
-		     var element = section.addElement('<input id = "textName" type="text" /><p>Search by:</p>'+
+             var searchFor;
+             if(that.getAttribute('searchBy').indexOf('Tag') > -1){
+				searchFor = '<input id = "checkName" type="checkbox"> Name &nbsp &nbsp '+
+                			'<input id = "checkTag" type="checkbox" checked> Tag <br><br>';             	
+             }else if(that.getAttribute('searchBy').indexOf('Name') > -1){
+                searchFor = '<input id = "checkName" type="checkbox" checked> Name &nbsp &nbsp '+
+                			'<input id = "checkTag" type="checkbox"> Tag <br><br>';  
+             }
+
+		     var element = section.addElement('<input id = "textName" type="text" placeholder="'+that.getAttribute('searchString')+'"/><p>Search by:</p>'+
                 		'<p>'+
-                		'<input id = "checkName" type="checkbox"> Name &nbsp &nbsp '+
-                		'<input id = "checkTag" type="checkbox"> Tag <br><br>'+
+                		searchFor +
                 		'<p>Search for:</p>'+
                 		'<input id = "checkPDF" type="checkbox"> PDF<br>'+
                 		'<input id = "checkHTML" type="checkbox"> HTML<br>'+

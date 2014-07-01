@@ -249,7 +249,7 @@ ObjectManager.getInventory = ObjectManager.getObjects;
  *
  *
  **/
-ObjectManager.createObject = function (roomID, type, attributes, content, context, callback) {
+ObjectManager.createObject = function (roomID, type, attributes, content, context, callback, addAtts) {
 
 
 	//TODO send error to client if there is a rights issue here
@@ -285,7 +285,7 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
 		}
 
 		Modules.EventBus.emit("room::" + roomID + "::action::createObject", {objectID: id});
-		callback(false, object);
+		callback(false, object, addAtts);
 	});
 }
 
