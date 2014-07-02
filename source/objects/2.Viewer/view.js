@@ -90,7 +90,7 @@ Viewer.createRepresentation = function(parent) {
   rep.dataObject = this;
   var $rep = $(rep);
 
-  var body = document.createElement("body");
+  var body = document.createElement("div");
   $rep.attr({id: this.getAttribute('id')});
   $rep.append(body);
 
@@ -104,6 +104,32 @@ Viewer.createRepresentation = function(parent) {
           '<input type="button" class="saveHighlightings" value="save highlightings" />' +
           '<input type="button" class="resetHighlightings" value="reset highlightings" />');
 
+  //this.createRepresentationAjax($body);
+  this.createRepresentationIframe($body);
+  
+  this.initGUI(rep);
+
+  return rep;
+};
+
+Viewer.createRepresentationIframe = function($body) {
+  var $iframe = $("<iframe>");
+  
+  $body.append($iframe);
+  
+  var iframe_loaded = false;
+  $iframe.one('load', function() {
+    iframe_loaded = true;
+    
+  });
+
+  $iframe.attr('src', 'http://' + window.location.hostname + ':8080/getPaper/public/' + this.getAttribute('file') + '.html/');
+  //$iframe.attr('src', 'http://' + window.location.hostname + ':8080/getPaper/public/cd7e6155-3a12-49c7-9bbd-a8e3098bd65d.html/');
+  
+  //$('head', $iframe).append('<link type="text/css" href="/guis/desktop/objects/paperViewer.css" rel="Stylesheet">');
+};
+
+Viewer.createRepresentationAjax = function($body) {
   var request = $.ajax({
     url: 'http://' + window.location.hostname + ':8080/getPaper/public/cd7e6155-3a12-49c7-9bbd-a8e3098bd65d.html/',
     cache: false
@@ -128,10 +154,6 @@ Viewer.createRepresentation = function(parent) {
   request.fail(function(jqXHR, textStatus) {
     console.log("I am sorry, I was not able to load the requested paper.");
   });
-
-  this.initGUI(rep);
-
-  return rep;
 };
 
 
