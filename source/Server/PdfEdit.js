@@ -48,6 +48,8 @@ var PdfEdit = {
 
 		converter.success(function() {
 			//data.object.setContentFromFile(outputfile);
+			if(!callback)
+				callback = function(){};
 			Modules.ObjectManager.createObject(
 				data.object.inRoom,
 				'HiddenFile',

@@ -227,33 +227,52 @@ app.get('/getRoomHierarchy', function(req, res, next) {
   });
 });
 
-app.get("/getPaper/:roomID/:objectID", function(req, res, next) {
-  var context = {username: "dummy"};
-  res.set('Content-Type', 'text/html');
-  res.set('Content-Disposition', 'inline; filename="paper.html"');
+app.get("/getPaper/:roomID/:objectID/:hash", function(req, res, next) {
+	var context = {username: "dummy"};
+	res.set('Content-Type', 'text/html');
+	res.set('Content-Disposition', 'inline; filename="paper.html"');
+	if (req.params.objectID != '0')
+	{
+		Modules.Connector.getContent(req.params.roomID, req.params.objectID + '.html', req.context, function(data) {
+			if(data === false)
+			{
+				res.send(404, "no html content");
+				return;
+			}
 
-  var data;
-  if (req.params.objectID != '0')
-    data = Modules.Connector.getContent(req.params.roomID, req.params.objectID + ".html", context);
-  else
-    data = '<!DOCTYPE html>' +
-            '<html><head><title>Drag a document in here!</title></head>' +
-            '<body><div style="width: 388px; margin: 0 auto;">' +
-            '<img src="/guis.common/images/dragDocument.png" alt="Drag a document in here!" title="Drag a document in here!">' +
-            '</div></body></html>';
+			res.send(200, new Buffer(data));
+		});
+	}
+	else
+	{
+		var data;
+		data = '<!DOCTYPE html>' +
+				'<html><head><title>Drag a document in here!</title></head>' +
+				'<body><div style="width: 388px; margin: 0 auto;">' +
+				'<img src="/guis.common/images/dragDocument.png" alt="Drag a document in here!" title="Drag a document in here!">' +
+				'</div></body></html>';
 
-  res.send(200, new Buffer(data));
-  return;
+		res.send(200, new Buffer(data));
+	}
+	return;
 });
 
 // p3 might specify a content age
 app.get('/getContent/:roomID/:objectID/:p3/:hash', function(req, res, next) {
+
+	// pdf file html preview
   var objectAdditionalContent = req.params.objectID.match(/(.+?)\.(.+)/);
   if (objectAdditionalContent) {
     res.set('Content-Type', 'text/html');
     res.set('Content-Disposition', 'inline; filename="preview.html"');
-    var data = Modules.Connector.getContent(req.params.roomID, req.params.objectID, context);
-    res.send(200, new Buffer(data));
+		Modules.Connector.getContent(req.params.roomID, req.params.objectID, req.context, function(data) {
+			if(data === false)
+			{
+				res.send(404, "no html content");
+				return;
+			}
+			res.send(200, new Buffer(data));
+		});
     return;
   }
 
