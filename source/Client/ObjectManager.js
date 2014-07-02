@@ -66,6 +66,7 @@ ObjectManager.getPrototype = function(objType) {
  * @returns {string} 
  */
 ObjectManager.getIndexOfObject = function(objectID) {
+    
   // room?
   for (var index in this.currentRoomID) {
     if (this.currentRoomID[index] === objectID) {
@@ -78,7 +79,8 @@ ObjectManager.getIndexOfObject = function(objectID) {
       return index;
     }
   }
-  return false;
+  
+  return 'left';
 }
 
 /**
@@ -460,8 +462,8 @@ ObjectManager.loadPaperWriter = function(roomid, byBrowserNav, index, callback) 
           ObjectManager.removeLocally(obj);
         }
 
-        if (!roomid)
-          roomid = 'public';
+        if (!roomid) roomid = 'public';
+        
         self.currentRoomID[index] = roomid;
 
         if (!byBrowserNav && index === 'left') {
@@ -472,8 +474,7 @@ ObjectManager.loadPaperWriter = function(roomid, byBrowserNav, index, callback) 
           GUI.defaultZoomPanState(index, true);
         }
 
-        if (callback)
-          setTimeout(callback, 1200);
+        if (callback) setTimeout(callback, 1200);
       }
 
     });

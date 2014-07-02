@@ -25,7 +25,9 @@
     "body-parser": "*",
     "cookie-parser": "*",
     "express-session": "*",
-    "mongoose": "^3.8.8"
+    "mongoose": "^3.8.8",
+    "gridfs-stream": "*",
+    "mongodb": "*"
   },
   "devDependencies": {
     "superagent": "~0.15.7",

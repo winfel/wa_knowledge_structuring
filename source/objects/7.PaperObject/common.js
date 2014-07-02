@@ -47,6 +47,7 @@ PaperObject.register = function(type) {
 
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
   this.registerAttribute('bigIcon', {hidden: true});
+  this.registerAttribute('padID', {type:'text', hidden: true, standard:'[somepaperid]'});
 }
 
 /**
@@ -59,7 +60,7 @@ PaperObject.register = function(type) {
  * @param {boolean} openInNewWindow
  */
 PaperObject.execute = function(openInNewWindow) {
-  var destination = this.getAttribute('destination');
+  var destination = this.getAttribute('padID');
 
   if (!destination) {
     var random = new Date().getTime() - 1296055327011;

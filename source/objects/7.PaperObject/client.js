@@ -10,22 +10,19 @@ PaperObject.hasContent = function() {
     return true;
 }
 
-PaperObject.createReview = function() {
-    // TODO
-}
-
-PaperObject.exportFile = function() {
-    // TODO
-}
-
-PaperObject.open = function() {
-    // TODO
-}
-
-PaperObject.publish = function() {
-    // TODO
-}
-
 PaperObject.deleteIt = function() {
     this.remove();
+}
+
+PaperObject.create = function(attributes) {
+    
+    if (attributes === undefined) {
+        var attributes = {
+
+        };
+    } else {
+        attributes.padID = new Date().getTime() - 1296055327011;
+    } 
+    
+    ObjectManager.createObject(this.type, attributes);
 }

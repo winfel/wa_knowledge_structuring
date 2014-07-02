@@ -189,9 +189,7 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
     }
 
     var attr = {x: "20", y: "45", width: "700", locked: true, paper: data.roomID};
-    Modules.ObjectManager.createObject(data.roomID, PAPER_WRITER, attr, false, context, function(error, obj) {
-      //Modules.Log.debug(obj);
-    });
+    Modules.ObjectManager.createObject(data.roomID, PAPER_WRITER, attr, false, context, function(error, obj) {});
   });
 };
 
@@ -203,63 +201,58 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
  * @param {Object} responseID response ID.
  **/
 UserManager.enterRoom = function(socketOrUser, data, responseID) {
-  if (typeof socketOrUser.id == 'string')
-    var userID = socketOrUser.id;
-  else
-    var userID = socketOrUser;
-  // var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
+    var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
+    var index = (data.index === undefined) ? 'left' : data.index;
+  
+    var roomID = data.roomID;
 
-  if (data.index === undefined)
-    var index = 'left';
-  else
-    var index = data.index;
-  // var index = (data.index === undefined) ? 'left' : data.index;
+    var connection = UserManager.connections[userID];
+    var ObjectManager = Modules.ObjectManager;
 
-  var roomID = data.roomID;
-
-  var connection = UserManager.connections[userID];
-  var ObjectManager = Modules.ObjectManager;
-
-  //oldrooom is sent down to the connector, which may use it for parent creation
-  if (connection.rooms[index]) {
-    var oldRoomId = connection.rooms[index].id;
-  }
-
-  if (!connection) {
-    Modules.Log.error("UserManager", "+enter", "There is no connection for this user (user: '" + userID + "')");
-    return;
-  }
-
-  var socket = connection.socket;
-  var connector = Modules.Connector;
-  var socketServer = Modules.SocketServer;
-  var user = connection.user;
-
-  // try to enter the room on the connector
-  connector.mayEnter(roomID, connection, function(err, mayEnter) {
-
-    // if the connector responds true, the client is informed about the successful entering of the room
-    // and all clients in the same rooms get new awarenessData.
-    if (mayEnter) {
-
-      ObjectManager.getRoom(roomID, connection, function(room) {
-        connection.rooms[index] = room;
-        Modules.RoomController.sendRoom(socket, room.id);
-        socketServer.sendToSocket(socket, 'entered', room.id);
-        UserManager.sendAwarenessData(room.id);
-      }, oldRoomId);
-
-      //ObjectManager.sendChatMessages(roomID,socket);
-
-      Modules.Dispatcher.respond(socket, responseID, false);
-      Modules.EventBus.emit("room::" + roomID + "::userEntered", {username: connection.user.username});
-
-    } else {
-      socketServer.sendToSocket(socket, 'error', 'User ' + user.username + ' may not enter ' + roomID);
-      Modules.Dispatcher.respond(socket, responseID, true);
+    // oldrooom is sent down to the connector, which may use it for parent
+    // creation
+    if (connection.rooms[index]) {
+        var oldRoomId = connection.rooms[index].id;
     }
 
-  });
+    if (!connection) {
+        Modules.Log.error("UserManager", "+enter", "There is no connection for this user (user: '" + userID + "')");
+        return;
+    }
+
+    var socket = connection.socket;
+    var connector = Modules.Connector;
+    var socketServer = Modules.SocketServer;
+    var user = connection.user;
+
+    // try to enter the room on the connector
+    connector.mayEnter(roomID, connection, function(err, mayEnter) {
+
+        // if the connector responds true, the client is informed about the
+        // successful entering of the room
+        // and all clients in the same rooms get new awarenessData.
+        if (mayEnter) {
+
+            ObjectManager.getRoom(roomID, connection, function(room) {
+                connection.rooms[index] = room;
+                Modules.RoomController.sendRoom(socket, room.id);
+                socketServer.sendToSocket(socket, 'entered', room.id);
+                UserManager.sendAwarenessData(room.id);
+            }, oldRoomId);
+
+            // ObjectManager.sendChatMessages(roomID,socket);
+
+            Modules.Dispatcher.respond(socket, responseID, false);
+            Modules.EventBus.emit("room::" + roomID + "::userEntered", {
+                username : connection.user.username
+            });
+
+        } else {
+            socketServer.sendToSocket(socket, 'error', 'User ' + user.username + ' may not enter ' + roomID);
+            Modules.Dispatcher.respond(socket, responseID, true);
+        }
+
+    });
 };
 
 /**
