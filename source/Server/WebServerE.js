@@ -117,9 +117,12 @@ app.use('/Common', express.static(path.resolve(__dirname, '../Common')))
     .set('views', path.resolve(__dirname, '../Client/views'))    
     .set('view engine', 'html')
     .engine('html', hbs.__express)
-    .use(bodyParser())
+    .use(bodyParser.urlencoded({
+        extended: true
+    }))
+    .use(bodyParser.json())
     .use(cookieParser())
-    .use(session({ secret: 'keyboard gato', key: 'sid'}))
+    .use(session({ secret: 'keyboard gato', key: 'sid', resave: true, saveUninitialized: true}))
     .use(everyauth.middleware(app));
 
 // invoked for any requested passed to this router
