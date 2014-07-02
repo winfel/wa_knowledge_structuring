@@ -816,3 +816,13 @@ button#btn-previous {margin-left: 133px;}
 /*end Rightmanager sidebar */
 
 
+/* chatbox */
+#one2one-container {
+    display: none;
+    background-color: #3efd44;
+    z-index: 10;
+    width: 400;
+    height: 200;
+}
+/* end of chatbox */
+

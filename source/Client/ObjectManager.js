@@ -621,7 +621,8 @@ ObjectManager.init = function() {
   });
 
   Modules.Dispatcher.registerCall('inform', function(data) {
-
+    console.log("client side registercall inform data:\n")
+    console.log(data)
     if (data.message.awareness !== undefined && data.message.awareness.present !== undefined) {
       //list of users
       var users = [];
@@ -630,6 +631,7 @@ ObjectManager.init = function() {
         users.push(d);
       }
       GUI.chat.setUsers(users);
+        console.log("users are: " + users);
       GUI.userMarker.removeOfflineUsers(users);
     }
 

@@ -52,8 +52,15 @@ GUI.chat.setUsers = function(users) {
 	$("#chat_users").html("");
 	for (var i = 0; i < users.length; i++) {
 		var user = users[i];
-		$("#chat_users").append('<div><span style="background-color: '+user.color+'"></span>'+user.username+'</div>');
+		$("#chat_users").append('<div class="chatuserhandle"><span style="background-color: '+user.color+'"></span>'+user.username+'</div>');
 	}
+    $(".chatuserhandle").click(function(){
+        var usr = $(this).text();
+        console.log("#### text"+usr);
+        var newbox = '<div id="receiver-' +usr+ '"> whofiwqfw wf</div>';
+        $("#one2one-container").append(newbox).css("display", "block").css("background-color","#535EFD");
+
+    });
 }
 
 
