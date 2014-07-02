@@ -15,9 +15,10 @@ Viewer.draw = function(external) {
   this.setViewWidth(this.getAttribute('width'));
   this.setViewHeight(this.getAttribute('height'));
 
+  this.adjustPaper();
+  
   $(rep).attr("layer", this.getAttribute('layer'));
 
-  this.adjustPaper();
 
   var that = this;
 
@@ -106,27 +107,30 @@ Viewer.createRepresentation = function(parent) {
 
   //this.createRepresentationAjax($body);
   this.createRepresentationIframe($body);
-  
+
   this.initGUI(rep);
 
   return rep;
 };
 
+/**
+ * Creates the iframe representation
+ * 
+ * @param {type} $body
+ * @returns {undefined}
+ */
 Viewer.createRepresentationIframe = function($body) {
   var $iframe = $("<iframe>");
-  
+  $iframe.attr("id", "iframe-" + this.getAttribute('id'));
+
   $body.append($iframe);
-  
+
   var iframe_loaded = false;
   $iframe.one('load', function() {
     iframe_loaded = true;
-    
   });
 
   $iframe.attr('src', 'http://' + window.location.hostname + ':8080/getPaper/public/' + this.getAttribute('file') + '.html/');
-  //$iframe.attr('src', 'http://' + window.location.hostname + ':8080/getPaper/public/cd7e6155-3a12-49c7-9bbd-a8e3098bd65d.html/');
-  
-  //$('head', $iframe).append('<link type="text/css" href="/guis/desktop/objects/paperViewer.css" rel="Stylesheet">');
 };
 
 Viewer.createRepresentationAjax = function($body) {
@@ -137,16 +141,16 @@ Viewer.createRepresentationAjax = function($body) {
 
   request.done(function(html) {
     $body.append(html.replace(/sidebar/g, "sidebar-paper"));
-    
+
     // Adding another container for scaling...
     var $scaleContainer = $("<div>");
     $scaleContainer.attr("id", "scale-container");
-    
+
     var $pageContainer = $("#page-container", $body);
-    
+
     // Move all page to the new scale container...
     $scaleContainer.append($pageContainer.children("div.pd"));
-    
+
     // Finally append the scale container.
     $pageContainer.append($scaleContainer);
   });
@@ -155,7 +159,6 @@ Viewer.createRepresentationAjax = function($body) {
     console.log("I am sorry, I was not able to load the requested paper.");
   });
 };
-
 
 Viewer.resizeHandler = function() {
   this.setDimensions(this.getViewWidth(), this.getViewHeight());
@@ -169,23 +172,22 @@ Viewer.adjustPaper = function() {
   var rep = this.getRepresentation();
   var $rep = $(rep);
 
-  var $scaleContainer = $("div#scale-container", $rep);
-  var firstPage = $("div.pd", $rep).first();
-          
+  var $iframe = $("#iframe-" + this.getAttribute("id"), $rep);
+  var contents = $iframe.contents();
+
+  var $scaleContainer = $("body", contents);
+  var firstPage = $("[data-page-no]", contents).first();
+
   var pageWidth = firstPage.width();
   var pageHeight = $scaleContainer.height();
-  
-  if(!pageWidth || !pageHeight)
+
+  if (!pageWidth || !pageHeight)
     return;
-  
-  var width = this.getAttribute('width') - 16; // -16 for the scrollbar
+
+  var width = this.getAttribute('width') - 30; // -30 for the scrollbar and shadow
 
   var scaleFactor = (width / pageWidth);
   var translateFactor = (1 - scaleFactor) / 2;
-  
+
   $scaleContainer.css("transform", "translate(" + (-width * translateFactor) + "px, " + (-pageHeight * translateFactor) + "px) scale(" + scaleFactor + ")");
-    
-//  $("div.pd", $rep).each(function(index, element) {
-//    $(element).css("transform", "translate(" + (-pageWidth * translateFactor) + "px, " + (-pageHeight * translateFactor) + "px) scale(" + scaleFactor + ")");
-//  });
 };
