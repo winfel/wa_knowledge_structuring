@@ -444,16 +444,39 @@ mongoConnector.moveObjects = function(roomID, toRoom, objectIDs, objectAttribute
     
     if (!context) this.Modules.Log.error("Missing context");
     
-    var promise = updateObjectRoom(objectIDs, objectAttributes, toRoom);
-    promise.on('complete', function(err, obj) {        
-        if (err || !obj) {
-            console.warn("ERROR: mongoConnector.move object with id: " + objectID + " in room " + roomID + " not found: " + err);
-            callback(err, null);
+    var that = this;
+    function updateObject(i) {
+        
+        if (i < objectIDs.length) {
+            
+            var objID = objectIDs[i];
+            var obJX = objectAttributes[objID].x;
+            var objY = objectAttributes[objID].y;
+            
+            that.mayInsert(toRoom, context, function (err, hasRight) { 
+                if (err) {
+                    console.warn("ERROR: mongoConnector.moveObjects object with id: " + objID + " in room " + roomID + ": " + err);
+                } else if (!hasRight) {
+                    console.warn("mongoConnector.moveObjects Can't insert into the target room!"); 
+                } else {
+                    
+                    var promise = objects.update({id: objID}, { $set: { inRoom : toRoom, x: obJX, y: objY }} );
+                    promise.on('complete', function(err, obj) {  
+                        if (err || !obj) {
+                            console.warn("ERROR: mongoConnector.move object with id: " + objID + " in room " + roomID + " not found: " + err);
+                        } else {
+                            updateObject(i + 1);
+                        }
+                    });
+                }
+            });
+           
         } else {
-        	console.log(JSON.stringify(obj));
-        	callback(null, objectIDs);
-        }
-    });
+            callback(null, objectIDs);
+        }       
+    }
+    
+    updateObject(0);
 }
 
 /**
@@ -582,18 +605,8 @@ function removeObjectsContentFromDB(id) {
 *   moves an object to the trash room
 *   @param id
 */
-function moveObjectToTrashRoom(id) {
-    return objects.update({id: id},{ $set: { inRoom : TRASH_ROOM }});
-}
-
-/**
-*   internal
-*   moves an object to the trash room
-*   @param id
-*/
-function updateObjectRoom(objectIDs, objectAttributes, toRoom) {    
-	//return objects.update({id: objectIDs[0]},{ $set: { inRoom : toRoom, x: objectAttributes[objectIDs[0]].x, y: objectAttributes[objectIDs[0]].y  }} );
-	return objects.update({id: { $in: objectIDs}},{ $set: { inRoom : toRoom }}, { multi: true });
+function moveObjectToTrashRoom(id, oldRoom) {
+    return objects.update({id: id}, { $set: { inRoom : TRASH_ROOM, oldRoom: oldRoom }});
 }
 
 /**
@@ -1037,7 +1050,7 @@ mongoConnector.moveObjectToTrashRoom = function(roomID, objectID, context, callb
     roomID = roomID.toString();
 	this.getObjectData(roomID, objectID, context, function(objectData) {        
         
-		var promise = moveObjectToTrashRoom(objectID);
+		var promise = moveObjectToTrashRoom(objectID, roomID);
 		promise.on('complete', function(err, obj) {         
 	        if (err) {
 	            console.warn("ERROR: mongoConnector.moveObjectToTrashRoom: Error trying to move to trash room the object " 

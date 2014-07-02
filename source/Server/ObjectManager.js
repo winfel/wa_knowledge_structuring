@@ -563,6 +563,10 @@ ObjectManager.duplicateNew = function (data, context, cbo) {
 	Modules.Connector.moveObjects(fromRoom, toRoom, objectIDs, objectAttributes, context, cbo);
 }
 
+/**
+ * THIS METHOD IS DEPRECATED 
+ * USE duplicateNew INSTEAD
+ */
 ObjectManager.duplicateNew2 = function (data, context, cbo) {
 	var cut = data.cut;
 
