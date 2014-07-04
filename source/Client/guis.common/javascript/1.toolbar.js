@@ -448,39 +448,9 @@ GUI.initToolbar = function() {
 
 		$("#header > .header_right").append(inspectorButton);
 
-		
+		GUI.sidebar.openPage("inspector", inspectorButton);
 	
 	}
-	
-	/* add Tabs toggle */
-	
-	if (!Modules.Config.presentationMode) {
-	
-		var tabButton = document.createElement("img");
-		$(tabButton).attr("src", "../../guis.common/images/tab_128_w.png").attr("alt", "");
-		$(tabButton).attr("width", "24").attr("height", "24");
-
-		$(tabButton).attr("id", "tab_button");
-		$(tabButton).addClass("sidebar_button");
-
-		$(tabButton).attr("title", GUI.translate("Tabs"));
-
-		var click = function() {
-			GUI.sidebar.openPage("tabs", tabButton);
-		}
-		
-		if (GUI.isTouchDevice) {
-			$(tabButton).bind("touchstart", click);
-		} else {
-			$(tabButton).bind("mousedown", click);
-		}
-
-		$("#header > .header_right").append(tabButton);
-
-		GUI.sidebar.openPage("tabs", tabButton);
-	
-	}
-	
 	
 	
 }

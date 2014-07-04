@@ -22,25 +22,21 @@ GUI.sidebar.savedState = undefined;
  * Available sidebar pages
  */
 GUI.sidebar.elementConfig = {
-  "tabs": {
-    order: 0,
-    title: GUI.translate("System Tabs"),
-  },
   "inspector": {
-    order: 1,
+    order: 0,
     title: GUI.translate("Object inspector"),
   },
   "rightmanager": {
-    order: 2,
+    order: 1,
     title: GUI.translate("Right Manager"),
   },
   "chat": {
-    order: 3,
+    order: 2,
     title: GUI.translate("Chat"),
     onOpen: GUI.chat.opened
   },
   "bug": {
-    order: 4,
+    order: 3,
     title: GUI.translate("Bugreport"),
   },
 };

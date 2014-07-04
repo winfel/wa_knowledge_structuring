@@ -39,7 +39,7 @@ GUI.tabs = new function() {
     this.tabsContent = $("#tabs_content");
     $("#tabs_content").html("");
 
-    $("<p>").html("Add new tabs to the tab-bar with the help of the context menu of sub-rooms and paperobjects").appendTo("#tabs-room");
+    //$("<p>").html("Add new tabs to the tab-bar with the help of the context menu of sub-rooms and paperobjects").appendTo("#tabs-room");
     
     this.redrawTabContent();
   };
@@ -177,7 +177,7 @@ GUI.tabs = new function() {
     var destFromURL = document.URL.substring(document.URL.lastIndexOf("/")+1,document.URL.length);
 
     $("#tabs_content").html(""); // clear
-    var upperUl = $("<ul style='list-style-type:none;'>").appendTo( "#tabs_content" );
+    var upperUl = $("<ul class='ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all' style='list-style-type:none;'>").appendTo( "#tabs_content" );
     defaultTabs.forEach(function(item){
     	var token = item.split("#");
       

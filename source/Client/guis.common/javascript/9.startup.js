@@ -2,7 +2,7 @@ $(function() {
     /**
      * Set translated placeholder for username input at login screen
      */
-    $("#login_username").attr("placeholder", GUI.translate("Username"));
+    //$("#login_username").attr("placeholder", GUI.translate("Username"));
 
     /**
      * Reporting of bugs
