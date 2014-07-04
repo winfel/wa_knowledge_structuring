@@ -49,20 +49,37 @@ Viewer.initGUI = function(rep) {
 
     //get the iframe contents and apply the textHighlighter
     var frameDocument = $(rep).find('iframe').contents();
+    
+    // do not load highlighter for about:blank, but if error happens, ignore
+    try {
+		if(frameDocument[0].URL == 'about:blank') {
+			return;
+		}
+    }
+    catch(ex){}
     frameDocument.textHighlighter({
       // register a function to call after each highlight process
       onAfterHighlight: function(highlights, range) {
         // TODO: maybe postprocess highlights here, set different style and transmit to server
         console.log('selected "' + range + '" and created ' + highlights.length + ' highlight(s)!');
         // save highlights to server
-        //var jsonStr = highlighter.serializeHighlights();
-        //self.setAttribute('highlights', jsonStr);
+        var jsonStr = highlighter.serializeHighlights();
+        self.setAttribute('highlights', jsonStr);
       }
     });
     console.log('highlighting for object ' + rep.id + ' activated');
 
     // get the highlighter object
     highlighter = frameDocument.getHighlighter();
+
+	self.loadHighlights = function () {
+		var jsonStr = self.getAttribute('highlights');
+		if (jsonStr != undefined && jsonStr != '')
+			highlighter.removeHighlights();
+			highlighter.deserializeHighlights(jsonStr);
+	};
+
+	self.loadHighlights();
   };
 
   // activate highlighter for iframe when iframe document is loaded

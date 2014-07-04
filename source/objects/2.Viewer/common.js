@@ -17,7 +17,9 @@ Viewer.register=function(type){
 	GeneralObject.register.call(this,type);
 	
   this.registerAttribute('file', {type:'text', standard:'[somefileid]'});
-	this.registerAttribute('highlights', {type:'text', standard:''});
+	this.registerAttribute('highlights', {type:'text', standard:'', changedFunction: function(object, value) {
+		object.loadHighlights();
+	}});
 	
 	this.standardData.width=210*3;
 	this.standardData.height=297*3;
