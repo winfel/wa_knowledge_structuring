@@ -17,6 +17,16 @@ and open the template in the editor.
   background-color: purple;
 }
 
+.paperViewer .moveOverlay {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  display: none;
+}
+
 .paperViewer #page-container {
   top: 40px !important;
   overflow-x: hidden !important;

@@ -25,6 +25,7 @@ Viewer.draw = function(external) {
   //this.updateContent();
   return rep;
 };
+
 /*
  Viewer.updateContent = function() {
  
@@ -108,6 +109,10 @@ Viewer.createRepresentation = function(parent) {
   //this.createRepresentationAjax($body);
   this.createRepresentationIframe($body);
 
+  var moveOverlay = $("<div>");
+  moveOverlay.addClass("moveOverlay");
+  $body.append(moveOverlay);
+  
   this.initGUI(rep);
 
   return rep;
@@ -160,10 +165,27 @@ Viewer.createRepresentationAjax = function($body) {
   });
 };
 
+
+Viewer.onMoveStart = function() {
+  GeneralObject.onMoveStart();
+  console.log("move start");
+  
+  var rep = $(this.getRepresentation());
+  $("div.moveOverlay", rep).show();
+};
+
+Viewer.onMoveEnd = function() {
+  GeneralObject.onMoveEnd();
+  console.log("move end");
+  
+  var rep = $(this.getRepresentation());
+  $("div.moveOverlay", rep).hide();
+};
+
 Viewer.resizeHandler = function() {
   this.setDimensions(this.getViewWidth(), this.getViewHeight());
   this.setPosition(this.getViewX(), this.getViewY());
-
+  console.log("resize");
 //  this.adjustPaper();
 };
 
@@ -187,7 +209,16 @@ Viewer.adjustPaper = function() {
   var width = this.getAttribute('width') - 30; // -30 for the scrollbar and shadow
 
   var scaleFactor = (width / pageWidth);
-  var translateFactor = (1 - scaleFactor) / 2;
+  
+  var translateFactorX = (1 - scaleFactor) / 2;
+  var translateFactorY = (1 - scaleFactor) / 2;
+  
+  if(scaleFactor > 1)
+    translateFactorX = 0;
 
-  $scaleContainer.css("transform", "translate(" + (-width * translateFactor) + "px, " + (-pageHeight * translateFactor) + "px) scale(" + scaleFactor + ")");
+  // CSS 3
+  $scaleContainer.css("transform", "translate(" + (-width * translateFactorX) + "px, " + (-pageHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
+  
+  // For chrome and safari...
+  $scaleContainer.css("-webkit-transform", "translate(" + (-width * translateFactorX) + "px, " + (-pageHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
 };
