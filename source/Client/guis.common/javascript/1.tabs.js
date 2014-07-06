@@ -9,7 +9,7 @@ GUI.tabs = new function() {
   /* Content of tabs sidebar*/
   var currentlyStoredTab = [];
   var defaultTabs = [];
-  var namesWithoutDeletePermission = ["Public Space","Private Space"];
+  var namesWithoutDeletePermission = ["Global Space","Private Space"];
 
   var internalID;
 
@@ -21,7 +21,7 @@ GUI.tabs = new function() {
     console.log("GUI.tabs initialized");
     var that = this;
 
-    defaultTabs = ["Public Space#public","Private Space#PrivateSpace"+GUI.username];
+    defaultTabs = ["Global Space#public","Private Space#PrivateSpace"+GUI.username];
 
     /* try to load the tab data from db */
     Modules.UserManager.getTabCache(function(data){
@@ -185,7 +185,7 @@ GUI.tabs = new function() {
     	var currentLi = $("<li><a href='#' title='"+token[0]+"'>"+token[0]+"</a></li>").on( "click", function () {
         if(token[0].indexOf('Private Space') > -1){
           ObjectManager.loadSpecificSpace(token[1], false, 'left', 'enterPrivateSpace');
-        }else if(token[0].indexOf('Public Space') > -1){
+        }else if(token[0].indexOf('Global Space') > -1){
           ObjectManager.loadSpecificSpace(token[1], false, 'left', 'enterPublicSpace');
         }else{
           if(token[0].indexOf('(PO)') > 0){
