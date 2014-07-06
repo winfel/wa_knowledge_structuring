@@ -799,7 +799,7 @@ GeneralObject.addControl = function(type, resizeFunction) {
         return;
 
       event.preventDefault();
-
+      
       if (!GUI.isTouchDevice) {
         /* mouse */
         var dx = event.pageX - control.startMouseX;
@@ -815,8 +815,8 @@ GeneralObject.addControl = function(type, resizeFunction) {
 
       self.adjustControls();
 
-
-
+      // Call resize handler also...
+      self.resizeHandler();
     };
 
     var end = function(event) {

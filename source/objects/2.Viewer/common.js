@@ -17,7 +17,9 @@ Viewer.register=function(type){
 	GeneralObject.register.call(this,type);
 	
   this.registerAttribute('file', {type:'text', standard:'[somefileid]'});
-	this.registerAttribute('highlights', {type:'text', standard:''});
+	this.registerAttribute('highlights', {type:'text', standard:'', changedFunction: function(object, value) {
+		object.loadHighlights();
+	}});
   this.registerAttribute('twopage', {type: 'boolean', standard: false});
 	
 	this.standardData.width=210*3;
