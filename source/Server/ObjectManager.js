@@ -555,12 +555,34 @@ var mayReadMultiple = function (fromRoom, files, context, cb) {
  * 5. Update object link targets
  */
 ObjectManager.duplicateNew = function (data, context, cbo) {
+    // console.log(JSON.stringify(data));
 	var fromRoom = data.fromRoom;
 	var toRoom = data.toRoom;
 	var objectIDs = data.objects;
 	var objectAttributes = data.attributes;
-	//console.log(JSON.stringify(data));
-	Modules.Connector.moveObjects(fromRoom, toRoom, objectIDs, objectAttributes, context, cbo);
+	var duplicate = data.duplicate;
+	
+	if (duplicate) {
+	    // duplicate button was pressed in the client side
+	    Modules.Connector.duplicateObjects(fromRoom, toRoom, objectIDs, context, function (err, idList) {
+	         
+	        for (var i = 0; i < idList.length; i++) {
+	            var id = idList[i];
+	            
+	            ObjectManager.getObject(fromRoom, id, context, function (object) {
+	                // inform the client about the new created object
+	                object.persist();
+	             }); 
+	            
+	         }
+	        
+	        cbo(err, idList);
+	    });
+	   
+	} else {
+	    // moving objects between rooms
+	    Modules.Connector.moveObjects(fromRoom, toRoom, objectIDs, objectAttributes, context, cbo);
+	}
 }
 
 /**

@@ -382,6 +382,28 @@ mongoConnector.createObject = function(roomID, type, data, context, callback) {
         }
     });
 }
+ 
+/**
+ * Duplicate a list of objects
+ * see function duplicateObject
+ */
+mongoConnector.duplicateObjects = function(roomID, toRoom, objectIDs, context, callback) {
+    var that = this;
+    var idList = [];
+    
+    function dObject(i) {
+        if (i < objectIDs.length) {
+            that.duplicateObject(roomID, toRoom, objectIDs[i], context, function (err, newID, objectID) {
+                idList.push(newID);
+                dObject(i+1);
+            });
+        } else {
+            callback(null, idList);
+        }
+    }
+    
+    dObject(0);
+}
 
 /**
  * duplicate an object on the persistence layer to directly work on the new
@@ -415,8 +437,14 @@ mongoConnector.duplicateObject = function(roomID, toRoom, objectID, context, cal
             obj.id = newID;
             obj.inRoom = toRoom;
             
-            // TODO: check what about with .content and .preview
-            //       what are these files for?
+            if (obj.x != undefined) {
+                // So the copy do not appear in the same position
+                obj.x += 20;
+                obj.y += 20;
+            }
+            
+            // TODO: duplicate the content in GridFS
+            // mongoConnector.saveContent
             
             var promise2 = saveObject(obj);
             promise2.on('complete', function(err, doc) {
@@ -450,8 +478,8 @@ mongoConnector.moveObjects = function(roomID, toRoom, objectIDs, objectAttribute
         if (i < objectIDs.length) {
             
             var objID = objectIDs[i];
-            var obJX = objectAttributes[objID].x;
-            var objY = objectAttributes[objID].y;
+            var obJX = (objectAttributes[objID] != undefined) ? objectAttributes[objID].x : 100;
+            var objY = (objectAttributes[objID] != undefined) ? objectAttributes[objID].y : 100;
             
             that.mayInsert(toRoom, context, function (err, hasRight) { 
                 if (err) {
