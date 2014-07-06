@@ -261,25 +261,13 @@ UserManager.login = function(socketOrUser, data) {
 };
 
 UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
-  UserManager.enterRoom(socketOrUser, data, responseID);
-
-  var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
-  var context = UserManager.connections[userID];
-
-  Modules.ObjectManager.getObjects(data.roomID, context, function(inventory) {
-    for (var aux in inventory) {
-      var obj = inventory[aux];
-
-      if (obj.type == PAPER_WRITER) {
-        return;
-      }
-    }
-
-    var attr = {x: "20", y: "45", width: "700", locked: true, paper: data.roomID};
-    Modules.ObjectManager.createObject(data.roomID, PAPER_WRITER, attr, false, context, function(error, obj) {
-      //Modules.Log.debug(obj);
-    });
-  });
+  //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
+  var shouldInclude = [ PAPER_WRITER+"#Writer#20#100#700#2#locked;true#paper;"+data.roomID,
+                        "Textarea#WritingAreaInfo#20#45#100#2#height;30#content;Writing Area:",
+                        "Textarea#ReferenceInfo#800#45#100#2#height;30#content;References:",
+                        "Container#References#800#100#500#2#locked;true#height;455",
+                        "Textarea#DefineInfo#20#600#190#2#height;30#content;Define your structure here:"];
+  UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 
 UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, responseID, shouldInclude){
@@ -299,10 +287,9 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
       var oWidth= token[4];
       var oAttsL= token[5];
       var oAtts = [];
-
+      var oHeight = -1;
       var oContent = "ERROR - Content not defined";
-
-      var attr = {x: oX, y: oY, width: oWidth, name: oName , paper: data.roomID};
+  
       var additionalAtts = []; 
       for(var i = 6; i < oAttsL+6-1; i++){
         if(typeof token[i] != 'undefined'){
@@ -313,10 +300,19 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
 
           if(attName.indexOf('content') > -1){
             oContent = attValue;
+          }else if(attName.indexOf('height') > -1){
+            oHeight = attValue;
           }else{
             additionalAtts.push(attName+";"+attValue);
           }
         }
+      }
+
+      var attr;
+      if(oHeight == -1){ 
+        attr = {x: oX, y: oY, width: oWidth, name: oName , paper: data.roomID};
+      }else{
+        attr = {x: oX, y: oY, width: oWidth, height: oHeight, name: oName , paper: data.roomID};
       }
 
       var found = false;
