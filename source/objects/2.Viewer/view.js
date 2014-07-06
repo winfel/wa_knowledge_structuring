@@ -15,10 +15,11 @@ Viewer.draw = function(external) {
   this.setViewWidth(this.getAttribute('width'));
   this.setViewHeight(this.getAttribute('height'));
 
-  this.adjustPaper();
-  
-  $(rep).attr("layer", this.getAttribute('layer'));
+  console.log("draw");
 
+  this.adjustPaper();
+
+  $(rep).attr("layer", this.getAttribute('layer'));
 
   var that = this;
 
@@ -112,7 +113,7 @@ Viewer.createRepresentation = function(parent) {
   var moveOverlay = $("<div>");
   moveOverlay.addClass("moveOverlay");
   $body.append(moveOverlay);
-  
+
   this.initGUI(rep);
 
   return rep;
@@ -133,6 +134,9 @@ Viewer.createRepresentationIframe = function($body) {
   var iframe_loaded = false;
   $iframe.one('load', function() {
     iframe_loaded = true;
+
+    // Add the iframe css file to the html document.
+    $("head", $iframe.contents()).append('<link type="text/css" href="/guis/desktop/objects/paperViewerIFrame.css" rel="Stylesheet">');
   });
 
   $iframe.attr('src', 'http://' + window.location.hostname + ':8080/getPaper/public/' + this.getAttribute('file') + '.html/');
@@ -168,16 +172,14 @@ Viewer.createRepresentationAjax = function($body) {
 
 Viewer.onMoveStart = function() {
   GeneralObject.onMoveStart();
-  console.log("move start");
-  
+
   var rep = $(this.getRepresentation());
   $("div.moveOverlay", rep).show();
 };
 
 Viewer.onMoveEnd = function() {
   GeneralObject.onMoveEnd();
-  console.log("move end");
-  
+
   var rep = $(this.getRepresentation());
   $("div.moveOverlay", rep).hide();
 };
@@ -185,40 +187,72 @@ Viewer.onMoveEnd = function() {
 Viewer.resizeHandler = function() {
   this.setDimensions(this.getViewWidth(), this.getViewHeight());
   this.setPosition(this.getViewX(), this.getViewY());
-  console.log("resize");
+
 //  this.adjustPaper();
 };
 
 Viewer.adjustPaper = function() {
 
+  console.log("adjust");
+
   var rep = this.getRepresentation();
   var $rep = $(rep);
 
-  var $iframe = $("#iframe-" + this.getAttribute("id"), $rep);
-  var contents = $iframe.contents();
+  var twopage = this.getAttribute("twopage");
 
-  var $scaleContainer = $("body", contents);
+  var iframe = $("#iframe-" + this.getAttribute("id"), $rep);
+  var contents = iframe.contents();
+
+  var scaleContainer = $("body", contents);
   var firstPage = $("[data-page-no]", contents).first();
-
+  
+  // page dimensions
   var pageWidth = firstPage.width();
-  var pageHeight = $scaleContainer.height();
+  var pageHeight = firstPage.height();
 
-  if (!pageWidth || !pageHeight)
+  // paper dimensions (including all pages...)
+  var paperWidth = pageWidth;
+  var paperHeight = scaleContainer.height();
+
+  if (!paperWidth || !paperHeight)
     return;
+
+  //console.log(paperWidth + " " + iframe.width() + " " + paperHeight + " " + contents.height());
 
   var width = this.getAttribute('width') - 30; // -30 for the scrollbar and shadow
 
-  var scaleFactor = (width / pageWidth);
-  
+  var scaleFactor = (width / paperWidth);
+
   var translateFactorX = (1 - scaleFactor) / 2;
   var translateFactorY = (1 - scaleFactor) / 2;
-  
-  if(scaleFactor > 1)
+
+  if (scaleFactor > 1)
     translateFactorX = 0;
 
-  // CSS 3
-  $scaleContainer.css("transform", "translate(" + (-width * translateFactorX) + "px, " + (-pageHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
-  
-  // For chrome and safari...
-  $scaleContainer.css("-webkit-transform", "translate(" + (-width * translateFactorX) + "px, " + (-pageHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
+  // CSS 3 transform: supported by Firefox
+  scaleContainer.css("transform", "translate(" + (-width * translateFactorX) + "px, " + (-paperHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
+  // Chrome, Safari and Opera browsers support though -webkit-transform...
+  scaleContainer.css("-webkit-transform", "translate(" + (-width * translateFactorX) + "px, " + (-paperHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
+
+  if (this.getAttribute("twopage")) {
+    // Adjust pages for two page mode
+    var translateFactorXeven = (-pageWidth / 4);
+    var translateFactorYeven = (-pageHeight / 4);
+
+    var translateFactorXodd = (pageWidth / 4);
+    var translateFactorYodd = (-pageHeight / 4);
+
+    $("[data-page-no]:even", contents).each(function(index) {
+      $(this).css("transform", "translate(" + translateFactorXeven + "px, " + (translateFactorYeven - (index * (pageHeight * 1.5))) + "px) scale(0.5)");
+      $(this).css("-webkit-transform", "translate(" + translateFactorXeven + "px, " + (translateFactorYeven - (index * (pageHeight * 1.5))) + "px) scale(0.5)");
+    });
+
+    $("[data-page-no]:odd", contents).each(function(index) {
+      $(this).css("transform", "translate(" + translateFactorXodd + "px, " + (translateFactorYodd - (index * (pageHeight * 1.5)) - pageHeight) + "px) scale(0.5)");
+      $(this).css("-webkit-transform", "translate(" + translateFactorXodd + "px, " + (translateFactorYodd - (index * (pageHeight * 1.5)) - pageHeight) + "px) scale(0.5)");
+    });
+  } else {
+    $("[data-page-no]", contents).css("transform", "none");
+    $("[data-page-no]", contents).css("-webkit-transform", "none");
+  }
 };

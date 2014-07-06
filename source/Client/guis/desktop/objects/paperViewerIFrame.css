@@ -1,0 +1,29 @@
+/*
+This css file is added to the header of the html document within the iframe.
+  
+Created on : 19.06.2014, 23:16:22
+Author     : Patrick
+*/
+
+body {
+  
+}
+
+body > div {
+  margin: 0 auto !important;
+}
+
+body.twopage > div {
+  /*float: left;*/
+  /*transform: scale(0.5);*/
+  /*-webkit-transform: transform(-0.5%, -0.5%) scale(0.5);*/
+}
+
+body.twopage > div:nth-child(odd) {
+  background-color: blue !important;
+  clear: left;
+}
+
+body.twopage > div:nth-child(even) {
+  background-color: green !important;
+}
