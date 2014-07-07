@@ -48,6 +48,9 @@ Container.register=function(type){
 	this.registerAttribute('searchForPDF', {type: 'boolean', hidden: true, standard: true});
 	this.registerAttribute('searchForHTML', {type: 'boolean', hidden: true, standard: false});
 	this.registerAttribute('searchForImage', {type: 'boolean', hidden: true, standard: false});
+	this.registerAttribute('searchForAudio', {type: 'boolean', hidden: true, standard: false});
+	this.registerAttribute('searchForVideo', {type: 'boolean', hidden: true, standard: false});
+	this.registerAttribute('searchForText', {type: 'boolean', hidden: true, standard: false});
 	
 	this.registerAction('Edit',function(){
 		$.each(ObjectManager.getSelected(), function(key, object) {

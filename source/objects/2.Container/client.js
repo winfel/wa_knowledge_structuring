@@ -22,6 +22,16 @@ Container.afterSetAttribute=function(){
 
 Container.getFiles = function(){
 	
+	var s = 	this.getAttribute('searchString');
+	var name = this.getAttribute('searchByName');
+	var tag = this.getAttribute('searchByTag');
+	var pdf = this.getAttribute('searchForPDF');
+	var html = this.getAttribute('searchForHTML');
+	var image = this.getAttribute('searchForImage');
+	var audio = this.getAttribute('searchForAudio');
+	var video = this.getAttribute('searchForVideo');
+	var txt = this.getAttribute('searchForText');
+	
 	var o = new Array();
 	
 	var objects = ObjectManager.getObjects();
@@ -30,7 +40,7 @@ Container.getFiles = function(){
 	for (key in objects) {
 		
 		if(objects[key].type == "File"){
-		
+					
 			o.push(objects[key]);
 			
 		}
