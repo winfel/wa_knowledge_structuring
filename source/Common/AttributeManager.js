@@ -203,6 +203,13 @@ AttributeManager.setAttribute = function(object, attribute, value, forced, noeva
 		this.setAttribute(object, 'y', value.y, forced);
 		return true;
 	} 	
+	
+	if (attribute == 'dimensions' && object.ObjectManager.isServer) {
+        this.setAttribute(object, 'width',  value.width, forced);
+        this.setAttribute(object, 'height', value.height, forced);
+        return true;
+    }   
+	
 	var that = this;
 	
 	if (object.ObjectManager.isServer && !noevaluation) {	
@@ -257,7 +264,6 @@ AttributeManager.setAttribute = function(object, attribute, value, forced, noeva
 		if (window.transactionTimer) {
 			window.clearTimeout(window.transactionTimer);
 		}
-
 		
 		if (!this.transactionId) {
 			that.transactionId = new Date().getTime();
@@ -273,25 +279,34 @@ AttributeManager.setAttribute = function(object, attribute, value, forced, noeva
 		var theTimer = 200;
 		
 		
-		// instead of sending the position of X and Y in separate messages, 
+		// instead of sending the position of X and Y in separate messages same with height and width), 
 		// with this patch they are now sent in a single message called 'position'.
 		// This message is send when the 'y' attribute is updated
-		if (attribute != 'x') {
+		if (attribute != 'x' && attribute != 'width') {
+		    
+		    // to leave attribute untouched we copy it
+		    var attrAux = attribute;
 		    
 		    // The attribute name is overwritten 
-		    if (attribute == 'y') {
-		        attribute = 'position';
+		    if (attrAux == 'y') {
+		        attrAux = 'position';
 		        value = {'x': object.get('x'), 'y': value}
 		    }
 		    
+		    // The attribute name is overwritten 
+            if (attrAux == 'height') {
+                attrAux = 'dimensions';
+                value = {'width': object.get('width'), 'height': value}
+            }
+		    
     		if (forced) {
-                object.serverCall('setAttribute', attribute, value, false, {
+                object.serverCall('setAttribute', attrAux, value, false, {
                 	'transactionId': that.transactionId,
                 	'userId' : GUI.userid
                 })
     		} else {
     			saveDelays[identifier] = window.setTimeout(function() {
-                    object.serverCall('setAttribute', attribute, value, false, {
+                    object.serverCall('setAttribute', attrAux, value, false, {
                     	'transactionId': that.transactionId,
                     	'userId' : GUI.userid
                 	})
