@@ -5,33 +5,8 @@
 *
 */
 
-/*
-Container.afterSetContent=function(){
-
-	GUI.updateLayers();
-
-}
-
-Container.afterSetAttribute=function(){
-
-	GUI.updateLayers();
-
-}
-*/
-
-
 Container.getFiles = function(){
-	
-	var s = 	this.getAttribute('searchString');
-	var name = this.getAttribute('searchByName');
-	var tag = this.getAttribute('searchByTag');
-	var pdf = this.getAttribute('searchForPDF');
-	var html = this.getAttribute('searchForHTML');
-	var image = this.getAttribute('searchForImage');
-	var audio = this.getAttribute('searchForAudio');
-	var video = this.getAttribute('searchForVideo');
-	var txt = this.getAttribute('searchForText');
-	
+		
 	var o = new Array();
 	
 	var objects = ObjectManager.getObjects();
@@ -47,9 +22,107 @@ Container.getFiles = function(){
 		
 	}
 	
-	return o;
+	return this.searchAndFilter(o);
 	
 }
+
+
+Container.searchAndFilter = function(files){
+
+	var filteredFiles1 = new Array();
+	var filteredFiles2 = new Array();
+
+	var s = 	this.getAttribute('searchString');
+	var name = this.getAttribute('searchByName');
+	var tag = this.getAttribute('searchByTag');
+	var pdf = this.getAttribute('searchForPDF');
+	var html = this.getAttribute('searchForHTML');
+	var image = this.getAttribute('searchForImage');
+	var audio = this.getAttribute('searchForAudio');
+	var video = this.getAttribute('searchForVideo');
+	var text = this.getAttribute('searchForText');
+
+	if(s.length == 0 || s == "" || s == 0){
+		filteredFiles1 = files;
+	}
+	else{
+	
+		var key;
+		for (key in files) { //filter name/tag with the given searchstring
+		
+			var n = files[key].getAttribute('name');
+			var mainTag = files[key].getAttribute('mainTag');
+			var secTags = files[key].getAttribute('secondaryTags');
+			secTags.push(mainTag);
+		
+		
+			if(name){
+				if(n.indexOf(s) > -1){ //searchString part of the name of the object
+					filteredFiles1.push(files[key]);
+					continue;
+				}
+			}
+			if(tag){
+				for(var i = 0; i<secTags.length; i++){ 
+					if(secTags[i].indexOf(s) > -1){ //searchString part of a tag of the object
+						filteredFiles1.push(files[key]);
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	
+	var k;
+	for (k in filteredFiles1) { //filter files with the given types
+	
+		var type = filteredFiles1[k].getAttribute('mimeType');
+	
+		if(pdf){
+			if(type == "application/pdf"){ //type of object is pdf
+				filteredFiles2.push(filteredFiles1[k]);
+				continue;
+			}
+		}
+		if(html){
+			if(type == "text/html"){ //type of object is html
+				filteredFiles2.push(filteredFiles1[k]);
+				continue;
+			}
+		}
+		if(image){
+			var t = type.split('/');
+			if(t[0] == "image"){ //type of object is image
+				filteredFiles2.push(filteredFiles1[k]);
+				continue;
+			}
+		}
+		if(audio){
+			var t = type.split('/');
+			if(t[0] == "audio"){ //type of object is audio
+				filteredFiles2.push(filteredFiles1[k]);
+				continue;
+			}
+		}
+		if(video){
+			var t = type.split('/');
+			if(t[0] == "video"){ //type of object is video
+				filteredFiles2.push(filteredFiles1[k]);
+				continue;
+			}
+		}
+		if(text){
+			if(type == "text/plain"){ //type of object is text
+				filteredFiles2.push(filteredFiles1[k]);
+			}
+		}
+	}
+	
+	return filteredFiles2;
+	
+}
+
 
 Container.sortFiles = function(files){ //bubble sort
 
