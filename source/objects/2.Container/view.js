@@ -138,24 +138,61 @@ Container.drawContent = function(rep){
              var page = popover.addPage(GUI.translate('Search/Filter'));
              var section = page.addSection();
 
-             var searchFor;
-             if(typeof that.getAttribute('searchBy') != 'undefined'){
-             	if(String(that.getAttribute('searchBy')).indexOf('Tag') > -1){
-             		searchFor = '<input id = "checkName" type="checkbox"> Name &nbsp &nbsp '+
-             		'<input id = "checkTag" type="checkbox" checked> Tag <br><br>';             	
-             	}else if(String(that.getAttribute('searchBy')).indexOf('Name') > -1){
-             		searchFor = '<input id = "checkName" type="checkbox" checked> Name &nbsp &nbsp '+
-             		'<input id = "checkTag" type="checkbox"> Tag <br><br>';  
-             	}
-             }
-
-		     var element = section.addElement('<input id = "textName" type="text" placeholder="'+that.getAttribute('searchString')+'"/><p>Search by:</p>'+
+             var searchByName;
+			 var searchByTag;
+			 if(that.getAttribute('searchByName')){
+             	searchByName = '<input id = "checkName" type="checkbox" checked> Name &nbsp &nbsp ';
+			}
+			else{
+				searchByName = '<input id = "checkName" type="checkbox"> Name &nbsp &nbsp ';
+			}
+			if(that.getAttribute('searchByTag')){
+				searchByTag = '<input id = "checkTag" type="checkbox" checked> Tag <br><br>';    
+			}
+			else{
+				searchByTag = '<input id = "checkTag" type="checkbox"> Tag <br><br>';  
+			}
+            
+		   
+		    var searchForPDF;
+			var searchForHTML;
+			var searchForImage;
+			
+            if(that.getAttribute('searchForPDF')){
+             	searchForPDF = '<input id = "checkPDF" type="checkbox" checked> PDF<br>';
+			}
+			else{
+				searchForPDF = '<input id = "checkPDF" type="checkbox"> PDF<br>';
+			}
+			if(that.getAttribute('searchForHTML')){
+             	searchForHTML = '<input id = "checkHTML" type="checkbox" checked> HTML<br>';
+			}
+			else{
+				searchForHTML = '<input id = "checkHTML" type="checkbox"> HTML<br>';
+			}
+			if(that.getAttribute('searchForImage')){
+				searchForImage = '<input id = "checkImage" type="checkbox" checked> Image';
+			}
+            else{
+				searchForImage = '<input id = "checkImage" type="checkbox"> Image';
+			}
+			
+			var s = that.getAttribute('searchString');
+			if(s==0){
+				s = "placeholder='search'";
+			}
+			else{
+				s = "value='"+that.getAttribute('searchString')+"'";
+			}
+			
+		     var element = section.addElement('<input id = "textName" type="text"'+s+'><p>Search by:</p>'+
                 		'<p>'+
-                		searchFor +
+                		searchByName +
+						searchByTag+
                 		'<p>Search for:</p>'+
-                		'<input id = "checkPDF" type="checkbox"> PDF<br>'+
-                		'<input id = "checkHTML" type="checkbox"> HTML<br>'+
-                		'<input id = "checkBild" type="checkbox"> Bilddateien'+
+                		searchForPDF +
+						searchForHTML +
+						searchForImage +
                 		'</p><br>'+
                 		'<button id= "searchButton" type="submit" height="30"><img src="/guis.common/images/icon-lupe.png" alt="Suchen" width="22" height="22"></button>'
             ); 
@@ -170,30 +207,35 @@ Container.drawContent = function(rep){
 				var checkboxTag = $('#checkTag').prop('checked');
 				var checkboxPDF = $('#checkPDF').prop('checked');
 				var checkboxHTML = $('#checkHTML').prop('checked');
-				var checkboxBild = $('#checkBild').prop('checked');
+				var checkboxImage = $('#checkImage').prop('checked');
 			
-				/* Output values */
-				console.log(textfieldValue);
-				console.log(checkboxName);
-				console.log(checkboxTag);
-				console.log(checkboxPDF);
-				console.log(checkboxHTML);
-				console.log(checkboxBild);
 
-				/* TODO: Use values as input for search/filter */
+				if(textfieldValue == ""){
+					alert('Please enter a searchstring');
+				}
+				else{
+					if(!checkboxName && !checkboxTag){
+						alert('Please select the option name and/or tag');
+					}
+					else{
+						if(!checkboxPDF && !checkboxHTML && !checkboxImage){
+							alert('Please select the option PDF and/or HTML and/or Image');
+						}
+						else{
+				
+							that.setAttribute('searchString', textfieldValue);
+							that.setAttribute('searchByName', checkboxName);
+							that.setAttribute('searchByTag', checkboxTag);
+							that.setAttribute('searchForPDF', checkboxPDF);
+							that.setAttribute('searchForHTML', checkboxHTML);
+							that.setAttribute('searchForImage', checkboxImage);
+				
+							/* Close popover */
+							popover.hide();
 
-				/* Close popover */
-				popover.hide();
-
-				/* Clear textfield and uncheck checkboxes */ 
-				$('#textName').val('');
-				$("#checkName").prop("checked", false);
-				$("#checkTag").prop("checked", false);
-				$("#checkTag").prop("checked", false);
-				$("#checkPDF").prop("checked", false);
-				$("#checkHTML").prop("checked", false);
-				$("#checkBild").prop("checked", false);
-         
+						}
+					}
+				}
 			});
 		}
 	});	
@@ -217,7 +259,7 @@ Container.drawContent = function(rep){
 						'<option value="AZ">From A to Z</option>'+
 						'<option value="ZA">From Z to A</option>'+
 						'</select>'+
-						'<button id= "submitButton">Submit</button>'
+						'<button id="submitButton">Submit</button>'
             ); 
 			
 			var sel = document.getElementById('criterion');

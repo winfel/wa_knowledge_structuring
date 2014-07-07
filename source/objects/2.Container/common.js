@@ -43,8 +43,11 @@ Container.register=function(type){
 	this.registerAttribute('sortingCriterion', {type: 'text', standard: 'By Name', hidden: true});
 	this.registerAttribute('sortingOrder', {type: 'text', standard: 'From A to Z', hidden: true});
 	this.registerAttribute('searchString', {type: 'text', hidden: true});
-	this.registerAttribute('searchBy', {type: 'text', hidden: true});
-	this.registerAttribute('searchFor', {type: 'text', hidden: true});
+	this.registerAttribute('searchByName', {type: 'boolean', hidden: true, standard: true});
+	this.registerAttribute('searchByTag', {type: 'boolean', hidden: true, standard: false});
+	this.registerAttribute('searchForPDF', {type: 'boolean', hidden: true, standard: true});
+	this.registerAttribute('searchForHTML', {type: 'boolean', hidden: true, standard: false});
+	this.registerAttribute('searchForImage', {type: 'boolean', hidden: true, standard: false});
 	
 	this.registerAction('Edit',function(){
 		$.each(ObjectManager.getSelected(), function(key, object) {
