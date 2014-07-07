@@ -196,7 +196,7 @@ var saveDelays={};
 /**
 *	set an attribute to a value on a specified object
 */
-AttributeManager.setAttribute=function(object,attribute,value,forced,noevaluation) {
+AttributeManager.setAttribute = function(object, attribute, value, forced, noevaluation) {
     
 	if (attribute == 'position') {
 		this.setAttribute(object, 'x', value.x, forced);
@@ -263,8 +263,8 @@ AttributeManager.setAttribute=function(object,attribute,value,forced,noevaluatio
 			that.transactionId = new Date().getTime();
 		} else {
 			window.transactionTimer = window.setTimeout(function() {
-				//calculate new transactionId
-		        //TODO: isn't safe - concurrent users may result in same timestamp
+				// calculate new transactionId
+		        // TODO: isn't safe - concurrent users may result in same timestamp
 				that.transactionId = new Date().getTime();
 			}, this.transactionTimeout);
 		}
@@ -272,18 +272,31 @@ AttributeManager.setAttribute=function(object,attribute,value,forced,noevaluatio
 		// this timer is the delay in which changes on the same object are discarded
 		var theTimer = 200;
 		
-		if (forced) {
-            object.serverCall('setAttribute', attribute, value, false, {
-            	'transactionId': that.transactionId,
-            	'userId' : GUI.userid
-            })
-		} else {
-			saveDelays[identifier]= window.setTimeout(function() {
+		
+		// instead of sending the position of X and Y in separate messages, 
+		// with this patch they are now sent in a single message called 'position'.
+		// This message is send when the 'y' attribute is updated
+		if (attribute != 'x') {
+		    
+		    // The attribute name is overwritten 
+		    if (attribute == 'y') {
+		        attribute = 'position';
+		        value = {'x': object.get('x'), 'y': value}
+		    }
+		    
+    		if (forced) {
                 object.serverCall('setAttribute', attribute, value, false, {
                 	'transactionId': that.transactionId,
                 	'userId' : GUI.userid
-            	})
-			}, theTimer);
+                })
+    		} else {
+    			saveDelays[identifier] = window.setTimeout(function() {
+                    object.serverCall('setAttribute', attribute, value, false, {
+                    	'transactionId': that.transactionId,
+                    	'userId' : GUI.userid
+                	})
+    			}, theTimer);
+    		}
 		}
 		
 	}
