@@ -53,9 +53,15 @@ Container.searchAndFilter = function(files){
 			var n = files[key].getAttribute('name');
 			var mainTag = files[key].getAttribute('mainTag');
 			var secTags = files[key].getAttribute('secondaryTags');
-			secTags.push(mainTag);
-		
-		
+			
+			if(secTags == 0){
+				secTags = new Array();
+			}
+			if(mainTag != ""){
+				secTags.push(mainTag);
+			}
+
+					
 			if(name){
 				if(n.indexOf(s) > -1){ //searchString part of the name of the object
 					filteredFiles1.push(files[key]);
