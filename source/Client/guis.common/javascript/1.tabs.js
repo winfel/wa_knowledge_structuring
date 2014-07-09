@@ -177,12 +177,12 @@ GUI.tabs = new function() {
     var destFromURL = document.URL.substring(document.URL.lastIndexOf("/")+1,document.URL.length);
 
     $("#tabs_content").html(""); // clear
-    var upperUl = $("<ul class='ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all' style='list-style-type:none;'>").appendTo( "#tabs_content" );
+    var upperUl = $("<ul class='ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all header-tabs' style='list-style-type:none;'>").appendTo( "#tabs_content" );
     defaultTabs.forEach(function(item){
     	var token = item.split("#");
       
       var isActive = (token[1] == destFromURL); // boolean value if this tab is the active one
-    	var currentLi = $("<li><a href='#' title='"+token[0]+"'>"+token[0]+"</a></li>").on( "click", function () {
+    	var currentLi = $("<li class='header-tabs'><a href='#' title='"+token[0]+"'>"+token[0]+"</a></li>").on( "click", function () {
         if(token[0].indexOf('Private Space') > -1){
           ObjectManager.loadSpecificSpace(token[1], false, 'left', 'enterPrivateSpace');
         }else if(token[0].indexOf('Global Space') > -1){
@@ -256,7 +256,7 @@ GUI.tabs = new function() {
        }
      }
 
-     var currentLi = $("<li><a href='#' title='"+ currentName+"'>"+drawName+"</a></li>").on( "click", function () {
+     var currentLi = $("<li class='header-tabs'><a href='#' title='"+ currentName+"'>"+drawName+"</a></li>").on( "click", function () {
 
       if(drawName.indexOf('(PO)') > 0){
          ObjectManager.loadPaperWriter(dest, false, 'left');
