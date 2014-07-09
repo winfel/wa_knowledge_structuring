@@ -62,7 +62,9 @@ Viewer.initGUI = function(rep) {
       // register a function to call after each highlight process
       onAfterHighlight: function(highlights, range) {
         // TODO: maybe postprocess highlights here, set different style and transmit to server
-        console.log('selected "' + range + '" and created ' + highlights.length + ' highlight(s)!');
+        console.log(highlights);
+        $(highlights)
+			.css('background-color', $.Color(ObjectManager.getUser().color).alpha(0.4));
         // save highlights to server
         var jsonStr = highlighter.serializeHighlights();
         self.setAttribute('highlights', jsonStr);
