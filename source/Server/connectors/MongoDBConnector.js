@@ -333,9 +333,9 @@ mongoConnector.saveObjectData = function(roomID, objectID, data, callback, conte
     promise.on('complete', function(err, objects) {
         if (err) {
             console.warn("mongoConnector.saveObjectData error: " + err);
-           // if (!_.isUndefined(callback)) callback();
+            if (!_.isUndefined(callback) && callback != false) callback();
         } else {
-        	 //if (!_.isUndefined(callback)) callback();
+        	if (!_.isUndefined(callback) && callback != false) callback();
         }
     });
 }
@@ -966,12 +966,13 @@ mongoConnector.getContent = function(roomID, objectID, context, callback) {
 				// Read in the whole file
 		        GridStore.read(that.db, filename, function(err, content) {
 		        	var byteArray = [];
-					var contentBuffer = new Buffer(content);
-
-					for (var j = 0; j < contentBuffer.length; j++) {
-						byteArray.push(contentBuffer.readUInt8(j));
-					}
-
+		        	if(content != null) {
+						var contentBuffer = new Buffer(content);
+	
+						for (var j = 0; j < contentBuffer.length; j++) {
+							byteArray.push(contentBuffer.readUInt8(j));
+						}
+		        	}
 					callback(byteArray);		          
 		        });
 			} else {
