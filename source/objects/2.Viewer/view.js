@@ -64,7 +64,9 @@ Viewer.initGUI = function(rep) {
         // TODO: maybe postprocess highlights here, set different style and transmit to server
         console.log(highlights);
         $(highlights)
-			.css('background-color', $.Color(ObjectManager.getUser().color).alpha(0.4));
+			.css('background-color', $.Color(ObjectManager.getUser().color).alpha(0.4))
+			.addClass('by_user_' + GUI.userid)
+			.attr('title', 'by ' + GUI.username);
         // save highlights to server
         var jsonStr = highlighter.serializeHighlights();
         self.setAttribute('highlights', jsonStr);
