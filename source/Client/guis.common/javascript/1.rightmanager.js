@@ -233,6 +233,7 @@ GUI.rightmanager = new function() {
     that.obj = theObject;
     that.objData = {id: theObject.id, type: theObject.type};
 
+    if(theObject.type == 'PaperObject' || theObject.type == 'Subroom'){
     /* Display selected object information */
     var selectedObjects = ObjectManager.getSelected();
 
@@ -351,6 +352,7 @@ GUI.rightmanager = new function() {
 
       this.containerSelected.show();
       this.containerNoneSelected.hide();
+    }
     }
   };
 
