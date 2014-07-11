@@ -423,6 +423,8 @@ mongoConnector.duplicateObject = function(roomID, toRoom, objectID, context, cal
     
     if (!context) this.Modules.Log.error("Missing context");
     
+    var that = this;
+    
     var promise = getObjectDataFromDB(objectID);
     promise.on('complete', function(err, obj) {
         
@@ -443,15 +445,59 @@ mongoConnector.duplicateObject = function(roomID, toRoom, objectID, context, cal
                 obj.y += 20;
             }
             
-            // TODO: duplicate the content in GridFS
-            // mongoConnector.saveContent
             
-            var promise2 = saveObject(obj);
+            //console.log("File was written in the DB");
+   		    var promise2 = saveObject(obj);
             promise2.on('complete', function(err, doc) {
-                if (err || doc === undefined || doc.length === 0) {
+            	if (err || doc === undefined || doc.length === 0) {
                     console.warn("ERROR mongoConnector.duplicateObject : " + err);
                     callback(err, false, false);
-                } else callback(null, newID, objectID);
+                } else {
+                	if(obj.hasContent){ //if the object has content, also copy the content
+			            var filenameSource = objectID;
+			            var filenameNew = newID; // create a file in the fs.files with a name the id of the object
+			            gfs.exist({ filename : filenameSource	}, function(err, found) {
+			            	
+			        	    if (err) {
+			        	    	this.Modules.Log.debug("Could not read content from file (roomID: '"
+			        	    		+ roomID + "', objectID: '" + objectID + "', user: '" + 
+			        	    		this.Modules.Log.getUserFromContext(context) + "')");
+			        	    	callback(err, false, false);
+			        	    } else {
+			        			if (found) {			
+			        				// Read in the whole  file
+			        		        GridStore.read(that.db, filenameSource, function(err, content) {        		        	
+			        		        	if(content != null) {
+			        						var contentBuffer = new Buffer(content);        						
+			        						var gridStore2 = new GridStore(that.db, filenameNew, "w");
+			        						gridStore2.open(function(err, gridStore) {
+				        						gridStore.write(contentBuffer, function(err, gridStore) {
+				        					    	if (err) {throw err; callback(err, false, false); }
+				        					    	// Close (Flushes the data to MongoDB)
+				        					        gridStore.close(function(err, result) {
+				        					        	if (err) { throw err; callback(err, false, false);}
+				        					        	// Verify that the file exists
+				        					            GridStore.exist(that.db, filenameNew, function(err, result) {
+				        					            	if(err) { throw err; callback(err, false, false); }
+				        					            	if(result){
+				        					            		callback(null, newID, objectID);			        					                      
+				        					            	}
+				        					            });
+				        					        });
+				        					    });	
+			        						});	
+			        		        	}	          
+			        		        });
+			        			} else {
+			        				// console.log("mongoConnector.getContent " + filename + " does not exist");
+			        				callback(err, false, false);
+			        			}
+			        		}
+			        	});
+	                } else {//if the object dosen't have a content
+                		callback(null, newID, objectID);
+                	}
+                }
             });
         }
     });
@@ -952,7 +998,6 @@ mongoConnector.getContent = function(roomID, objectID, context, callback) {
 	
 	var filename = objectID;
 	
-	var that = this;
 	gfs.exist({ filename : filename	}, function(err, found) {
 	
 	    if (err) {
