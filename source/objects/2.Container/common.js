@@ -30,9 +30,27 @@ Container.register=function(type){
 	
 	GeneralObject=Modules.ObjectManager.getPrototype('GeneralObject');
 	GeneralObject.register.call(this,type);
-		
-    this.standardData.width=475;
-    this.standardData.height=325;
+	
+	this.registerAttribute('width', {type: 'number', min: 410, standard: 475, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
+
+      if (object.resizeProportional()) {
+        object.setAttribute("height", object.getAttribute("height") * (value / object.getAttribute("width")));
+      }
+
+      return true;
+
+    }});
+
+  this.registerAttribute('height', {type: 'number', min: 200, standard: 325, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
+
+      if (object.resizeProportional()) {
+        object.setAttribute("width", object.getAttribute("width") * (value / object.getAttribute("height")));
+      }
+
+      return true;
+
+    }});
+
 
 	this.registerAttribute('name', {type: 'text', standard: 'Container', changedFunction: function(object, value) {
 		var obj = {id:object.id, name:value}; 

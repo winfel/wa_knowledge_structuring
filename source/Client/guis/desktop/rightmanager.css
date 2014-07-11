@@ -181,8 +181,8 @@ hr {
 }
 
 .rightmanager-role-separator {
-  background-color: black;
-  height: 2px;
+  background-color: darkgrey;
+  height: 1px;
   width: 100%;
 }
 

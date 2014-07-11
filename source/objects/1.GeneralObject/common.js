@@ -208,7 +208,7 @@ GeneralObject.register = function(type) {
 
     }});
 
-  this.registerAttribute('height', {type: 'number', min: 5, standard: 100, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
+  this.registerAttribute('height', {type: 'number', min: 5, standard: 200, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
 
       if (object.resizeProportional()) {
         object.setAttribute("width", object.getAttribute("width") * (value / object.getAttribute("height")));
