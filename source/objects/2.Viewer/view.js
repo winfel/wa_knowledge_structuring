@@ -15,8 +15,6 @@ Viewer.draw = function(external) {
   this.setViewWidth(this.getAttribute('width'));
   this.setViewHeight(this.getAttribute('height'));
 
-  console.log("draw");
-
   this.adjustPaper();
 
   $(rep).attr("layer", this.getAttribute('layer'));
@@ -47,18 +45,23 @@ Viewer.draw = function(external) {
 Viewer.initGUI = function(rep) {
   var self = this;
   var highlighter;
+  var toggled = false;
+
   var initializeTextHighlighter = function() {
 
     //get the iframe contents and apply the textHighlighter
-    var frameDocument = $(rep).find('iframe').contents();
-    
+    var frameDocument = $("#iframe-" + rep.id).contents();
+
     // do not load highlighter for about:blank, but if error happens, ignore
     try {
-		if(frameDocument[0].URL == 'about:blank') {
-			return;
-		}
+      if (frameDocument[0].URL == 'about:blank') {
+        return;
+      }
     }
-    catch(ex){}
+    catch (ex) {
+      // Do nothing...
+    }
+
     frameDocument.textHighlighter({
       // register a function to call after each highlight process
       onAfterHighlight: function(highlights, range) {
@@ -69,19 +72,20 @@ Viewer.initGUI = function(rep) {
         self.setAttribute('highlights', jsonStr);
       }
     });
+
     console.log('highlighting for object ' + rep.id + ' activated');
 
     // get the highlighter object
     highlighter = frameDocument.getHighlighter();
 
-	self.loadHighlights = function () {
-		var jsonStr = self.getAttribute('highlights');
-		if (jsonStr != undefined && jsonStr != '')
-			highlighter.removeHighlights();
-			highlighter.deserializeHighlights(jsonStr);
-	};
+    self.loadHighlights = function() {
+      var jsonStr = self.getAttribute('highlights');
+      if (jsonStr != undefined && jsonStr != '')
+        highlighter.removeHighlights();
+      highlighter.deserializeHighlights(jsonStr);
+    };
 
-	self.loadHighlights();
+    self.loadHighlights();
   };
 
   // activate highlighter for iframe when iframe document is loaded
@@ -103,6 +107,31 @@ Viewer.initGUI = function(rep) {
   $(rep).find('.resetHighlightings').click(function() {
     highlighter.removeHighlights();
   });
+
+  // add function to button for testing removage of highlights
+  $(rep).find('.btnFullscreen').click(function() {
+
+    if (toggled) {
+      var viewerContainer = $(".paperViewer");
+      viewerContainer.removeClass("fullscreen");
+
+      $(rep).prepend(viewerContainer);
+      self.select();
+      self.adjustPaper();
+
+    } else {
+      self.deselect();
+
+      var viewerContainer = $(".paperViewer", rep);
+      viewerContainer.addClass("fullscreen");
+
+      $("body").append(viewerContainer);
+      $(".moveOverlay", viewerContainer).hide();
+    }
+    toggled = !toggled;
+    $("#iframe-" + rep.id).data("fullscreen", toggled);
+  });
+
 };
 
 Viewer.createRepresentation = function(parent) {
@@ -118,11 +147,20 @@ Viewer.createRepresentation = function(parent) {
   $body.addClass('paperViewer');
 
   var moveArea = $("<div>");
-  moveArea.addClass("moveArea");
+  moveArea.addClass("moveArea pointer");
   $body.append(moveArea);
-  moveArea.html('<input type="button" class="loadHighlightings" value="load highlightings" />' +
+
+  var buttonArea = $("<div>");
+  buttonArea.addClass("buttonArea");
+  moveArea.append(buttonArea);
+
+  buttonArea.html(
+          '<input type="button" class="loadHighlightings" value="load highlightings" />' +
           '<input type="button" class="saveHighlightings" value="save highlightings" />' +
-          '<input type="button" class="resetHighlightings" value="reset highlightings" />');
+          '<input type="button" class="resetHighlightings" value="reset highlightings" />' +
+          '<input type="image" class="btn btnFullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
+          ''
+          );
 
   //this.createRepresentationAjax($body);
   this.createRepresentationIframe($body);
@@ -143,17 +181,18 @@ Viewer.createRepresentation = function(parent) {
  * @returns {undefined}
  */
 Viewer.createRepresentationIframe = function($body) {
+  var self = this;
+
   var $iframe = $("<iframe>");
   $iframe.attr("id", "iframe-" + this.getAttribute('id'));
 
   $body.append($iframe);
 
-  var iframe_loaded = false;
-  $iframe.one('load', function() {
-    iframe_loaded = true;
-
+  $iframe.on('load', function() {
     // Add the iframe css file to the html document.
     $("head", $iframe.contents()).append('<link type="text/css" href="/guis/desktop/objects/paperViewerIFrame.css" rel="Stylesheet">');
+    
+    self.adjustPaper();
   });
 
   $iframe.attr('src', 'http://' + window.location.hostname + ':8080/getPaper/public/' + this.getAttribute('file') + '.html/');
@@ -186,6 +225,27 @@ Viewer.createRepresentationAjax = function($body) {
   });
 };
 
+/**
+ * Called after object selection
+ */
+Viewer.selectHandler = function() {
+  GeneralObject.selectHandler();
+
+  var rep = $(this.getRepresentation());
+  $("div.moveOverlay", rep).hide();
+  $("div.moveArea", rep).removeClass("pointer");
+};
+
+/**
+ * Called after object deselection
+ */
+Viewer.deselectHandler = function() {
+  GeneralObject.deselectHandler();
+
+  var rep = $(this.getRepresentation());
+  $("div.moveOverlay", rep).show();
+  $("div.moveArea", rep).addClass("pointer");
+};
 
 Viewer.onMoveStart = function() {
   GeneralObject.onMoveStart();
@@ -209,36 +269,30 @@ Viewer.resizeHandler = function() {
 };
 
 Viewer.adjustPaper = function() {
-
-  console.log("adjust");
-
-  var rep = this.getRepresentation();
-  var $rep = $(rep);
-
-  var twopage = this.getAttribute("twopage");
-
-  var iframe = $("#iframe-" + this.getAttribute("id"), $rep);
+  var iframe = $("#iframe-" + this.getAttribute("id"));
   var contents = iframe.contents();
 
   var scaleContainer = $("body", contents);
   var firstPage = $("[data-page-no]", contents).first();
-  
+
   // page dimensions
   var pageWidth = firstPage.width();
   var pageHeight = firstPage.height();
 
   // paper dimensions (including all pages...)
-  var paperWidth = pageWidth;
-  var paperHeight = scaleContainer.height();
+  var papersWidth = pageWidth;
+  var papersHeight = scaleContainer.height();
 
-  if (!paperWidth || !paperHeight)
+  if (!papersWidth || !papersHeight)
     return;
 
-  //console.log(paperWidth + " " + iframe.width() + " " + paperHeight + " " + contents.height());
+  var width;
+  if (iframe.data("fullscreen"))
+    width = $("body").width() - 150; // -30 for the scrollbar, shadow and comments
+  else
+    width = this.getAttribute('width') - 30; // -30 for the scrollbar and shadow
 
-  var width = this.getAttribute('width') - 30; // -30 for the scrollbar and shadow
-
-  var scaleFactor = (width / paperWidth);
+  var scaleFactor = (width / papersWidth);
 
   var translateFactorX = (1 - scaleFactor) / 2;
   var translateFactorY = (1 - scaleFactor) / 2;
@@ -247,9 +301,9 @@ Viewer.adjustPaper = function() {
     translateFactorX = 0;
 
   // CSS 3 transform: supported by Firefox
-  scaleContainer.css("transform", "translate(" + (-width * translateFactorX) + "px, " + (-paperHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
+  scaleContainer.css("transform", "translate(" + (-width * translateFactorX) + "px, " + (-papersHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
   // Chrome, Safari and Opera browsers support though -webkit-transform...
-  scaleContainer.css("-webkit-transform", "translate(" + (-width * translateFactorX) + "px, " + (-paperHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
+  scaleContainer.css("-webkit-transform", "translate(" + (-width * translateFactorX) + "px, " + (-papersHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
 
   if (this.getAttribute("twopage")) {
     // Adjust pages for two page mode
