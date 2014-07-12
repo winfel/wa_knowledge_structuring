@@ -288,20 +288,24 @@ Viewer.initGUI = function(rep) {
   var toggleFullscreen = function(event) {
     
     if (toggled) {
-      //'[data-id="paperViewer-' + rep.id + '"]'
+      // Normal...
       var viewerContainer = $('[data-id="paperViewer-' + rep.id + '"]');
       viewerContainer.removeClass("fullscreen");
+      viewerContainer.css("left", 0);
 
       $(rep).prepend(viewerContainer);
 
       self.adjustPaper();
 
     } else {
+      // Fullscreen
       var viewerContainer = $('[data-id="paperViewer-' + rep.id + '"]');
       viewerContainer.addClass("fullscreen");
+      viewerContainer.css("left", $(window).scrollLeft());
 
       $("body").append(viewerContainer);
       $(".moveOverlay", viewerContainer).hide();
+      
     }
     toggled = !toggled;
     $("#iframe-" + rep.id).data("fullscreen", toggled);
@@ -309,6 +313,9 @@ Viewer.initGUI = function(rep) {
     // Toggle the buttons..
     btnFullscreen.toggle();
     btnRestore.toggle();
+    
+    // Make sure the scrollbars of the window are not visible in the fullscreen mode...
+    $("body").first().toggleClass("overflowHidden");
     
     // We don't want to move the element. That's why we stop the propagation.
     event.stopPropagation();
