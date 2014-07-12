@@ -263,10 +263,10 @@ UserManager.login = function(socketOrUser, data) {
 UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
   var shouldInclude = [ PAPER_WRITER+"#Writer#20#100#700#2#locked;true#paper;"+data.roomID,
-                        "Textarea#WritingAreaInfo#20#45#100#2#height;30#content;Writing Area:",
-                        "Textarea#ReferenceInfo#800#45#100#2#height;30#content;References:",
+                        "SimpleText#WritingAreaInfo#20#45#100#2#height;30#content;Writing Area:",
+                        "SimpleText#ReferenceInfo#800#45#100#2#height;30#content;References:",
                         "Container#References#800#100#500#2#locked;true#height;455",
-                        "Textarea#DefineInfo#800#600#190#2#height;30#content;Define your structure here:",
+                        "SimpleText#DefineInfo#800#600#190#2#height;30#content;Define your structure here:",
                         "PaperSelector#Selector#800#650#1#1#locked;true",
                         "PaperChapter#Chapter1#880#650#1#1#chapterID;"+data.roomID];
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
