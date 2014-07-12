@@ -9,7 +9,10 @@ and open the template in the editor.
 */
 
 .paperViewer {
-  height: 100%;
+  height: 99.8%;
+  position: relative;
+  border: 1px solid #9E9E9E;
+  border-bottom-width: 10px;
 }
 
 .paperViewer .btn {
@@ -27,8 +30,6 @@ and open the template in the editor.
 }
 
 .paperViewer .paperViewerHeader {
-  height: 32px;
-
   background: -moz-linear-gradient(center top, #BEBEBE 0%, #9E9E9E 100%) repeat scroll 0 0 transparent;
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #3E3E3E), color-stop(1, #1E1E1E));
 }
@@ -36,8 +37,6 @@ and open the template in the editor.
 .paperViewerTitle {
   color: #3D3D3D;
   font-size: 12px;
-  padding-top: 5px;
-  display: block;
 }
 
 .paperViewer .paperViewerHeader > div {
@@ -46,19 +45,24 @@ and open the template in the editor.
   vertical-align: top;
 }
 
+.paperViewerHeader table {
+  width: 100%;
+}
+
 .paperViewerHeader .buttonAreaLeft {
-  width: 25%;
+  white-space: nowrap;
 }
 
 .paperViewerHeader .buttonAreaRight {
-  width: 10%;
-  text-align: right;
+  white-space: nowrap;
 }
 
 .paperViewerHeader .titleArea {
-  width: 65%;
+  width: 100%;
+  padding: 0 12px;
   position: relative;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .titleArea .moveArea {
@@ -67,6 +71,18 @@ and open the template in the editor.
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.titleArea .moveArea:hover {
+  cursor: move;
+}
+
+.paperViewerFooter {
+  position: fixed;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  border-bottom: 1px solid #9E9E9E;
 }
 
 .paperViewer .moveOverlay {
@@ -95,4 +111,6 @@ and open the template in the editor.
   height: 100%;
   padding: 0;
   border: 0;
+  overflow-x: auto;
+  overflow-y: scroll;
 }

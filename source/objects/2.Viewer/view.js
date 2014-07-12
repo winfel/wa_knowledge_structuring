@@ -112,7 +112,7 @@ Viewer.initGUI = function(rep) {
   var btnRestore = $(".btnRestore", rep).first();
 
   var toggleFullscreen = function(event) {
-    
+
     if (toggled) {
       //'[data-id="paperViewer-' + rep.id + '"]'
       var viewerContainer = $('[data-id="paperViewer-' + rep.id + '"]');
@@ -135,7 +135,7 @@ Viewer.initGUI = function(rep) {
     // Toggle the buttons..
     btnFullscreen.toggle();
     btnRestore.toggle();
-    
+
     // We don't want to move the element. That's why we stop the propagation.
     event.stopPropagation();
   };
@@ -163,7 +163,8 @@ Viewer.createRepresentation = function(parent) {
 
   var header = $("<div>");
   header.addClass("paperViewerHeader");
-  header.html('<div class="buttonAreaLeft"></div><div class="titleArea"></div><div class="buttonAreaRight"></div>');
+  header.html('<table><tr><td class="buttonAreaLeft"></td><td class="titleArea"></td><td class="buttonAreaRight"></td></tr></table>');
+
   $body.append(header);
 
   $(".buttonAreaLeft", header).html(
@@ -173,14 +174,23 @@ Viewer.createRepresentation = function(parent) {
           ''
           );
 
-  $(".titleArea", header).html('<span class="paperViewerTitle">' + file.getAttribute("name") + '</span><div class="moveArea"></div>');
+  if (file) {
+    $(".titleArea", header).html('<span class="paperViewerTitle">' + file.getAttribute("name") + '</span><div class="moveArea"></div>');
+  } else {
+    $(".titleArea", header).html('<span class="paperViewerTitle">No document</span><div class="moveArea"></div>');
+  }
+
   $(".buttonAreaRight", header).html(
           '<input type="image" class="btn btnFullscreen" title="Fullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
           '<input type="image" class="btn btnRestore" title="Restore Screen" src="/guis.common/images/oxygen/16x16/actions/view-restore.png" style="display: none;" />' +
           '');
-  
+
   //this.createRepresentationAjax($body);
   this.createRepresentationIframe($body);
+
+  var borderBottom = $("<div>");
+  borderBottom.addClass("paperViewerFooter");
+  $body.append(borderBottom);
 
   var moveOverlay = $("<div>");
   moveOverlay.addClass("moveOverlay");
@@ -306,6 +316,12 @@ Viewer.adjustPaper = function() {
     width = $("body").width() - 150; // -30 for the scrollbar, shadow and comments
   else
     width = this.getAttribute('width') - 30; // -30 for the scrollbar and shadow
+
+  var height;
+  if (iframe.data("fullscreen"))
+    height = $("body").height(); // -30 for the scrollbar, shadow and comments
+  else
+    height = this.getAttribute('height') - 30; // -30 for the scrollbar and shadow
 
   var scaleFactor = (width / papersWidth);
 
