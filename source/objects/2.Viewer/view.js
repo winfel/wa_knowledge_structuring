@@ -16,7 +16,7 @@ Viewer.draw = function(external) {
   this.setViewHeight(this.getAttribute('height'));
 
   this.adjustPaper();
-
+  
   $(rep).attr("layer", this.getAttribute('layer'));
 
   var that = this;
@@ -51,12 +51,12 @@ Viewer.initGUI = function(rep) {
 
     //get the iframe contents and apply the textHighlighter
     var frameDocument = $("#iframe-" + rep.id).contents();
-
+    
     // do not load highlighter for about:blank, but if error happens, ignore
     try {
-      if (frameDocument[0].URL == 'about:blank') {
-        return;
-      }
+		if(frameDocument[0].URL == 'about:blank') {
+			return;
+		}
     }
     catch (ex) {
       // Do nothing...
@@ -66,7 +66,12 @@ Viewer.initGUI = function(rep) {
       // register a function to call after each highlight process
       onAfterHighlight: function(highlights, range) {
         // TODO: maybe postprocess highlights here, set different style and transmit to server
-        console.log('selected "' + range + '" and created ' + highlights.length + ' highlight(s)!');
+        console.log(highlights);
+        console.log(range);
+        $(highlights)
+			.css('background-color', $.Color(ObjectManager.getUser().color).alpha(0.4))
+			.addClass('by_user_' + GUI.userid)
+			.attr('title', 'by ' + GUI.username);
         // save highlights to server
         var jsonStr = highlighter.serializeHighlights();
         self.setAttribute('highlights', jsonStr);
@@ -78,14 +83,170 @@ Viewer.initGUI = function(rep) {
     // get the highlighter object
     highlighter = frameDocument.getHighlighter();
 
-    self.loadHighlights = function() {
-      var jsonStr = self.getAttribute('highlights');
-      if (jsonStr != undefined && jsonStr != '')
-        highlighter.removeHighlights();
-      highlighter.deserializeHighlights(jsonStr);
-    };
+	self.loadHighlights = function () {
+		var jsonStr = self.getAttribute('highlights');
+		if (jsonStr != undefined && jsonStr != '') {
+			highlighter.removeHighlights();
+			highlighter.deserializeHighlights(jsonStr);
+		}
+	};
 
-    self.loadHighlights();
+	self.saveHighlights = function () {
+		var jsonStr = highlighter.serializeHighlights();
+		self.setAttribute('highlights', jsonStr);
+	};
+
+
+	var menu = $('<div id="highlightmenu"></div>')
+		.css({
+			border:	'1px solid black',
+			width:	'auto',
+			height:	'auto',
+			position:	'absolute',
+			top:	'10px',
+			left:	'10px',
+			background:	'white',
+			whiteSpace: 'nowrap',
+		})
+		.append(
+			// invisible placeholder at the bottom of the menu to close the gap between the menu and the text
+			$('<div></div>')
+				.css({
+					position:	'absolute',
+					bottom:		'-5px',
+					left:		'0',
+					width:		'100%',
+					height:		'5px',
+				})
+		);
+
+
+	var lastTarget;
+
+	menu.append(
+		$('<button class="strike" title="strike">S</button>').click(function(){
+			lastTarget.toggleClass('strike');
+			self.saveHighlights();
+		})
+	);
+	menu.append(
+		$('<button class="scratchout" title="scratch out text">&emsp;</button>').click(function(){
+			lastTarget.toggleClass('scratchout');
+			self.saveHighlights();
+		})
+	);
+	menu.append(
+		$('<button class="glow" title="glow">G</button>').click(function(){
+			lastTarget.toggleClass('glow');
+			self.saveHighlights();
+		})
+	);
+	menu.append(
+		$('<button title="create a quote out of this text">&ldquo;Q&rdquo;</button>').click(function(){
+			lastTarget.toggleClass('quote');
+			self.saveHighlights();
+		})
+	);
+	menu.append(
+		$('<button title="add audio comment">A</button>').click(function(){
+			lastTarget.toggleClass('audio');
+			self.saveHighlights();
+		})
+	);
+	menu.append(
+		$('<button title="remove highlighting">X</button>').click(function(){
+			console.log('we can´t remove yet');
+			self.saveHighlights();
+		})
+	);
+	frameDocument.find('body').append(menu);
+
+	// maybe this styles should be placed somewhere else
+	frameDocument.find('head').append('<style type="text/css">\
+		.strike {\
+			/*text-line-through-color: red;*/\
+			text-line-through-mode: skip-white-space;\
+			text-line-through-style: wave;\
+			text-line-through-width: normal;\
+			text-decoration: line-through;\
+			/*text-decoration-color: red;*/\
+			text-decoration-line: wave;\
+			/*-moz-text-line-through-color: red;*/\
+			-moz-text-line-through-mode: skip-white-space;\
+			-moz-text-line-through-style: wave;\
+			-moz-text-line-through-width: normal;\
+			/*-moz-text-decoration-color: red;*/\
+			-moz-text-decoration-line: wave;\
+		}\
+		.scratchout {\
+			background-image: url(/guis.common/images/scratchout.png);\
+		}\
+		.glow {\
+			text-shadow: 0px 0px 10px red;\
+		}\
+		.quote {\
+			box-shadow: 0px 0px 10px 5px;\
+		}\
+		.quote:hover::before {\
+			content: "\\"";\
+			position: absolute;\
+			margin-left:-0.5em;\
+		}\
+		.quote:hover::after {\
+			content: "\\"";\
+			position: absolute;\
+			margin-left:0;\
+		}\
+		.strike, .glow, .scratchout, .quote {\
+			background-color: none !important;\
+		}\
+		.audio::before {\
+			content: "";\
+			position: absolute;\
+			left: -10px;\
+			top: -10px;\
+			width: 20px;\
+			height: 20px;\
+			background: blue;\
+			border-radius: 20px;\
+		}\
+		</style>\
+	');
+
+	var delaymenu;
+
+	frameDocument.on('mouseover', '.highlighted', function(event){
+		if(delaymenu != undefined)
+			window.clearTimeout(delaymenu);
+		delaymenu = window.setTimeout(function(){
+			lastTarget = $(event.target);
+			var refpos = lastTarget.offset();
+			menu.show();
+			refpos.left += 5;
+			refpos.top -= menu.height() + 5;
+			menu.offset(refpos);
+			delaymenu = window.setTimeout(function(){ menu.hide(); }, 8000);
+		}, 800);
+	});
+
+	menu.on('mouseover', function(){
+		if(delaymenu != undefined)
+			window.clearTimeout(delaymenu);
+	});
+
+	menu.on('mouseout', function(){
+		delaymenu = window.setTimeout(function(){ menu.hide(); }, 8000);
+	});
+
+/*	frameDocument.on('mouseover', '.highlighted', function(event){
+		lastTarget = $(event.target);
+		var refpos = lastTarget.offset();
+		refpos.left += 5;
+		refpos.top -= menu.height() + 5;
+		menu.offset(refpos);
+	});*/
+
+	self.loadHighlights();
   };
 
   // activate highlighter for iframe when iframe document is loaded
@@ -138,7 +299,7 @@ Viewer.initGUI = function(rep) {
 
     // We don't want to move the element. That's why we stop the propagation.
     event.stopPropagation();
-  };
+};
 
   // add function to button for testing removage of highlights
   btnFullscreen.click(toggleFullscreen);
@@ -195,7 +356,7 @@ Viewer.createRepresentation = function(parent) {
   var moveOverlay = $("<div>");
   moveOverlay.addClass("moveOverlay");
   $body.append(moveOverlay);
-
+  
   this.initGUI(rep);
 
   return rep;
@@ -274,14 +435,14 @@ Viewer.deselectHandler = function() {
 
 Viewer.onMoveStart = function() {
   GeneralObject.onMoveStart();
-
+  
   var rep = $(this.getRepresentation());
   $("div.moveOverlay", rep).show();
 };
 
 Viewer.onMoveEnd = function() {
   GeneralObject.onMoveEnd();
-
+  
   var rep = $(this.getRepresentation());
   $("div.moveOverlay", rep).hide();
 };
@@ -324,18 +485,18 @@ Viewer.adjustPaper = function() {
     height = this.getAttribute('height') - 30; // -30 for the scrollbar and shadow
 
   var scaleFactor = (width / papersWidth);
-
+  
   var translateFactorX = (1 - scaleFactor) / 2;
   var translateFactorY = (1 - scaleFactor) / 2;
-
-  if (scaleFactor > 1)
+  
+  if(scaleFactor > 1)
     translateFactorX = 0;
 
   // CSS 3 transform: supported by Firefox
   scaleContainer.css("transform", "translate(" + (-width * translateFactorX) + "px, " + (-papersHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
   // Chrome, Safari and Opera browsers support though -webkit-transform...
   scaleContainer.css("-webkit-transform", "translate(" + (-width * translateFactorX) + "px, " + (-papersHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
-
+  
   if (this.getAttribute("twopage")) {
     // Adjust pages for two page mode
     var translateFactorXeven = (-pageWidth / 4);
