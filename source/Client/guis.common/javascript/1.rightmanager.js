@@ -135,7 +135,10 @@ GUI.rightmanager = new function() {
     // Add role event
     $("#rmNewRoleButton").click(function(event) {
       var role = $("#rmNewRoleTextfield").val();
-      console.log(role);
+     
+      Modules.UserManager.addRole(GUI.rightmanager.objData, {name: role});
+
+      GUI.rightmanager.updateContent(GUI.rightmanager.obj);
     });
 
     // Add user event
@@ -178,6 +181,9 @@ GUI.rightmanager = new function() {
    * @returns {undefined}
    */
   this.updateUsersSection = function(users) {
+    /* sort array in alphabetical order */
+    users.sort();
+
     //users=["Patrick","Jörg","Vanessa","Mohammad","Lisa","Ivan","Oliver","Shari"]; // Demo data
     var that = GUI.rightmanager;
 
@@ -361,10 +367,15 @@ GUI.rightmanager = new function() {
     var role = that.selectedRoleSpan.data("role");
 
     var resultCallback = function(users) {
+      users.sort();
+
       users.forEach(function(user) {
         addUserToSection(that, user, that.rmUsers, role, true);
         Modules.UserManager.addUser(that.objData, role, user);
       });
+
+      GUI.rightmanager.updateContent(GUI.rightmanager.obj);
+
     };
 
     GUI.userdialog.show(that.objData, role, resultCallback);
