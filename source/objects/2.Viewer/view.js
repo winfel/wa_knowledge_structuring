@@ -67,7 +67,6 @@ Viewer.initGUI = function(rep) {
       onAfterHighlight: function(highlights, range) {
         // TODO: maybe postprocess highlights here, set different style and transmit to server
         console.log(highlights);
-        console.log(range);
         $(highlights)
 			.css('background-color', $.Color(ObjectManager.getUser().color).alpha(0.4))
 			.addClass('by_user_' + GUI.userid)
@@ -127,39 +126,46 @@ Viewer.initGUI = function(rep) {
 		$('<button class="strike" title="strike">S</button>').click(function(){
 			lastTarget.toggleClass('strike');
 			self.saveHighlights();
+			menu.hide();
 		})
 	);
 	menu.append(
 		$('<button class="scratchout" title="scratch out text">&emsp;</button>').click(function(){
 			lastTarget.toggleClass('scratchout');
 			self.saveHighlights();
+			menu.hide();
 		})
 	);
 	menu.append(
 		$('<button class="glow" title="glow">G</button>').click(function(){
 			lastTarget.toggleClass('glow');
 			self.saveHighlights();
+			menu.hide();
 		})
 	);
 	menu.append(
 		$('<button title="create a quote out of this text">&ldquo;Q&rdquo;</button>').click(function(){
 			lastTarget.toggleClass('quote');
 			self.saveHighlights();
+			menu.hide();
 		})
 	);
 	menu.append(
 		$('<button title="add audio comment">A</button>').click(function(){
 			lastTarget.toggleClass('audio');
 			self.saveHighlights();
+			menu.hide();
 		})
 	);
 	menu.append(
-		$('<button title="remove highlighting">X</button>').click(function(){
-			console.log('we can´t remove yet');
+		$('<button title="remove highlighting">X</button>').click(function(event){
+			highlighter.removeHighlights(lastTarget);
 			self.saveHighlights();
+			menu.hide();
 		})
 	);
 	frameDocument.find('body').append(menu);
+	menu.hide();
 
 	// maybe this styles should be placed somewhere else
 	frameDocument.find('head').append('<style type="text/css">\
