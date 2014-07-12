@@ -63,6 +63,7 @@ Viewer.initGUI = function(rep) {
       onAfterHighlight: function(highlights, range) {
         // TODO: maybe postprocess highlights here, set different style and transmit to server
         console.log(highlights);
+        console.log(range);
         $(highlights)
 			.css('background-color', $.Color(ObjectManager.getUser().color).alpha(0.4))
 			.addClass('by_user_' + GUI.userid)
@@ -79,10 +80,166 @@ Viewer.initGUI = function(rep) {
 
 	self.loadHighlights = function () {
 		var jsonStr = self.getAttribute('highlights');
-		if (jsonStr != undefined && jsonStr != '')
+		if (jsonStr != undefined && jsonStr != '') {
 			highlighter.removeHighlights();
 			highlighter.deserializeHighlights(jsonStr);
+		}
 	};
+
+	self.saveHighlights = function () {
+		var jsonStr = highlighter.serializeHighlights();
+		self.setAttribute('highlights', jsonStr);
+	};
+
+
+	var menu = $('<div id="highlightmenu"></div>')
+		.css({
+			border:	'1px solid black',
+			width:	'auto',
+			height:	'auto',
+			position:	'absolute',
+			top:	'10px',
+			left:	'10px',
+			background:	'white',
+			whiteSpace: 'nowrap',
+		})
+		.append(
+			// invisible placeholder at the bottom of the menu to close the gap between the menu and the text
+			$('<div></div>')
+				.css({
+					position:	'absolute',
+					bottom:		'-5px',
+					left:		'0',
+					width:		'100%',
+					height:		'5px',
+				})
+		);
+
+
+	var lastTarget;
+
+	menu.append(
+		$('<button class="strike" title="strike">S</button>').click(function(){
+			lastTarget.toggleClass('strike');
+			self.saveHighlights();
+		})
+	);
+	menu.append(
+		$('<button class="scratchout" title="scratch out text">&emsp;</button>').click(function(){
+			lastTarget.toggleClass('scratchout');
+			self.saveHighlights();
+		})
+	);
+	menu.append(
+		$('<button class="glow" title="glow">G</button>').click(function(){
+			lastTarget.toggleClass('glow');
+			self.saveHighlights();
+		})
+	);
+	menu.append(
+		$('<button title="create a quote out of this text">&ldquo;Q&rdquo;</button>').click(function(){
+			lastTarget.toggleClass('quote');
+			self.saveHighlights();
+		})
+	);
+	menu.append(
+		$('<button title="add audio comment">A</button>').click(function(){
+			lastTarget.toggleClass('audio');
+			self.saveHighlights();
+		})
+	);
+	menu.append(
+		$('<button title="remove highlighting">X</button>').click(function(){
+			console.log('we can´t remove yet');
+			self.saveHighlights();
+		})
+	);
+	frameDocument.find('body').append(menu);
+
+	// maybe this styles should be placed somewhere else
+	frameDocument.find('head').append('<style type="text/css">\
+		.strike {\
+			/*text-line-through-color: red;*/\
+			text-line-through-mode: skip-white-space;\
+			text-line-through-style: wave;\
+			text-line-through-width: normal;\
+			text-decoration: line-through;\
+			/*text-decoration-color: red;*/\
+			text-decoration-line: wave;\
+			/*-moz-text-line-through-color: red;*/\
+			-moz-text-line-through-mode: skip-white-space;\
+			-moz-text-line-through-style: wave;\
+			-moz-text-line-through-width: normal;\
+			/*-moz-text-decoration-color: red;*/\
+			-moz-text-decoration-line: wave;\
+		}\
+		.scratchout {\
+			background-image: url(/guis.common/images/scratchout.png);\
+		}\
+		.glow {\
+			text-shadow: 0px 0px 10px red;\
+		}\
+		.quote {\
+			box-shadow: 0px 0px 10px 5px;\
+		}\
+		.quote:hover::before {\
+			content: "\\"";\
+			position: absolute;\
+			margin-left:-0.5em;\
+		}\
+		.quote:hover::after {\
+			content: "\\"";\
+			position: absolute;\
+			margin-left:0;\
+		}\
+		.strike, .glow, .scratchout, .quote {\
+			background-color: none !important;\
+		}\
+		.audio::before {\
+			content: "";\
+			position: absolute;\
+			left: -10px;\
+			top: -10px;\
+			width: 20px;\
+			height: 20px;\
+			background: blue;\
+			border-radius: 20px;\
+		}\
+		</style>\
+	');
+
+	var delaymenu;
+
+	frameDocument.on('mouseover', '.highlighted', function(event){
+		if(delaymenu != undefined)
+			window.clearTimeout(delaymenu);
+		delaymenu = window.setTimeout(function(){
+			lastTarget = $(event.target);
+			var refpos = lastTarget.offset();
+			menu.show();
+			refpos.left += 5;
+			refpos.top -= menu.height() + 5;
+			menu.offset(refpos);
+			delaymenu = window.setTimeout(function(){ menu.hide(); }, 8000);
+		}, 800);
+	});
+
+	menu.on('mouseover', function(){
+		if(delaymenu != undefined)
+			window.clearTimeout(delaymenu);
+	});
+
+	menu.on('mouseout', function(){
+		delaymenu = window.setTimeout(function(){ menu.hide(); }, 8000);
+	});
+
+/*	frameDocument.on('mouseover', '.highlighted', function(event){
+		lastTarget = $(event.target);
+		var refpos = lastTarget.offset();
+		refpos.left += 5;
+		refpos.top -= menu.height() + 5;
+		menu.offset(refpos);
+	});*/
 
 	self.loadHighlights();
   };
