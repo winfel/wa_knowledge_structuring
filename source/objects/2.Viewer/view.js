@@ -108,21 +108,22 @@ Viewer.initGUI = function(rep) {
     highlighter.removeHighlights();
   });
 
-  // add function to button for testing removage of highlights
-  $(rep).find('.btnFullscreen').click(function() {
+  var btnFullscreen = $(".btnFullscreen", rep).first();
+  var btnRestore = $(".btnRestore", rep).first();
 
+  var toggleFullscreen = function(event) {
+    
     if (toggled) {
-      var viewerContainer = $(".paperViewer");
+      //'[data-id="paperViewer-' + rep.id + '"]'
+      var viewerContainer = $('[data-id="paperViewer-' + rep.id + '"]');
       viewerContainer.removeClass("fullscreen");
 
       $(rep).prepend(viewerContainer);
-      self.select();
+
       self.adjustPaper();
 
     } else {
-      self.deselect();
-
-      var viewerContainer = $(".paperViewer", rep);
+      var viewerContainer = $('[data-id="paperViewer-' + rep.id + '"]');
       viewerContainer.addClass("fullscreen");
 
       $("body").append(viewerContainer);
@@ -130,8 +131,18 @@ Viewer.initGUI = function(rep) {
     }
     toggled = !toggled;
     $("#iframe-" + rep.id).data("fullscreen", toggled);
-  });
 
+    // Toggle the buttons..
+    btnFullscreen.toggle();
+    btnRestore.toggle();
+    
+    // We don't want to move the element. That's why we stop the propagation.
+    event.stopPropagation();
+  };
+
+  // add function to button for testing removage of highlights
+  btnFullscreen.click(toggleFullscreen);
+  btnRestore.click(toggleFullscreen);
 };
 
 Viewer.createRepresentation = function(parent) {
@@ -143,25 +154,31 @@ Viewer.createRepresentation = function(parent) {
   $rep.attr({id: this.getAttribute('id')});
   $rep.append(body);
 
+  var file = ObjectManager.getObject(this.getAttribute("file"));
+
   var $body = $(body);
   $body.addClass('paperViewer');
+  // data-id is required, because of a fallback logic in GeneralObject.moveStart!
+  $body.attr({'data-id': "paperViewer-" + this.getAttribute('id')});
 
-  var moveArea = $("<div>");
-  moveArea.addClass("moveArea pointer");
-  $body.append(moveArea);
+  var header = $("<div>");
+  header.addClass("paperViewerHeader");
+  header.html('<div class="buttonAreaLeft"></div><div class="titleArea"></div><div class="buttonAreaRight"></div>');
+  $body.append(header);
 
-  var buttonArea = $("<div>");
-  buttonArea.addClass("buttonArea");
-  moveArea.append(buttonArea);
-
-  buttonArea.html(
-          '<input type="button" class="loadHighlightings" value="load highlightings" />' +
-          '<input type="button" class="saveHighlightings" value="save highlightings" />' +
-          '<input type="button" class="resetHighlightings" value="reset highlightings" />' +
-          '<input type="image" class="btn btnFullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
+  $(".buttonAreaLeft", header).html(
+          '<input type="image" class="btn loadHighlightings" title="load highlightings" src="/guis.common/images/oxygen/16x16/actions/view-pim-notes-open.png" />' +
+          '<input type="image" class="btn saveHighlightings" title="save highlightings" src="/guis.common/images/oxygen/16x16/actions/view-pim-notes-save.png" />' +
+          '<input type="image" class="btn resetHighlightings" title="reset highlightings" src="/guis.common/images/oxygen/16x16/actions/view-pim-notes-delete.png" />' +
           ''
           );
 
+  $(".titleArea", header).html('<span class="paperViewerTitle">' + file.getAttribute("name") + '</span><div class="moveArea"></div>');
+  $(".buttonAreaRight", header).html(
+          '<input type="image" class="btn btnFullscreen" title="Fullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
+          '<input type="image" class="btn btnRestore" title="Restore Screen" src="/guis.common/images/oxygen/16x16/actions/view-restore.png" style="display: none;" />' +
+          '');
+  
   //this.createRepresentationAjax($body);
   this.createRepresentationIframe($body);
 
@@ -191,7 +208,7 @@ Viewer.createRepresentationIframe = function($body) {
   $iframe.on('load', function() {
     // Add the iframe css file to the html document.
     $("head", $iframe.contents()).append('<link type="text/css" href="/guis/desktop/objects/paperViewerIFrame.css" rel="Stylesheet">');
-    
+
     self.adjustPaper();
   });
 
@@ -233,7 +250,6 @@ Viewer.selectHandler = function() {
 
   var rep = $(this.getRepresentation());
   $("div.moveOverlay", rep).hide();
-  $("div.moveArea", rep).removeClass("pointer");
 };
 
 /**
@@ -244,7 +260,6 @@ Viewer.deselectHandler = function() {
 
   var rep = $(this.getRepresentation());
   $("div.moveOverlay", rep).show();
-  $("div.moveArea", rep).addClass("pointer");
 };
 
 Viewer.onMoveStart = function() {
