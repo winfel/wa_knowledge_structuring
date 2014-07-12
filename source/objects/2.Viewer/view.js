@@ -394,8 +394,6 @@ Viewer.createRepresentation = function(parent) {
 
   return rep;
 };
-
-var getPaperUrl = 'http://' + window.location.hostname + ':8080/getPaper/';
 /**
  * Creates the iframe representation
  * 
@@ -417,7 +415,7 @@ Viewer.createRepresentationIframe = function($body) {
     self.adjustPaper();
   });
 
-  $iframe.attr('src', 'http://' + window.location.hostname + ':8080/getPaper/public/' + this.getAttribute('file') + '.html/');
+  this.setDocument(this.getAttribute('file'));
 };
 
 Viewer.setTitle = function(title) {
@@ -428,13 +426,14 @@ Viewer.setTitle = function(title) {
   }
 };
 
+var getPaperUrl = 'http://' + window.location.hostname + ':8080/getPaper';
+
 Viewer.setDocument = function(documentId) {
-  $("#iframe-" + this.getAttribute("id")).attr("src", getPaperUrl + "public/" + documentId + ".html/");
+  $("#iframe-" + this.getAttribute("id")).attr("src", getPaperUrl + "/" + this.getRoom().id + "/" + (documentId && documentId != "[somefileid]" ? documentId : "0"));
 };
 
 Viewer.reloadDocument = function(documentId) {
   var file = ObjectManager.getObject(documentId);
-
   this.setTitle((file ? file.getAttribute("name") : ""));
   this.setDocument(documentId);
 };
@@ -513,6 +512,9 @@ Viewer.adjustPaper = function() {
 
   var scaleContainer = $("body", contents);
   var firstPage = $("[data-page-no]", contents).first();
+
+  if(!firstPage)
+    return;
 
   // page dimensions
   var pageWidth = firstPage.width();

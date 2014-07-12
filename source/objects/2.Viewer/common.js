@@ -16,7 +16,7 @@ Viewer.register = function(type) {
   GeneralObject = Modules.ObjectManager.getPrototype('GeneralObject');
   GeneralObject.register.call(this, type);
 
-  this.registerAttribute('file', {type: 'text', standard: '[somefileid]', changedFunction: function(object, value) {
+  this.registerAttribute('file', {type: 'text', changedFunction: function(object, value) {
       object.reloadDocument(value);
     }});
   this.registerAttribute('highlights', {type: 'text', standard: '', changedFunction: function(object, value) {

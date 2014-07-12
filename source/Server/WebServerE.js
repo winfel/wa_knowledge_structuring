@@ -207,11 +207,21 @@ app.get('/getRoomHierarchy', function(req, res, next) {
   });
 });
 
-app.get("/getPaper/:roomID/:objectID/", function(req, res, next) {
+app.get("/getPaper/:roomID/:objectID", function(req, res, next) {
   var context = {username: "dummy"};
   res.set('Content-Type', 'text/html');
   res.set('Content-Disposition', 'inline; filename="paper.html"');
-  var data = Modules.Connector.getContent(req.params.roomID, req.params.objectID, context);
+
+  var data;
+  if (req.params.objectID != '0')
+    data = Modules.Connector.getContent(req.params.roomID, req.params.objectID + ".html", context);
+  else
+    data = '<!DOCTYPE html>' +
+            '<html><head><title>Drag a document in here!</title></head>' +
+            '<body><div style="width: 388px; margin: 0 auto;">' +
+            '<img src="/guis.common/images/dragDocument.png" alt="Drag a document in here!" title="Drag a document in here!">' +
+            '</div></body></html>';
+
   res.send(200, new Buffer(data));
   return;
 });
