@@ -19,7 +19,6 @@ Viewer.draw = function(external) {
   
   $(rep).attr("layer", this.getAttribute('layer'));
 
-
   var that = this;
 
   //this.updateContent();
@@ -46,10 +45,12 @@ Viewer.draw = function(external) {
 Viewer.initGUI = function(rep) {
   var self = this;
   var highlighter;
+  var toggled = false;
+
   var initializeTextHighlighter = function() {
 
     //get the iframe contents and apply the textHighlighter
-    var frameDocument = $(rep).find('iframe').contents();
+    var frameDocument = $("#iframe-" + rep.id).contents();
     
     // do not load highlighter for about:blank, but if error happens, ignore
     try {
@@ -57,7 +58,10 @@ Viewer.initGUI = function(rep) {
 			return;
 		}
     }
-    catch(ex){}
+    catch (ex) {
+      // Do nothing...
+    }
+
     frameDocument.textHighlighter({
       // register a function to call after each highlight process
       onAfterHighlight: function(highlights, range) {
@@ -73,6 +77,7 @@ Viewer.initGUI = function(rep) {
         self.setAttribute('highlights', jsonStr);
       }
     });
+
     console.log('highlighting for object ' + rep.id + ' activated');
 
     // get the highlighter object
@@ -263,6 +268,42 @@ Viewer.initGUI = function(rep) {
   $(rep).find('.resetHighlightings').click(function() {
     highlighter.removeHighlights();
   });
+
+  var btnFullscreen = $(".btnFullscreen", rep).first();
+  var btnRestore = $(".btnRestore", rep).first();
+
+  var toggleFullscreen = function(event) {
+    
+    if (toggled) {
+      //'[data-id="paperViewer-' + rep.id + '"]'
+      var viewerContainer = $('[data-id="paperViewer-' + rep.id + '"]');
+      viewerContainer.removeClass("fullscreen");
+
+      $(rep).prepend(viewerContainer);
+
+      self.adjustPaper();
+
+    } else {
+      var viewerContainer = $('[data-id="paperViewer-' + rep.id + '"]');
+      viewerContainer.addClass("fullscreen");
+
+      $("body").append(viewerContainer);
+      $(".moveOverlay", viewerContainer).hide();
+    }
+    toggled = !toggled;
+    $("#iframe-" + rep.id).data("fullscreen", toggled);
+
+    // Toggle the buttons..
+    btnFullscreen.toggle();
+    btnRestore.toggle();
+    
+    // We don't want to move the element. That's why we stop the propagation.
+    event.stopPropagation();
+};
+
+  // add function to button for testing removage of highlights
+  btnFullscreen.click(toggleFullscreen);
+  btnRestore.click(toggleFullscreen);
 };
 
 Viewer.createRepresentation = function(parent) {
@@ -274,16 +315,31 @@ Viewer.createRepresentation = function(parent) {
   $rep.attr({id: this.getAttribute('id')});
   $rep.append(body);
 
+  var file = ObjectManager.getObject(this.getAttribute("file"));
+
   var $body = $(body);
   $body.addClass('paperViewer');
+  // data-id is required, because of a fallback logic in GeneralObject.moveStart!
+  $body.attr({'data-id': "paperViewer-" + this.getAttribute('id')});
 
-  var moveArea = $("<div>");
-  moveArea.addClass("moveArea");
-  $body.append(moveArea);
-  moveArea.html('<input type="button" class="loadHighlightings" value="load highlightings" />' +
-          '<input type="button" class="saveHighlightings" value="save highlightings" />' +
-          '<input type="button" class="resetHighlightings" value="reset highlightings" />');
+  var header = $("<div>");
+  header.addClass("paperViewerHeader");
+  header.html('<div class="buttonAreaLeft"></div><div class="titleArea"></div><div class="buttonAreaRight"></div>');
+  $body.append(header);
 
+  $(".buttonAreaLeft", header).html(
+          '<input type="image" class="btn loadHighlightings" title="load highlightings" src="/guis.common/images/oxygen/16x16/actions/view-pim-notes-open.png" />' +
+          '<input type="image" class="btn saveHighlightings" title="save highlightings" src="/guis.common/images/oxygen/16x16/actions/view-pim-notes-save.png" />' +
+          '<input type="image" class="btn resetHighlightings" title="reset highlightings" src="/guis.common/images/oxygen/16x16/actions/view-pim-notes-delete.png" />' +
+          ''
+          );
+
+  $(".titleArea", header).html('<span class="paperViewerTitle">' + file.getAttribute("name") + '</span><div class="moveArea"></div>');
+  $(".buttonAreaRight", header).html(
+          '<input type="image" class="btn btnFullscreen" title="Fullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
+          '<input type="image" class="btn btnRestore" title="Restore Screen" src="/guis.common/images/oxygen/16x16/actions/view-restore.png" style="display: none;" />' +
+          '');
+  
   //this.createRepresentationAjax($body);
   this.createRepresentationIframe($body);
 
@@ -303,14 +359,18 @@ Viewer.createRepresentation = function(parent) {
  * @returns {undefined}
  */
 Viewer.createRepresentationIframe = function($body) {
+  var self = this;
+
   var $iframe = $("<iframe>");
   $iframe.attr("id", "iframe-" + this.getAttribute('id'));
 
   $body.append($iframe);
 
-  var iframe_loaded = false;
-  $iframe.one('load', function() {
-    iframe_loaded = true;
+  $iframe.on('load', function() {
+    // Add the iframe css file to the html document.
+    $("head", $iframe.contents()).append('<link type="text/css" href="/guis/desktop/objects/paperViewerIFrame.css" rel="Stylesheet">');
+
+    self.adjustPaper();
   });
 
   $iframe.attr('src', 'http://' + window.location.hostname + ':8080/getPaper/public/' + this.getAttribute('file') + '.html/');
@@ -343,10 +403,28 @@ Viewer.createRepresentationAjax = function($body) {
   });
 };
 
+/**
+ * Called after object selection
+ */
+Viewer.selectHandler = function() {
+  GeneralObject.selectHandler();
+
+  var rep = $(this.getRepresentation());
+  $("div.moveOverlay", rep).hide();
+};
+
+/**
+ * Called after object deselection
+ */
+Viewer.deselectHandler = function() {
+  GeneralObject.deselectHandler();
+
+  var rep = $(this.getRepresentation());
+  $("div.moveOverlay", rep).show();
+};
 
 Viewer.onMoveStart = function() {
   GeneralObject.onMoveStart();
-  console.log("move start");
   
   var rep = $(this.getRepresentation());
   $("div.moveOverlay", rep).show();
@@ -354,7 +432,6 @@ Viewer.onMoveStart = function() {
 
 Viewer.onMoveEnd = function() {
   GeneralObject.onMoveEnd();
-  console.log("move end");
   
   var rep = $(this.getRepresentation());
   $("div.moveOverlay", rep).hide();
@@ -363,30 +440,35 @@ Viewer.onMoveEnd = function() {
 Viewer.resizeHandler = function() {
   this.setDimensions(this.getViewWidth(), this.getViewHeight());
   this.setPosition(this.getViewX(), this.getViewY());
-  console.log("resize");
+
 //  this.adjustPaper();
 };
 
 Viewer.adjustPaper = function() {
+  var iframe = $("#iframe-" + this.getAttribute("id"));
+  var contents = iframe.contents();
 
-  var rep = this.getRepresentation();
-  var $rep = $(rep);
-
-  var $iframe = $("#iframe-" + this.getAttribute("id"), $rep);
-  var contents = $iframe.contents();
-
-  var $scaleContainer = $("body", contents);
+  var scaleContainer = $("body", contents);
   var firstPage = $("[data-page-no]", contents).first();
 
+  // page dimensions
   var pageWidth = firstPage.width();
-  var pageHeight = $scaleContainer.height();
+  var pageHeight = firstPage.height();
 
-  if (!pageWidth || !pageHeight)
+  // paper dimensions (including all pages...)
+  var papersWidth = pageWidth;
+  var papersHeight = scaleContainer.height();
+
+  if (!papersWidth || !papersHeight)
     return;
 
-  var width = this.getAttribute('width') - 30; // -30 for the scrollbar and shadow
+  var width;
+  if (iframe.data("fullscreen"))
+    width = $("body").width() - 150; // -30 for the scrollbar, shadow and comments
+  else
+    width = this.getAttribute('width') - 30; // -30 for the scrollbar and shadow
 
-  var scaleFactor = (width / pageWidth);
+  var scaleFactor = (width / papersWidth);
   
   var translateFactorX = (1 - scaleFactor) / 2;
   var translateFactorY = (1 - scaleFactor) / 2;
@@ -394,9 +476,30 @@ Viewer.adjustPaper = function() {
   if(scaleFactor > 1)
     translateFactorX = 0;
 
-  // CSS 3
-  $scaleContainer.css("transform", "translate(" + (-width * translateFactorX) + "px, " + (-pageHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
+  // CSS 3 transform: supported by Firefox
+  scaleContainer.css("transform", "translate(" + (-width * translateFactorX) + "px, " + (-papersHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
+  // Chrome, Safari and Opera browsers support though -webkit-transform...
+  scaleContainer.css("-webkit-transform", "translate(" + (-width * translateFactorX) + "px, " + (-papersHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
   
-  // For chrome and safari...
-  $scaleContainer.css("-webkit-transform", "translate(" + (-width * translateFactorX) + "px, " + (-pageHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
+  if (this.getAttribute("twopage")) {
+    // Adjust pages for two page mode
+    var translateFactorXeven = (-pageWidth / 4);
+    var translateFactorYeven = (-pageHeight / 4);
+
+    var translateFactorXodd = (pageWidth / 4);
+    var translateFactorYodd = (-pageHeight / 4);
+
+    $("[data-page-no]:even", contents).each(function(index) {
+      $(this).css("transform", "translate(" + translateFactorXeven + "px, " + (translateFactorYeven - (index * (pageHeight * 1.5))) + "px) scale(0.5)");
+      $(this).css("-webkit-transform", "translate(" + translateFactorXeven + "px, " + (translateFactorYeven - (index * (pageHeight * 1.5))) + "px) scale(0.5)");
+    });
+
+    $("[data-page-no]:odd", contents).each(function(index) {
+      $(this).css("transform", "translate(" + translateFactorXodd + "px, " + (translateFactorYodd - (index * (pageHeight * 1.5)) - pageHeight) + "px) scale(0.5)");
+      $(this).css("-webkit-transform", "translate(" + translateFactorXodd + "px, " + (translateFactorYodd - (index * (pageHeight * 1.5)) - pageHeight) + "px) scale(0.5)");
+    });
+  } else {
+    $("[data-page-no]", contents).css("transform", "none");
+    $("[data-page-no]", contents).css("-webkit-transform", "none");
+  }
 };

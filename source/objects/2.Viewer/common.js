@@ -20,6 +20,7 @@ Viewer.register=function(type){
 	this.registerAttribute('highlights', {type:'text', standard:'', changedFunction: function(object, value) {
 		object.loadHighlights();
 	}});
+  this.registerAttribute('twopage', {type: 'boolean', standard: false});
 	
 	this.standardData.width=210*3;
 	this.standardData.height=297*3;
