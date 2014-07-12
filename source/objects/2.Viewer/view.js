@@ -231,7 +231,9 @@ Viewer.initGUI = function(rep) {
 			refpos.left += 5;
 			refpos.top -= menu.height() + 5;
 			menu.offset(refpos);
-			delaymenu = window.setTimeout(function(){ menu.hide(); }, 8000);
+        delaymenu = window.setTimeout(function() {
+          menu.hide();
+        }, 8000);
 		}, 800);
 	});
 
@@ -241,7 +243,9 @@ Viewer.initGUI = function(rep) {
 	});
 
 	menu.on('mouseout', function(){
-		delaymenu = window.setTimeout(function(){ menu.hide(); }, 8000);
+      delaymenu = window.setTimeout(function() {
+        menu.hide();
+      }, 8000);
 	});
 
 /*	frameDocument.on('mouseover', '.highlighted', function(event){
@@ -278,6 +282,9 @@ Viewer.initGUI = function(rep) {
   var btnFullscreen = $(".btnFullscreen", rep).first();
   var btnRestore = $(".btnRestore", rep).first();
 
+  var btnTwopage = $(".btnTwopage", rep).first();
+  var btnSinglepage = $(".btnSinglepage", rep).first();
+
   var toggleFullscreen = function(event) {
     
     if (toggled) {
@@ -310,6 +317,20 @@ Viewer.initGUI = function(rep) {
   // add function to button for testing removage of highlights
   btnFullscreen.click(toggleFullscreen);
   btnRestore.click(toggleFullscreen);
+  
+  btnTwopage.click(function() {
+    self.setAttribute("twopage", true);
+    
+    btnTwopage.toggle();
+    btnSinglepage.toggle();
+  });
+  
+  btnSinglepage.click(function() {
+    self.setAttribute("twopage", false);
+    
+    btnTwopage.toggle();
+    btnSinglepage.toggle();
+  });
 };
 
 Viewer.createRepresentation = function(parent) {
@@ -330,7 +351,8 @@ Viewer.createRepresentation = function(parent) {
 
   var header = $("<div>");
   header.addClass("paperViewerHeader");
-  header.html('<div class="buttonAreaLeft"></div><div class="titleArea"></div><div class="buttonAreaRight"></div>');
+  header.html('<table><tr><td class="buttonAreaLeft"></td><td class="titleArea"></td><td class="buttonAreaRight"></td></tr></table>');
+
   $body.append(header);
 
   $(".buttonAreaLeft", header).html(
@@ -340,14 +362,25 @@ Viewer.createRepresentation = function(parent) {
           ''
           );
 
+  if (file) {
   $(".titleArea", header).html('<span class="paperViewerTitle">' + file.getAttribute("name") + '</span><div class="moveArea"></div>');
+  } else {
+    $(".titleArea", header).html('<span class="paperViewerTitle">No document</span><div class="moveArea"></div>');
+  }
+
   $(".buttonAreaRight", header).html(
+          '<input type="image" class="btn btnTwopage" title="Two page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-new.png" />' +
+          '<input type="image" class="btn btnSinglepage" title="Single page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-close.png" style="display: none;" />' +
           '<input type="image" class="btn btnFullscreen" title="Fullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
           '<input type="image" class="btn btnRestore" title="Restore Screen" src="/guis.common/images/oxygen/16x16/actions/view-restore.png" style="display: none;" />' +
           '');
   
   //this.createRepresentationAjax($body);
   this.createRepresentationIframe($body);
+
+  var borderBottom = $("<div>");
+  borderBottom.addClass("paperViewerFooter");
+  $body.append(borderBottom);
 
   var moveOverlay = $("<div>");
   moveOverlay.addClass("moveOverlay");
@@ -473,6 +506,12 @@ Viewer.adjustPaper = function() {
     width = $("body").width() - 150; // -30 for the scrollbar, shadow and comments
   else
     width = this.getAttribute('width') - 30; // -30 for the scrollbar and shadow
+
+  var height;
+  if (iframe.data("fullscreen"))
+    height = $("body").height(); // -30 for the scrollbar, shadow and comments
+  else
+    height = this.getAttribute('height') - 30; // -30 for the scrollbar and shadow
 
   var scaleFactor = (width / papersWidth);
   
