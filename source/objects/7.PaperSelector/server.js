@@ -25,8 +25,12 @@ theObject.onEnter=function(object,oldData,newData){
 
     // FIXME: send to writer
     var currentRoom = that.getCurrentRoom();
-    
 
+    // get writer
+    var o = Modules.ObjectManager.getObject(currentRoom,object.getAttribute('writer'),object.context);
+
+    console.log("setting paper:"+id);
+    o.setAttribute('paper',id);
 }
 
 theObject.createReview = function() {

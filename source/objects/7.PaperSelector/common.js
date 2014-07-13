@@ -37,6 +37,7 @@ PaperSelector.register = function(type) {
 
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
   this.registerAttribute('bigIcon', {hidden: true});
+
 }
 
 /**
@@ -64,6 +65,8 @@ PaperSelector.execute = function(openInNewWindow) {
   } else {
     ObjectManager.loadPaperWriter(destination, false, 'left');
   }*/
+
+
 }
 
 PaperSelector.register('PaperSelector');

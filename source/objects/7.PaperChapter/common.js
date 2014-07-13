@@ -69,6 +69,7 @@ this.registerAction('to back', function() {
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
   this.registerAttribute('bigIcon', {hidden: true});
 
+     this.registerAttribute('writer', {type: 'text'});
 
   var random = new Date().getTime() - 1296055327011;
   this.registerAttribute('chapterID', {type: 'text', standard:random});
@@ -88,21 +89,15 @@ this.registerAction('to back', function() {
  * @param {boolean} openInNewWindow
  */
 PaperChapter.execute = function(openInNewWindow) {
-  /*var destination = this.getAttribute('destination');
+  var inv = ObjectManager.getCurrentRoom().getInventory();
 
-  if (!destination) {
-    var random = new Date().getTime() - 1296055327011;
+        for (var i in inv) {
+            if(inv[i].type == "Writer"){
+                console.log(inv[i]);
 
-    this.setAttribute('destination', random);
-    destination = random;
-  }
-
-  // open
-  if (openInNewWindow) {
-    window.open(destination);
-  } else {
-    ObjectManager.loadPaperWriter(destination, false, 'left');
-  }*/
+                this.setAttribute('writer',inv[i].id);
+            }
+        }
 }
 
 PaperChapter.register('PaperChapter');

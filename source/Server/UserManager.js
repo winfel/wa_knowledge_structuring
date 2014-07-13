@@ -342,6 +342,7 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
               obj.setAttribute(attName2,attValue2); 
             }
           });
+
           },additionalAtts);
       }
       });
@@ -365,6 +366,28 @@ UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
                           UserManager.getConnectionBySocket(socketOrUser).user.username];
 
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
+};
+
+UserManager.setDataOfSpaceWithDestServerSide = function(data){
+     var ss = db.get('SpaceStorage');
+
+     // if data is not included: store it
+    ss.find({'destination':data.destination,'key':data.key}, {}, function(e, docs){
+        if(typeof docs == 'undefined' || docs.length == 0){
+            ss.insert({'destination':data.destination, 'key':data.key, 'value':data.value});
+        }
+    });
+};
+
+UserManager.getDataOfSpaceWithDestServerSide = function(data, callback){
+     var ss = db.get('SpaceStorage');
+    ss.find({'destination':data.destination, 'key':data.key}, {}, function(e, docs){
+      if(typeof docs != 'undefined' && docs.length > 0){
+        callback(docs);
+      }else{
+        callback("error");
+      }
+    });
 };
 
 UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID){
