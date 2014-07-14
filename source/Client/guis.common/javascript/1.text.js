@@ -44,10 +44,12 @@ GUI.editText = function(webarenaObject, multiLine, width, height, passThrough) {
 		
 		if (multiLine) {
 			var value = $(domContent).find("textarea").val();
+			if(value == "") {value = 'No text yet!';}
 			if (webarenaObject.intelligentRename) webarenaObject.intelligentRename(value);
 			webarenaObject.setContent(value);
 		} else {
 			var value = $(domContent).find("input").val();
+			if(value == "") {value = 'No text yet!';}
 			if (webarenaObject.intelligentRename) webarenaObject.intelligentRename(value);
 			webarenaObject.setContent(value);
 		}

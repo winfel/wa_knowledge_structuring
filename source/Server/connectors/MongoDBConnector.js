@@ -467,35 +467,37 @@ mongoConnector.duplicateObject = function(roomID, toRoom, objectID, context, cal
 			        			if (found) {			
 			        				// Read in the whole  file
 			        		        GridStore.read(that.db, filenameSource, function(err, content) {        		        	
-			        		        	if(content != null) {
-			        						var contentBuffer = new Buffer(content);        						
-			        						var gridStore2 = new GridStore(that.db, filenameNew, "w");
-			        						gridStore2.open(function(err, gridStore) {
-				        						gridStore.write(contentBuffer, function(err, gridStore) {
-				        					    	if (err) {throw err; callback(err, false, false); }
-				        					    	// Close (Flushes the data to MongoDB)
-				        					        gridStore.close(function(err, result) {
-				        					        	if (err) { throw err; callback(err, false, false);}
-				        					        	// Verify that the file exists
-				        					            GridStore.exist(that.db, filenameNew, function(err, result) {
-				        					            	if(err) { throw err; callback(err, false, false); }
-				        					            	if(result){
-				        					            		callback(null, newID, objectID);			        					                      
-				        					            	}
-				        					            });
-				        					        });
-				        					    });	
-			        						});	
-			        		        	}	          
+			        		        	if(content == null) { content = "";}			        		        	
+		        						var contentBuffer = new Buffer(content);        						
+		        						var gridStore2 = new GridStore(that.db, filenameNew, "w");
+		        						gridStore2.open(function(err, gridStore) {
+			        						gridStore.write(contentBuffer, function(err, gridStore) {
+			        					    	if (err) {throw err; callback(err, false, false); }
+			        					    	// Close (Flushes the data to MongoDB)
+			        					        gridStore.close(function(err, result) {
+			        					        	if (err) { throw err; callback(err, false, false);}
+			        					        	// Verify that the file exists
+			        					            GridStore.exist(that.db, filenameNew, function(err, result) {
+			        					            	if(err) { 
+			        					            		throw err; 
+			        					            		callback(err, false, false);			        					            		
+			        					            	}
+			        					            	if(result){
+			        					            		callback(null, newID, objectID);			        					            		
+			        					            	}
+			        					            });
+			        					        });
+			        					    });	
+		        						});			        		        	          
 			        		        });
 			        			} else {
-			        				// console.log("mongoConnector.getContent " + filename + " does not exist");
+			        				console.log("mongoConnector.getContent " + filename + " does not exist");
 			        				callback(err, false, false);
 			        			}
 			        		}
 			        	});
 	                } else {//if the object dosen't have a content
-                		callback(null, newID, objectID);
+	                	callback(null, newID, objectID);
                 	}
                 }
             });
@@ -1131,21 +1133,23 @@ mongoConnector.moveObjectToTrashRoom = function(roomID, objectID, context, callb
 	            		+ objectID + " in room " + roomID + " : " + err);
 	            if (!_.isUndefined(callback)) callback(false);
 	        } else {
-	        	// if the object is a Subrrom and it is in the public room
+	        	// if the object is a Subroom and it is in the public room
 	        	// find the corresponding Room object and set the 'parent' attribute to 'trash'
 	        	
 	        	var objectType = objectData.attributes.type;	        	
 	        	if (roomID == PUBLIC_ROOM && objectType == SUBROOM_TYPE) {
-	        		var roomObjectID = objectData.attributes.destination; 
-	        		objects.update({id: roomObjectID},{ $set: { parent : TRASH_ROOM }}, function(err, doc){
-	        			if (err) {
-	        	            console.warn("ERROR: mongoConnector.moveObjectToTrashRoom: Error trying to move to trash room the object " 
-	        	            		+ objectID + " in room " + roomID + " : " + err);
-	        	            if (!_.isUndefined(callback)) callback(false);
-	        	        } else { 
-	        	        	if (!_.isUndefined(callback)) callback(true);	
-	        	        }
-	        		});
+	        		if(objectData.attributes.destination != null){
+		        		var roomObjectID = objectData.attributes.destination.toString(); 
+		        		objects.update({id: roomObjectID},{ $set: { parent : TRASH_ROOM }}, function(err, doc){
+		        			if (err) {
+		        	            console.warn("ERROR: mongoConnector.moveObjectToTrashRoom: Error trying to move to trash room the object " 
+		        	            		+ objectID + " in room " + roomID + " : " + err);
+		        	            if (!_.isUndefined(callback)) callback(false);
+		        	        } else { 
+		        	        	if (!_.isUndefined(callback)) callback(true);	
+		        	        }
+		        		});
+	        		}
 	        	} else {
 	        		if (!_.isUndefined(callback)) callback(true);
 	        	}
@@ -1159,7 +1163,7 @@ mongoConnector.removeObjectFromDB = function(roomID, objectID, context, callback
 	this.getObjectData(roomID, objectID, context, function(objectData) {        
 		var objectType = objectData.attributes.type;
 		
-		if (objectType != SUBROOM_TYPE) { // if the object to delete is not a Room
+		if (objectType != SUBROOM_TYPE) { // if the object to delete is not a Subroom
 			var promise = removeObjectFromDB(objectID);
 			promise.on('complete', function(err, obj) {         
 		        if (err) {
@@ -1186,72 +1190,86 @@ mongoConnector.removeObjectFromDB = function(roomID, objectID, context, callback
 		        		        	
 		        }
 		    });
-		} else { // if the object to delete is a Room			
-		    var roomObjectID = objectData.attributes.destination;
-		    var descendants = [];
-		    var stack = [];
-		    objects.findOne({id: roomObjectID}, function (err, root) {
-		        descendants.push(root.id);
-		        stack.push(root);
-		        
-		        function pushToDescendants() {
-		            var currentnode = stack.pop();
-		            
-		            objects.find({parent:currentnode.id}, function(err, children) {
-		                children.forEach(function(child) {
-		                    descendants.push(child.id);
-		                    stack.push(child);
-		                });
-		                
-		                if (stack.length > 0) pushToDescendants();
-		                else {
-		                    // console.log("Rooms: " + JSON.stringify(descendants));
-		                    objects.find( { inRoom: { $in: descendants }, hasContent: true }, function (err, objectsArray) {
-		                        if (err) {
-                                    this.Modules.Log.error("Could not delete object's content (roomID: '" + roomID + "', user: '"
-                                               + this.Modules.Log.getUserFromContext(context) + "')");
-                                    if (!_.isUndefined(callback)) callback(false);
-                               } else {
-                                    // console.log("objectsArray: " + JSON.stringify(objectsArray));
-    		                        objects.remove( { inRoom: { $in: descendants } }, function (err, data) {
-    	                                if (err) {
-    	                                     this.Modules.Log.error("Could not delete object's content (roomID: '" + roomID + "', user: '"
-    	                                                + this.Modules.Log.getUserFromContext(context) + "')");
-    	                                     if (!_.isUndefined(callback)) callback(false);
-    	                                } else {
-    	                                    
-    	                                    var objectsIDs = [];
-    	                                    objectsArray.forEach(function(obj) {
-    	                                        objectsIDs.push(obj.id);
-    	                                    });
-    	                                    
-    	                                    GridStore.unlink(mongoConnector.db, objectsIDs, function(err, gridStore) {
-    	                                        if (err) {
-    	                                            console.log("unlink err: " + err);
-    	                                        }else {
-    	                                            // console.log("unlink done :) ");
-    	                                        } 
-    	                                    });
-    	                                    
-    	                                    objects.remove( { destination: { $in: descendants } }, function (err, data) {
-    	                                        if (err) {
-    	                                             this.Modules.Log.error("Could not delete object's content (roomID: '" + roomID + "', user: '"
-    	                                                        + this.Modules.Log.getUserFromContext(context) + "')");
-    	                                             if (!_.isUndefined(callback)) callback(false);
-    	                                        } else {
-    	                                            if (!_.isUndefined(callback)) callback(true);
-    	                                        } 
-    	                                    });
-    	                                } 
-    	                            });
-                               }
-		                    });
-		                }
-		            });
-		        }
-		        
-		        pushToDescendants();
-		    });
+		} else { // if the object to delete is a Subroom, then check if it has related Room object
+			if(objectData.attributes.destination != undefined){
+			    var roomObjectID = objectData.attributes.destination.toString();
+			    var descendants = [];
+			    var stack = [];
+			    objects.findOne({id: roomObjectID}, function (err, root) {
+			    	
+			        descendants.push(root.id);
+			        stack.push(root);
+			        
+			        function pushToDescendants() {
+			            var currentnode = stack.pop();
+			            
+			            objects.find({parent:currentnode.id}, function(err, children) {
+			                children.forEach(function(child) {
+			                    descendants.push(child.id);
+			                    stack.push(child);
+			                });
+			                
+			                if (stack.length > 0) pushToDescendants();
+			                else {
+			                    // console.log("Rooms: " + JSON.stringify(descendants));
+			                    objects.find( { inRoom: { $in: descendants }, hasContent: true }, function (err, objectsArray) {
+			                        if (err) {
+	                                    this.Modules.Log.error("Could not delete object's content (roomID: '" + roomID + "', user: '"
+	                                               + this.Modules.Log.getUserFromContext(context) + "')");
+	                                    if (!_.isUndefined(callback)) callback(false);
+	                               } else {
+	                                    // console.log("objectsArray: " + JSON.stringify(objectsArray));
+	    		                        objects.remove( { inRoom: { $in: descendants } }, function (err, data) {
+	    	                                if (err) {
+	    	                                     this.Modules.Log.error("Could not delete object's content (roomID: '" + roomID + "', user: '"
+	    	                                                + this.Modules.Log.getUserFromContext(context) + "')");
+	    	                                     if (!_.isUndefined(callback)) callback(false);
+	    	                                } else {
+	    	                                    
+	    	                                    var objectsIDs = [];
+	    	                                    objectsArray.forEach(function(obj) {
+	    	                                        objectsIDs.push(obj.id);
+	    	                                    });
+	    	                                    
+	    	                                    GridStore.unlink(mongoConnector.db, objectsIDs, function(err, gridStore) {
+	    	                                        if (err) {
+	    	                                            console.log("unlink err: " + err);
+	    	                                        }else {
+	    	                                            // console.log("unlink done :) ");
+	    	                                        } 
+	    	                                    });
+	    	                                    
+	    	                                    objects.remove( { destination: { $in: descendants } }, function (err, data) {
+	    	                                        if (err) {
+	    	                                             this.Modules.Log.error("Could not delete object's content (roomID: '" + roomID + "', user: '"
+	    	                                                        + this.Modules.Log.getUserFromContext(context) + "')");
+	    	                                             if (!_.isUndefined(callback)) callback(false);
+	    	                                        } else {
+	    	                                            if (!_.isUndefined(callback)) callback(true);
+	    	                                        } 
+	    	                                    });
+	    	                                } 
+	    	                            });
+	                               }
+			                    });
+			                }
+			            });
+			        }
+			        
+			        pushToDescendants();
+			    });
+			} else {
+				var promise = removeObjectFromDB(objectID);
+				promise.on('complete', function(err, obj) {				
+					if (err) {
+			            console.warn("ERROR: mongoConnector.removeObjectFromDB: Error trying to remove the object " 
+			            		+ objectID + " in room " + roomID + " : " + err);
+			            if (!_.isUndefined(callback)) callback(false);
+			        } else {
+			        	if (!_.isUndefined(callback)) callback(false);
+			        }
+				});  
+			}
 		}
 	});	
 }
