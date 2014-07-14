@@ -267,8 +267,8 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
                         "SimpleText#ReferenceInfo#800#45#100#2#height;30#content;References:",
                         "Container#References#800#100#500#2#locked;true#height;455",
                         "SimpleText#DefineInfo#800#600#190#2#height;30#content;Define your structure here:",
-                        "PaperSelector#Selector#800#650#1#1#locked;true",
-                        "PaperChapter#Chapter1#880#650#1#1#chapterID;"+data.roomID];
+                        "PaperSelector#Selector#800#650#1#1#locked;true"/*,
+                        "PaperChapter#Chapter1#880#650#1#1#chapterID;"+data.roomID*/];
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 

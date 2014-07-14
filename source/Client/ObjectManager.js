@@ -769,6 +769,7 @@ ObjectManager.getSelected = function() {
 
     }
   }
+
   return result;
 }
 
