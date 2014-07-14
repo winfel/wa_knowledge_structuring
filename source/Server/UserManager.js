@@ -266,8 +266,9 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
                         "SimpleText#WritingAreaInfo#20#45#100#2#height;30#content;Writing Area:",
                         "SimpleText#ReferenceInfo#800#45#100#2#height;30#content;References:",
                         "Container#References#800#100#500#2#locked;true#height;455",
-                        "SimpleText#DefineInfo#800#600#190#2#height;30#content;Define your structure here:",
-                        "PaperSelector#Selector#800#650#1#1#locked;true"/*,
+                        "SimpleText#DefineInfo#800#600#190#2#height;30#content;Define your structure here: Sort the PaperChapters from left to right to give them an order",
+                        "SimpleText#DefineInfo2#800#650#190#2#height;30#content;Note: At the moment you need to double-click a chapter to run the ordering algorithm...",
+                        "PaperSelector#Selector#800#700#1#1#locked;true"/*,
                         "PaperChapter#Chapter1#880#650#1#1#chapterID;"+data.roomID*/];
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };

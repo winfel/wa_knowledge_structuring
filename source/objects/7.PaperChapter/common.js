@@ -65,6 +65,11 @@ this.registerAction('to back', function() {
 
 }, false);
 
+  this.registerAttribute('x', {type: 'number', min: 0, category: 'Dimensions', changedFunction: function(object, value) {
+      
+    //console.log("change x");
+
+    }});
 
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
   this.registerAttribute('bigIcon', {hidden: true});
@@ -73,7 +78,7 @@ this.registerAction('to back', function() {
 
   var random = new Date().getTime() - 1296055327011;
   this.registerAttribute('chapterID', {type: 'text', standard:random});
-
+  this.registerAttribute('order', {type: 'text', standard:1});
 
 
 
@@ -89,6 +94,7 @@ this.registerAction('to back', function() {
  * @param {boolean} openInNewWindow
  */
 PaperChapter.execute = function(openInNewWindow) {
+  /* set writer id */
   var inv = ObjectManager.getCurrentRoom().getInventory();
 
         for (var i in inv) {
@@ -96,7 +102,26 @@ PaperChapter.execute = function(openInNewWindow) {
 
                 this.setAttribute('writer',inv[i].id);
             }
-        }
+        } 
+
+            /* === set order === */
+    /* find lengths */
+    var len = [];
+    for (var i in inv) {
+      if(inv[i].type == "PaperChapter"){
+        len.push(parseInt(inv[i].getAttribute('x')));      
+      }
+    }
+
+    len.sort(function(a,b){return a - b});
+
+    for (var i in inv) {
+      if(inv[i].type == "PaperChapter"){
+      // whats the position in the array
+      var pos = len.indexOf(inv[i].getAttribute('x')) + 1;
+      inv[i].setAttribute("order",pos);
+    }
+  }   
 }
 
 PaperChapter.register('PaperChapter');
