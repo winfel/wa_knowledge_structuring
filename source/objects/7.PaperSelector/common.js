@@ -50,22 +50,6 @@ PaperSelector.register = function(type) {
  * @param {boolean} openInNewWindow
  */
 PaperSelector.execute = function(openInNewWindow) {
-  /*var destination = this.getAttribute('destination');
-
-  if (!destination) {
-    var random = new Date().getTime() - 1296055327011;
-
-    this.setAttribute('destination', random);
-    destination = random;
-  }
-
-  // open
-  if (openInNewWindow) {
-    window.open(destination);
-  } else {
-    ObjectManager.loadPaperWriter(destination, false, 'left');
-  }*/
-
 
 }
 

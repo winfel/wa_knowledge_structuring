@@ -29,3 +29,14 @@ PaperChapter.publish = function() {
 PaperChapter.deleteIt = function() {
     this.remove();
 }
+
+PaperChapter.justCreated = function(){
+  var inv = ObjectManager.getCurrentRoom().getInventory();
+
+        for (var i in inv) {
+            if(inv[i].type == "Writer"){
+
+                this.setAttribute('writer',inv[i].id);
+            }
+        }
+}

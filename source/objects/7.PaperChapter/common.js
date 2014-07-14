@@ -93,7 +93,6 @@ PaperChapter.execute = function(openInNewWindow) {
 
         for (var i in inv) {
             if(inv[i].type == "Writer"){
-                console.log(inv[i]);
 
                 this.setAttribute('writer',inv[i].id);
             }

@@ -15,6 +15,7 @@ theObject.createNew = function() {
     // TODO
     var p = new PaperEntity();
     p.createNew(null);
+
 }
 
 theObject.createReview = function() {

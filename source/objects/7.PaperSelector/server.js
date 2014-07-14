@@ -29,8 +29,9 @@ theObject.onEnter=function(object,oldData,newData){
     // get writer
     var o = Modules.ObjectManager.getObject(currentRoom,object.getAttribute('writer'),object.context);
 
-    console.log("setting paper:"+id);
-    o.setAttribute('paper',id);
+    if(o != false){
+        o.setAttribute('paper',id);
+    }
 }
 
 theObject.createReview = function() {
