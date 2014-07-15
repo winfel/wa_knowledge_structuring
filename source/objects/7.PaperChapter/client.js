@@ -39,4 +39,10 @@ PaperChapter.justCreated = function(){
                 this.setAttribute('writer',inv[i].id);
             }
         }
+
+
+    /* generate new chapterID */
+    var random = new Date().getTime() - 1296055327011;
+
+    this.setAttribute('chapterID', random);
 }
