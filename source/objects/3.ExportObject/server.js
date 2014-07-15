@@ -34,7 +34,7 @@ theObject.onEnter=function(object,oldData,newData){
 	};
 
 
-	if(object.get('type')=='PaperObject')
+	if(object.get('type')=='PaperSpace')
 	{
 		if(this.getAttribute('exportFormat')=='html')
 		{
