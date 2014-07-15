@@ -39,7 +39,7 @@ GUI.tabs = new function() {
     this.tabsContent = $("#tabs_content");
     $("#tabs_content").html("");
 
-    //$("<p>").html("Add new tabs to the tab-bar with the help of the context menu of sub-rooms and paperobjects").appendTo("#tabs-room");
+    //$("<p>").html("Add new tabs to the tab-bar with the help of the context menu of sub-rooms and PaperSpaces").appendTo("#tabs-room");
     
     this.redrawTabContent();
   };
@@ -133,7 +133,7 @@ GUI.tabs = new function() {
 
    if(objectIsUsedInCache){
      var newObject = {id:object.id,
-      isPO:(object.type == 'PaperObject'),
+      isPO:(object.type == 'PaperSpace'),
       name:object.name,
       dest:object.getAttribute('destination')};
 
@@ -188,7 +188,7 @@ GUI.tabs = new function() {
         }else if(token[0].indexOf('Global Space') > -1){
           ObjectManager.loadSpecificSpace(token[1], false, 'left', 'enterPublicSpace');
         }else{
-          if(token[0].indexOf('(PO)') > 0){
+          if(token[0].indexOf('(PS)') > 0){
             ObjectManager.loadPaperWriter(token[1], false, 'left');
           }else{
             ObjectManager.loadRoom(token[1], false, 'left');
@@ -214,7 +214,7 @@ GUI.tabs = new function() {
     	var getCurrentObject = Modules.ObjectManager.getObject(item);
 
       var currentName;
-      var isPaperObject;
+      var isPaperSpace;
       var dest;
 
       /* maybe we need to use a cache */
@@ -222,16 +222,16 @@ GUI.tabs = new function() {
         // object is in another room - load from cache instead
         getCurrentObject = that.getFromCache(item);
 
-        isPaperObject = getCurrentObject.isPO;
+        isPaperSpace = getCurrentObject.isPO;
         currentName = getCurrentObject.name;
         dest = getCurrentObject.dest;
      }else{
         // load directly from the object and update the interal cache
-        isPaperObject = (getCurrentObject.type == 'PaperObject');
+        isPaperSpace = (getCurrentObject.type == 'PaperSpace');
         currentName = getCurrentObject.getAttribute('name');
         dest = getCurrentObject.getAttribute('destination');
 
-        that.createCacheEntry(getCurrentObject.id,isPaperObject,currentName,dest);
+        that.createCacheEntry(getCurrentObject.id,isPaperSpace,currentName,dest);
 
         // if possible: update
         that.updateCache(getCurrentObject);
@@ -241,15 +241,15 @@ GUI.tabs = new function() {
       var isActive = (dest == destFromURL); // boolean value if this tab is the active one
      
       var drawName = ""; 
-      if(currentName.replace("(PaperObject)","").replace("(Room)","").length > 15){
-        if(isPaperObject){
-          drawName = currentName.substring(0,10)+ "... (PO)";
+      if(currentName.replace("(PaperSpace)","").replace("(Room)","").length > 15){
+        if(isPaperSpace){
+          drawName = currentName.substring(0,10)+ "... (PS)";
        }else{
           drawName = currentName.substring(0,10)+ "... (Room)";
        }
     }else{
-       if(isPaperObject){
-         drawName = currentName + " (PO)";
+       if(isPaperSpace){
+         drawName = currentName + " (PS)";
       }else{
          drawName = currentName + " (Room)";
 
@@ -258,7 +258,7 @@ GUI.tabs = new function() {
 
      var currentLi = $("<li class='header-tabs'><a href='#' title='"+ currentName+"'>"+drawName+"</a></li>").on( "click", function () {
 
-      if(drawName.indexOf('(PO)') > 0){
+      if(drawName.indexOf('(PS)') > 0){
          ObjectManager.loadPaperWriter(dest, false, 'left');
       }else{
          ObjectManager.loadRoom(dest, false, 'left');

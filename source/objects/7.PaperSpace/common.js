@@ -8,24 +8,24 @@
 var Modules = require('../../server.js');
 
 /**
- * PaperObject
+ * PaperSpace
  * 
  * @class
  * @classdesc Common elements for view and server
  */
 
-var PaperObject = Object.create(Modules.ObjectManager.getPrototype('IconObject'));
+var PaperSpace = Object.create(Modules.ObjectManager.getPrototype('IconObject'));
 
 /**
  * Registers the object (actions).
  * 
- * @this {PaperObject}
+ * @this {PaperSpace}
  * @see Client/ObjectManager.js
  * @see objects/2.IconObject/common.js
  * @see objects/1.GeneralObject/common.js
  * @param {string} type The type of the object
  */
-PaperObject.register = function(type) {
+PaperSpace.register = function(type) {
 
   // Registering the object
   IconObject = Modules.ObjectManager.getPrototype('IconObject');
@@ -55,7 +55,7 @@ PaperObject.register = function(type) {
       destination = random;
     }
     
-    GUI.tabs.addTab(object.getAttribute('name')+" (PaperObject)",object.getAttribute('destination'),object.id);
+    GUI.tabs.addTab(object.getAttribute('name')+" (PaperSpace)",object.getAttribute('destination'),object.id);
     GUI.tabs.redrawTabContent();
 
   }, true);
@@ -68,12 +68,12 @@ PaperObject.register = function(type) {
  * Opens the paper object with the help of the attribute 'destination'. If the
  * destination is not set the destination will choose randomly.
  * 
- * @this {PaperObject}
+ * @this {PaperSpace}
  * @see Client/ObjectManager.js
  * @see objects/1.GeneralObject/common.js
  * @param {boolean} openInNewWindow
  */
-PaperObject.execute = function(openInNewWindow) {
+PaperSpace.execute = function(openInNewWindow) {
   var destination = this.getAttribute('destination');
 
   if (!destination) {
@@ -91,9 +91,9 @@ PaperObject.execute = function(openInNewWindow) {
   }
 }
 
-PaperObject.register('PaperObject');
-PaperObject.isCreatable = true;
+PaperSpace.register('PaperSpace');
+PaperSpace.isCreatable = true;
 
-PaperObject.category = 'Files';
+PaperSpace.category = 'Files';
 
-module.exports = PaperObject;
+module.exports = PaperSpace;
