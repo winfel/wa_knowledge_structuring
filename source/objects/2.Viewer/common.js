@@ -28,6 +28,11 @@ Viewer.register = function(type) {
   this.standardData.height = 297 * 3;
 };
 
+Viewer.alwaysOnTop = function () {
+	// if( documentShown )
+	return true;
+};
+
 //set restrictedMovingArea to true, if you want to enable interface interaction within
 //the HTML element. This is useful if you want to use buttons, links or even canvas elements.
 //when set to true, you must specify an area where the object can be moved. This area must
