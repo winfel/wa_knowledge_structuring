@@ -102,27 +102,8 @@ Viewer.initGUI = function(rep) {
 
 
     var menu = $('<div id="highlightmenu"></div>')
-            .css({
-              border: '1px solid black',
-              width: 'auto',
-              height: 'auto',
-              position: 'absolute',
-              top: '10px',
-              left: '10px',
-              background: 'white',
-              whiteSpace: 'nowrap',
-            })
-            .append(
                     // invisible placeholder at the bottom of the menu to close the gap between the menu and the text
-                    $('<div></div>')
-                    .css({
-                      position: 'absolute',
-                      bottom: '-5px',
-                      left: '0',
-                      width: '100%',
-                      height: '5px',
-                    })
-                    );
+		.append('<div class="closegap"></div>');
 
 
     var lastTarget;
@@ -163,7 +144,7 @@ Viewer.initGUI = function(rep) {
     })
             );
     menu.append(
-            $('<button title="remove highlighting">X</button>').click(function(event) {
+            $('<button id="removeHighlighting" title="remove highlighting">X</button>').click(function(event) {
       highlighter.removeHighlights(lastTarget);
       self.saveHighlights();
       menu.hide();
@@ -171,58 +152,6 @@ Viewer.initGUI = function(rep) {
             );
     frameDocument.find('body').append(menu);
     menu.hide();
-
-    // maybe this styles should be placed somewhere else
-    frameDocument.find('head').append('<style type="text/css">\
-		.strike {\
-			/*text-line-through-color: red;*/\
-			text-line-through-mode: skip-white-space;\
-			text-line-through-style: wave;\
-			text-line-through-width: normal;\
-			text-decoration: line-through;\
-			/*text-decoration-color: red;*/\
-			text-decoration-line: wave;\
-			/*-moz-text-line-through-color: red;*/\
-			-moz-text-line-through-mode: skip-white-space;\
-			-moz-text-line-through-style: wave;\
-			-moz-text-line-through-width: normal;\
-			/*-moz-text-decoration-color: red;*/\
-			-moz-text-decoration-line: wave;\
-		}\
-		.scratchout {\
-			background-image: url(/guis.common/images/scratchout.png);\
-		}\
-		.glow {\
-			text-shadow: 0px 0px 10px red;\
-		}\
-		.quote {\
-			box-shadow: 0px 0px 10px 5px;\
-		}\
-		.quote:hover::before {\
-			content: "\\"";\
-			position: absolute;\
-			margin-left:-0.5em;\
-		}\
-		.quote:hover::after {\
-			content: "\\"";\
-			position: absolute;\
-			margin-left:0;\
-		}\
-		.strike, .glow, .scratchout, .quote {\
-			background-color: none !important;\
-		}\
-		.audio::before {\
-			content: "";\
-			position: absolute;\
-			left: -10px;\
-			top: -10px;\
-			width: 20px;\
-			height: 20px;\
-			background: blue;\
-			border-radius: 20px;\
-		}\
-		</style>\
-	');
 
     var delaymenu;
 
@@ -233,9 +162,9 @@ Viewer.initGUI = function(rep) {
         lastTarget = $(event.target);
         var refpos = lastTarget.offset();
         menu.show();
-        refpos.left += 5;
+        //refpos.left += 5;
         refpos.top -= menu.height() + 5;
-        menu.offset(refpos);
+        menu.offset(refpos).offset(refpos).offset(refpos); // repeated repositioning fixes somehow the transform-offset bug
         delaymenu = window.setTimeout(function() {
           menu.hide();
         }, 8000);
@@ -252,14 +181,6 @@ Viewer.initGUI = function(rep) {
         menu.hide();
       }, 8000);
     });
-
-    /*	frameDocument.on('mouseover', '.highlighted', function(event){
-     lastTarget = $(event.target);
-     var refpos = lastTarget.offset();
-     refpos.left += 5;
-     refpos.top -= menu.height() + 5;
-     menu.offset(refpos);
-     });*/
 
     self.loadHighlights();
   };
