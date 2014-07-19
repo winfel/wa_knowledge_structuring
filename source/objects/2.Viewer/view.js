@@ -137,10 +137,19 @@ Viewer.initGUI = function(rep) {
     })
             );
     menu.append(
-            $('<button title="add audio comment">A</button>').click(function() {
-      lastTarget.toggleClass('audio');
+		$('<button id="addAudioComment" title="add audio comment">A</button>')
+			// start recording while mousedown
+			.mousedown(startRecording)
+			// stop recording and save when mouseup
+			.mouseup(function() {
+				stopRecording(function(newObject) {
+					lastTarget.addClass('audio');
+					// connect the highlight with the newly created audio
+					lastTarget.attr('data-audioobject', newObject.getAttribute('id'));
+
       self.saveHighlights();
       menu.hide();
+				});
     })
             );
     menu.append(
