@@ -84,12 +84,17 @@ body.twopage > div:nth-child(even) {
 	background-repeat: no-repeat;
 	width: 48px;
 	height: 48px;
+	border-radius: 100%;
 /*	border: 3px double black;
 	background: white;
 	border-radius: 1em;*/
 }
 .audioobject.playing {
 	background-image: url("/guis.common/images/oxygen/48x48/actions/media-playback-pause.png");
+}
+
+.remotehover {
+	box-shadow: 0 0 100px 50px red;
 }
 
 #highlightmenu {

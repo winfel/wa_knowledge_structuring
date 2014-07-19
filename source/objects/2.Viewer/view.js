@@ -87,11 +87,72 @@ Viewer.initGUI = function(rep) {
     // get the highlighter object
     highlighter = frameDocument.getHighlighter();
 
+	// this function adds a play option for every audio highlighting
+	self.addAudioToHighlights = function() {
+		frameDocument.find('.highlighted.audio').each(function() {
+			var that = $(this);
+			var aoid = that.attr('data-audioobject');
+			if(aoid == undefined || frameDocument.find('#' + aoid).length>0) {
+				// there is no connected audio or the audioobject already exists
+				return;
+			}
+
+			// get the object of the wave
+			var wave = ObjectManager.getObject(aoid);
+			if(wave == undefined || !wave) {
+				return;
+			}
+			// create the player for the wave (the object isn't needed anymore)
+			wave = new Audio(wave.getContentURL());
+
+			// guess the position of the highlight
+			var offset = that.offset();
+
+			// create an audio play button
+			var audioobject = $('<div>')
+			.attr('id', aoid)
+			//.html('AUDIO')
+			.addClass('audioobject')
+			//.offset(offset)
+			.append(wave)
+			.click(function() {
+				wave.paused?wave.play():wave.pause();
+			})
+			// highlight the highlight if hovering the button
+			.hover(function() {
+				that.toggleClass('remotehover');
+			})
+			.appendTo(that.closest('.pf')) // append to the pageFrame, position left:0 works then
+			.offset(offset)
+			.css('left', '0px');
+
+			$(wave)
+			.on('playing', function() {
+				audioobject.addClass('playing');
+			})
+			.on('pause', function() {
+				audioobject.removeClass('playing');
+			})
+			.on('ended', function() {
+				// chrome has a replay bug; load fixes it
+				if (window.chrome) {
+					wave.load();
+				}
+			});
+
+			// last but not least, highlight button if hovering highlight
+			that.hover(function() {
+				audioobject.toggleClass('remotehover');
+			});
+		});
+	};
+
     self.loadHighlights = function() {
       var jsonStr = self.getAttribute('highlights');
       if (jsonStr != undefined && jsonStr != '') {
         highlighter.removeHighlights();
         highlighter.deserializeHighlights(jsonStr);
+        window.setTimeout(self.addAudioToHighlights, 50);
       }
     };
 
@@ -101,8 +162,8 @@ Viewer.initGUI = function(rep) {
     };
 
 
-    var menu = $('<div id="highlightmenu"></div>')
-                    // invisible placeholder at the bottom of the menu to close the gap between the menu and the text
+	var menu = $('<div id="highlightmenu"></div>')
+		// invisible placeholder at the bottom of the menu to close the gap between the menu and the text
 		.append('<div class="closegap"></div>');
 
 
@@ -136,7 +197,7 @@ Viewer.initGUI = function(rep) {
       menu.hide();
     })
             );
-    menu.append(
+	menu.append(
 		$('<button id="addAudioComment" title="add audio comment">A</button>')
 			// start recording while mousedown
 			.mousedown(startRecording)
@@ -147,11 +208,11 @@ Viewer.initGUI = function(rep) {
 					// connect the highlight with the newly created audio
 					lastTarget.attr('data-audioobject', newObject.getAttribute('id'));
 
-      self.saveHighlights();
-      menu.hide();
+					self.saveHighlights();
+					menu.hide();
 				});
-    })
-            );
+		})
+	);
     menu.append(
             $('<button id="removeHighlighting" title="remove highlighting">X</button>').click(function(event) {
       highlighter.removeHighlights(lastTarget);
