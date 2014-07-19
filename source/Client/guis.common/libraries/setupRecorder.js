@@ -1,7 +1,9 @@
 var audio_context;
 var recorder;
+var globalaudioinputstream;
 
 function startUserMedia(stream) {
+	globalaudioinputstream = stream;
 	var input = audio_context.createMediaStreamSource(stream);
 
 	var muteInput = audio_context.createGain();
