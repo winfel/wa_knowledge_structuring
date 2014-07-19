@@ -63,6 +63,11 @@ Viewer.initGUI = function(rep) {
     }
 
     frameDocument.textHighlighter({
+		// before highlighting, test if selected elements are valid for highlighting
+		onBeforeHighlight: function(range) {
+			// only allow selections within one ".pc"
+			return ($(range.commonAncestorContainer).closest('.pc').length>0);
+		},
       // register a function to call after each highlight process
       onAfterHighlight: function(highlights, range) {
         // TODO: maybe postprocess highlights here, set different style and transmit to server
