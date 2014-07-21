@@ -18,7 +18,8 @@ var PdfEdit = {
 	*/
 	convertToHtml : function(data, callback){
 		//console.dir(data);
-		
+		callback = callback || data.callback || function(){};
+
 		var inputfile;
 		if( data.file && data.file.path) {
 			inputfile = data.file.path;
@@ -47,6 +48,21 @@ var PdfEdit = {
 
 		converter.success(function() {
 			//data.object.setContentFromFile(outputfile);
+			Modules.ObjectManager.createObject(
+				data.object.inRoom,
+				'HiddenFile',
+				{
+					hasContent: true,
+					mimeType: 'text/html',
+					name: data.object.id + '.html',
+				},
+				false,
+				data.object.context,
+				function(alwaysFalse, newObject){
+					//newObject.setAttribute("link", data.object.id); // produces many errors
+					newObject.copyContentFromFile(outputfile, callback);
+				});
+			// TODO: remove this line! only for temporary backward compatibility
 			Modules.Connector.copyContentFromFile(data.object.inRoom, data.object.id + '.html', outputfile, data.object.context, callback);
 		});
 
