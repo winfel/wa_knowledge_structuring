@@ -38,14 +38,10 @@ function stopRecording(callback) {
 
 function uploadFile(file, callback){
 	var mimeType = file.type;
-	var x=50, y=80;
 
 	/* create new File object and set position */
-	ObjectManager.createObject("File",{
-		"x":x,
-		"y":y,
-		"visible":false,
-		"hasContent":true //prevent calling justCreated() after object creation (would display file upload dialog)
+	ObjectManager.createObject("HiddenFile",{
+		//"hasContent":true //prevent calling justCreated() after object creation (would display file upload dialog)
 	},false,function(newObject) {
 		/* object created --> upload content */
 
