@@ -89,6 +89,7 @@ Viewer.initGUI = function(rep) {
 
 	// this function adds a play option for every audio highlighting
 	self.addAudioToHighlights = function() {
+		var matchYClass = /\b(y[0-9a-z]+)\b/; // this finds the y-positioning class within pdf classes
 		frameDocument.find('.highlighted.audio').each(function() {
 			var that = $(this);
 			var aoid = that.attr('data-audioobject');
@@ -122,9 +123,21 @@ Viewer.initGUI = function(rep) {
 			.hover(function() {
 				that.toggleClass('remotehover');
 			})
-			.appendTo(that.closest('.pf')) // append to the pageFrame, position left:0 works then
-			.offset(offset)
-			.css('left', '0px');
+			.appendTo(that.closest('.pf')); // append to the pageFrame, position left:0 works then
+
+			// try to reuse pdf positioning classes, else use offset
+			try{
+				if(matchYClass.exec(that.closest('.t').attr('class'))) {
+					audioobject.addClass(RegExp.$1);
+				}
+				else {
+					audioobject.offset(offset);
+				}
+			}
+			catch(ex) {
+				audioobject.offset(offset);
+			}
+			audioobject.css('left', '0px');
 
 			$(wave)
 			.on('playing', function() {
