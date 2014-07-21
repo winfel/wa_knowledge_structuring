@@ -1,345 +1,337 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Webarena 1.0</title>
+{{#extend "head"}}
+<link rel="apple-touch-icon" sizes="72x72" href="/guis.common/images/ipad_icon.png">
 
-  <meta content="minimum-scale=1.0, initial-scale=1.0, width=device-width, maximum-scale=1, user-scalable=no" name="viewport">
-  <meta content="yes" name="apple-mobile-web-app-capable">
-  <link rel="apple-touch-icon" sizes="72x72" href="/guis.common/images/ipad_icon.png">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
 
-  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
-  <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/jquery.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jPopover.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jsTree/jquery.jstree.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.toastmessage.js"></script>
 
-  <script type="text/javascript" src="/guis.common/libraries/jquery/jquery.js"></script>
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jPopover.js"></script>
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jsTree/jquery.jstree.js"></script>
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.toastmessage.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/moment.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/lodash.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.autogrow.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jeditable.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jeditable.autogrow.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.dotdotdot.js"></script>
 
-  <script type="text/javascript" src="/guis.common/libraries/moment.min.js"></script>
-  <script type="text/javascript" src="/guis.common/libraries/lodash.min.js"></script>
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.autogrow.js"></script>
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jeditable.js"></script>
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jeditable.autogrow.js"></script>
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.dotdotdot.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.scrollTo.min.js"></script>
 
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.mousewheel.js"></script>
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.scrollTo.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svg.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svgdom.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svgfilter.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svganim.min.js"></script>
 
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svg.min.js"></script>
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svgdom.min.js"></script>
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svgfilter.min.js"></script>
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svganim.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/jquery-ui.js"></script>
+<link type="text/css" href="/guis.common/libraries/jquery/css/jquery-ui.css" rel="Stylesheet">
 
-  <script type="text/javascript" src="/guis.common/libraries/jquery/jquery-ui.js"></script>
-  <link type="text/css" href="/guis.common/libraries/jquery/css/jquery-ui.css" rel="Stylesheet">
-
-  <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.color.js"></script>
-
-  
-
-  <script src="/guis.common/javascript/0.loadTab.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.color.js"></script>
 
 
-  <script src="/config.default.js"></script>
-  <script src="/config.local.js"></script>
-  <script src="/Helper.js"></script>
-  <script src="/Dispatcher.js"></script>
-  <script src="/SocketClient.js"></script>
-  <script src="/ObjectManager.js"></script>
-  <script src="/RightManager.js"></script>
-  <script src="/UserManager.js"></script>
-  <script src="/TagManager.js"></script>
 
-  <script src="/Common/Log.js"></script>
-  <script src="/Common/DataSet.js"></script>
-  <script src="/Common/ActionManager.js"></script>
-  <script src="/Common/AttributeManager.js"></script>
-  <script src="/Common/TranslationManager.js"></script>
-
-  <script>
-  var Modules = {
-    'Log': Log,
-    'config': Config,
-    'Config': Config,
-    'SocketClient': SocketClient,
-    'Dispatcher': Dispatcher,
-    'ObjectManager': ObjectManager,
-    'Helper': Helper,
-        //Object specific
-
-        'DataSet': DataSet,
-        'AttributeManager': AttributeManager,
-        'TranslationManager': TranslationManager,
-        'ActionManager': ActionManager,
-        //'Schema':Schema,
-        'RightManager': RightManager,
-        'UserManager': UserManager,
-        'TagManager': TagManager,
-      };
+<script src="/guis.common/javascript/0.loadTab.js"></script>
 
 
-      $(document).ready(function() {
-        for (var name in Modules) {
-          var module = Modules[name];
-          if (module.init) {
-            module.init(Modules);
-            module.Modules = Modules;
-          }
-        }
+<script src="/config.default.js"></script>
+<script src="/config.local.js"></script>
+<script src="/Helper.js"></script>
+<script src="/Dispatcher.js"></script>
+<script src="/SocketClient.js"></script>
+<script src="/ObjectManager.js"></script>
+<script src="/RightManager.js"></script>
+<script src="/UserManager.js"></script>
+<script src="/TagManager.js"></script>
 
-        document.title = Modules.Config.projectTitle || 'WebArena';
+<script src="/Common/Log.js"></script>
+<script src="/Common/DataSet.js"></script>
+<script src="/Common/ActionManager.js"></script>
+<script src="/Common/AttributeManager.js"></script>
+<script src="/Common/TranslationManager.js"></script>
 
-      });
-      </script>
+<script>
+var Modules = {
+  'Log': Log,
+  'config': Config,
+  'Config': Config,
+  'SocketClient': SocketClient,
+  'Dispatcher': Dispatcher,
+  'ObjectManager': ObjectManager,
+  'Helper': Helper,
+  //Object specific
 
-      <!-- /objects is generated in BuildTool.js on the server side. -->
-      <script src="/objects"></script>
-      <script type="text/javascript" src="/defaultJavascripts"></script>
-      <script type="text/javascript" src="/guis.common/translation_de.js"></script>
+  'DataSet': DataSet,
+  'AttributeManager': AttributeManager,
+  'TranslationManager': TranslationManager,
+  'ActionManager': ActionManager,
+  //'Schema':Schema,
+  'RightManager': RightManager,
+  'UserManager': UserManager,
+  'TagManager': TagManager,
+};
 
-      <link type="text/css" href="/guis/desktop/style.css" rel="Stylesheet">
-      <link type="text/css" href="/guis.common/css/actionsheet.css" rel="Stylesheet">
-      <link type="text/css" href="/guis.common/css/progressBar.css" rel="Stylesheet">
-      <link type="text/css" href="/guis.common/css/login.css" rel="Stylesheet">
-      <link type="text/css" href="/guis.common/css/studiolo.css" rel="Stylesheet">
 
-      <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+$(document).ready(function() {
+  for (var name in Modules) {
+    var module = Modules[name];
+    if (module.init) {
+      module.init(Modules);
+      module.Modules = Modules;
+    }
+  }
 
-      <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jDesktopInspector.js"></script>
-      <link type="text/css" href="/guis.common/libraries/jquery/plugins/css/jquery.jDesktopInspector.css" rel="Stylesheet">
-      <link type="text/css" href="/guis.common/libraries/jquery/plugins/css/jquery.jPopover.desktop.css" rel="Stylesheet">
+  document.title = Modules.Config.projectTitle || 'WebArena';
 
-      <link type="text/css" href="/guis/desktop/rightmanager.css" rel="Stylesheet">
-      <link type="text/css" href="/guis/desktop/objects/paperWriter.css" rel="Stylesheet">
-      <link type="text/css" href="/guis.common/css/verTabs.css" rel="Stylesheet">
+});
+</script>
 
-      <script type="text/javascript" src="/guis/desktop/main.js"></script>
-      <script>
+<!-- /objects is generated in BuildTool.js on the server side. -->
+<script src="/objects"></script>
+<script type="text/javascript" src="/defaultJavascripts"></script>
+<script type="text/javascript" src="/guis.common/translation_de.js"></script>
 
-      /**
-       * Define room which will be loaded (value will be replaced by node.js Webserver)
-       */
-       GUI.startRoom = '{{start_room}}';
+<link type="text/css" href="/guis/desktop/style.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/css/actionsheet.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/css/progressBar.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/css/login.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/css/studiolo.css" rel="Stylesheet">
 
-      /**
-       * check if device is touch-device
-       */
-       if (!!('ontouchstart' in window)) {
-        GUI.isTouchDevice = true;
-      }
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
-      /**
-       * jQuery extension used to prevent scrolling of sidebar/body when scrolling of sidebar contents hits top/bottom (e.g. for chat messages container)
-       */
-       $.fn.dontScrollParent = function() {
-        this.bind('mousewheel DOMMouseScroll', function(e)
-        {
-          var delta = e.originalEvent.wheelDelta || -e.originalEvent.detail;
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jDesktopInspector.js"></script>
+<link type="text/css" href="/guis.common/libraries/jquery/plugins/css/jquery.jDesktopInspector.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/libraries/jquery/plugins/css/jquery.jPopover.desktop.css" rel="Stylesheet">
 
-          if (delta > 0 && $(this).scrollTop() <= 0)
-            return false;
-          if (delta < 0 && $(this).scrollTop() >= this.scrollHeight - $(this).height())
-            return false;
+<link type="text/css" href="/guis/desktop/rightmanager.css" rel="Stylesheet">
+<link type="text/css" href="/guis/desktop/objects/paperWriter.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/css/verTabs.css" rel="Stylesheet">
 
-          return true;
-        });
-      };
-      </script>
-    </head>
-    <body>
-      <div id="header">
-        <div class="header_right"></div>
-        <div class="header_left"></div>
-        <div class="header_tabs">
-            <div class="ui-tabs ui-widget ui-widget-content ui-corner-all header-tabs" id="tabs_content"> DEMO Content </div>
-        </div>
-      </div>
+<script type="text/javascript" src="/guis/desktop/main.js"></script>
+<script>
 
-      <div id="couplingNavigation"></div>
+/**
+ * Define room which will be loaded (value will be replaced by node.js Webserver)
+ */
+GUI.startRoom = '{{start_room}}';
 
-      <div id="content"></div>
+/**
+ * check if device is touch-device
+ */
+if (!!('ontouchstart' in window)) {
+  GUI.isTouchDevice = true;
+}
 
-      <div id="sidebar">
-        <div id="sidebar_title"><span></span></div>
-        <div id="sidebar_content">
-          <div>
+/**
+ * jQuery extension used to prevent scrolling of sidebar/body when scrolling of sidebar contents hits top/bottom (e.g. for chat messages container)
+ */
+$.fn.dontScrollParent = function() {
+  this.bind('mousewheel DOMMouseScroll', function(e)
+  {
+    var delta = e.originalEvent.wheelDelta || -e.originalEvent.detail;
 
-            <div id="inspector"></div>
-            <div id="rightmanager" class="jDesktopInspector">
-              <div class="jDesktopInspector_main rightmanagerSelected">
-                <div class="jDesktopInspector_pageHead">Object:</div>
-                <div class="jDesktopInspector_page jDesktopInspector_page_0">
-                  <div class="jDesktopInspector_section">	                        	
-                    <div class="jDesktopInspector_element">
-                      ID
-                      <div class="jDesktopInspector_button_right" id= "rm_ID"></div>
-                      <br style="clear: both">
-                    </div>
-                    <div class="jDesktopInspector_element">
-                      Type
-                      <div class="jDesktopInspector_button_right" id="rm_Type"></div>
-                      <br style="clear: both">
-                    </div>
-                    <div class="jDesktopInspector_element">
-                      Name
-                      <div class="jDesktopInspector_button_right" id="rm_Name"></div>
-                      <br style="clear: both">
-                    </div>
-                  </div>
-                </div>
+    if (delta > 0 && $(this).scrollTop() <= 0)
+      return false;
+    if (delta < 0 && $(this).scrollTop() >= this.scrollHeight - $(this).height())
+      return false;
 
-                <div class="jDesktopInspector_pageHead" id="rm_rolesHead">Roles</div>
-                <div class="jDesktopInspector_page jDesktopInspector_page_1" id="rm_rolesPage">
-                  <div class="jDesktopInspector_section" id="rm_roles"></div>
-                  <div class="jDesktopInspector_section">                                                             							
-                    <div class="jDesktopInspector_element">
-                      <input id="rmNewRoleTextfield" name="newRoleName" type="text" size="15" value="New role" onfocus="this.value = ''">
-                      <div class= "jDesktopInspector_button_right">										
-                        <input id="rmNewRoleButton" type="button" value="Add role">
-                      </div>
-                      <br style="clear: both">										
-                    </div>                                    
-                  </div>	                   
-                </div>
+    return true;
+  });
+};
+</script>
+{{/extend}}
+<div id="header">
+  <div class="header_right"></div>
+  <div class="header_left"></div>
+  <div class="header_tabs">
+    <div class="ui-tabs ui-widget ui-widget-content ui-corner-all header-tabs" id="tabs_content"> DEMO Content </div>
+  </div>
+</div>
 
-                <div class="rightmanager-role-separator"></div>
+<div id="couplingNavigation"></div>
 
-                <div class="jDesktopInspector_pageHead rightmanager-section-header" id="rm_rightsHead">Rights <span>&nbsp;</span></div>
-                <div class="jDesktopInspector_page jDesktopInspector_page_2" id="rm_rightsPage">
-                  <div class="jDesktopInspector_section" id="rm_rights"></div>
-                </div>
+<div id="content"></div>
 
-                <div class="jDesktopInspector_pageHead rightmanager-section-header" id="rm_usersHead">Users <span>&nbsp;</span></div>
-                <div class="jDesktopInspector_page jDesktopInspector_page_3" id="rm_usersPage">
-                  <div class="jDesktopInspector_section" id="rm_users">
-                  </div>
-                  <br style="clear: both;">
-                  <div class="jDesktopInspector_section">
-                    <div class="jDesktopInspector_element">
-                      <div class= "jDesktopInspector_button_right">					
-                        <input id="rmDeleteUsersButton" class="rightmanager-delete-all" type="button" value="Delete users">
-                      </div>
-                      <br style="clear: both">										
-                    </div> 
-                    <div class="jDesktopInspector_element">
-                      <div class= "jDesktopInspector_button_right">					
-                        <input id="rmAddUsersButton" type="button" value="Add users">
-                      </div>
-                      <br style="clear: both">										
-                    </div> 
-                  </div>
-                </div>
+<div id="sidebar">
+  <div id="sidebar_title"><span></span></div>
+  <div id="sidebar_content">
+    <div>
+
+      <div id="inspector"></div>
+      <div id="rightmanager" class="jDesktopInspector">
+        <div class="jDesktopInspector_main rightmanagerSelected">
+          <div class="jDesktopInspector_pageHead">Object:</div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_0">
+            <div class="jDesktopInspector_section">	                        	
+              <div class="jDesktopInspector_element">
+                ID
+                <div class="jDesktopInspector_button_right" id= "rm_ID"></div>
+                <br style="clear: both">
               </div>
-
-              <div class="jDesktopInspector rightmanagerNoneSelected">
-                <div class="jDesktopInspector_main">
-                  <div class="jDesktopInspector_pageHead">Object:</div>
-                  <div class="jDesktopInspector_page jDesktopInspector_page_0">
-                    <div class="jDesktopInspector_section">
-                      <div class="jDesktopInspector_element">Please select a Subroom or PaperObject to use the rightmanager!</div>
-                    </div>
-                  </div>
-                </div>
+              <div class="jDesktopInspector_element">
+                Type
+                <div class="jDesktopInspector_button_right" id="rm_Type"></div>
+                <br style="clear: both">
+              </div>
+              <div class="jDesktopInspector_element">
+                Name
+                <div class="jDesktopInspector_button_right" id="rm_Name"></div>
+                <br style="clear: both">
               </div>
             </div>
+          </div>
 
-            <div id="chat"></div>
-            <div id="bug">                    
+          <div class="jDesktopInspector_pageHead" id="rm_rolesHead">Roles</div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_1" id="rm_rolesPage">
+            <div class="jDesktopInspector_section" id="rm_roles"></div>
+            <div class="jDesktopInspector_section">                                                             							
+              <div class="jDesktopInspector_element">
+                <input id="rmNewRoleTextfield" name="newRoleName" type="text" size="15" value="New role" onfocus="this.value = ''">
+                <div class= "jDesktopInspector_button_right">										
+                  <input id="rmNewRoleButton" type="button" value="Add role">
+                </div>
+                <br style="clear: both">										
+              </div>                                    
+            </div>	                   
+          </div>
 
-              <div>
-                Ist Ihnen bei der Benutzung ein Fehler aufgefallen? Teilen Sie uns ihn doch bitte mit.<br />
-                Bitte haben Sie Verständnis dafür, dass wir nicht auf jede Anfrage persönlich antworten können.
-                <span><br />
-                  <br />
-                  Beachten Sie: Mit Ihrer Fehlermeldung wird eine Liste aller Objekte gesendet, um uns eine Auswertung des Fehlers zu ermöglichen.
-                </span>
+          <div class="rightmanager-role-separator"></div>
+
+          <div class="jDesktopInspector_pageHead rightmanager-section-header" id="rm_rightsHead">Rights <span>&nbsp;</span></div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_2" id="rm_rightsPage">
+            <div class="jDesktopInspector_section" id="rm_rights"></div>
+          </div>
+
+          <div class="jDesktopInspector_pageHead rightmanager-section-header" id="rm_usersHead">Users <span>&nbsp;</span></div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_3" id="rm_usersPage">
+            <div class="jDesktopInspector_section" id="rm_users">
+            </div>
+            <br style="clear: both;">
+            <div class="jDesktopInspector_section">
+              <div class="jDesktopInspector_element">
+                <div class= "jDesktopInspector_button_right">					
+                  <input id="rmDeleteUsersButton" class="rightmanager-delete-all" type="button" value="Delete users">
+                </div>
+                <br style="clear: both">										
+              </div> 
+              <div class="jDesktopInspector_element">
+                <div class= "jDesktopInspector_button_right">					
+                  <input id="rmAddUsersButton" type="button" value="Add users">
+                </div>
+                <br style="clear: both">										
+              </div> 
+            </div>
+          </div>
+        </div>
+
+        <div class="jDesktopInspector rightmanagerNoneSelected">
+          <div class="jDesktopInspector_main">
+            <div class="jDesktopInspector_pageHead">Object:</div>
+            <div class="jDesktopInspector_page jDesktopInspector_page_0">
+              <div class="jDesktopInspector_section">
+                <div class="jDesktopInspector_element">Please select a Subroom or PaperObject to use the rightmanager!</div>
               </div>
-
-              <div id="bug_report">
-
-                <span>Was wollten Sie tun?</span>
-                <textarea id="bug_task"></textarea>
-
-                <span>Welches Problem ist aufgetreten?</span>
-                <textarea id="bug_problem"></textarea>
-
-                <span>Ihre Email-Adresse:</span>
-                <input type="email" id="bug_email" />
-
-                <p><input type="submit" value="Senden" id="bug_submit" /></p>
-
-              </div>
-
-              <div id="bug_result"></div>
-
             </div>
           </div>
         </div>
       </div>
 
-      <div id="actionsheet"></div>
-      <div id="error_bg"></div>
-      <div id="error_box">
-        <div id="error_box_heading"></div>
-        <div id="error_box_message"></div>
-        <div id="error_box_button"></div>
-      </div>
+      <div id="chat"></div>
+      <div id="bug">                    
 
+        <div>
+          Ist Ihnen bei der Benutzung ein Fehler aufgefallen? Teilen Sie uns ihn doch bitte mit.<br />
+          Bitte haben Sie Verständnis dafür, dass wir nicht auf jede Anfrage persönlich antworten können.
+          <span><br />
+            <br />
+            Beachten Sie: Mit Ihrer Fehlermeldung wird eine Liste aller Objekte gesendet, um uns eine Auswertung des Fehlers zu ermöglichen.
+          </span>
+        </div>
 
-      <!-- BEGIN: GUI rightmanager pop-up dialog -->
-      <div id="rightmanagerDialog" style="display: none;">
-       <div id="rmdTabs">
-         <ul id="rmdTabList">       
-         </ul>
-       </div>
-     </div>
-     <!-- END: GUI rightmanager pop-up dialog -->
+        <div id="bug_report">
 
-     <!-- BEGIN: GUI add user dialog -->
-     <div id="manageUserDialog" class="rightmanager-user-dialog" style="display: none;">
-      <h3>Friend list</h3>
-      <div id="manageUserDialogFriendList" class="rightmanager-user-dialog-section"></div>
-      <h3>Suggested</h3>
-      <div id="manageUserDialogSuggested" class="rightmanager-user-dialog-section"></div>
-      <h3>Searched Users</h3>
-      <input id="manageUserDialogNewTextfield" type="text" value="Type in the username" />
-      <div id="manageUserDialogSearched" class="rightmanager-user-dialog-section">
+          <span>Was wollten Sie tun?</span>
+          <textarea id="bug_task"></textarea>
+
+          <span>Welches Problem ist aufgetreten?</span>
+          <textarea id="bug_problem"></textarea>
+
+          <span>Ihre Email-Adresse:</span>
+          <input type="email" id="bug_email" />
+
+          <p><input type="submit" value="Senden" id="bug_submit" /></p>
+
+        </div>
+
+        <div id="bug_result"></div>
+
       </div>
     </div>
-    <!-- END: GUI add user dialog -->
-
-    <!-- BEGIN: GUI confirm dialog -->
-    <div id="confirmDialog" style="display: none;">
-     <span id="confirmDialogMessage"></span>
-   </div>
-   <!-- END: GUI confirm dialog -->
-
-   <div id="login_background" style="display: none">&nbsp;</div>
-   <div id="login" style="display: none;">
-
-    <div class="login_title" id="login_title">WebArena 1.0</div>
-
-    <div class="login_error"></div>
-
-    <div class="login_icon login_icon_username"></div>
-    <input type="text" name="username" value="{{username}}" id="login_username" class="login_input" autocomplete="off" placeholder="Username" autofocus="autofocus" />
-
-    <br />
-
-    <div class="login_icon login_icon_password"></div><input type="password" name="password" value="" id="login_password" class="login_input" autocomplete="off" />
-
-    <br />
-
-    <input type="submit" name="login" value="Login" class="login_submit" id="login_submit" />
-
   </div>
+</div>
 
-  <div id="progressBar"><div class="progressBar_container"></div></div>
+<div id="actionsheet"></div>
+<div id="error_bg"></div>
+<div id="error_box">
+  <div id="error_box_heading"></div>
+  <div id="error_box_message"></div>
+  <div id="error_box_button"></div>
+</div>
 
-  <!-- BEGIN: Underscore Template Definition. -->
-  <script type="text/template" id="proceeding-statusdialog">
+
+<!-- BEGIN: GUI rightmanager pop-up dialog -->
+<div id="rightmanagerDialog" style="display: none;">
+  <div id="rmdTabs">
+    <ul id="rmdTabList">       
+    </ul>
+  </div>
+</div>
+<!-- END: GUI rightmanager pop-up dialog -->
+
+<!-- BEGIN: GUI add user dialog -->
+<div id="manageUserDialog" class="rightmanager-user-dialog" style="display: none;">
+  <h3>Friend list</h3>
+  <div id="manageUserDialogFriendList" class="rightmanager-user-dialog-section"></div>
+  <h3>Suggested</h3>
+  <div id="manageUserDialogSuggested" class="rightmanager-user-dialog-section"></div>
+  <h3>Searched Users</h3>
+  <input id="manageUserDialogNewTextfield" type="text" value="Type in the username" />
+  <div id="manageUserDialogSearched" class="rightmanager-user-dialog-section">
+  </div>
+</div>
+<!-- END: GUI add user dialog -->
+
+<!-- BEGIN: GUI confirm dialog -->
+<div id="confirmDialog" style="display: none;">
+  <span id="confirmDialogMessage"></span>
+</div>
+<!-- END: GUI confirm dialog -->
+
+<div id="login_background" style="display: none">&nbsp;</div>
+<div id="login" style="display: none;">
+
+  <div class="login_title" id="login_title">WebArena 1.0</div>
+
+  <div class="login_error"></div>
+
+  <div class="login_icon login_icon_username"></div>
+  <input type="text" name="username" value="{{username}}" id="login_username" class="login_input" autocomplete="off" placeholder="Username" autofocus="autofocus" />
+
+  <br />
+
+  <div class="login_icon login_icon_password"></div><input type="password" name="password" value="" id="login_password" class="login_input" autocomplete="off" />
+
+  <br />
+
+  <input type="submit" name="login" value="Login" class="login_submit" id="login_submit" />
+
+</div>
+
+<div id="progressBar"><div class="progressBar_container"></div></div>
+
+<!-- BEGIN: Underscore Template Definition. -->
+<script type="text/template" id="proceeding-statusdialog">
   <div>
   <table>
   <tr>
@@ -349,37 +341,37 @@
   <th>Enddatum</th>
   </tr>
   <% _.each(milestones, function(mileStone, index) { %>
-    <tr>
-    <td>
-    <input type="checkbox" name="" value="" <%= mileStone.done ? 'checked disabled' : ''%> >
-    </td>
-    <td>
-    <%- mileStone.name %>
-    </td>
-    <td>
-    <%- mileStone.startdate || "Nicht gesetzt" %>
-    </td>
-    <td>
-    <% if( editable == index){ %>
-      <input readonly='true' class="datepicker-trigger" type="text" value="<%- mileStone.enddate %>">
-      <% } else { %>
-        <%- mileStone.enddate || "Nicht gesetzt" %>
-        <% } %>
-        </td>
-        <tr>
-        <% }); %>
+  <tr>
+  <td>
+  <input type="checkbox" name="" value="" <%= mileStone.done ? 'checked disabled' : ''%> >
+  </td>
+  <td>
+  <%- mileStone.name %>
+  </td>
+  <td>
+  <%- mileStone.startdate || "Nicht gesetzt" %>
+  </td>
+  <td>
+  <% if( editable == index){ %>
+  <input readonly='true' class="datepicker-trigger" type="text" value="<%- mileStone.enddate %>">
+  <% } else { %>
+  <%- mileStone.enddate || "Nicht gesetzt" %>
+  <% } %>
+  </td>
+  <tr>
+  <% }); %>
   </table>
   </div>
-  </script>
-  <script type="text/template" id="process-log-entry-template">
+</script>
+<script type="text/template" id="process-log-entry-template">
   <div>
   <% _.each(logEntries, function(logEntry) { %>
-    <p class="<%= logEntry.cssclass %>"> <%= moment(logEntry.timestamp).format("DD.MM.YY, HH:mm:ss") %> <br/>
-    <%= logEntry.message %></p>
-    <% }); %>
+  <p class="<%= logEntry.cssclass %>"> <%= moment(logEntry.timestamp).format("DD.MM.YY, HH:mm:ss") %> <br/>
+  <%= logEntry.message %></p>
+  <% }); %>
   </div>
-  </script>
-  <script type="text/template" id="discussion-message-template">
+</script>
+<script type="text/template" id="discussion-message-template">
 
   <div class='discussion-statement <%- additionalClasses %>' data-message-id='<%- message.timestamp %>'>
   <div class='discussion-statement-heading'>
@@ -391,8 +383,8 @@
   <div class='statement-delete'>löschen</div>
   <div class='statement-edit'>bearbeiten</div>
   </div>
-  </script>
-  <script type="text/template" id="discussion-container-template">
+</script>
+<script type="text/template" id="discussion-container-template">
   <div class="discussion">
   <div class="embedded-toolbar moveArea">
   <span class="minimize-button"></span>
@@ -404,9 +396,9 @@
   </div>
   <input class="discussion-input" placeholder=Texteingabe>
   </div>
-  </script>
+</script>
 
-  <script type="text/template" id="container-template">
+<script type="text/template" id="container-template">
   <table class="headline" bgcolor=#CCFFFF><tr>
   <th id ="containername" width="350"><%- heading %></th>
   <th id ="buttons" width="125">
@@ -419,9 +411,5 @@
   <ul id="sortablefiles">
   </ul>
   </div>
-  </script>
-
-  <!-- END: Underscore Template Definition. -->
-
-</body>
-</html>
+</script>
+<!-- END: Underscore Template Definition. -->
