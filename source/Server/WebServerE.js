@@ -28,9 +28,6 @@ var app     = express();
 var Modules   = false;
 var WebServer = {};
 
-var userHash = false;
-var context  = false;
-
 /**
  * Init function called in server.js to initialize this module
  * 
@@ -115,14 +112,17 @@ everyauth.everymodule.findUserById(function (id, callback) {
 // key field in the User collection
 everyauth.everymodule.userPkey('_id');
 
-app.use('/Common', express.static('Common'))
-    .use(express.static('Client'))
+app.use('/Common', express.static(path.resolve(__dirname, '../Common')))
+    .use(express.static(path.resolve(__dirname, '../Client')))
     .set('views', path.resolve(__dirname, '../Client/views'))    
     .set('view engine', 'html')
     .engine('html', hbs.__express)
-    .use(bodyParser())
+    .use(bodyParser.urlencoded({
+        extended: true
+    }))
+    .use(bodyParser.json())
     .use(cookieParser())
-    .use(session({ secret: 'keyboard gato', key: 'sid'}))
+    .use(session({ secret: 'keyboard gato', key: 'sid', resave: true, saveUninitialized: true}))
     .use(everyauth.middleware(app));
 
 // invoked for any requested passed to this router
@@ -141,13 +141,13 @@ app.use(function(req, res, next) {
             if (userHashIndex > -1) {
                 
                 /* userHash found */
-                userHash = req.path.slice(userHashIndex + 1);
-                context = Modules.UserManager.getConnectionByUserHash(userHash);
+                var userHash = req.path.slice(userHashIndex + 1);
+                var context = Modules.UserManager.getConnectionByUserHash(userHash);
             } else {
-                userHash = false;
-                context = false;
+                var context = false;
             }
             
+            req.context = context;
             next();
         } else {
             res.redirect('/login');
@@ -162,14 +162,15 @@ app.get('/', function(req, res, next) {
 
 app.get('/room/:id', function(req, res, next) {
     //console.log("user -> " + JSON.stringify(req.user));
+    var userName = (req.user !== undefined) ? req.user.username : "";
     
     var indexFilename = '../Client/guis/desktop/index.html';
-    res.render(path.resolve(__dirname, indexFilename), {start_room: req.params.id, username: req.user.username});
+    res.render(path.resolve(__dirname, indexFilename), {start_room: req.params.id, username: userName});
 });
 
 app.get('/getRoomHierarchy', function(req, res, next) {
     var roomId = req.query.id;
-    var hierarchy = Modules.Connector.getRoomHierarchy(roomId, false, function(hierarchy) {
+    Modules.Connector.getRoomHierarchy(roomId, false, function(hierarchy) {
         var result = [];
 
         if (roomId === "") {
@@ -199,65 +200,67 @@ app.get('/getRoomHierarchy', function(req, res, next) {
 });
 
 app.get('/getContent/:roomID/:objectID/:p3/:hash', function(req, res, next) {
-    var object = Modules.ObjectManager.getObject(req.params.roomID, req.params.objectID, context);
+    Modules.ObjectManager.getObject(req.params.roomID, req.params.objectID, req.context, function(object) {
+       
+        if (!object) {
+            Modules.Log.warn('Object not found (roomID: ' + req.params.roomID + ' objectID: ' + req.params.objectID + ')');
+            return res.send(404, 'Object not found');
+        }
 
-    if (!object) {
-        Modules.Log.warn('Object not found (roomID: ' + req.params.roomID + ' objectID: ' + req.params.objectID + ')');
-        return res.send(404, 'Object not found');
-    }
-
-    var mimeType = object.getAttribute('mimeType') || 'text/plain';
-    
-    res.set('Content-Type', mimeType + '; charset=ISO-8859-1');
-    res.set('Content-Disposition', 'inline; filename="' + object.getAttribute("name") + '"');
-    
-    if (Modules.Connector.getContentStream !== undefined) {
-        var objStream = Modules.Connector.getContentStream(req.params.roomID, req.params.objectID, context);
-        objStream.pipe(res);
-        objStream.on("end", function() {
-            try {
-                res.send(200);
-            } catch(Ex) {
-             // console.log("paintings ex: " + err);
-            }
-        })
-    } else {
-        var data = object.getContent();
-        res.send(200, new Buffer(data));
-    }
+        var mimeType = object.getAttribute('mimeType') || 'text/plain';
+        
+        res.set('Content-Type', mimeType + '; charset=ISO-8859-1');
+        res.set('Content-Disposition', 'inline; filename="' + object.getAttribute("name") + '"');
+        
+        if (Modules.Connector.getContentStream !== undefined) {
+            var objStream = Modules.Connector.getContentStream(req.params.roomID, req.params.objectID, req.context);
+            objStream.pipe(res);
+            objStream.on("end", function() {
+                try {
+                    res.send(200);
+                } catch(Ex) {
+                // console.log("paintings ex: " + err);
+                }
+            })
+        } else {
+            var data = object.getContent();
+            res.send(200, new Buffer(data));
+        }
+    });
 });
 
 app.get('/getPreviewContent/:roomID/:objectID/:p3/:hash', function(req, res, next) {
-    var object = Modules.ObjectManager.getObject(req.params.roomID, req.params.objectID, context);
+    Modules.ObjectManager.getObject(req.params.roomID, req.params.objectID, req.context, function(object) {
+        
+        if (!object) {
+            return  res.send(404, 'Object not found'); 
+        }
+        
+        object.getInlinePreviewMimeType(function (mimeType) {
+            object.getInlinePreview(function (data) {
 
-    if (!object) {
-        return  res.send(404, 'Object not found'); 
-    }
-    
-    object.getInlinePreviewMimeType(function (mimeType) {
-        object.getInlinePreview(function (data) {
+                if (!data) {
+                    Modules.Log.warn('no inline preview found (roomID: ' + req.params.roomID + ' objectID: ' + req.params.objectID + ')');
+                    if (mimeType.indexOf("image/") >= 0) {
+                        fs.readFile(__dirname + '/../Client/guis.common/images/imageNotFound.png', function (err, data) {
 
-            if (!data) {
-                Modules.Log.warn('no inline preview found (roomID: ' + req.params.roomID + ' objectID: ' + req.params.objectID + ')');
-                if (mimeType.indexOf("image/") >= 0) {
-                    fs.readFile(__dirname + '/../Client/guis.common/images/imageNotFound.png', function (err, data) {
+                            if (err) {
+                                Modules.Log.warn("Error loading imageNotFound.png file (" + req.path + ")");
+                                return res.send(404, '404 Error loading imageNotFound.png file');
+                            }
 
-                        if (err) {
-                            Modules.Log.warn("Error loading imageNotFound.png file (" + req.path + ")");
-                            return res.send(404, '404 Error loading imageNotFound.png file');
-                        }
-
-                        res.set({'Content-Type': 'image/png', 'Content-Disposition': 'inline'});
-                        res.send(200, data);
-                    });
+                            res.set({'Content-Type': 'image/png', 'Content-Disposition': 'inline'});
+                            res.send(200, data);
+                        });
+                    } else {
+                        res.send(404, 'Object not found'); 
+                    }
                 } else {
-                    res.send(404, 'Object not found'); 
+                    res.set({'Content-Type': 'text/plain', 'Content-Disposition': 'inline'});
+                    res.send(200, new Buffer(data)); 
                 }
-            } else {
-                res.set({'Content-Type': 'text/plain', 'Content-Disposition': 'inline'});
-                res.send(200, new Buffer(data)); 
-            }
-        }, mimeType, true);
+            }, mimeType, true);
+        });
     });
 });
 
@@ -353,66 +356,67 @@ app.post('/setContent/:roomID/:objectID/:hash', function(req, res, next) {
     var roomID = req.params.roomID
     var objectID = req.params.objectID
     
-    var object = Modules.ObjectManager.getObject(roomID, objectID, context);
     var historyEntry = {
         'objectID' : roomID,
         'roomID' : roomID,
         'action' : 'setContent'
     }
-    Modules.ObjectManager.history.add(
-            new Date().toDateString(), context.user.username, historyEntry)
-
-    if (!object) {
-        Modules.Log.warn('Object not found (roomID: ' + roomID + ' objectID: ' + objectID + ')');
-        return res.send(404, 'Object not found');
-    }
     
+    Modules.ObjectManager.history.add(new Date().toDateString(), req.context.user.username, historyEntry)
     var formidable = require('formidable');
     var form = new formidable.IncomingForm();
     
     form.parse(req, function (err, fields, files) {
 
-        object.copyContentFromFile(files.file.path, function () {
-
-            object.set('hasContent', true);
-            object.set('contentAge', new Date().getTime());
-            object.set('mimeType', files.file.type);
-
-            /* check if content is inline displayable */
-            if (Modules.Connector.isInlineDisplayable(files.file.type)) {
-
-                object.set('preview', true);
-                object.persist();
-
-                /* get dimensions */
-                Modules.Connector.getInlinePreviewDimensions(roomID, objectID, files.file.type, true, function (width, height) {
-
-                    if (width != false)  object.setAttribute("width", width);
-                    if (height != false) object.setAttribute("height", height);
-
-                    //send object update to all listeners
-                    object.persist();
-                    object.updateClients('contentUpdate');
-
-                    res.send(200);
-                });
-
-            } else {
-                object.set('preview', false);
-
-                //send object update to all listeners
-                object.persist();
-                object.updateClients('contentUpdate');
-
-                res.send(200);
-            }
-        });
-    });
+    	Modules.ObjectManager.getObject(roomID, objectID, req.context, function(object) { 
+		    if (!object) {
+		        Modules.Log.warn('Object not found (roomID: ' + roomID + ' objectID: ' + objectID + ')');
+		        return res.send(404, 'Object not found');
+		    }   		
+	    	
+	        object.copyContentFromFile(files.file.path, function () {
+	
+	            object.set('hasContent', true);
+	            object.set('contentAge', new Date().getTime());
+	            object.set('mimeType', files.file.type);
+	
+	            /* check if content is inline displayable */
+	            if (Modules.Connector.isInlineDisplayable(files.file.type)) {
+	
+	                object.set('preview', true);
+	                object.persist();
+	
+	                /* get dimensions */
+	                Modules.Connector.getInlinePreviewDimensions(roomID, objectID, files.file.type, true, function (width, height) {
+	
+	                    if (width != false)  object.setAttribute("width", width);
+	                    if (height != false) object.setAttribute("height", height);
+	
+	                    //send object update to all listeners
+	                    object.persist();
+	                    object.updateClients('contentUpdate');
+	
+	                    res.send(200);
+	                });
+	
+	            } else {
+	                object.set('preview', false);
+	
+	                //send object update to all listeners
+	                object.persist();
+	                object.updateClients('contentUpdate');
+	
+	                res.send(200);
+	            }
+	        });
+    	});
+    });    
+    
 });
 
 app.get('/paintings/:roomID/:user/:picID/:hash', function(req, res, next) {
     if (Modules.Connector.getPaintingStream !== undefined) {
-        var objStream = Modules.Connector.getPaintingStream(req.params.roomID, req.params.user, context);
+        var objStream = Modules.Connector.getPaintingStream(req.params.roomID, req.params.user, req.context);
         objStream.pipe(res);
         objStream.on("end", function() {
             try {

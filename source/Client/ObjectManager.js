@@ -66,6 +66,7 @@ ObjectManager.getPrototype = function(objType) {
  * @returns {string} 
  */
 ObjectManager.getIndexOfObject = function(objectID) {
+    
   // room?
   for (var index in this.currentRoomID) {
     if (this.currentRoomID[index] === objectID) {
@@ -78,7 +79,8 @@ ObjectManager.getIndexOfObject = function(objectID) {
       return index;
     }
   }
-  return false;
+  
+  return 'left';
 }
 
 /**
@@ -255,20 +257,18 @@ ObjectManager.hasObject = function(obj) {
  *  
  */
 ObjectManager.objectUpdate = function(data) {
-
   var object = ObjectManager.getObject(data.id);
 
   if (object) {
 
-    if (object.moving)
+    if (object.moving) {
       return;
+    }
 
     var oldData = object.get();
-
     object.setAll(data);
 
     /**
-     
      TODO Room updated come with no object type. Why?
      
      if (!data.type){
@@ -278,10 +278,10 @@ ObjectManager.objectUpdate = function(data) {
      }
      **/
 
-
     for (var key in oldData) {
       var oldValue = oldData[key];
       var newValue = data[key];
+      
       if (oldValue != newValue) {
         this.attributeChanged(object, key, newValue);
       }
@@ -292,6 +292,7 @@ ObjectManager.objectUpdate = function(data) {
     object = ObjectManager.buildObject(data.type, data);
 
     if (GUI.couplingModeActive) {
+        
       // to enable smooth dragging of objects between rooms display new objects immediately 
       // exceptions: SimpleText and Textarea need to load their content first else they are invisible or empty
       if (data.type !== "SimpleText" && data.type !== "Textarea") {
@@ -460,8 +461,8 @@ ObjectManager.loadPaperWriter = function(roomid, byBrowserNav, index, callback) 
           ObjectManager.removeLocally(obj);
         }
 
-        if (!roomid)
-          roomid = 'public';
+        if (!roomid) roomid = 'public';
+        
         self.currentRoomID[index] = roomid;
 
         if (!byBrowserNav && index === 'left') {
@@ -472,8 +473,7 @@ ObjectManager.loadPaperWriter = function(roomid, byBrowserNav, index, callback) 
           GUI.defaultZoomPanState(index, true);
         }
 
-        if (callback)
-          setTimeout(callback, 1200);
+        if (callback) setTimeout(callback, 1200);
       }
 
     });
@@ -570,12 +570,13 @@ ObjectManager.createObject = function(type, attributes, content, callback, index
   };
 
   Modules.Dispatcher.query('createObject', data, function(objectID) {
-    //objectID is the id of the newly created object
-    //the object may not yet be loaded so we wait for it
-
+    
+    // objectID is the id of the newly created object
+    // the object may not yet be loaded so we wait for it
     var runs = 0;
     var object = false;
     var interval = setInterval(function() {
+        
       if (runs == 50) {
         console.log('ERROR: Timeout while waiting for the object');
         clearTimeout(interval);
@@ -588,8 +589,10 @@ ObjectManager.createObject = function(type, attributes, content, callback, index
         ObjectManager.renumberLayers(true);
 
         object.justCreated();
-        if (callback != undefined)
+        if (callback != undefined) {
           callback(object);
+        }
+        
         return;
       }
       runs++;
@@ -1013,6 +1016,7 @@ ObjectManager.duplicateObjects = function(objects) {
   if (objects != undefined && objects.length > 0) {
 
     var duplicate = false;
+    
     if (objects.length <= 5) {
       duplicate = true;
     } else {
@@ -1033,22 +1037,46 @@ ObjectManager.duplicateObjects = function(objects) {
       requestData.toRoom = objects[0].getCurrentRoom();
       requestData.objects = array;
       requestData.cut = false;
+      requestData.duplicate = true;
       requestData.attributes = {};
 
       // select new objects after duplication
       var newIDs = [];
       var selectNewObjects = function() {
         for (var key in newIDs) {
-          var newObject = ObjectManager.getObject(newIDs[key]);
-          newObject.select(true);
+            
+            var runs = 0;
+            var newObject = false;
+            
+            var interval = setInterval(function() {
+                
+                if (runs == 50) {
+                    console.log("selectNewObjects Object " + newIDs[key] + " was not found");
+                    clearTimeout(interval);
+                    return;
+                }
+                
+                var newObject = ObjectManager.getObject(newIDs[key]);
+                if (newObject) {
+                    clearTimeout(interval);
+                    newObject.select(true);
+                    return
+                }
+                
+                runs++;
+                
+            }, 100);
+  
         }
       };
 
       Modules.Dispatcher.query('duplicateObjects', requestData, function(idList) {
         newIDs = idList;
         GUI.deselectAllObjects();
-        setTimeout(selectNewObjects, 200);
+        
+        setTimeout(selectNewObjects, 200 + (idList.length * 100));
       });
+      
     }
   }
 }

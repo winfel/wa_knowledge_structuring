@@ -9,71 +9,70 @@
 
 var theObject=Object.create(require('./common.js'));
 var Modules=require('../../server.js');
-module.exports=theObject;
-
 
 theObject.onEnter=function(object,oldData,newData){
 	var that = this;
 	
 	var createFile = function(filename, data, mimeType) {
-		Modules.ObjectManager.createObject(that.getRoomID(),
-			"File",
-			{
+        Modules.ObjectManager.createObject(that.getRoomID(), "File", {
 				x: 80,
 				y: 60,
-				hasContent: true, //prevent calling justCreated() after object creation (would display file upload dialog)
+            hasContent : true,  // prevent calling justCreated() after object
+                                // creation (would display file upload dialog)
 				name: filename,
-			},
-			data,
-			that.context,
-			function(dummy, newObject){
+        }, data, that.context, function(dummy, newObject) {
 				newObject.set('mimeType',mimeType);
 				newObject.persist();
-			}
-		);
+        });
 	};
 
+    if (object.get('type') == 'PaperObject') {
+        if (this.getAttribute('exportFormat') == 'html') {
 
 	if(object.get('type')=='PaperSpace')
 	{
 		if(this.getAttribute('exportFormat')=='html')
 		{
 			// read the html from etherpad
-			Modules.EtherpadController.pad.getHTML({padID:object.getAttribute('destination')}, function(error, data) {
+            Modules.EtherpadController.pad.getHTML({
+                padID : object.getAttribute('padID')
+            }, function(error, data) {
 				if(error) {
-					console.error("Error pad.getText", error.message);
+                    console.error("Error pad.getText: ", error.message);
 					return;
 				}
 
 				// create html file object
 				createFile(object.getName() + '.html', data.html, 'text/html');
 			});
-		}
-		else if(this.getAttribute('exportFormat')=='pdf')
-		{
+        } else if (this.getAttribute('exportFormat') == 'pdf') {
+            
 			// first read the html from etherpad
-			Modules.EtherpadController.pad.getHTML({padID:object.getAttribute('destination')}, function(error, data) {
+            Modules.EtherpadController.pad.getHTML({
+                padID : object.getAttribute('padID')
+            }, function(error, data) {
 				if(error) {
-					console.error("Error pad.getText", error.message);
+                    console.error("Error pad.getText: ", error.message);
 					return;
 				}
 
 				// convert html to pdf
 				Modules.EtherpadController.convertToPdf(data.html, function(pdfcontent){
-
 					// create pdf file object in webarena
 					createFile(object.getName() + '.pdf', pdfcontent, 'application/pdf');
+                });
 
 				});
-			});
-		}
-		else if(this.getAttribute('exportFormat').substr(0,5)=='image')
-		{
+        } else if (this.getAttribute('exportFormat').substr(0, 5) == 'image') {
 			var imgtype = this.getAttribute('exportFormat').substr(6);
+            
 			// first read the html from etherpad
-			Modules.EtherpadController.pad.getHTML({padID:object.getAttribute('destination')}, function(error, data) {
+            Modules.EtherpadController.pad.getHTML({
+                padID : object.getAttribute('padID')
+            }, function(error, data) {
+                
 				if(error) {
-					console.error("Error pad.getText", error.message);
+                    console.error("Error pad.getText: ", error.message);
 					return;
 				}
 
@@ -82,15 +81,14 @@ theObject.onEnter=function(object,oldData,newData){
 
 					// create image file object in webarena
 					createFile(object.getName() + '.' + imgtype, imgcontent, 'image/' + imgtype);
-
 				});
 			});
-		}
-		else
-		{
-			Modules['EtherpadController'].pad.getText({padID:object.getAttribute('destination')}, function(error, data) {
+        } else {
+            Modules['EtherpadController'].pad.getText({
+                padID : object.getAttribute('padID')
+            }, function(error, data) {
 				if(error) {
-					console.error("Error pad.getText", error.message);
+                    console.error("Error pad.getText: ", error.message);
 					return;
 				}
 
@@ -99,5 +97,9 @@ theObject.onEnter=function(object,oldData,newData){
 			});
 		}
 	}
+    
 	this.fireEvent('enter',object);
-};
+}
+
+module.exports = theObject;
+

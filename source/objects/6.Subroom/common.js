@@ -76,9 +76,8 @@ Subroom.execute = function(openInNewWindow) {
 
     // TODO this must be done serverside in the connector
     if (!destination) {
-        var random = new Date().getTime() - 1296055327011;
-
-        this.setAttribute('destination', random);
+        var random = new Date().getTime() - 1296055327011;        
+        this.setAttribute('destination', random.toString());
         destination = random;
     }
 

@@ -68,7 +68,7 @@ GUI.sidebar.openPage = function(element, button) {
 
   /* check if the given element name exists */
   if (GUI.sidebar.elementConfig[element] == undefined) {
-    console.error("Open Sidebar: Unknown element ID");
+    //console.error("Open Sidebar: Unknown element ID");
     return;
   }
 

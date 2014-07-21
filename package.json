@@ -2,7 +2,7 @@
   "name": "webarena",
   "version": "1.0.0",
   "dependencies": {
-    "socket.io": ">=0.9.14",
+    "socket.io": "=0.9.14",
     "formidable": "*",
     "imagemagick": "0.1.2",
     "underscore": "*",
@@ -17,7 +17,7 @@
     "lodash": "",
     "monk": "",
     "etherpad-lite-client":"",
-    "express": ">=4.x",
+    "express": "~4.x",
     "path": "*",
     "hbs": "*",
     "validator": "*",
@@ -25,7 +25,9 @@
     "body-parser": "*",
     "cookie-parser": "*",
     "express-session": "*",
-    "mongoose": "^3.8.8"
+    "mongoose": "~3.8.8",
+    "gridfs-stream": "*",
+    "mongodb": "*"
   },
   "devDependencies": {
     "superagent": "~0.15.7",

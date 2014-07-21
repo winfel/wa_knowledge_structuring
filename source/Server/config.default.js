@@ -10,7 +10,7 @@
 
 module.exports={
 	filebase:'/path/to/data_folder', // The path where object data is saved (for the fileConnector)
-	connector:require('./FileConnector.js'), // The chosen connector
+	connector:require('./connectors/MongoDBConnector.js'), // The chosen connector
 	language:'de', // The current language (e.g. for error messages)
 	port: 8080,     // HTTP Port for server
 	homepage: '/index.html',
@@ -59,6 +59,6 @@ module.exports={
               dbname: "",
               host: "",
               port: 27017,
-              path2bin: "<for local DB only>" // example : C:\Program Files\mongodb-win32-i386-2.4.9\bin\
+              path2bin: "<for local DB only>" // example : "C:\\Program Files\\mongodb-win32-i386-2.4.9\\bin\\"
             }      
 };

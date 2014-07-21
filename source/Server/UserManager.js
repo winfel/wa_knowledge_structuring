@@ -429,24 +429,16 @@ UserManager.getDataOfSpaceWithDest = function(socketOrUser, data, responseID){
  * @param {Object} responseID response ID.
  **/
 UserManager.enterRoom = function(socketOrUser, data, responseID) {
-  if (typeof socketOrUser.id == 'string')
-    var userID = socketOrUser.id;
-  else
-    var userID = socketOrUser;
-  // var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
-
-  if (data.index === undefined)
-    var index = 'left';
-  else
-    var index = data.index;
-  // var index = (data.index === undefined) ? 'left' : data.index;
+    var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
+    var index = (data.index === undefined) ? 'left' : data.index;
 
   var roomID = data.roomID;
 
   var connection = UserManager.connections[userID];
   var ObjectManager = Modules.ObjectManager;
 
-  //oldrooom is sent down to the connector, which may use it for parent creation
+    // oldrooom is sent down to the connector, which may use it for parent
+    // creation
   if (connection.rooms[index]) {
     var oldRoomId = connection.rooms[index].id;
   }
@@ -464,7 +456,8 @@ UserManager.enterRoom = function(socketOrUser, data, responseID) {
   // try to enter the room on the connector
   connector.mayEnter(roomID, connection, function(err, mayEnter) {
 
-    // if the connector responds true, the client is informed about the successful entering of the room
+        // if the connector responds true, the client is informed about the
+        // successful entering of the room
     // and all clients in the same rooms get new awarenessData.
     if (mayEnter) {
 
@@ -478,7 +471,9 @@ UserManager.enterRoom = function(socketOrUser, data, responseID) {
       //ObjectManager.sendChatMessages(roomID,socket);
 
       Modules.Dispatcher.respond(socket, responseID, false);
-      Modules.EventBus.emit("room::" + roomID + "::userEntered", {username: connection.user.username});
+            Modules.EventBus.emit("room::" + roomID + "::userEntered", {
+                username : connection.user.username
+            });
 
     } else {
       socketServer.sendToSocket(socket, 'error', 'User ' + user.username + ' may not enter ' + roomID);
