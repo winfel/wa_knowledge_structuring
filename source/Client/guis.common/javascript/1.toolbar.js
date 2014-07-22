@@ -415,6 +415,34 @@ GUI.initToolbar = function() {
 	
 	}
 	
+	/* add search toggle */
+	
+	if (!Modules.Config.presentationMode) {
+	
+		var searchButton = document.createElement("img");
+		$(searchButton).attr("src", "../../guis.common/images/fileicons/selectBidFile.png").attr("alt", "");
+		$(searchButton).attr("width", "24").attr("height", "24");
+
+		$(searchButton).attr("id", "search_Button");
+		$(searchButton).addClass("sidebar_button");
+
+		$(searchButton).attr("title", GUI.translate("Search"));
+
+		var click = function() {
+			GUI.sidebar.openPage("search", searchButton);
+		}
+		
+		if (GUI.isTouchDevice) {
+			$(searchButton).bind("touchstart", click);
+		} else {
+			$(searchButton).bind("mousedown", click);
+		}
+
+		$("#header > .header_right").append(searchButton);
+
+		GUI.sidebar.openPage("search", searchButton);
+	
+	}
 /* add Right Manager toggle */
 	
 	if (!Modules.Config.presentationMode) {
