@@ -27,11 +27,12 @@ theObject.onEnter=function(object,oldData,newData){
     var currentRoom = that.getCurrentRoom();
 
     // get writer
-    var o = Modules.ObjectManager.getObject(currentRoom,object.getAttribute('writer'),object.context);
+    Modules.ObjectManager.getObject(currentRoom,object.getAttribute('writer'),object.context, function(o){
+        if(o != false){
+            o.setAttribute('paper',id);
+        }
+    });
 
-    if(o != false){
-        o.setAttribute('paper',id);
-    }
 }
 
 theObject.createReview = function() {
