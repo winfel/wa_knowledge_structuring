@@ -85,18 +85,47 @@ body {
   right: 0;
   top: 0;
   transition-duration: 500ms;
+  border-bottom: 1px solid #636363;
 }
 
 #header>div.header_tabs_sidebar>img {
   display: inline-block;
-  margin-top: 3px;
-  margin-left: 8px;
-  margin-right: 8px;
+  position: relative;
+  top: 1px;
+  
+  margin-top: 1px;
+  padding-top: 2px;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-bottom: 4px;
+
+  border: 1px solid #636363;
+  border-bottom: none;
+  
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+}
+
+#header>div.header_tabs_sidebar>img:hover,
+#header>div.header_tabs_sidebar>img.active {
+  border-color: #ADADAD;
+  
+  background: -moz-linear-gradient(
+    center top ,
+    #6E6E6E 0%,
+    #1E1E1E 100%) repeat scroll 0 0 transparent;	
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    color-stop(0, #6E6E6E),
+    color-stop(1, #1E1E1E)
+    );
 }
 
 #header > div.header_tabs_sidebar > #header_toggle_sidebar {
   position: absolute;
-  left: -18px;
+  left: -20px;
 }
 
 #header > div.header_tabs_sidebar > #header_toggle_sidebar > img {
