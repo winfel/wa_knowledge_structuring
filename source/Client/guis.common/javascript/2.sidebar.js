@@ -129,11 +129,13 @@ GUI.sidebar.openSidebar = function() {
 
   GUI.sidebar.transformX($("#sidebar"), 0);
   GUI.sidebar.transformX($("#header>.header_right"), -230);
+  GUI.sidebar.transformX($("#header>.header_tabs_sidebar"), 0);
 
   GUI.sidebar.open = true;
 
-}
-
+  $("#header_toggle_sidebar_hide").show();
+  $("#header_toggle_sidebar_show").hide();
+};
 /**
  * Closes the sidebar
  * 
@@ -143,6 +145,7 @@ GUI.sidebar.closeSidebar = function(noReset) {
 
   GUI.sidebar.transformX($("#sidebar"), 230);
   GUI.sidebar.transformX($("#header>.header_right"), 0);
+  GUI.sidebar.transformX($("#header>.header_tabs_sidebar"), 230);
 
   GUI.sidebar.open = false;
 
@@ -152,7 +155,9 @@ GUI.sidebar.closeSidebar = function(noReset) {
 
   $(".sidebar_button").removeClass("active");
 
-}
+  $("#header_toggle_sidebar_hide").hide();
+  $("#header_toggle_sidebar_show").show();
+};
 
 /**
  * Saves the current sidebar state and hides it

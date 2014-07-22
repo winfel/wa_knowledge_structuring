@@ -133,7 +133,7 @@ GUI.initToolbar = function() {
 
 				if (toolbar_locked_elements[object[0].type] === true) return; //element is locked
 
-				if (object[0].type == "Paint" || object[0].type == "Highlighter") {
+				if (object[0].type == "Paint" || object[0].type == "Highlighter") {
 					
 					toolbar_locked_elements[object[0].type] = true;
 					
@@ -173,7 +173,7 @@ GUI.initToolbar = function() {
 			}
 			
 			/* All objects (except for Paint and Highlighter) can be created by dragging them to the svg area */
-			if (object[0].type != "Paint" && object[0].type != "Highlighter") {
+			if (object[0].type != "Paint" && object[0].type != "Highlighter") {
 				
 				/* make draggable */
 				var helper = $('<img src="../../guis.common/images/categories/'+object[0].category+'.png" alt="" width="24" height="24" />');
@@ -338,7 +338,7 @@ GUI.initToolbar = function() {
 		
 		$(bugButton).attr("title", GUI.translate("Bugreport"));
 
-		$("#header > .header_right").append(bugButton);
+		$("#header > .header_tabs_sidebar").append(bugButton);
 		
 		var click = function() {
 			GUI.sidebar.openPage("bug", bugButton);
@@ -366,7 +366,7 @@ GUI.initToolbar = function() {
 		
 		$(chatButton).attr("title", GUI.translate("Chat"));
 
-		$("#header > .header_right").append(chatButton);
+		$("#header > .header_tabs_sidebar").append(chatButton);
 
 
 		var chatNotifier = document.createElement("span");
@@ -379,7 +379,7 @@ GUI.initToolbar = function() {
 
 		$(chatNotifier).css("left", buttonPos.left).css("top", buttonPos.top);
 
-		$("#header > .header_right").append(chatNotifier);
+		$("#header > .header_tabs_sidebar").append(chatNotifier);
 		
 		
 		var click = function() {
@@ -418,7 +418,7 @@ GUI.initToolbar = function() {
 			$(searchButton).bind("mousedown", click);
 		}
 
-		$("#header > .header_right").append(searchButton);
+		$("#header > .header_tabs_sidebar").append(searchButton);
 
 		GUI.sidebar.openPage("search", searchButton);
 	
@@ -440,7 +440,7 @@ GUI.initToolbar = function() {
 
 		var click = function() {
 			GUI.sidebar.openPage("rightmanager", rmButton);
-		}
+		};
 		
 		if (GUI.isTouchDevice) {
 			$(rmButton).bind("touchstart", click);
@@ -448,7 +448,7 @@ GUI.initToolbar = function() {
 			$(rmButton).bind("mousedown", click);
 		}
 
-		$("#header > .header_right").append(rmButton);
+		$("#header > .header_tabs_sidebar").append(rmButton);
 	
 	}
 	
@@ -467,7 +467,7 @@ GUI.initToolbar = function() {
 
 		var click = function() {
 			GUI.sidebar.openPage("inspector", inspectorButton);
-		}
+		};
 		
 		if (GUI.isTouchDevice) {
 			$(inspectorButton).bind("touchstart", click);
@@ -475,11 +475,17 @@ GUI.initToolbar = function() {
 			$(inspectorButton).bind("mousedown", click);
 		}
 
-		$("#header > .header_right").append(inspectorButton);
+		$("#header > .header_tabs_sidebar").append(inspectorButton);
 
 		GUI.sidebar.openPage("inspector", inspectorButton);
 	
 	}
 	
+	$("#header_toggle_sidebar_hide").on("click", function() {
+    GUI.sidebar.closeSidebar();
+  });
 	
-}
+	$("#header_toggle_sidebar_show").on("click", function() {
+    GUI.sidebar.openSidebar();
+  });
+};
