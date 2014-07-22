@@ -18,7 +18,7 @@
 
 
 var TRASH_ROOM  = 'trash';
-var PAPER_OBJECT  = 'PaperObject';
+var PAPER_SPACE  = 'PaperSpace';
 
 var fs = require('fs');
 var _ = require('lodash');
@@ -272,7 +272,7 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
 				object.setContent(content);
 			}
 			
-			if (type == PAPER_OBJECT) {
+			if (type == PAPER_SPACE) {
 			    
 			    // create a new pad
 	            Modules.EtherpadController.pad.createPad({
