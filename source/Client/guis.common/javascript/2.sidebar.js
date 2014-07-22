@@ -39,10 +39,7 @@ GUI.sidebar.elementConfig = {
     order: 3,
     title: GUI.translate("Bugreport"),
   },
-  "search": {
-    order: 4,
-    title: GUI.translate("Search"),
-  },
+  
 };
 
 /**
