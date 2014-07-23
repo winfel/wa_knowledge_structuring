@@ -334,6 +334,7 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
       if(!found){
         Modules.ObjectManager.createObject(data.roomID, oType, attr, oContent, context, function(error, obj, addAtts) {
 
+          if(typeof addAtts != 'undefined'){
           addAtts.forEach(function(item){
 
             if(typeof item != 'undefined'){
@@ -345,6 +346,7 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
               obj.setAttribute(attName2,attValue2); 
             }
           });
+          }
 
           },additionalAtts);
       }
@@ -355,10 +357,10 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
 
 UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
-  var shouldInclude = [ "Container#HMI#60#45#500#4#searchByTag;true#searchByName;false#name;HMI#locked;true#searchString;HMI",
-                        "Container#ESS#600#45#500#4#searchByTag;true#searchByName;false#name;ESS#locked;true#searchString;ESS",
-                        "Container#MaA#60#400#500#4#searchByTag;true#searchByName;false#name;MaA#locked;true#searchString;MaA",
-                        "Container#SWT#600#400#500#4#searchByTag;true#searchByName;false#name;SWT#locked;true#searchString;SWT"];
+  var shouldInclude = [ "Container#HMI#60#45#500#5#searchByTag;true#searchByName;false#name;HMI#locked;true#searchString;HMI#height;300",
+                        "Container#ESS#600#45#500#5#searchByTag;true#searchByName;false#name;ESS#locked;true#searchString;ESS#height;300",
+                        "Container#MaA#60#400#500#5#searchByTag;true#searchByName;false#name;MaA#locked;true#searchString;MaA#height;300",
+                        "Container#SWT#600#400#500#5#searchByTag;true#searchByName;false#name;SWT#locked;true#searchString;SWT#height;300"];
 
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };

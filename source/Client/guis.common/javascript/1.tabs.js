@@ -21,7 +21,7 @@ GUI.tabs = new function() {
     console.log("GUI.tabs initialized");
     var that = this;
 
-    defaultTabs = ["Global Space#public","Private Space#PrivateSpace"+GUI.username];
+    defaultTabs = ["Private Space#PrivateSpace"+GUI.username,"Global Space#public"];
 
     /* try to load the tab data from db */
     Modules.UserManager.getTabCache(function(data){

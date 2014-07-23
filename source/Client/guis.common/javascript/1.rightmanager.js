@@ -239,7 +239,7 @@ GUI.rightmanager = new function() {
     that.obj = theObject;
     that.objData = {id: theObject.id, type: theObject.type};
 
-    if(theObject.type == 'PaperObject' || theObject.type == 'Subroom'){
+    if(theObject.type == 'PaperSpace' || theObject.type == 'Subroom'){
     /* Display selected object information */
     var selectedObjects = ObjectManager.getSelected();
 
