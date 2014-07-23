@@ -42,5 +42,6 @@ HiddenFile.register=function(type){
 HiddenFile.register('HiddenFile');
 HiddenFile.isGraphical = false;
 HiddenFile.isCreatable = false;
+HiddenFile.duplicateWithLinkedObjects = false;
 
 module.exports=HiddenFile;
