@@ -142,7 +142,15 @@ $.fn.dontScrollParent = function() {
 </script>
 {{/extend}}
 <div id="header">
-  <div class="header_right"></div>
+  <div class="header_right">
+    <div class="header_menu">
+
+      <form id="logOut_form" action="/logout" method="get">
+        <p>Welcome {{everyauth.user.username}}</p>
+        <button id="btn-logout" class="btn btn-primary" type="submit" form="logOut_form"><i class="icon-lock icon-white"></i>Sign Out</button>
+      </form>
+    </div>
+  </div>
   <div class="header_left"></div>
   <div class="header_tabs">
     <div class="ui-tabs ui-widget ui-widget-content ui-corner-all header-tabs" id="tabs_content"> DEMO Content </div>

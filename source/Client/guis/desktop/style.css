@@ -11,7 +11,6 @@ body {
   z-index: 11001;
   height: 33px;
   position: fixed;
-  top: 38px;
   left: 0px;
   right: 0px;
   background: -moz-linear-gradient(
@@ -47,6 +46,7 @@ body {
   margin-left: 0px;
   position: relative;
   top: -4px;
+  z-index: 2;
 }
 
 
@@ -55,14 +55,16 @@ body {
   position: relative;
   top: -4px;
   right: 10px;
+  z-index: 3;
 }
 
 #header>div.header_tabs {
   position: fixed;
-  top: 71px;
+  top: 33px;
   left: 0px;
   right: 0px;
   background: #DDE0E5;
+  z-index: 1;
 }
 
 #header>div.header_left>img {
@@ -92,7 +94,9 @@ body {
   display: inline-block;
   position: relative;
   top: 1px;
-  
+}
+
+#header img.header_tab {
   margin-top: 1px;
   padding-top: 2px;
   padding-left: 6px;
@@ -106,8 +110,8 @@ body {
   border-top-left-radius: 4px;
 }
 
-#header>div.header_tabs_sidebar>img:hover,
-#header>div.header_tabs_sidebar>img.active {
+#header img.header_tab:hover,
+#header img.header_tab.active {
   border-color: #ADADAD;
   
   background: -moz-linear-gradient(
@@ -121,6 +125,31 @@ body {
     color-stop(0, #6E6E6E),
     color-stop(1, #1E1E1E)
     );
+}
+
+#header img.header_tab.tab_to_button {
+  border-color: transparent;
+  margin-top: 6px;
+  padding-top: 1px;
+  padding-bottom: 2px;
+  
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+#header img.header_tab.tab_to_button.active {
+  border: 1px solid #636363;
+  border-bottom: none;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+#header img.header_tab.tab_to_button:hover {
+  border: 1px solid #636363;
+}
+
+#header img.header_tab.tab_to_button.active:hover {
+  border-bottom: none;
 }
 
 #header > div.header_tabs_sidebar > #header_toggle_sidebar {
@@ -153,6 +182,35 @@ body {
 #header>div.header_right>span.button_save {
   background-color: #e5e31f;
   color:black;
+}
+
+#header > div.header_right > div.header_menu {
+  display: none;
+  font-size: 14px;
+  padding: 10px;
+  
+  position: absolute;
+  right: 10px;
+  top: 33px;
+  
+  border: 1px solid #636363;
+  border-radius: 4px;
+  
+  background: -moz-linear-gradient(
+    center top ,
+    #1E1E1E 0%,
+    #000000 100%) repeat scroll 0 0 transparent;	
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    color-stop(0, #1E1E1E),
+    color-stop(1, #000000)
+    );
+}
+
+div.header_menu form {
+  margin: 0;
 }
 
 #chat_notifier {
@@ -285,7 +343,7 @@ body {
   position: fixed;
   width: 230px;
   right: 0px;
-  top: 71px;
+  top: 33px;
   bottom: 0px;
   -webkit-box-shadow: inset 2px 0px 10px rgba(0,0,0,0.3);
   box-shadow: rgba(0,0,0,0.3) 2px 0px 10px inset;
