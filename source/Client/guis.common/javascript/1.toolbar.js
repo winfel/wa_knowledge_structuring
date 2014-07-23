@@ -350,7 +350,7 @@ GUI.initToolbar = function() {
   
   $(document.body).on("click", function(e) {    
     // Hide the menu, once a user clicks somewhere on the screen. For some reason the comparison of the class attribute is needed...
-    if (e.target != menuButton && headerMenu.attr("class") != $(e.target).parents(".header_menu").attr("class")) {
+    if (e.target != menuButton && $(e.target).attr("class") != headerMenu.attr("class") && headerMenu.attr("class") != $(e.target).parents(".header_menu").attr("class")) {
       headerMenu.hide();
       $(menuButton).removeClass("active");
     }
