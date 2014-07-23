@@ -65,7 +65,7 @@ body.twopage > div:nth-child(even) {
 .strike, .glow, .scratchout, .quote {
 	background-color: none !important;
 }
-.audio::before {
+.audio:first-of-type::before {
 	content: "";
 	position: absolute;
 	left: -10px;

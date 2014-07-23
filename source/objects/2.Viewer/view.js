@@ -75,6 +75,7 @@ Viewer.initGUI = function(rep) {
         $(highlights)
                 .css('background-color', $.Color(ObjectManager.getUser().color).alpha(0.4))
                 .addClass('by_user_' + GUI.userid)
+                .addClass('at_time_' + (new Date()).getTime())
                 .attr('title', 'by ' + GUI.username);
         // save highlights to server
         var jsonStr = highlighter.serializeHighlights();
@@ -123,7 +124,7 @@ Viewer.initGUI = function(rep) {
 			.hover(function() {
 				that.toggleClass('remotehover');
 			})
-			.appendTo(that.closest('.pf')); // append to the pageFrame, position left:0 works then
+			.appendTo(that.closest('.pf').first()); // append to the pageFrame, position left:0 works then
 
 			// try to reuse pdf positioning classes, else use offset
 			try{
@@ -239,10 +240,17 @@ Viewer.initGUI = function(rep) {
     var delaymenu;
 
     frameDocument.on('mouseover', '.highlighted', function(event) {
+		var matchIdClass = /(by_user_\w+|at_time_[0-9]+)/g;
       if (delaymenu != undefined)
         window.clearTimeout(delaymenu);
       delaymenu = window.setTimeout(function() {
-        lastTarget = $(event.target);
+		var classname = $(event.target).attr('class');
+		// try to identify all belonging highlights by user and time identifier
+		classname = classname.match(matchIdClass);
+		if(classname && classname.length==2)
+			lastTarget = frameDocument.find('.' + classname[0] + '.' + classname[1]);
+		else
+			lastTarget = $(event.target);
         var refpos = lastTarget.offset();
         menu.show();
         //refpos.left += 5;
