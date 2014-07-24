@@ -156,9 +156,11 @@ ObjectManager.getObject = function (roomID, objectID, context, callback) {
 	if (!callback) throw new Error('Missing callback in ObjectManager.getObject');
 
 	Modules.Connector.getObjectData(roomID, objectID, context, function (objectData) {
-	    var object = buildObjectFromObjectData(objectData, roomID, objectData.type);
-	    object.context = context;
-	    callback(object);
+		if(typeof objectData != 'undefined' && objectData != false){
+		    var object = buildObjectFromObjectData(objectData, roomID, objectData.type);
+		    object.context = context;
+		    callback(object);
+	    }
 	});
 }
 
