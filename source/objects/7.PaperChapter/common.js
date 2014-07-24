@@ -94,6 +94,8 @@ this.registerAction('to back', function() {
  * @param {boolean} openInNewWindow
  */
 PaperChapter.execute = function(openInNewWindow) {
+  var tempIDs = [];
+
   /* set writer id */
   var inv = ObjectManager.getCurrentRoom().getInventory();
 
@@ -120,8 +122,24 @@ PaperChapter.execute = function(openInNewWindow) {
       // whats the position in the array
       var pos = len.indexOf(inv[i].getAttribute('x')) + 1;
       inv[i].setAttribute("order",pos);
+      tempIDs[pos-1] = inv[i].getAttribute('chapterID');
     }
-  }   
+  }
+
+  var tempString = "";
+  /* build String */
+  tempIDs.forEach(function(item){
+    tempString += item+";";
+  });
+  
+
+  tempString = tempString.substr(0,tempString.length-1);
+
+  var destFromURL = document.URL.substring(document.URL.lastIndexOf("/")+1,document.URL.length);
+
+  /* set ids of pads */
+  //UserManager.removeDataOfSpaceWithDest(ObjectManager.getCurrentRoom().id,"paperIDs");
+  UserManager.setDataOfSpaceWithDest(destFromURL,"paperIDs",tempString);   
 }
 
 PaperChapter.register('PaperChapter');

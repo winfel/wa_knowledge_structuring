@@ -30,18 +30,41 @@ theObject.onEnter=function(object,oldData,newData){
 	{
 		if(this.getAttribute('exportFormat')=='html')
 		{
-			// read the html from etherpad
-            Modules.EtherpadController.pad.getHTML({
-                padID : object.getAttribute('padID')
-            }, function(error, data) {
-				if(error) {
-                    console.error("Error pad.getText: ", error.message);
-					return;
-				}
+			var dbData = {'destination':object.getAttribute('destination'), 'key':"paperIDs"};
+			Modules.UserManager.getDataOfSpaceWithDestServerSide(dbData, function(i){
+				var token = i[0].value.split(";"); 
+				var cPos = 0;
 
-				// create html file object
-				createFile(object.getName() + '.html', data.html, 'text/html');
+				var summedText = "";
+
+				token.forEach(function(i2){
+					// read the html from etherpad
+					Modules.EtherpadController.pad.getHTML({
+					    padID : i2
+					    }, function(error, data) {
+						if(error) {
+					        console.error("PadID "+ object.getAttribute('padID') + " >> Error pad.getText: ", error.message);
+							//return;
+						}
+
+						if(cPos < token.length-1){
+							if(data != null){
+								summedText +=  data.html;
+							}
+							cPos++;
+							}else{
+								if(data != null){
+									summedText +=  data.html;
+								}
+								// create html file object
+								createFile(object.getName() + '.html', summedText, 'text/html');
+							}
+						});
+				});
+
 			});
+
+
         } else if (this.getAttribute('exportFormat') == 'pdf') {
             
 			// first read the html from etherpad

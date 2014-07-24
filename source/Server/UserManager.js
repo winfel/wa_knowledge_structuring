@@ -386,7 +386,8 @@ UserManager.setDataOfSpaceWithDestServerSide = function(data){
 
 UserManager.getDataOfSpaceWithDestServerSide = function(data, callback){
      var ss = db.get('SpaceStorage');
-    ss.find({'destination':data.destination, 'key':data.key}, {}, function(e, docs){
+
+    ss.find({'destination':String(data.destination), 'key':String(data.key)}, {}, function(e, docs){
       if(typeof docs != 'undefined' && docs.length > 0){
         callback(docs);
       }else{
@@ -399,7 +400,7 @@ UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID){
      var ss = db.get('SpaceStorage');
 
      // if data is not included: store it
-    ss.find({'destination':data.destination,'key':data.key}, {}, function(e, docs){
+    ss.find({'destination':String(data.destination),'key':String(data.key)}, {}, function(e, docs){
         if(typeof docs == 'undefined' || docs.length == 0){
             ss.insert({'destination':data.destination, 'key':data.key, 'value':data.value});
         }
