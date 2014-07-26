@@ -1,5 +1,9 @@
 "use strict";
 
+/* SETTINGS */
+var popover_positionOffsetX = -12;
+var popover_positionOffsetY = 20;
+
 /**
  * Init. the toolbar
  */
@@ -47,7 +51,8 @@ GUI.initToolbar = function() {
       /* add Popover */
 
       $(newCategoryIcon).jPopover({
-        positionOffsetY: $("#header").height() - 7,
+        positionOffsetX: popover_positionOffsetX,
+        positionOffsetY: popover_positionOffsetY,
         onSetup: function(domEl, popover) {
 
           var page = popover.addPage(GUI.translate(key));
@@ -73,7 +78,7 @@ GUI.initToolbar = function() {
                 alert(GUI.translate("You cannot create objects in presentation mode"));
               }
 
-            }
+            };
 
             if (GUI.isTouchDevice) {
               $(element.getDOM()).bind("touchstart", function() {
@@ -106,7 +111,7 @@ GUI.initToolbar = function() {
                 "y": top
               });
 
-            }
+            };
 
             $(element.getDOM()).addClass("toolbar_draggable");
             $(element.getDOM()).draggable({
@@ -155,7 +160,7 @@ GUI.initToolbar = function() {
           alert(GUI.translate("You cannot create objects in presentation mode"));
         }
 
-      }
+      };
 
       if (GUI.isTouchDevice) {
         $(newCategoryIcon).bind("touchstart", function() {
@@ -190,7 +195,7 @@ GUI.initToolbar = function() {
             "y": top
           });
 
-        }
+        };
 
         $(newCategoryIcon).addClass("toolbar_draggable");
         $(newCategoryIcon).draggable({
@@ -211,7 +216,7 @@ GUI.initToolbar = function() {
       $(this).animate({opacity: 1}, 500, function() {
         $(this).animate({opacity: 0.6}, 500);
       });
-    }
+    };
 
     if (GUI.isTouchDevice) {
       $(newCategoryIcon).bind("touchstart", effect);
@@ -241,7 +246,7 @@ GUI.initToolbar = function() {
 
     var click = function() {
       GUI.enterCouplingMode();
-    }
+    };
 
     if (GUI.isTouchDevice) {
       $(couplingButton).bind("touchstart", click);
@@ -266,7 +271,7 @@ GUI.initToolbar = function() {
 
   var click = function() {
     Modules.ObjectManager.goParent();
-  }
+  };
 
   if (GUI.isTouchDevice) {
     $(parentButton).bind("touchstart", click);
@@ -319,7 +324,7 @@ GUI.initToolbar = function() {
 
   var click = function() {
     Modules.ObjectManager.pasteObjects();
-  }
+  };
 
   if (GUI.isTouchDevice) {
     $(pasteButton).bind("touchstart", click);
@@ -327,40 +332,40 @@ GUI.initToolbar = function() {
     $(pasteButton).bind("mousedown", click);
   }
 
-
   /*add menu button*/
-
   var menuButton = document.createElement("img");
   $(menuButton).attr("src", "../../guis.common/images/menu.png").attr("alt", "");
   $(menuButton).attr("width", "24").attr("height", "24");
 
   $(menuButton).attr("id", "menu_button");
-  $(menuButton).addClass("sidebar_button header_tab tab_to_button");
+  $(menuButton).addClass("sidebar_button");
 
   $(menuButton).attr("title", GUI.translate("Menu"));
 
   $("#header > .header_right").append(menuButton);
 
-  var headerMenu = $(".header_menu").first();
+  $(menuButton).jPopover({
+    positionOffsetX: popover_positionOffsetX,
+    positionOffsetY: popover_positionOffsetY,
+    arrowOffsetRight: 30,
+    onSetup: function(domEl, popover) {
+      var page = popover.addPage(GUI.translate("Welcome")+ " " + GUI.username);
+      var section = page.addSection();
 
-  var click = function() {
-    headerMenu.toggle();
-    $(this).toggleClass("active");
-  };
-  
-  $(document.body).on("click", function(e) {    
-    // Hide the menu, once a user clicks somewhere on the screen. For some reason the comparison of the class attribute is needed...
-    if (e.target != menuButton && $(e.target).attr("class") != headerMenu.attr("class") && headerMenu.attr("class") != $(e.target).parents(".header_menu").attr("class")) {
-      headerMenu.hide();
-      $(menuButton).removeClass("active");
+      var element = section.addElement('<img src= "../../guis.common/images/lock.png" alt="" width="24" height="24" /> ' + GUI.translate("Sign out"));
+
+      var click = function() {
+        location.pathname = "/logout";
+        popover.hide();
+      };
+
+      if (GUI.isTouchDevice) {
+        $(element.getDOM()).bind("touchstart", click);
+      } else {
+        $(element.getDOM()).bind("click", click);
+      }
     }
   });
-
-  if (GUI.isTouchDevice) {
-    $(menuButton).bind("touchstart", click);
-  } else {
-    $(menuButton).bind("mousedown", click);
-  }
 
   /* add bug report toggle */
   if (!Modules.Config.presentationMode) {
@@ -378,7 +383,7 @@ GUI.initToolbar = function() {
 
     var click = function() {
       GUI.sidebar.openPage("bug", bugButton);
-    }
+    };
 
     if (GUI.isTouchDevice) {
       $(bugButton).bind("touchstart", click);
@@ -420,7 +425,7 @@ GUI.initToolbar = function() {
 
     var click = function() {
       GUI.sidebar.openPage("chat", chatButton);
-    }
+    };
 
     if (GUI.isTouchDevice) {
       $(chatButton).bind("touchstart", click);
@@ -446,7 +451,7 @@ GUI.initToolbar = function() {
 
     var click = function() {
       GUI.sidebar.openPage("search", searchButton);
-    }
+    };
 
     if (GUI.isTouchDevice) {
       $(searchButton).bind("touchstart", click);
