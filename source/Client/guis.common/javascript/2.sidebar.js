@@ -128,7 +128,7 @@ GUI.sidebar.openPage = function(element, button) {
 GUI.sidebar.openSidebar = function() {
 
   GUI.sidebar.transformX($("#sidebar"), 0);
-  GUI.sidebar.transformX($("#header>.header_right"), -230);
+  GUI.sidebar.transformX($("#header>.header_right"), -250);
   GUI.sidebar.transformX($("#header>.header_tabs_sidebar"), 0);
 
   GUI.sidebar.open = true;
@@ -144,7 +144,7 @@ GUI.sidebar.openSidebar = function() {
 GUI.sidebar.closeSidebar = function(noReset) {
 
   GUI.sidebar.transformX($("#sidebar"), 230);
-  GUI.sidebar.transformX($("#header>.header_right"), 0);
+  GUI.sidebar.transformX($("#header>.header_right"), -20);
   GUI.sidebar.transformX($("#header>.header_tabs_sidebar"), 230);
 
   GUI.sidebar.open = false;
