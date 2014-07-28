@@ -75,6 +75,9 @@ Container.register=function(type){
 			object.execute();
 		});
 	}, true);
+
+
+	this.makeSensitive();
 	
 }
 
