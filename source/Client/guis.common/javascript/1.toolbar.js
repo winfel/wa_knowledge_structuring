@@ -226,7 +226,7 @@ GUI.initToolbar = function() {
 
   });
 
-  /*add coupling button*/
+  /*add coupling button
   if (Modules.Config.couplingMode) {
     var couplingButton = document.createElement("img");
     $(couplingButton).attr("src", "../../guis.common/images/coupling.png").attr("alt", "");
@@ -253,10 +253,10 @@ GUI.initToolbar = function() {
     } else {
       $(couplingButton).bind("mousedown", click);
     }
-  }
+  }*/
 
 
-  /*add parent button*/
+  /*add parent button
 
   var parentButton = document.createElement("img");
   $(parentButton).attr("src", "../../guis.common/images/parent.png").attr("alt", "");
@@ -277,7 +277,7 @@ GUI.initToolbar = function() {
     $(parentButton).bind("touchstart", click);
   } else {
     $(parentButton).bind("mousedown", click);
-  }
+  }*/
 
 
   /*add paint button*/
@@ -304,7 +304,7 @@ GUI.initToolbar = function() {
    }
    */
 
-  /*add paste button*/
+  /*add paste button
   var pasteButton = document.createElement("img");
   $(pasteButton).attr("src", "../../guis.common/images/paste.png").attr("alt", "");
   $(pasteButton).attr("width", "24").attr("height", "24");
@@ -330,7 +330,7 @@ GUI.initToolbar = function() {
     $(pasteButton).bind("touchstart", click);
   } else {
     $(pasteButton).bind("mousedown", click);
-  }
+  }*/
 
   /*add menu button*/
   var menuButton = document.createElement("img");
@@ -353,9 +353,28 @@ GUI.initToolbar = function() {
       var section = page.addSection();
 
       var element = section.addElement('<img src= "../../guis.common/images/lock.png" alt="" width="24" height="24" /> ' + GUI.translate("Sign out"));
-
       var click = function() {
         location.pathname = "/logout";
+        popover.hide();
+      };
+
+      var element = section.addElement('<img src= "../../guis.common/images/paste-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Paste"));
+      var click = function() {
+        alert("Paste");
+        Modules.ObjectManager.pasteObjects();
+        popover.hide();
+      };
+
+      var element = section.addElement('<img src= "../../guis.common/images/level-up.png" alt="" width="24" height="24" /> ' + GUI.translate("Home"));
+      var click = function() {
+        Modules.ObjectManager.goParent();
+        alert("Go parent");
+        popover.hide();
+      };
+
+      var element = section.addElement('<img src= "../../guis.common/images/coupling-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Coupling"));
+      var click = function() {
+        GUI.enterCouplingMode();
         popover.hide();
       };
 
