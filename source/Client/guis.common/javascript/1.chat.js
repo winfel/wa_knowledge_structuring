@@ -32,6 +32,8 @@ GUI.chat.init = function() {
 		}
 		
 	});
+
+    $()
 	
 }
 
@@ -52,15 +54,21 @@ GUI.chat.setUsers = function(users) {
 	$("#chat_users").html("");
 	for (var i = 0; i < users.length; i++) {
 		var user = users[i];
+        if (user['username'] == ObjectManager.user['username']){
+            continue;
+        }
 		$("#chat_users").append('<div class="chatuserhandle"><span style="background-color: '+user.color+'"></span>'+user.username+'</div>');
 	}
+
     $(".chatuserhandle").click(function(){
         var usr = $(this).text();
         console.log("#### text"+usr);
-        var newbox = '<div id="receiver-' +usr+ '"> whofiwqfw wf</div>';
-        $("#one2one-container").append(newbox).css("display", "block").css("background-color","#535EFD");
 
+        var random_id = Math.floor((Math.random()*10000)+1);
+        GUI.chat.createChatbox(usr, random_id);
     });
+
+
 }
 
 
@@ -70,7 +78,7 @@ GUI.chat.setUsers = function(users) {
 GUI.chat.clear = function() {
 	
 	$("#chat_messages").html('<span id="chat_messages_spacer"></span>');
-	
+
 }
 
 /**
@@ -81,7 +89,6 @@ GUI.chat.clear = function() {
  * @param {Boolean} read True, if it is an old message
  */
 GUI.chat.addMessage = function(username, text, userColor, read) {
-	
 	/* check if the message was send by the own user */
 	if (username == GUI.username) {
 		var type = "mine";
@@ -137,6 +144,35 @@ GUI.chat.addMessage = function(username, text, userColor, read) {
 
 }
 
+/**
+ * add a single message to the chat window
+ * @param {String} username The username of the sender
+ * @param {String} text The text of the message
+ * @param {String} [userColor=#000000] The senders user color
+ * @param {Boolean} read True, if it is an old message
+ */
+GUI.chat.addMessageOne = function(username, text, userColor, read) {
+    var windowTitle = text.receiver; // shows the receiver of chatbox
+    if (username == GUI.username) {
+        // sender is myself
+        var type = "mine";
+         windowTitle = text.receiver;
+    }
+    else {
+        // sender is someone else --> it is a received message
+        windowTitle = username;
+        if (text.receiver != GUI.username){
+            return;
+        }
+    }
+    GUI.chat.createChatbox(windowTitle, text.random_id);
+    var bubble = text.bubble;
+    $(bubble).hide().appendTo('.message-box').fadeIn();
+
+    //keep scrolled to bottom of chat!
+    var scrolltoh = $('.message-box')[0].scrollHeight;
+    $('.message-box').scrollTop(scrolltoh);
+}
 
 /**
  * called when chat is opened in GUI
@@ -163,3 +199,76 @@ GUI.chat.showNotifier = function() {
 GUI.chat.hideNotifier = function() {
 	$("#chat_notifier").css("opacity", 0);
 }
+
+
+GUI.chat.createChatbox = function(user, random_id) {
+
+    if ( $("#chat-"+user).length != 0 ){
+        // window already exists
+        return;
+    }
+
+    if (!random_id){
+        var random_id = Math.floor((Math.random()*10000)+1);
+    }
+    var newbox =
+        '<div class="chat-box" id="chat-' +user+ '">\
+                <div class="chat-header">' +user+
+            '<div class="close_btn">&nbsp;</div>\
+            <div class="minimize_btn">&nbsp;</div>\
+        </div>\
+        <div class="toggle_chat">\
+            <div class="message-box">\
+            </div>\
+            <div class="user-info">\
+                <textarea name="chat-message" id="chat-message-' +random_id /*id="chat-message"*/ +'" placeholder="Type Message Hit Enter" maxlength="100" />\
+                    </div>\
+                </div>\
+        ';
+
+    $("#one2one-container").append(newbox).css("display", "block").css("background-color","#535EFD");
+
+    $(".close_btn").click(function(){
+        console.log("### close but");
+        $("#one2one-container").html("").css("display", "none");
+    });
+
+    var minimize_box = function(){
+        $('.toggle_chat').slideToggle();
+    };
+
+    $('.minimize_btn').click(minimize_box);
+    $('.chat-header').dblclick(minimize_box);
+
+    $("#chat-message-"+random_id).keypress(function(evt) {
+        if(evt.which == 13) {
+            var val = $(this).val();
+            if (jQuery.trim(val) == "") {
+                $(this).val("");
+                return;
+            }
+
+            var iusername = ObjectManager.user['username'];
+            console.log('### user'+ iusername );
+            var imessage = $(this).val();
+            var post_data = {'sender':iusername, 'message':imessage};
+
+            var d = new Date;
+            var months = ['Jan', 'Feb', 'Mar', 'Apr','May', 'Jun','Jul', 'Aug','Sep', 'Oct','Nov', 'Dec'];
+            var msg_time = d.getHours()+':'+ d.getMinutes()+ ' '+ months[d.getMonth()] +' ' + d.getDay();
+            var bubble =
+                '<div class="chat-msg">\
+                    <time>' +msg_time+'</time>' +
+                    '<span class="username">'+iusername+'</span>' +
+                    '<span class="message">'+imessage+'</span>\
+                    </div>';
+            console.log(msg_time +' ' + iusername + ' ' + imessage);
+
+
+            //reset value of message box
+            $(this).val('');
+            console.log("iusername: " + iusername + '  receiver: '+user );
+            ObjectManager.tellOne({'bubble':bubble, 'sender':iusername, 'receiver': user,'random_id':random_id});
+        }
+    });
+};
