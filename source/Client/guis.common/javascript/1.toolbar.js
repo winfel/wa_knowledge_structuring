@@ -352,36 +352,42 @@ GUI.initToolbar = function() {
       var page = popover.addPage(GUI.translate("Welcome")+ " " + GUI.username);
       var section = page.addSection();
 
-      var element = section.addElement('<img src= "../../guis.common/images/lock.png" alt="" width="24" height="24" /> ' + GUI.translate("Sign out"));
-      var click = function() {
+      var btnSignout = section.addElement('<img src= "../../guis.common/images/lock.png" alt="" width="24" height="24" /> ' + GUI.translate("Sign out"));
+      var clickSignout = function() {
         location.pathname = "/logout";
         popover.hide();
       };
 
-      var element = section.addElement('<img src= "../../guis.common/images/paste-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Paste"));
-      var click = function() {
+      var btnPaste = section.addElement('<img src= "../../guis.common/images/paste-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Paste"));
+      var clickPaste = function() {
         alert("Paste");
         Modules.ObjectManager.pasteObjects();
         popover.hide();
       };
 
-      var element = section.addElement('<img src= "../../guis.common/images/level-up.png" alt="" width="24" height="24" /> ' + GUI.translate("Home"));
-      var click = function() {
+      var btnHome = section.addElement('<img src= "../../guis.common/images/level-up.png" alt="" width="24" height="24" /> ' + GUI.translate("Home"));
+      var clickHome = function() {
         Modules.ObjectManager.goParent();
         alert("Go parent");
         popover.hide();
       };
 
-      var element = section.addElement('<img src= "../../guis.common/images/coupling-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Coupling"));
-      var click = function() {
+      var btnCoupling = section.addElement('<img src= "../../guis.common/images/coupling-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Coupling"));
+      var clickCoupling = function() {
         GUI.enterCouplingMode();
         popover.hide();
       };
 
       if (GUI.isTouchDevice) {
-        $(element.getDOM()).bind("touchstart", click);
+        $(btnSignout.getDOM()).bind("touchstart", clickSignout);
+        $(btnPaste.getDOM()).bind("touchstart", clickPaste);
+        $(btnHome.getDOM()).bind("touchstart", clickHome);
+        $(btnCoupling.getDOM()).bind("touchstart", clickCoupling);
       } else {
-        $(element.getDOM()).bind("click", click);
+        $(btnSignout.getDOM()).bind("click", clickSignout);
+        $(btnPaste.getDOM()).bind("click", clickPaste);
+        $(btnHome.getDOM()).bind("click", clickHome);
+        $(btnCoupling.getDOM()).bind("click", clickCoupling);
       }
     }
   });
