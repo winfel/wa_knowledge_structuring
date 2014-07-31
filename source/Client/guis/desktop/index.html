@@ -250,9 +250,10 @@ $.fn.dontScrollParent = function() {
           </div>
         </div>
       </div>
-
+ 
       <div id="chat"></div>
-      <div id="bug">                    
+      <div id="bug"> 
+	  
 
         <div>
           Ist Ihnen bei der Benutzung ein Fehler aufgefallen? Teilen Sie uns ihn doch bitte mit.<br />
@@ -281,7 +282,52 @@ $.fn.dontScrollParent = function() {
         <div id="bug_result"></div>
 
       </div>
+	  <div id="search" class="jDesktopInspector">
+            <div class="jDesktopInspector_main content">
+            
+              <div class="jDesktopInspector_pageHead" id="search_title">Search</div>
+              <div class="jDesktopInspector_page jDesktopInspector_page_1" id="rm_rolesPage">
+                <div class="jDesktopInspector_section" id="rm_roles"></div>
+                <div class="jDesktopInspector_section">                                                             							
+                  <div class="jDesktopInspector_element">
+                    <input id="searchFileId" name="searchFileName" type="text" size="15" value="" >
+                    <div class= "jDesktopInspector_button_right">										
+                      <input id="searchButton" type="button" value="Search">
+					   <input id="resetButton" type="button" value="Reset">
+                    </div>
+                    <br style="clear: both">									
+                  </div>                                    
+                </div>	                   
+              </div>
+              
+              <div class="rightmanager-role-separator"></div>
+			  <div class="jDesktopInspector_pageHead" id="prim_search_title">Filter By Primary Tag</div>
+			  </br>
+			<div class= "jDesktopInspector_button_right" >
+			<select id="primButton">
+					<option value=" ">Select</option>
+					<option value="Human-Machine Interaction">Human-Machine Interaction</option>
+					<option value="Software Technologies">Software Technologies</option>
+					<option value="Algorithm">Algorithm</option>
+					<option value="Embedded Systems">Embedded Systems</option>
+			</select>
+			<div class="rightmanager-role-separator"></div>
+			<div class="jDesktopInspector_section" id="title_Sec_tag"></div>
+             <div class="jDesktopInspector_section" id="Sec_tag">
+            
+            </div>  
+			<div class= "jDesktopInspector_button_right" id="filterButton">										
+                     
+					  
+                    </div>
+			<div class="rightmanager-role-separator"></div>			
+          </div>
+          
+		</div>
+      </div>
+
     </div>
+	
   </div>
 </div>
 
