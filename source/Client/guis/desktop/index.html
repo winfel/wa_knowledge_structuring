@@ -142,23 +142,15 @@ $.fn.dontScrollParent = function() {
 </script>
 {{/extend}}
 <div id="header">
-  <div class="header_right">
-    <div class="header_menu">
-
-      <form id="logOut_form" action="/logout" method="get">
-        <p>Welcome {{everyauth.user.username}}</p>
-        <button id="btn-logout" class="btn btn-primary" type="submit" form="logOut_form"><i class="icon-lock icon-white"></i>Sign Out</button>
-      </form>
-    </div>
-  </div>
+  <div class="header_right"></div>
   <div class="header_left"></div>
   <div class="header_tabs">
     <div class="ui-tabs ui-widget ui-widget-content ui-corner-all header-tabs" id="tabs_content"> DEMO Content </div>
   </div>
   <div class="header_tabs_sidebar animate">
     <div id="header_toggle_sidebar">
-      <img id="header_toggle_sidebar_hide" title="Hide sidebar" src="/guis.common/images/oxygen/16x16/actions/arrow-right.png" alt="">
-      <img id="header_toggle_sidebar_show" title="Show sidebar" src="/guis.common/images/oxygen/16x16/actions/arrow-left.png" alt="" style="display: none;">
+      <img id="header_toggle_sidebar_hide" title="Hide sidebar" src="/guis.common/images/arrow-right.png" alt="" style="width: 18px; height: 18px;">
+      <img id="header_toggle_sidebar_show" title="Show sidebar" src="/guis.common/images/arrow-left.png" alt="" style="width: 18px; height: 18px; display: none;">
     </div>
   </div>
 </div>
@@ -244,7 +236,7 @@ $.fn.dontScrollParent = function() {
             <div class="jDesktopInspector_pageHead">Object:</div>
             <div class="jDesktopInspector_page jDesktopInspector_page_0">
               <div class="jDesktopInspector_section">
-                <div class="jDesktopInspector_element">Please select a Subroom or PaperObject to use the rightmanager!</div>
+                <div class="jDesktopInspector_element">Please select a Subroom or PaperSpace to use the rightmanager!</div>
               </div>
             </div>
           </div>
@@ -371,7 +363,7 @@ $.fn.dontScrollParent = function() {
 <div id="login_background" style="display: none">&nbsp;</div>
 <div id="login" style="display: none;">
 
-  <div class="login_title" id="login_title">WebArena 1.0</div>
+  <div class="login_title" id="login_title">Cooperative Writing (COW)</div>
 
   <div class="login_error"></div>
 

@@ -245,9 +245,9 @@ var RightManager = function() {
     
     var Dispatcher = Modules.Dispatcher;
 
-    fillCurrentDbWithTestData();
-    fillCurrentDbWithLayer0CanvasData();
-    fillWithDefaultRights();
+    //fillCurrentDbWithTestData();
+    //fillCurrentDbWithLayer0CanvasData();
+    //fillWithDefaultRights();
 
     this.initRights();
 

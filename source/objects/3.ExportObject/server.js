@@ -12,7 +12,7 @@ var Modules=require('../../server.js');
 
 theObject.onEnter=function(object,oldData,newData){
 	var that = this;
-	
+
 	var createFile = function(filename, data, mimeType) {
         Modules.ObjectManager.createObject(that.getRoomID(), "File", {
 				x: 80,
@@ -26,95 +26,81 @@ theObject.onEnter=function(object,oldData,newData){
         });
 	};
 
-	if(object.get('type')=='PaperSpace')
-	{
-		if(this.getAttribute('exportFormat')=='html')
-		{
-			var dbData = {'destination':object.getAttribute('destination'), 'key':"paperIDs"};
-			Modules.UserManager.getDataOfSpaceWithDestServerSide(dbData, function(i){
-				var token = i[0].value.split(";"); 
-				var cPos = 0;
+	var exportToSth = function(object,fileExtension){
+		var dbData = {'destination':object.getAttribute('destination'), 'key':"paperIDs"};
+		Modules.UserManager.getDataOfSpaceWithDestServerSide(dbData, function(i){
+			var token = i[0].value.split(";"); 
+			var cPos = 0;
 
-				var summedText = "";
+			var summedText = "";
 
-				token.forEach(function(i2){
-					// read the html from etherpad
-					Modules.EtherpadController.pad.getHTML({
-					    padID : i2
-					    }, function(error, data) {
-						if(error) {
-					        console.error("PadID "+ object.getAttribute('padID') + " >> Error pad.getText: ", error.message);
-							//return;
-						}
-
-						if(cPos < token.length-1){
-							if(data != null){
-								summedText +=  data.html;
+			token.forEach(function(i2){
+						// read the html from etherpad
+						Modules.EtherpadController.pad.getHTML({
+							padID : i2
+						}, function(error, data) {
+							if(error) {
+								console.error("PadID "+ object.getAttribute('padID') + " >> Error pad.getText: ", error.message);
+								//return;
 							}
-							cPos++;
+
+							if(cPos < token.length-1){
+								if(data != null){
+									summedText +=  data.html;
+								}
+								cPos++;
 							}else{
 								if(data != null){
 									summedText +=  data.html;
 								}
-								// create html file object
-								createFile(object.getName() + '.html', summedText, 'text/html');
-							}
-						});
-				});
+									// create a file object
 
-			});
+									if(fileExtension == '.html'){
+										// create a html file object
+										createFile(object.getName() + fileExtension/*'.html'*/, summedText, 'text/html');
+									}else if(fileExtension == '.txt'){
+										// create plain textfile
+										createFile(object.getName() + fileExtension, summedText, 'text/plain');
+									}else if(fileExtension == '.pdf'){
+										// convert html to pdf
+										Modules.EtherpadController.convertToPdf(summedText, function(pdfcontent){
+											// create pdf file object in webarena
+											createFile(object.getName() + fileExtension, pdfcontent, 'application/pdf');
+						                });
+									}else{
+										var imgtype = that.getAttribute('exportFormat').substr(6);
 
+										// convert html to image
+										Modules.EtherpadController.convertToImage(summedText, imgtype, function(imgcontent){
 
-        } else if (this.getAttribute('exportFormat') == 'pdf') {
-            
-			// first read the html from etherpad
-            Modules.EtherpadController.pad.getHTML({
-                padID : object.getAttribute('padID')
-            }, function(error, data) {
-				if(error) {
-                    console.error("Error pad.getText: ", error.message);
-					return;
-				}
+											// create image file object in webarena
+											createFile(object.getName() + '.' + imgtype, imgcontent, 'image/' + imgtype);
+										});
+									}
 
-				// convert html to pdf
-				Modules.EtherpadController.convertToPdf(data.html, function(pdfcontent){
-					// create pdf file object in webarena
-					createFile(object.getName() + '.pdf', pdfcontent, 'application/pdf');
-                });
+								}
+							});
+					});
 
-				});
-        } else if (this.getAttribute('exportFormat').substr(0, 5) == 'image') {
-			var imgtype = this.getAttribute('exportFormat').substr(6);
-            
-			// first read the html from etherpad
-            Modules.EtherpadController.pad.getHTML({
-                padID : object.getAttribute('padID')
-            }, function(error, data) {
-                
-				if(error) {
-                    console.error("Error pad.getText: ", error.message);
-					return;
-				}
+		});
+	};
 
-				// convert html to image
-				Modules.EtherpadController.convertToImage(data.html, imgtype, function(imgcontent){
+	if(object.get('type')=='PaperSpace')
+	{
+		if(this.getAttribute('exportFormat')=='html')
+		{
+			exportToSth(object,'.html');
 
-					// create image file object in webarena
-					createFile(object.getName() + '.' + imgtype, imgcontent, 'image/' + imgtype);
-				});
-			});
+        } else if (this.getAttribute('exportFormat') == 'pdf') 
+        {
+            exportToSth(object,'.pdf');
+
+        } else if (this.getAttribute('exportFormat').substr(0, 5) == 'image') 
+        {
+        	exportToSth(object,'.image');
+
         } else {
-            Modules['EtherpadController'].pad.getText({
-                padID : object.getAttribute('padID')
-            }, function(error, data) {
-				if(error) {
-                    console.error("Error pad.getText: ", error.message);
-					return;
-				}
-
-				// create plain textfile
-				createFile(object.getName() + '.txt', data.text, 'text/plain');
-			});
+            exportToSth(object,'.txt');
 		}
 	}
     

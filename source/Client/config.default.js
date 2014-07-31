@@ -8,7 +8,7 @@
 "use strict";
 
 var Config={
-	projectTitle:'WebArena 1.0',
+	projectTitle:'Cooperative Writing (COW)',
 	language:'de',
 	presentationMode:false,
 	couplingMode:true,
