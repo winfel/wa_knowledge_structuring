@@ -141,16 +141,16 @@ Container.drawContent = function(rep){
              var searchByName;
 			 var searchByTag;
 			 if(that.getAttribute('searchByName')){
-             	searchByName = '<input id = "checkName" type="checkbox" checked> Name &nbsp &nbsp ';
+             	searchByName = '<input id = "checkName_for'+that.id+'" type="checkbox" checked> Name &nbsp &nbsp ';
 			}
 			else{
-				searchByName = '<input id = "checkName" type="checkbox"> Name &nbsp &nbsp ';
+				searchByName = '<input id = "checkName_for'+that.id+'" type="checkbox"> Name &nbsp &nbsp ';
 			}
 			if(that.getAttribute('searchByTag')){
-				searchByTag = '<input id = "checkTag" type="checkbox" checked> Tag <br><br>';    
+				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox" checked> Tag <br><br>';    
 			}
 			else{
-				searchByTag = '<input id = "checkTag" type="checkbox"> Tag <br><br>';  
+				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox"> Tag <br><br>';  
 			}
             
 		   
@@ -161,41 +161,42 @@ Container.drawContent = function(rep){
 			var searchForVideo;
 			var searchForText;
 			
+			
             if(that.getAttribute('searchForPDF')){
-             	searchForPDF = '<input id = "checkPDF" type="checkbox" checked> PDF<br>';
+             	searchForPDF = '<input id = "checkPDF_for'+that.id+'" type="checkbox" checked> PDF<br>';
 			}
 			else{
-				searchForPDF = '<input id = "checkPDF" type="checkbox"> PDF<br>';
+				searchForPDF = '<input id = "checkPDF_for'+that.id+'" type="checkbox"> PDF<br>';
 			}
 			if(that.getAttribute('searchForHTML')){
-             	searchForHTML = '<input id = "checkHTML" type="checkbox" checked> HTML<br>';
+             	searchForHTML = '<input id = "checkHTML_for'+that.id+'" type="checkbox" checked> HTML<br>';
 			}
 			else{
-				searchForHTML = '<input id = "checkHTML" type="checkbox"> HTML<br>';
+				searchForHTML = '<input id = "checkHTML_for'+that.id+'" type="checkbox"> HTML<br>';
 			}
 			if(that.getAttribute('searchForAudio')){
-             	searchForAudio = '<input id = "checkAudio" type="checkbox" checked> Audio<br>';
+             	searchForAudio = '<input id = "checkAudio_for'+that.id+'" type="checkbox" checked> Audio<br>';
 			}
 			else{
-				searchForAudio = '<input id = "checkAudio" type="checkbox"> Audio<br>';
+				searchForAudio = '<input id = "checkAudio_for'+that.id+'" type="checkbox"> Audio<br>';
 			}
 			if(that.getAttribute('searchForVideo')){
-             	searchForVideo = '<input id = "checkVideo" type="checkbox" checked> Video<br>';
+             	searchForVideo = '<input id = "checkVideo_for'+that.id+'" type="checkbox" checked> Video<br>';
 			}
 			else{
-				searchForVideo = '<input id = "checkVideo" type="checkbox"> Video<br>';
+				searchForVideo = '<input id = "checkVideo_for'+that.id+'" type="checkbox"> Video<br>';
 			}
 			if(that.getAttribute('searchForText')){
-             	searchForText = '<input id = "checkText" type="checkbox" checked> Text<br>';
+             	searchForText = '<input id = "checkText_for'+that.id+'" type="checkbox" checked> Text<br>';
 			}
 			else{
-				searchForText = '<input id = "checkText" type="checkbox"> Text<br>';
+				searchForText = '<input id = "checkText_for'+that.id+'" type="checkbox"> Text<br>';
 			}
 			if(that.getAttribute('searchForImage')){
-				searchForImage = '<input id = "checkImage" type="checkbox" checked> Image';
+				searchForImage = '<input id = "checkImage_for'+that.id+'" type="checkbox" checked> Image';
 			}
             else{
-				searchForImage = '<input id = "checkImage" type="checkbox"> Image';
+				searchForImage = '<input id = "checkImage_for'+that.id+'" type="checkbox"> Image';
 			}
 			
 			var s = that.getAttribute('searchString');
@@ -206,7 +207,7 @@ Container.drawContent = function(rep){
 				s = "value='"+that.getAttribute('searchString')+"'";
 			}
 			
-		     var element = section.addElement('<input id = "textName" type="text"'+s+'><p>Search by:</p>'+
+		     var element = section.addElement('<input id = "textName_for'+that.id+'" type="text"'+s+'><p>Search by:</p>'+
                 		'<p>'+
                 		searchByName +
 						searchByTag+
@@ -218,23 +219,23 @@ Container.drawContent = function(rep){
 						searchForText +
 						searchForImage +
                 		'</p><br>'+
-                		'<button id= "searchButton" type="submit" height="30"><img src="/guis.common/images/icon-lupe.png" alt="Suchen" width="22" height="22"></button>'
+                		'<button id= "searchButton_for_'+that.id+'" type="submit" height="30"><img src="/guis.common/images/icon-lupe.png" alt="Suchen" width="22" height="22"></button>'
             ); 
 
 
 		    /* Click event for search button in popover */
-			$('#searchButton').on("click",function(){
+			$('#searchButton_for_'+that.id).on("click",function(){
 
 				/* Get value from textfield and selected checkboxes */
-				var textfieldValue = $('#textName').val();
-				var checkboxName = $('#checkName').prop('checked');
-				var checkboxTag = $('#checkTag').prop('checked');
-				var checkboxPDF = $('#checkPDF').prop('checked');
-				var checkboxHTML = $('#checkHTML').prop('checked');
-				var checkboxAudio = $('#checkAudio').prop('checked');
-				var checkboxVideo = $('#checkVideo').prop('checked');
-				var checkboxText = $('#checkText').prop('checked');
-				var checkboxImage = $('#checkImage').prop('checked');
+				var textfieldValue = $('#textName_for'+that.id).val();
+				var checkboxName = $('#checkName_for'+that.id).prop('checked');
+				var checkboxTag = $('#checkTag_for'+that.id).prop('checked');
+				var checkboxPDF = $('#checkPDF_for'+that.id).prop('checked');
+				var checkboxHTML = $('#checkHTML_for'+that.id).prop('checked');
+				var checkboxAudio = $('#checkAudio_for'+that.id).prop('checked');
+				var checkboxVideo = $('#checkVideo_for'+that.id).prop('checked');
+				var checkboxText = $('#checkText_for'+that.id).prop('checked');
+				var checkboxImage = $('#checkImage_for'+that.id).prop('checked');
 			
 
 				if(textfieldValue != "" && !checkboxName && !checkboxTag){
@@ -256,7 +257,7 @@ Container.drawContent = function(rep){
 							that.setAttribute('searchForVideo', checkboxVideo);
 							that.setAttribute('searchForText', checkboxText);
 				
-							that.addFiles(that.sortFiles(that.getFiles()));
+							that.getFiles();
 				
 							/* Close popover */
 							popover.hide();
@@ -278,22 +279,22 @@ Container.drawContent = function(rep){
 
 		     var element = section.addElement(
                 		'<p>Criterion</p>'+
-						'<select id="criterion">'+
+						'<select id="criterion_for'+that.id+'">'+
 						'<option value="name">By Name</option>'+
 						'<option value="date">By Date</option>'+
 						'</select>'+
 						'<p>Order</p>'+
-						'<select id="order">'+
+						'<select id="order_for'+that.id+'">'+
 						'<option value="AZ">From A to Z</option>'+
 						'<option value="ZA">From Z to A</option>'+
 						'</select>'+
-						'<button id="submitButton">Submit</button>'
+						'<button id="submitButton_for_'+that.id+'">Submit</button>'
             ); 
 			
-			var sel = document.getElementById('criterion');
+			var sel = document.getElementById('criterion_for'+that.id);
 			sel.onchange = function() {
 							
-				var order = document.getElementById('order');
+				var order = document.getElementById('order_for'+that.id);
 				
 				order.innerHTML = '';
 				
@@ -307,19 +308,19 @@ Container.drawContent = function(rep){
 			}
 
 			/* Click event for search button in popover */
-			$('#submitButton').on("click",function(){
+			$('#submitButton_for_'+that.id).on("click",function(){
 
 				/* Get value from the selection boxes */				
-				var select1 = document.getElementById("criterion");
+				var select1 = document.getElementById('criterion_for'+that.id);
 				var select1Value = select1.options[select1.selectedIndex].text;
 					
-				var select2 = document.getElementById("order");
+				var select2 = document.getElementById('order_for'+that.id);
 				var select2Value = select2.options[select2.selectedIndex].text;
 										
 				that.setAttribute('sortingCriterion', select1Value);
 				that.setAttribute('sortingOrder', select2Value);
 				
-				that.addFiles(that.sortFiles(that.getFiles()));
+				that.getFiles();
 							
 				/* Close popover */
 				popover.hide();
@@ -345,7 +346,7 @@ Container.addFiles = function(files){
 		
 	var key;
 	for(key in files){
-		var name = files[key].getAttribute('name');
+		var name = files[key].attributes.name;
 		var type = name.split('.')[1];
 		
 		if(name.length>9){
@@ -377,6 +378,6 @@ Container.addFiles = function(files){
 
 Container.upd = function(){
 
-	this.addFiles(this.sortFiles(this.getFiles()));
+	this.getFiles();
 
 }

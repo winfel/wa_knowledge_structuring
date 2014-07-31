@@ -5,34 +5,29 @@
 *
 */
 
+Container.afterServerCall = function(files){
+
+	files = JSON.parse(files);
+
+	var id = files.pop();
+	var con = ObjectManager.getObject(id);
+	con.searchAndFilter(files);
+
+}
+
 Container.getFiles = function(){
 		
-	var o = new Array();
-	
-	var objects = ObjectManager.getObjects();
-	
-	var key;
-	for (key in objects) {
+	this.serverCall("getAllFileObjects", this.id, Container.afterServerCall);
 		
-		if(objects[key].type == "File"){
-					
-			o.push(objects[key]);
-			
-		}
-		
-	}
-	
-	return this.searchAndFilter(o);
-	
 }
 
 
 Container.searchAndFilter = function(files){
-
+	
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
-
-	var s = 	this.getAttribute('searchString');
+	
+	var s = this.getAttribute('searchString');
 	var name = this.getAttribute('searchByName');
 	var tag = this.getAttribute('searchByTag');
 	var pdf = this.getAttribute('searchForPDF');
@@ -50,9 +45,9 @@ Container.searchAndFilter = function(files){
 		var key;
 		for (key in files) { //filter name/tag with the given searchstring
 		
-			var n = files[key].getAttribute('name');
-			var mainTag = files[key].getAttribute('mainTag');
-			var secTags = files[key].getAttribute('secondaryTags');
+			var n = files[key].attributes.name;
+			var mainTag = files[key].attributes.mainTag;
+			var secTags = files[key].attributes.secondaryTags;
 			
 			if(secTags == 0){
 				secTags = new Array();
@@ -78,12 +73,10 @@ Container.searchAndFilter = function(files){
 			}
 		}
 	}
-	
-	
+		
 	var k;
 	for (k in filteredFiles1) { //filter files with the given types
-	
-		var type = filteredFiles1[k].getAttribute('mimeType');
+		var type = filteredFiles1[k].attributes.mimeType;
 	
 		if(pdf){
 			if(type == "application/pdf"){ //type of object is pdf
@@ -125,7 +118,7 @@ Container.searchAndFilter = function(files){
 		}
 	}
 	
-	return filteredFiles2;
+	this.sortFiles(filteredFiles2);
 	
 }
 
@@ -155,8 +148,8 @@ Container.sortFiles = function(files){ //bubble sort
 		
 		files.sort(function(a, b){
 			
-			var aName = a.getAttribute('name');
-			var bName = b.getAttribute('name');
+			var aName = a.attributes.name;
+			var bName = b.attributes.name;
 			
 			if(aName < bName) return R1;
 			if(aName > bName) return R2;
@@ -179,15 +172,15 @@ Container.sortFiles = function(files){ //bubble sort
 		
 		files.sort(function(a, b){
 
-			var aAge = a.getAttribute('contentAge');
-			var bAge = b.getAttribute('contentAge');
+			var aAge = a.attributes.contentAge;
+			var bAge = b.attributes.contentAge;
 			
 			if(aAge < bAge) return R1;
 			if(aAge > bAge) return R2;
 			return 0;
 		});
 	}
-		
-    return files;
+
+	this.addFiles(files);
 	
 }
