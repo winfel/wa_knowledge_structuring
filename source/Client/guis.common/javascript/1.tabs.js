@@ -263,6 +263,9 @@ GUI.tabs = new function() {
           Modules.RightManager.hasAccess("read", {id: getCurrentObject.id, type: getCurrentObject.type}, GUI.username, function(result) {
             if (result) {
               ObjectManager.loadPaperWriter(dest, false, 'left');
+            } else {
+              var audio = new Audio('/guis.common/sounds/cant_touch_this.mp3');
+              audio.play();
             }
           });
 
