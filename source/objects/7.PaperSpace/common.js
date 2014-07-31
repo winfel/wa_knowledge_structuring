@@ -87,9 +87,13 @@ PaperSpace.execute = function(openInNewWindow) {
   if (openInNewWindow) {
     window.open(destination);
   } else {
-    ObjectManager.loadPaperWriter(destination, false, 'left');
+    Modules.RightManager.hasAccess("read", { id: this.id, type: this.type}, GUI.username, function(result) {
+      if(result) {
+        ObjectManager.loadPaperWriter(destination, false, 'left');
+      }
+    });
   }
-}
+};
 
 PaperSpace.register('PaperSpace');
 PaperSpace.isCreatable = true;
