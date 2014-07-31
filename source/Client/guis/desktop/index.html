@@ -259,13 +259,31 @@ $.fn.dontScrollParent = function() {
         <div id="bug_report">
 
           <span>Was wollten Sie tun?</span>
-          <textarea id="bug_task"></textarea>
+          <textarea id="bug_task" style="
+    border-right-width: 0px;
+    border-bottom-width: 0px;
+    border-left-width: 0px;
+    border-top-width: 0px;
+    padding-right: 5px;
+    padding-left: 5px;
+"></textarea>
 
           <span>Welches Problem ist aufgetreten?</span>
-          <textarea id="bug_problem"></textarea>
+          <textarea id="bug_problem" style="
+    padding-right: 5px;
+    border-right-width: 0px;
+    padding-left: 5px;
+    border-left-width: 0px;
+    margin-bottom: 0px;
+"></textarea>
 
           <span>Ihre Email-Adresse:</span>
-          <input type="email" id="bug_email" />
+          <input type="email" id="bug_email" style="
+    padding-right: 5px;
+    border-right-width: 0px;
+    border-left-width: 0px;
+    padding-left: 5px;
+" />
 
           <p><input type="submit" value="Senden" id="bug_submit" /></p>
 
@@ -323,7 +341,7 @@ $.fn.dontScrollParent = function() {
   </div>
 </div>
 
-<div id="actionsheet"></div>
+<div id="actionsheet" style="-webkit-transform: translate3d(-920px, 0px, 0px); padding: 5px 10px 5px 5px;"></div>
 <div id="error_bg"></div>
 <div id="error_box">
   <div id="error_box_heading"></div>
