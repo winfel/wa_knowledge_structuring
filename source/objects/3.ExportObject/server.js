@@ -29,6 +29,16 @@ theObject.onEnter=function(object,oldData,newData){
 	var exportToSth = function(object,fileExtension){
 		var dbData = {'destination':object.getAttribute('destination'), 'key':"paperIDs"};
 		Modules.UserManager.getDataOfSpaceWithDestServerSide(dbData, function(i){
+		
+			if(i == "error"){
+				var errorText = "Error: You don't have created a chapter that could be exported right now. <br> To use"+
+				" the export object, you need to create a chapter, write something into it and, as soon as you wan't to export something, "+
+				"double click a chapter to run the ordering algorithm (this last step will be fixed in the final release of "+
+				" the COW aka HackArena aka HackATron...)";
+				createFile(object.getName() + '.html', errorText, 'text/html');
+				return;
+			}
+
 			var token = i[0].value.split(";"); 
 			var cPos = 0;
 
