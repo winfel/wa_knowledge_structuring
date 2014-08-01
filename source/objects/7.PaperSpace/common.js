@@ -97,6 +97,9 @@ PaperSpace.execute = function(openInNewWindow) {
     Modules.RightManager.hasAccess("read", { id: this.id, type: this.type}, GUI.username, function(result) {
       if(result) {
         ObjectManager.loadPaperWriter(destination, false, 'left');
+      }else{
+        var audio = new Audio('/guis.common/sounds/cant_touch_this.mp3');
+        audio.play();
       }
     });
   }
