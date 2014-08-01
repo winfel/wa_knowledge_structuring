@@ -386,8 +386,7 @@ Viewer.createRepresentation = function(parent) {
           ''
           );
 
-
-  this.setTitle((file ? file.getAttribute("name") : ""));
+  this.drawTitle((file ? file.getAttribute("name") : ""));
 
   $(".buttonAreaRight", header).html(
           '<input type="image" class="btn btnTwopage" title="Two page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-new.png" />' +
@@ -435,11 +434,20 @@ Viewer.createRepresentationIframe = function($body) {
   this.setDocument(this.getAttribute('file'));
 };
 
-Viewer.setTitle = function(title) {
+Viewer.drawTitle = function(title) {
+  var rep = this.getRepresentation();
+
   if (title) {
-    $(".titleArea", this.getRepresentation()).html('<span class="paperViewerTitle">' + title + '</span><div class="moveArea"></div>');
+    // Set a new title if needed.
+    rep.title = title;
+    //rep.titleWidthPx = $.fn.textWidth(title);
+    //Perhaps we may display some ... if the title is too long...
+  }
+  
+  if (rep.title) {
+    $(".titleArea", rep).html('<span class="paperViewerTitle">' + rep.title + '</span><div title="' + rep.title + '" class="moveArea"></div>');
   } else {
-    $(".titleArea", this.getRepresentation()).html('<span class="paperViewerTitle">No document</span><div class="moveArea"></div>');
+    $(".titleArea", rep).html('<span class="paperViewerTitle">No document...</span><div class="moveArea"></div>');
   }
 };
 
@@ -451,7 +459,8 @@ Viewer.setDocument = function(documentId) {
 
 Viewer.reloadDocument = function(documentId) {
   var file = ObjectManager.getObject(documentId);
-  this.setTitle((file ? file.getAttribute("name") : ""));
+
+  this.drawTitle((file ? file.getAttribute("name") : ""));
   this.setDocument(documentId);
 };
 
@@ -516,11 +525,14 @@ Viewer.onMoveEnd = function() {
   $("div.moveOverlay", rep).hide();
 };
 
+
 Viewer.resizeHandler = function() {
+
   this.setDimensions(this.getViewWidth(), this.getViewHeight());
   this.setPosition(this.getViewX(), this.getViewY());
-
-//  this.adjustPaper();
+  
+  this.drawTitle();
+  this.adjustPaper();
 };
 
 Viewer.adjustPaper = function() {

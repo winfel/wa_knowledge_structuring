@@ -13,7 +13,7 @@
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
     <script type="text/javascript" src="/guis.common/libraries/htmlparser.js"></script>
-    
+
     <script type="text/javascript" src="/guis.common/libraries/jquery/jquery.js"></script>
     <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jPopover.js"></script>
     <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jsTree/jquery.jstree.js"></script>
@@ -53,7 +53,7 @@
     <script src="/ObjectManager.js"></script>
     <script src="/RightManager.js"></script>
     <script src="/UserManager.js"></script>
-	<script src="/TagManager.js"></script>
+    <script src="/TagManager.js"></script>
 
     <script src="/Common/Log.js"></script>
     <script src="/Common/DataSet.js"></script>
@@ -79,8 +79,8 @@
         //'Schema':Schema,
         'RightManager': RightManager,
         'UserManager': UserManager,
-		'TagManager': TagManager,
-		};
+        'TagManager': TagManager,
+      };
 
 
       $(document).ready(function() {
@@ -149,6 +149,20 @@
           return true;
         });
       };
+
+      /**
+       * jQuery extension used to calculate the width of some text.
+       * 
+       * @param String text   The text to measure.
+       * @param String font   Optional. The CSS font.
+       * @returns Number  The width the given text.
+       */
+      $.fn.textWidth = function(text, font) {
+        if (!$.fn.textWidth.fakeEl)
+          $.fn.textWidth.fakeEl = $('<span>').hide().appendTo(document.body);
+        $.fn.textWidth.fakeEl.text(text || this.val() || this.text()).css('font', font || this.css('font'));
+        return $.fn.textWidth.fakeEl.width();
+      };
     </script>
   </head>
   <body>
@@ -166,8 +180,8 @@
       <div id="sidebar_content">
         <div>
           <div id="inspector"></div>
-          
-          
+
+
           <div id="rightmanager" class="jDesktopInspector">
             <div class="jDesktopInspector_main rightmanagerSelected">
               <div class="jDesktopInspector_pageHead">Object:</div>
@@ -204,7 +218,7 @@
                   </div>                                    
                 </div>	                   
               </div>
-              
+
               <div class="rightmanager-role-separator"></div>
 
               <div class="jDesktopInspector_pageHead rightmanager-section-header" id="rm_rightsHead">Rights <span>&nbsp;</span></div>
@@ -290,13 +304,13 @@
 
     <!-- BEGIN: GUI rightmanager pop-up dialog -->
     <div id="rightmanagerDialog" style="display: none;">
-         <div id="rmdTabs">
-           <ul id="rmdTabList">       
-           </ul>
-         </div>
+      <div id="rmdTabs">
+        <ul id="rmdTabList">       
+        </ul>
+      </div>
     </div>
     <!-- END: GUI rightmanager pop-up dialog -->
-    
+
     <!-- BEGIN: GUI add user dialog -->
     <div id="manageUserDialog" class="rightmanager-user-dialog" style="display: none;">
       <h3>Friend list</h3>
@@ -312,7 +326,7 @@
 
     <!-- BEGIN: GUI confirm dialog -->
     <div id="confirmDialog" style="display: none;">
-         <span id="confirmDialogMessage"></span>
+      <span id="confirmDialogMessage"></span>
     </div>
     <!-- END: GUI confirm dialog -->
 
@@ -337,7 +351,7 @@
     </div>
 
     <div id="progressBar"><div class="progressBar_container"></div></div>
-    
+
     <!-- BEGIN: Underscore Template Definition. -->
     <script type="text/template" id="proceeding-statusdialog">
       <div>
