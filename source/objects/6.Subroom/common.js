@@ -76,13 +76,12 @@ Subroom.register=function(type){
 
     // TODO this must be done serverside in the connector
     if (!destination) {
-        GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
-        GUI.tabs.redrawTabContent();
-        
         var random = new Date().getTime() - 1296055327011;        
         this.setAttribute('destination', random.toString());
         destination = random;
         
+        GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
+        GUI.tabs.redrawTabContent();
     }
 
     if (openInNewWindow) {

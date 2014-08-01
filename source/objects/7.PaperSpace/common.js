@@ -77,12 +77,13 @@ PaperSpace.execute = function(openInNewWindow) {
   var destination = this.getAttribute('destination');
 
   if (!destination) {
-    GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
-    GUI.tabs.redrawTabContent();
     var random = new Date().getTime() - 1296055327011;
 
     this.setAttribute('destination', random);
     destination = random;
+
+    GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
+    GUI.tabs.redrawTabContent();
   }
 
   // open
