@@ -165,13 +165,23 @@ GUI.chat.addMessageOne = function(username, text, userColor, read) {
             return;
         }
     }
+
+    // doesn't create if one already exist
     GUI.chat.createChatbox(windowTitle, text.random_id);
     var bubble = text.bubble;
-    $(bubble).hide().appendTo('.message-box').fadeIn();
+    var message_box_id = '#message-box-' + text.random_id;
+    $(bubble).hide().appendTo(message_box_id).fadeIn();
 
     //keep scrolled to bottom of chat!
-    var scrolltoh = $('.message-box')[0].scrollHeight;
-    $('.message-box').scrollTop(scrolltoh);
+    var scrolltoh = $(message_box_id)[0].scrollHeight;
+    $(message_box_id).scrollTop(scrolltoh);
+
+    $( draggablize );
+
+    function draggablize() {
+        $('.draggable-word').draggable({helper: "clone"});
+    }
+
 }
 
 /**
@@ -213,17 +223,17 @@ GUI.chat.createChatbox = function(user, random_id) {
     }
     var newbox =
         '<div class="chat-box" id="chat-' +user+ '">\
-                <div class="chat-header">' +user+
-            '<div class="close_btn">&nbsp;</div>\
-            <div class="minimize_btn">&nbsp;</div>\
-        </div>\
-        <div class="toggle_chat">\
-            <div class="message-box">\
+            <div class="chat-header">' +user+
+                '<div class="close_btn">&nbsp;</div>\
+                <div class="minimize_btn">&nbsp;</div>\
             </div>\
-            <div class="user-info">\
-                <textarea name="chat-message" id="chat-message-' +random_id /*id="chat-message"*/ +'" placeholder="Type Message Hit Enter" maxlength="100" />\
-                    </div>\
+            <div class="toggle_chat" id="toggle-chat-'+random_id+'">\
+                <div class="message-box" id="message-box-'+random_id+'">\
                 </div>\
+                <div class="user-info">\
+                    <textarea name="chat-message" id="chat-message-' +random_id /*id="chat-message"*/ +'" placeholder="Type Message Hit Enter" maxlength="100" />\
+                </div>\
+            </div>\
         ';
 
     $("#one2one-container").append(newbox).css("display", "block").css("background-color","#535EFD");
@@ -234,7 +244,7 @@ GUI.chat.createChatbox = function(user, random_id) {
     });
 
     var minimize_box = function(){
-        $('.toggle_chat').slideToggle();
+        $('#toggle-chat-'+random_id).slideToggle();
     };
 
     $('.minimize_btn').click(minimize_box);
@@ -256,6 +266,20 @@ GUI.chat.createChatbox = function(user, random_id) {
             var d = new Date;
             var months = ['Jan', 'Feb', 'Mar', 'Apr','May', 'Jun','Jul', 'Aug','Sep', 'Oct','Nov', 'Dec'];
             var msg_time = d.getHours()+':'+ d.getMinutes()+ ' '+ months[d.getMonth()] +' ' + d.getDay();
+
+            var special_texts = ['circle', 'paper', 'rectangle'];
+
+            var replace_text = function(spcialtext){
+                if (imessage.indexOf(spcialtext)>=0){
+                    imessage = imessage.replace(spcialtext, '<span class="draggable-word">'+spcialtext+'</span>');
+                }
+            };
+
+            var i, len;
+            for (i = 0, len = special_texts.length; i < len; i++) {
+                replace_text(special_texts[i]);
+            }
+
             var bubble =
                 '<div class="chat-msg">\
                     <time>' +msg_time+'</time>' +
@@ -263,7 +287,6 @@ GUI.chat.createChatbox = function(user, random_id) {
                     '<span class="message">'+imessage+'</span>\
                     </div>';
             console.log(msg_time +' ' + iusername + ' ' + imessage);
-
 
             //reset value of message box
             $(this).val('');
