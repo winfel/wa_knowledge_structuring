@@ -63,11 +63,11 @@ Viewer.initGUI = function(rep) {
     }
 
     frameDocument.textHighlighter({
-		// before highlighting, test if selected elements are valid for highlighting
-		onBeforeHighlight: function(range) {
-			// only allow selections within one ".pc"
-			return ($(range.commonAncestorContainer).closest('.pc').length>0);
-		},
+      // before highlighting, test if selected elements are valid for highlighting
+      onBeforeHighlight: function(range) {
+        // only allow selections within one ".pc"
+        return ($(range.commonAncestorContainer).closest('.pc').length > 0);
+      },
       // register a function to call after each highlight process
       onAfterHighlight: function(highlights, range) {
         // TODO: maybe postprocess highlights here, set different style and transmit to server
@@ -88,78 +88,78 @@ Viewer.initGUI = function(rep) {
     // get the highlighter object
     highlighter = frameDocument.getHighlighter();
 
-	// this function adds a play option for every audio highlighting
-	self.addAudioToHighlights = function() {
-		var matchYClass = /\b(y[0-9a-z]+)\b/; // this finds the y-positioning class within pdf classes
-		frameDocument.find('.highlighted.audio').each(function() {
-			var that = $(this);
-			var aoid = that.attr('data-audioobject');
-			if(aoid == undefined || frameDocument.find('#' + aoid).length>0) {
-				// there is no connected audio or the audioobject already exists
-				return;
-			}
+    // this function adds a play option for every audio highlighting
+    self.addAudioToHighlights = function() {
+      var matchYClass = /\b(y[0-9a-z]+)\b/; // this finds the y-positioning class within pdf classes
+      frameDocument.find('.highlighted.audio').each(function() {
+        var that = $(this);
+        var aoid = that.attr('data-audioobject');
+        if (aoid == undefined || frameDocument.find('#' + aoid).length > 0) {
+          // there is no connected audio or the audioobject already exists
+          return;
+        }
 
-			// get the object of the wave
-			var wave = ObjectManager.getObject(aoid);
-			if(wave == undefined || !wave) {
-				return;
-			}
-			// create the player for the wave (the object isn't needed anymore)
-			wave = new Audio(wave.getContentURL());
+        // get the object of the wave
+        var wave = ObjectManager.getObject(aoid);
+        if (wave == undefined || !wave) {
+          return;
+        }
+        // create the player for the wave (the object isn't needed anymore)
+        wave = new Audio(wave.getContentURL());
 
-			// guess the position of the highlight
-			var offset = that.offset();
+        // guess the position of the highlight
+        var offset = that.offset();
 
-			// create an audio play button
-			var audioobject = $('<div>')
-			.attr('id', aoid)
-			//.html('AUDIO')
-			.addClass('audioobject')
-			//.offset(offset)
-			.append(wave)
-			.click(function() {
-				wave.paused?wave.play():wave.pause();
-			})
-			// highlight the highlight if hovering the button
-			.hover(function() {
-				that.toggleClass('remotehover');
-			})
-			.appendTo(that.closest('.pf').first()); // append to the pageFrame, position left:0 works then
+        // create an audio play button
+        var audioobject = $('<div>')
+                .attr('id', aoid)
+                //.html('AUDIO')
+                .addClass('audioobject')
+                //.offset(offset)
+                .append(wave)
+                .click(function() {
+                  wave.paused ? wave.play() : wave.pause();
+                })
+                // highlight the highlight if hovering the button
+                .hover(function() {
+                  that.toggleClass('remotehover');
+                })
+                .appendTo(that.closest('.pf').first()); // append to the pageFrame, position left:0 works then
 
-			// try to reuse pdf positioning classes, else use offset
-			try{
-				if(matchYClass.exec(that.closest('.t').attr('class'))) {
-					audioobject.addClass(RegExp.$1);
-				}
-				else {
-					audioobject.offset(offset);
-				}
-			}
-			catch(ex) {
-				audioobject.offset(offset);
-			}
-			audioobject.css('left', '0px');
+        // try to reuse pdf positioning classes, else use offset
+        try {
+          if (matchYClass.exec(that.closest('.t').attr('class'))) {
+            audioobject.addClass(RegExp.$1);
+          }
+          else {
+            audioobject.offset(offset);
+          }
+        }
+        catch (ex) {
+          audioobject.offset(offset);
+        }
+        audioobject.css('left', '0px');
 
-			$(wave)
-			.on('playing', function() {
-				audioobject.addClass('playing');
-			})
-			.on('pause', function() {
-				audioobject.removeClass('playing');
-			})
-			.on('ended', function() {
-				// chrome has a replay bug; load fixes it
-				if (window.chrome) {
-					wave.load();
-				}
-			});
+        $(wave)
+                .on('playing', function() {
+                  audioobject.addClass('playing');
+                })
+                .on('pause', function() {
+                  audioobject.removeClass('playing');
+                })
+                .on('ended', function() {
+                  // chrome has a replay bug; load fixes it
+                  if (window.chrome) {
+                    wave.load();
+                  }
+                });
 
-			// last but not least, highlight button if hovering highlight
-			that.hover(function() {
-				audioobject.toggleClass('remotehover');
-			});
-		});
-	};
+        // last but not least, highlight button if hovering highlight
+        that.hover(function() {
+          audioobject.toggleClass('remotehover');
+        });
+      });
+    };
 
     self.loadHighlights = function() {
       var jsonStr = self.getAttribute('highlights');
@@ -176,9 +176,9 @@ Viewer.initGUI = function(rep) {
     };
 
 
-	var menu = $('<div id="highlightmenu"></div>')
-		// invisible placeholder at the bottom of the menu to close the gap between the menu and the text
-		.append('<div class="closegap"></div>');
+    var menu = $('<div id="highlightmenu"></div>')
+            // invisible placeholder at the bottom of the menu to close the gap between the menu and the text
+            .append('<div class="closegap"></div>');
 
 
     var lastTarget;
@@ -211,22 +211,22 @@ Viewer.initGUI = function(rep) {
       menu.hide();
     })
             );
-	menu.append(
-		$('<button id="addAudioComment" title="add audio comment">A</button>')
-			// start recording while mousedown
-			.mousedown(startRecording)
-			// stop recording and save when mouseup
-			.mouseup(function() {
-				stopRecording(function(newObject) {
-					lastTarget.addClass('audio');
-					// connect the highlight with the newly created audio
-					lastTarget.attr('data-audioobject', newObject.getAttribute('id'));
+    menu.append(
+            $('<button id="addAudioComment" title="add audio comment">A</button>')
+            // start recording while mousedown
+            .mousedown(startRecording)
+            // stop recording and save when mouseup
+            .mouseup(function() {
+              stopRecording(function(newObject) {
+                lastTarget.addClass('audio');
+                // connect the highlight with the newly created audio
+                lastTarget.attr('data-audioobject', newObject.getAttribute('id'));
 
-					self.saveHighlights();
-					menu.hide();
-				});
-		})
-	);
+                self.saveHighlights();
+                menu.hide();
+              });
+            })
+            );
     menu.append(
             $('<button id="removeHighlighting" title="remove highlighting">X</button>').click(function(event) {
       highlighter.removeHighlights(lastTarget);
@@ -240,17 +240,17 @@ Viewer.initGUI = function(rep) {
     var delaymenu;
 
     frameDocument.on('mouseover', '.highlighted', function(event) {
-		var matchIdClass = /(by_user_\w+|at_time_[0-9]+)/g;
+      var matchIdClass = /(by_user_\w+|at_time_[0-9]+)/g;
       if (delaymenu != undefined)
         window.clearTimeout(delaymenu);
       delaymenu = window.setTimeout(function() {
-		var classname = $(event.target).attr('class');
-		// try to identify all belonging highlights by user and time identifier
-		classname = classname.match(matchIdClass);
-		if(classname && classname.length==2)
-			lastTarget = frameDocument.find('.' + classname[0] + '.' + classname[1]);
-		else
-			lastTarget = $(event.target);
+        var classname = $(event.target).attr('class');
+        // try to identify all belonging highlights by user and time identifier
+        classname = classname.match(matchIdClass);
+        if (classname && classname.length == 2)
+          lastTarget = frameDocument.find('.' + classname[0] + '.' + classname[1]);
+        else
+          lastTarget = $(event.target);
         var refpos = lastTarget.offset();
         menu.show();
         //refpos.left += 5;
@@ -530,7 +530,7 @@ Viewer.adjustPaper = function() {
   var scaleContainer = $("body", contents);
   var firstPage = $("[data-page-no]", contents).first();
 
-  if(!firstPage)
+  if (!firstPage)
     return;
 
   // page dimensions
@@ -544,30 +544,25 @@ Viewer.adjustPaper = function() {
   if (!papersWidth || !papersHeight)
     return;
 
-  var width;
-  if (iframe.data("fullscreen"))
-    width = $("body").width() - 150; // -30 for the scrollbar, shadow and comments
-  else
-    width = this.getAttribute('width') - 30; // -30 for the scrollbar and shadow
+  var width, height;
 
-  var height;
-  if (iframe.data("fullscreen"))
-    height = $("body").height(); // -30 for the scrollbar, shadow and comments
-  else
-    height = this.getAttribute('height') - 30; // -30 for the scrollbar and shadow
+  if (iframe.data("fullscreen")) {
+    scaleContainer.addClass("fullscreen");
+    width = $("body").width();
+    height = $("body").height();
+  } else {
+    scaleContainer.removeClass("fullscreen");
+    width = this.getAttribute('width') - 30;
+    height = this.getAttribute('height') - 30;
+  }
 
   var scaleFactor = (width / papersWidth);
 
-  var translateFactorX = (1 - scaleFactor) / 2;
-  var translateFactorY = (1 - scaleFactor) / 2;
+  if (iframe.data("fullscreen") && scaleFactor > 1.5)
+    scaleFactor = 1.5;
 
-  if (scaleFactor > 1)
-    translateFactorX = 0;
-
-  // CSS 3 transform: supported by Firefox
-  scaleContainer.css("transform", "translate(" + (-width * translateFactorX) + "px, " + (-papersHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
-  // Chrome, Safari and Opera browsers support though -webkit-transform...
-  scaleContainer.css("-webkit-transform", "translate(" + (-width * translateFactorX) + "px, " + (-papersHeight * translateFactorY) + "px) scale(" + scaleFactor + ")");
+  scaleContainer.css("transform", "scale(" + scaleFactor + ")");
+  scaleContainer.css("-webkit-transform", "scale(" + scaleFactor + ")");
 
   if (this.getAttribute("twopage")) {
     // Adjust pages for two page mode
