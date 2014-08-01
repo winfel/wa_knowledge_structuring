@@ -77,6 +77,8 @@ PaperSpace.execute = function(openInNewWindow) {
   var destination = this.getAttribute('destination');
 
   if (!destination) {
+    GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
+    GUI.tabs.redrawTabContent();
     var random = new Date().getTime() - 1296055327011;
 
     this.setAttribute('destination', random);
@@ -85,8 +87,12 @@ PaperSpace.execute = function(openInNewWindow) {
 
   // open
   if (openInNewWindow) {
+    GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
+    GUI.tabs.redrawTabContent();
     window.open(destination);
   } else {
+    GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
+    GUI.tabs.redrawTabContent();
     Modules.RightManager.hasAccess("read", { id: this.id, type: this.type}, GUI.username, function(result) {
       if(result) {
         ObjectManager.loadPaperWriter(destination, false, 'left');

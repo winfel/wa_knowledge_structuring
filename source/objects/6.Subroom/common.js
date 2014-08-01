@@ -70,21 +70,29 @@ Subroom.register=function(type){
  * @see objects/1.GeneralObject/common.js
  * @param {boolean} openInNewWindow
  */
-Subroom.execute = function(openInNewWindow) {
-
+ Subroom.execute = function(openInNewWindow) {
+    
     var destination = this.getAttribute('destination');
 
     // TODO this must be done serverside in the connector
     if (!destination) {
+        GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
+        GUI.tabs.redrawTabContent();
+        
         var random = new Date().getTime() - 1296055327011;        
         this.setAttribute('destination', random.toString());
         destination = random;
+        
     }
 
     if (openInNewWindow) {
+    	GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
+        GUI.tabs.redrawTabContent();
         window.open(destination);
+
     } else {
         ObjectManager.loadRoom(destination, false, ObjectManager.getIndexOfObject(this.getAttribute('id')));
+        
     }
 }
 
