@@ -218,7 +218,10 @@ Container.drawContent = function(rep){
 						searchForVideo +
 						searchForText +
 						searchForImage +
-                		'</p><br>'+
+                		'</p>'+
+                		'<button id= "selectAll_'+that.id+'" type="submit" height="30">Select all</button>'+
+                		'<button id= "deselectAll_'+that.id+'" type="submit" height="30">Deselect all</button>'+
+                		'<br><br>'+
                 		'<button id= "searchButton_for_'+that.id+'" type="submit" height="30"><img src="/guis.common/images/icon-lupe.png" alt="Suchen" width="22" height="22"></button>'
             ); 
 
@@ -266,6 +269,31 @@ Container.drawContent = function(rep){
 					
 				}
 			});
+
+			/* Click event for select all button in popover */
+			$('#selectAll_'+that.id).on("click",function(){				
+				$('#checkPDF_for'+that.id).prop('checked',true);
+				$('#checkHTML_for'+that.id).prop('checked',true);
+				$('#checkAudio_for'+that.id).prop('checked',true);
+				$('#checkVideo_for'+that.id).prop('checked',true);
+				$('#checkText_for'+that.id).prop('checked',true);
+				$('#checkImage_for'+that.id).prop('checked',true);
+				
+			});
+
+
+			/* Click event for deselect all button in popover */
+			$('#deselectAll_'+that.id).on("click",function(){
+				$('#checkPDF_for'+that.id).prop('checked',false);
+				$('#checkHTML_for'+that.id).prop('checked',false);
+				$('#checkAudio_for'+that.id).prop('checked',false);
+				$('#checkVideo_for'+that.id).prop('checked',false);
+				$('#checkText_for'+that.id).prop('checked',false);
+				$('#checkImage_for'+that.id).prop('checked',false);
+				
+			});
+
+
 		}
 	});	
 	
