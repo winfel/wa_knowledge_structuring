@@ -37,7 +37,7 @@ PaperSelector.register = function(type) {
 
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
   this.registerAttribute('bigIcon', {hidden: true});
-
+  this.registerAttribute('verybigIcon', {hidden: false,standard:true});
 }
 
 /**

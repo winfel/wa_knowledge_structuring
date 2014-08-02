@@ -29,3 +29,8 @@ PaperSelector.publish = function() {
 PaperSelector.deleteIt = function() {
     this.remove();
 }
+
+PaperSelector.justCreated = function(){
+    this.setAttribute('width', 128);
+    this.setAttribute('height', 128);
+}

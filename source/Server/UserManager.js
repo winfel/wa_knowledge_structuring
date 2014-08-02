@@ -269,8 +269,8 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
                         "SimpleText#DefineInfo#800#600#190#2#height;30#content;Sort the PaperChapters from left to right to give them an order",
                         "SimpleText#DefineInfo2#255#600#190#2#height;30#content;Place a chapter inside the selector to load it",
                         "SimpleText#DefineInfo3#800#650#190#2#height;30#content;Note: At the moment you need to double-click a chapter to run the ordering algorithm...",
-                        "PaperSelector#Selector#655#700#1#1#locked;true",
-                        "Line#TestLine#690#553#0#1#height;148"/*,
+                        "PaperSelector#Selector#655#700#1#1#locked;true"/*,
+                        "Line#TestLine#690#553#0#1#height;148",
                         "PaperChapter#Chapter1#880#650#1#1#chapterID;"+data.roomID*/];
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
