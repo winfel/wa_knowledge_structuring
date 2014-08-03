@@ -380,7 +380,7 @@ GUI.initToolbar = function() {
 	  
 	  var btnTagManager = section.addElement('<img src= "../../guis.common/images/Tag-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Tag Manager"));
       var clickTagManager = function() {
-        //TODO
+        GUI.tagManager.open(800, 800,false);
         popover.hide();
       };
 
@@ -395,7 +395,7 @@ GUI.initToolbar = function() {
         $(btnPaste.getDOM()).bind("click", clickPaste);
         $(btnHome.getDOM()).bind("click", clickHome);
         $(btnCoupling.getDOM()).bind("click", clickCoupling);
-		 $(btnTagManager.getDOM()).bind("touchstart", clickTagManager);
+		 $(btnTagManager.getDOM()).bind("click", clickTagManager);
       }
     }
   });

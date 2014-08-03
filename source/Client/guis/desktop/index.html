@@ -482,4 +482,38 @@ $.fn.dontScrollParent = function() {
   </ul>
   </div>
 </script>
+
+<script type="text/html" id='secondary-tag-tmpl'>		
+         <li class='ui-widget-content' data-sectag='<%= secTag %>'>
+			<h5 class='ui-widget-header tagValue editable'><%= secTag %></h5>
+			<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
+		</li>      	
+    </script>
+	<script type="text/html" id='main-tag-tmpl'>
+
+	<% _.each(items,function(item,key,list){ %>
+		
+		<div class='portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all' data-maintag='<%= item.name %>'>
+			<div class='portlet-header ui-widget-header ui-corner-all'>
+				<span class='ui-icon ui-icon-trash portlet-delete'></span>
+				<span class='ui-icon ui-icon-plusthick portlet-toggle'></span>
+				<div class='editable'><%= item.name %></div>
+			</div>
+			<div class='portlet-content' style='display: none'>
+				<div class='ui-widget-content portlet-new-sec-tag'>
+					<h2>Create New Sec Tag</h2>
+				</div>
+				<ul class='managetags ui-helper-reset ui-helper-clearfix connectedSortable'>
+					<% for(var tag in item.secTags) { %>								
+						 <li class='ui-widget-content' data-sectag='<%= item.secTags[tag] %>'>
+							<h5 class='ui-widget-header tagValue editable'><%= item.secTags[tag] %></h5>
+							<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
+						</li>
+				   <% } %>
+				</ul>
+			</div>
+		</div>
+	<% }) %>
+
+</script>	
 <!-- END: Underscore Template Definition. -->
