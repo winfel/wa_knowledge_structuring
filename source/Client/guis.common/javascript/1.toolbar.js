@@ -377,17 +377,25 @@ GUI.initToolbar = function() {
         GUI.enterCouplingMode();
         popover.hide();
       };
+	  
+	  var btnTagManager = section.addElement('<img src= "../../guis.common/images/Tag-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Tag Manager"));
+      var clickTagManager = function() {
+        //TODO
+        popover.hide();
+      };
 
       if (GUI.isTouchDevice) {
         $(btnSignout.getDOM()).bind("touchstart", clickSignout);
         $(btnPaste.getDOM()).bind("touchstart", clickPaste);
         $(btnHome.getDOM()).bind("touchstart", clickHome);
         $(btnCoupling.getDOM()).bind("touchstart", clickCoupling);
+		 $(btnTagManager.getDOM()).bind("touchstart", clickTagManager);
       } else {
         $(btnSignout.getDOM()).bind("click", clickSignout);
         $(btnPaste.getDOM()).bind("click", clickPaste);
         $(btnHome.getDOM()).bind("click", clickHome);
         $(btnCoupling.getDOM()).bind("click", clickCoupling);
+		 $(btnTagManager.getDOM()).bind("touchstart", clickTagManager);
       }
     }
   });

@@ -74,7 +74,7 @@ $(function() {
 			newObject.setAttribute('mimeType',mimeType);
 			newObject.setAttribute('name',filename);
 			
-			GUI.tagManager.open(newObject, 600, 600,false);
+			GUI.tagAssigner.open(newObject, 600, 600,false);
 			
 		});
 				
