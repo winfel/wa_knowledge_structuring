@@ -105,6 +105,22 @@ and open the template in the editor.
   display: none;
 }
 
+.highlightMenu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  opacity: 0.5;
+}
+
+.highlightMenu:hover {
+  opacity: 1;
+}
+
+.highlightMenu .btn {
+  position: relative;
+}
+
 /* IFRAME solution... */
 .paperViewer iframe {
   width: 100%;
