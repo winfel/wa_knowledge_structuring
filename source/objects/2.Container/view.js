@@ -375,23 +375,47 @@ Container.addFiles = function(files){
 	var key;
 	for(key in files){
 		var name = files[key].attributes.name;
+		var n = name.split('.')[0];
 		var type = name.split('.')[1];
 		
-		if(name.length>9){
-			name = name.split('.')[0];
-			name = name.substring(0,8)+ "..." + type;
+		if(n.length>13){
+			n = n.substring(0,10)+ "...";
 		}
 	
 		var c = 'file'+key;
-	
-		$(rep).find("#sortablefiles").append('<li id='+c+' class=ui-state-default tabindex="-1">'+name+'</li>');
+		
+		var mime = files[key].attributes.mimeType;
+		var img;
+		var t = mime.split('/');
+		
+		if(mime == "application/pdf"){ //type of object is pdf
+			img = "pdf.png";
+		}
+		if(mime == "text/html"){ //type of object is html
+			img = "html.png";
+		}
+		if(t[0] == "image"){ //type of object is image
+			img = "image.png";
+		}
+		if(t[0] == "audio"){ //type of object is audio
+			img = "audio.png";
+		}
+		if(t[0] == "video"){ //type of object is video
+			img = "video.png";
+		}
+		if(mime == "text/plain"){ //type of object is text
+			img = "text.png";
+		}
+		
+		$(rep).find("#sortablefiles").append('<li id='+c+' class=ui-state-default tabindex="-1">'+n+'</li>');
+		$(rep).find("#"+c).prepend('<img id="image'+c+'" src="../../guis.common/images/fileicons/'+img+'" />');
 	
 		$(rep).find("#sortablefiles li").css("margin", "3px 3px 3px 0");
 		$(rep).find("#sortablefiles li").css("padding", "1px");
 		$(rep).find("#sortablefiles li").css("float", "left");
-		$(rep).find("#sortablefiles li").css("width", "90px");
-		$(rep).find("#sortablefiles li").css("height", "90px");
-		$(rep).find("#sortablefiles li").css("line-height", "90px");
+		$(rep).find("#sortablefiles li").css("width", "75px");
+		$(rep).find("#sortablefiles li").css("height", "75px");
+		$(rep).find("#sortablefiles li").css("line-height", "10px");
 		$(rep).find("#sortablefiles li").css("font-size", "1em");
 		$(rep).find("#sortablefiles li").css("text-align", "center");
 		$(rep).find("#sortablefiles li").css("vertical-align", "middle");	
