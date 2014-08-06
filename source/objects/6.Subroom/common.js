@@ -73,6 +73,7 @@ Subroom.register=function(type){
  Subroom.execute = function(openInNewWindow) {
     
     var destination = this.getAttribute('destination');
+    var that = this;
 
     // TODO this must be done serverside in the connector
     if (!destination) {
@@ -90,7 +91,15 @@ Subroom.register=function(type){
         window.open(destination);
 
     } else {
-        ObjectManager.loadRoom(destination, false, ObjectManager.getIndexOfObject(this.getAttribute('id')));
+
+        Modules.RightManager.hasAccess("read", { id: this.id, type: this.type}, GUI.username, function(result) {
+          if(result) {
+            ObjectManager.loadRoom(destination, false, ObjectManager.getIndexOfObject(that.getAttribute('id')));
+        }else{
+            var audio = new Audio('/guis.common/sounds/cant_touch_this.mp3');
+            audio.play();
+        }
+        });
         
     }
 }

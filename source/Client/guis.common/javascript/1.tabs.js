@@ -270,7 +270,14 @@ GUI.tabs = new function() {
           });
 
         } else {
-          ObjectManager.loadRoom(dest, false, 'left');
+          Modules.RightManager.hasAccess("read", {id: getCurrentObject.id, type: getCurrentObject.type}, GUI.username, function(result) {
+            if (result) {
+              ObjectManager.loadRoom(dest, false, 'left');
+            } else {
+              var audio = new Audio('/guis.common/sounds/cant_touch_this.mp3');
+              audio.play();
+            }
+          });
         }
 
       }).appendTo(upperUl);
