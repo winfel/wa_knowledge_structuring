@@ -229,6 +229,31 @@ UserManager.getUsers = function(object, role, user, callback) {
   });
 };
 
+UserManager.isManager = function(object, callback) {
+
+  Dispatcher.registerCall("umIsManager" + object.id, function(data) {
+    // call the callback
+    callback(true);
+
+    // deregister
+    Dispatcher.removeCall("umIsManager" + object.id);
+  });
+
+  Dispatcher.registerCall("umIsNotManager" + object.id, function(data) {
+    // call the callback
+    callback(false);
+
+    // deregister
+    Dispatcher.removeCall("umIsNotManager" + object.id);
+  });
+
+  // The responce should be some sort of broadcast... Instead of
+
+  Modules.SocketClient.serverCall('umIsManager', {
+    'object': object
+  });
+};
+
 /**
  * 
  * @param {type} object

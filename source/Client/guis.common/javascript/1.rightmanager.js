@@ -162,16 +162,17 @@ GUI.rightmanager = new function() {
   this.updateRightsSection = function(availableRights, checkedRights) {
     var that = GUI.rightmanager;
 
-    // Update the rights header
-    that.rmRightsHeader.children("span").html("(" + that.selectedRoleSpan.data("role").name + ")");
-    // Clear the rights section
-    that.rmRights.empty();
+        // Update the rights header
+        that.rmRightsHeader.children("span").html("(" + that.selectedRoleSpan.data("role").name + ")");
+        // Clear the rights section
+        that.rmRights.empty();
 
-    availableRights.forEach(function(right) {
-      var checked = checkedRights.indexOf(right.name) >= 0;
-      addRightToSection(that, right, that.selectedRoleSpan.data("role"), that.rmRights, checked);
-      that.rmRights.append("<br>");
-    });
+        availableRights.forEach(function(right) {
+          var checked = checkedRights.indexOf(right.name) >= 0;
+          addRightToSection(that, right, that.selectedRoleSpan.data("role"), that.rmRights, checked);
+          that.rmRights.append("<br>");
+        });
+
   };
 
   /**
@@ -272,10 +273,19 @@ GUI.rightmanager = new function() {
     else {
       $("#rm_rolesHead").show();
       $("#rm_rolesPage").show();
+
       $("#rm_rightsHead").show();
       $("#rm_rightsPage").show();
       $("#rm_usersHead").show();
       $("#rm_usersPage").show();
+
+      userHasTheRightToChangeStuff(GUI.rightmanager,function(result){
+        if(result == false){
+          $("#rm_rolesPage").hide();
+          $("#rm_usersPage").hide();
+          $("#rm_rightsPage").hide();
+        }
+      });
 
       $("#rm_ID").html(theObject.id);
       $("#rm_Name").html(theObject.getAttribute("name"));
@@ -382,6 +392,31 @@ GUI.rightmanager = new function() {
   }
 };
 
+function userHasTheRightToChangeStuff(that, callback){
+
+    // check if user is allowed to change rights
+    Modules.RightManager.hasAccess("update", { id: that.objData.id, type: that.objData.type}, GUI.username, function(result) {
+      if(result) {
+        // user has update right: do it
+        callback(true);
+      }else{
+        // check for manager role
+        Modules.UserManager.isManager({ id: that.objData.id}, function(o){
+          if(o == true){
+            // user is manager: do it
+            callback(true);
+          }else{
+            // no manager and no update right
+            callback(false);
+            //var audio = new Audio('/guis.common/sounds/cant_touch_this.mp3');
+            //audio.play();
+            console.log(">> access denied <<");
+          }
+        });
+      }
+    });
+
+};
 /**
  * Adds a right to a section.
  * 
@@ -410,6 +445,7 @@ function addRightToSection(that, right, role, sectionRights, checkedInitially) {
       Modules.RightManager.grantAccess(right.name, that.objData, role);
     else
       Modules.RightManager.revokeAccess(right.name, that.objData, role);
+
   });
 
   if (checkedInitially) // Check if the right is actually checked
@@ -449,117 +485,117 @@ function addUserToSection(that, user, sectionUsers, role, withDelete, forceMulti
   if (!that.objData)
     withDelete = false;
   
-  var checkedSpans, checkedUsers;
-  
-  if(that.checkedSpans[role.name]) {
-    checkedSpans = that.checkedSpans[role.name];
-    checkedUsers = that.checkedUsers[role.name];
-  } else {
-    checkedSpans = that.checkedSpans;
-    checkedUsers = that.checkedUsers;
-  }
+        var checkedSpans, checkedUsers;
+          
+          if(that.checkedSpans[role.name]) {
+            checkedSpans = that.checkedSpans[role.name];
+            checkedUsers = that.checkedUsers[role.name];
+          } else {
+            checkedSpans = that.checkedSpans;
+            checkedUsers = that.checkedUsers;
+          }
 
-  // Add a span for every user and make it clickable.
-  var span = $("<span>");
-  span.addClass("rightmanager-item rightmanager-user");
-  if (withDelete)
-    span.addClass("show-delete-img");
+          // Add a span for every user and make it clickable.
+          var span = $("<span>");
+          span.addClass("rightmanager-item rightmanager-user");
+          if (withDelete)
+            span.addClass("show-delete-img");
 
-  span.html(user);
-  span.data("user", user);
+          span.html(user);
+          span.data("user", user);
 
-  span.on("mouseenter", function(event) {
-    if (!span.hasClass("checked") && withDelete)
-      span.data("deleteImg").addClass("visible");
-  });
+          span.on("mouseenter", function(event) {
+            if (!span.hasClass("checked") && withDelete)
+              span.data("deleteImg").addClass("visible");
+          });
 
-  span.on("mouseleave", function(event) {
-    if (!span.hasClass("checked") && withDelete)
-      span.data("deleteImg").removeClass("visible");
-  });
+          span.on("mouseleave", function(event) {
+            if (!span.hasClass("checked") && withDelete)
+              span.data("deleteImg").removeClass("visible");
+          });
 
-  // The whole click magic ;)...
-  span.on("click", function(event) {
-    var index = checkedSpans.indexOf(span); // The index of the clicked span.
+          // The whole click magic ;)...
+          span.on("click", function(event) {
+            var index = checkedSpans.indexOf(span); // The index of the clicked span.
 
-    // Check for multi/single selection
-    if (event.ctrlKey || forceMulti) {
-      // Multi selection
-      if (index >= 0) {
-        checkedSpans.splice(index, 1); // Remove the span from the array
-        checkedUsers.splice(index, 1); // Remove the user from the array
-      } else {
-        checkedSpans.push(span); // Add the span to the array
-        checkedUsers.push(user); // Add the user to the array
-      }
+            // Check for multi/single selection
+            if (event.ctrlKey || forceMulti) {
+              // Multi selection
+              if (index >= 0) {
+                checkedSpans.splice(index, 1); // Remove the span from the array
+                checkedUsers.splice(index, 1); // Remove the user from the array
+              } else {
+                checkedSpans.push(span); // Add the span to the array
+                checkedUsers.push(user); // Add the user to the array
+              }
 
-    } else {
-      // Single selection: Uncheck all elements first and then check the current element again..
-      checkedSpans.forEach(function(item) {
-        item.removeClass("checked");
-        if (withDelete)
-          item.data("deleteImg").removeClass("visible");
-      });
-      checkedSpans.length = 0; // Delete all array items.
-      checkedSpans.push(span);
+            } else {
+              // Single selection: Uncheck all elements first and then check the current element again..
+              checkedSpans.forEach(function(item) {
+                item.removeClass("checked");
+                if (withDelete)
+                  item.data("deleteImg").removeClass("visible");
+              });
+              checkedSpans.length = 0; // Delete all array items.
+              checkedSpans.push(span);
 
-      checkedUsers.length = 0; // Delete all array items.
-      checkedUsers.push(user);
-    }
+              checkedUsers.length = 0; // Delete all array items.
+              checkedUsers.push(user);
+            }
 
-    span.toggleClass("checked"); // Toggle the span
+            span.toggleClass("checked"); // Toggle the span
 
-    if (withDelete) {
-      var deleteImg = span.data("deleteImg"); // The reference to the delete image.
+            if (withDelete) {
+              var deleteImg = span.data("deleteImg"); // The reference to the delete image.
 
-      // Check if delete buttons are or the delete all button is shown.
-      if (span.hasClass("checked") && checkedSpans.length == 1)
-        deleteImg.addClass("visible");
-      else
-        deleteImg.removeClass("visible");
+              // Check if delete buttons are or the delete all button is shown.
+              if (span.hasClass("checked") && checkedSpans.length == 1)
+                deleteImg.addClass("visible");
+              else
+                deleteImg.removeClass("visible");
 
-      if (checkedSpans.length > 1) {
-        checkedSpans.forEach(function(item) {
-          item.data("deleteImg").removeClass("visible");
-        });
-        // that.btnDeleteUsers.addClass("visible");
-      } else if (checkedSpans.length == 1) {
-        checkedSpans[0].data("deleteImg").addClass("visible");
-        // that.btnDeleteUsers.removeClass("visible");
-      }
-    }
-    
-    console.log(checkedUsers);
-  });
+              if (checkedSpans.length > 1) {
+                checkedSpans.forEach(function(item) {
+                  item.data("deleteImg").removeClass("visible");
+                });
+                // that.btnDeleteUsers.addClass("visible");
+              } else if (checkedSpans.length == 1) {
+                checkedSpans[0].data("deleteImg").addClass("visible");
+                // that.btnDeleteUsers.removeClass("visible");
+              }
+            }
+            
+            console.log(checkedUsers);
+          });
 
-  if (checkedInitially)
-    span.click();
+          if (checkedInitially)
+            span.click();
 
-  if (withDelete) {
-    // Setup the delete button if objData is available.
-    var deleteImg = $("<img>");
-    deleteImg.attr({
-      alt: "Delete",
-      src: "/guis.common/images/oxygen/16x16/actions/edit-delete.png"
-    });
-    deleteImg.on("click", function(event) {
-      span.remove();
-      // Update the arrays
-      var index = checkedSpans.indexOf(span); // The index of the clicked span
-      checkedSpans.splice(index, 1); // Remove the span from the array
-      checkedUsers.splice(index, 1); // Remove the user from the array
+          if (withDelete) {
+            // Setup the delete button if objData is available.
+            var deleteImg = $("<img>");
+            deleteImg.attr({
+              alt: "Delete",
+              src: "/guis.common/images/oxygen/16x16/actions/edit-delete.png"
+            });
+            deleteImg.on("click", function(event) {
+              span.remove();
+              // Update the arrays
+              var index = checkedSpans.indexOf(span); // The index of the clicked span
+              checkedSpans.splice(index, 1); // Remove the span from the array
+              checkedUsers.splice(index, 1); // Remove the user from the array
 
-      Modules.UserManager.removeUser(that.objData, role, user);
+              Modules.UserManager.removeUser(that.objData, role, user);
 
-      event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
-    });
+              event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
+            });
 
-    span.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
-    span.append(deleteImg);
-  }
+            span.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
+            span.append(deleteImg);
+          }
 
-  // Finally add it to the user section
-  sectionUsers.append(span);
+          // Finally add it to the user section
+          sectionUsers.append(span);
 
-  return span;
+          return span;
 }
