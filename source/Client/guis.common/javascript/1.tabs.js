@@ -175,6 +175,14 @@ GUI.tabs = new function() {
     var that = this;
 
     var destFromURL = document.URL.substring(document.URL.lastIndexOf("/") + 1, document.URL.length);
+    
+    // ===== small hack to preventing accessing the private space of somesome ===
+      if(destFromURL.indexOf(GUI.username) == -1 && destFromURL.indexOf("PrivateSpace") > -1){
+          ObjectManager.loadRoom("public", false, 'left');
+          var audio = new Audio('/guis.common/sounds/cant_touch_this.mp3');
+          audio.play();
+      }
+    // =====================
 
     $("#tabs_content").html(""); // clear
     var upperUl = $("<ul class='ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all header-tabs' style='list-style-type:none;'>").appendTo("#tabs_content");
