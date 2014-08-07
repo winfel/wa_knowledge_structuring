@@ -909,3 +909,13 @@ button#btn-previous {margin-left: 133px;}
 .custom-sec-tag-holder {margin-top: 40px;}
 
 /* end tag dialog */
+
+
+
+.favourite-menu {
+    z-index:1000;
+    position: absolute;
+    background-color:#d3d3d3;
+    border: 1px solid black;
+    padding: 2px;
+}

@@ -374,6 +374,7 @@ Container.addFiles = function(files){
 		
 	var key;
 	for(key in files){
+	
 		var name = files[key].attributes.name;
 		var n = name.split('.')[0];
 		var type = name.split('.')[1];
@@ -382,7 +383,7 @@ Container.addFiles = function(files){
 			n = n.substring(0,10)+ "...";
 		}
 	
-		var c = 'file'+key;
+		var id = files[key].attributes.id;
 		
 		var mime = files[key].attributes.mimeType;
 		var img;
@@ -407,8 +408,8 @@ Container.addFiles = function(files){
 			img = "text.png";
 		}
 		
-		$(rep).find("#sortablefiles").append('<li id='+c+' class=ui-state-default tabindex="-1">'+n+'</li>');
-		$(rep).find("#"+c).prepend('<img id="image'+c+'" src="../../guis.common/images/fileicons/'+img+'" />');
+		$(rep).find("#sortablefiles").append('<li id=representation_for_'+id+' class=ui-state-default tabindex="-1">'+n+'</li>');
+		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" src="../../guis.common/images/fileicons/'+img+'" />');
 	
 		$(rep).find("#sortablefiles li").css("margin", "3px 3px 3px 0");
 		$(rep).find("#sortablefiles li").css("padding", "1px");
@@ -419,12 +420,28 @@ Container.addFiles = function(files){
 		$(rep).find("#sortablefiles li").css("font-size", "1em");
 		$(rep).find("#sortablefiles li").css("text-align", "center");
 		$(rep).find("#sortablefiles li").css("vertical-align", "middle");	
-					
-		/*			
-		$(rep).find('#'+c).click(function(){
-			$(rep).find('#'+c).focus();
+			
+		$(rep).find("#representation_for_"+id).bind("contextmenu", function(event) { 
+			event.preventDefault();
+			$("div.favourite-menu").remove();
+			var id = this.id.split("_")[2];
+			$("<div id=menu_for_"+id+" class='favourite-menu'>Add to favourites</div>")
+			.appendTo("body")
+			.css({top: event.pageY + "px", left: event.pageX + "px"})
+			.on("click", function(event){
+				console.log("Todo: Add file "+this.id.split("_")[2]+" to favourites");
+				$("div.favourite-menu").remove()
+			});
 		});
-		*/
+		
+		
+		$(rep).find("#representation_for_"+id).mousedown(function(e){
+			
+			$("div.favourite-menu").remove();
+			this.focus();
+				
+		});
+		
 	}	
 }
 
