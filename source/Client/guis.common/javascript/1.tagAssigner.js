@@ -22,7 +22,7 @@ GUI.tagAssigner = new function() {
 	// the file object currently processed
 	var webarenaObject;
 	
-	// the dialog content of the dialog (its html)
+	// the content of the dialog (its html)
 	var dialogHtml = "";
 	
 	// selector for the container for unassigned secondary tags 
@@ -641,8 +641,14 @@ GUI.tagAssigner = new function() {
 		var buttons = {};
 		
 		buttons[GUI.translate("save")] = function(domContent){
-			
-			that.saveChanges();
+						
+			if(that.mainTag != ""){
+				that.saveChanges();
+				return true;
+			} else {
+				alert("You must set at least the main tag ");
+				return false;
+			}
 			
 		};
 
