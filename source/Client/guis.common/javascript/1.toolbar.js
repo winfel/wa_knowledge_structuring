@@ -37,7 +37,7 @@ GUI.initToolbar = function() {
 
   /* build categories for each type */
   $.each(types, function(key, object) {
-
+  
     var newCategoryIcon = document.createElement("img");
     $(newCategoryIcon).attr("src", "../../guis.common/images/categories/" + object[0].category + ".png").attr("alt", "");
     $(newCategoryIcon).attr("width", "24").attr("height", "24");
@@ -59,69 +59,75 @@ GUI.initToolbar = function() {
           var section = page.addSection();
 
           $.each(object, function(key, object) {
+		  	
+			var name = object.translate(GUI.currentLanguage, object.type);
 
-            var name = object.translate(GUI.currentLanguage, object.type);
+			var element = section.addElement('<img src="/objectIcons/' + object.type + '" alt="" width="24" height="24" /> ' + name);
 
-            var element = section.addElement('<img src="/objectIcons/' + object.type + '" alt="" width="24" height="24" /> ' + name);
+			var click = function(attributes) {
+		  
+				popover.hide();
+		  
+				if($(".ui-tabs-active").children().first().attr('title') != "Global Space" || object.type != "File"){ //do not allow Files in the Global Space
 
-            var click = function(attributes) {
+				  var proto = ObjectManager.getPrototype(object.type);
 
-              popover.hide();
+				  if (!Modules.Config.presentationMode) {
 
-              var proto = ObjectManager.getPrototype(object.type);
+					proto.create(attributes);
 
-              if (!Modules.Config.presentationMode) {
+				  } else {
+					alert(GUI.translate("You cannot create objects in presentation mode"));
+				  }
+				}
+				else{
+					alert("Sorry, it's not allowed to upload Files in the Global Space. Please upload them in your private Space or in the Paper Spaces");
+				}
+			};
 
-                proto.create(attributes);
-
-              } else {
-                alert(GUI.translate("You cannot create objects in presentation mode"));
-              }
-
-            };
-
-            if (GUI.isTouchDevice) {
-              $(element.getDOM()).bind("touchstart", function() {
-                click({
-                  "x": window.pageXOffset + 40,
-                  "y": window.pageYOffset + 40
-                });
-              });
-            } else {
-              $(element.getDOM()).bind("click", function() {
-                click({
-                  "x": window.pageXOffset + 40,
-                  "y": window.pageYOffset + 40
-                });
-              });
-            }
+			if (GUI.isTouchDevice) {
+			  $(element.getDOM()).bind("touchstart", function() {
+				click({
+				  "x": window.pageXOffset + 40,
+				  "y": window.pageYOffset + 40
+				});
+			  });
+			} else {
+			  $(element.getDOM()).bind("click", function() {
+				click({
+				  "x": window.pageXOffset + 40,
+				  "y": window.pageYOffset + 40
+				});
+			  });
+			}
 
 
-            /* make draggable */
-            var helper = $('<img src="/objectIcons/' + object.type + '" alt="" width="24" height="24" />');
-            helper.get(0).callback = function(offsetX, offsetY) {
+			/* make draggable */
+			var helper = $('<img src="/objectIcons/' + object.type + '" alt="" width="24" height="24" />');
+			helper.get(0).callback = function(offsetX, offsetY) {
 
-              var svgpos = $("#content").offset();
+			  var svgpos = $("#content").offset();
 
-              var top = offsetY - svgpos.top;
-              var left = offsetX;
+			  var top = offsetY - svgpos.top;
+			  var left = offsetX;
 
-              click({
-                "x": left,
-                "y": top
-              });
+			  click({
+				"x": left,
+				"y": top
+			  });
 
-            };
+			};
 
-            $(element.getDOM()).addClass("toolbar_draggable");
-            $(element.getDOM()).draggable({
-              revert: true,
-              distance: 20,
-              cursor: "move",
-              helper: function(event) {
-                return helper;
-              }
-            });
+			$(element.getDOM()).addClass("toolbar_draggable");
+			$(element.getDOM()).draggable({
+			  revert: true,
+			  distance: 20,
+			  cursor: "move",
+			  helper: function(event) {
+				return helper;
+			  }
+			});
+			
 
           });
 
