@@ -60,6 +60,7 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('enterPrivateSpace', UserManager.enterPrivateSpace);
 
   Dispatcher.registerCall('umIsManager', UserManager.isManager);
+  Dispatcher.registerCall('umisValidUser', UserManager.isValidUser);
 
   Dispatcher.registerCall('umDeleteObjectFromTabs', function(socket, data){
     for (var i in that.connections) {
@@ -849,6 +850,20 @@ UserManager.addUser = function(socket, data) {
  */
 UserManager.removeUser = function(socket, data) {
   UserManager.modifyUser(data.role, data.object, data.username, false);
+};
+
+/**
+ *  The function can be used to check wheter a user is valid (exists) or not
+ *  @param {Object} socket  Socket connection
+ *  @param {Object} data    Send data
+ *  @param {Sring} responseID  RespondId of the request
+ */
+UserManager.isValidUser = function(socket, data, responseID) {
+    Modules.UserDAO.usersByUserName(data.user, function(err, docs) {
+        var valid = (!err && docs.length > 0);
+        
+        Modules.SocketServer.respondToSocket(socket, responseID, valid);
+    })
 };
 
 /**

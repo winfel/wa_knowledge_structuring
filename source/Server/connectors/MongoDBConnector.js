@@ -180,9 +180,10 @@ mongoConnector.listRooms = function(callback) {
 mongoConnector.getInventory = function(roomID, context, callback) {
     roomID = roomID.toString();
     var self = this;
-    this.Modules.Log.debug("Request inventory (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
-
+    
     if (!context) throw new Error('Missing context in getInventory');
+    
+    this.Modules.Log.debug("Request inventory (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
 
     if (!this.isLoggedIn(context)) {
         this.Modules.Log.error("User is not logged in (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
@@ -376,8 +377,7 @@ mongoConnector.createObject = function(roomID, type, data, context, callback) {
             console.warn("ERROR mongoConnector.createObject : " + err);
             callback(false);
         } else {
-            // console.log("mongoConnector.createObject: Object " + objectID + "
-            // was successfully created");
+            // console.log("mongoConnector.createObject: Object " + objectID + " was successfully created");
             callback(objectID);
         }
     });
@@ -444,7 +444,6 @@ mongoConnector.duplicateObject = function(roomID, toRoom, objectID, context, cal
                 obj.x += 20;
                 obj.y += 20;
             }
-            
             
             //console.log("File was written in the DB");
    		    var promise2 = saveObject(obj);

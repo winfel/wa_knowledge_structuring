@@ -28,8 +28,13 @@ GUI.userdialog = new function() {
       if (event.keyCode == 13) {
         var newUser = $(this).val();
 
-        if (newUser)
-          addUserToSection(that, newUser, that.searched, false, false, true, true);
+        if (newUser) {
+            Modules.UserManager.isValidUser(newUser, function(valid) {
+                if (valid) addUserToSection(that, newUser, that.searched, false, false, true, true);
+                else alert("The User " + newUser + " was not found");
+            });
+        }
+        
       }
     });
 

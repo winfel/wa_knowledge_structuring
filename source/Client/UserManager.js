@@ -59,6 +59,16 @@ UserManager.storeTabCache = function(objectList, cache) {
   });
 };
 
+/**
+ * Check whether a user exists in the server or not
+ * 
+ * @param {String} newUser
+ * @param {Function} callback
+ */
+UserManager.isValidUser = function(newUser, callback) {
+    Dispatcher.query('umisValidUser', { 'user': newUser } ,callback);
+}
+
 UserManager.getTabCache = function(callback) {
   // get current user -- FIXME
   var username = GUI.username;
