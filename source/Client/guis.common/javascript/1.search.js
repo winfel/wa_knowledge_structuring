@@ -18,11 +18,13 @@ GUI.search = new function () {
 
                 if (candidate.getAttribute('type') == 'File') {
 
-                    candidate.setAttribute('visible', false);
-
+                   // candidate.setAttribute('visible', false);
+					var rep=document.getElementById(candidate.getAttribute('id'));
+$(rep).css("opacity", 0.1);
                     if (candidate.getAttribute('name').indexOf($("#searchFileId").val()) >= 0) {
 
-                        candidate.setAttribute('visible', true);
+                       // candidate.setAttribute('visible', true);
+$(rep).css("opacity", 1);
 
                     }
                 }
@@ -33,13 +35,15 @@ GUI.search = new function () {
 
             var inventory = Modules.ObjectManager.getInventory();
             $("#searchFileId").val('');
+				
 
             for (var i in inventory) {
                 var candidate = inventory[i];
                 if (candidate.getAttribute('type') == 'File') {
-                    candidate.setAttribute('visible', false);
+                   // candidate.setAttribute('visible', false);
+				   	var rep=document.getElementById(candidate.getAttribute('id'));
                     if (candidate.getAttribute('name').indexOf($("#searchFileId").val()) >= 0) {
-                        candidate.setAttribute('visible', true);
+                       $(rep).css("opacity", 1);
                     }
                 }
             }
@@ -62,11 +66,14 @@ GUI.search = new function () {
                 var candidate = inventory[i];
 
                 if (candidate.getAttribute('type') == 'File') {
+					   	var rep=document.getElementById(candidate.getAttribute('id'));
 
-                    candidate.setAttribute('visible', false);
+                    $(rep).css("opacity", 0.1);
                     if (candidate.getAttribute('mainTag').indexOf($("#primButton").val()) >= 0) {
+					
                         array.push(candidate.getAttribute('secondaryTags'));
                         if ($("#primButton").val() != " " && setTitle == true) {
+						
                             var spanTitle = $("<span >");
                             spanTitle.html("Filter By Secondary Tag - " + candidate.getAttribute('mainTag') + "");
                             spanTitle.addClass("jDesktopInspector_pageHead");
@@ -77,7 +84,7 @@ GUI.search = new function () {
                             filterButton.attr({
 
                                 type: "Button",
-                                value: "Remove Filter"
+                                value: "Filter"
                             });
 
                             $("#filterButton").append(filterButton);
@@ -85,7 +92,7 @@ GUI.search = new function () {
                         }
 
 
-                        candidate.setAttribute('visible', true);
+                       $(rep).css("opacity", 1);
                     }
                 }
             }
@@ -157,15 +164,19 @@ GUI.search = new function () {
             for (var i in inventory) {
                 var candidate = inventory[i];
                 if (candidate.getAttribute('type') == 'File') {
+				var rep=document.getElementById(candidate.getAttribute('id'));
                     if (candidate.getAttribute('mainTag').indexOf($("#primButton").val()) >= 0) {
                         visible = candidate.getAttribute('visible');
                         matchVisible = matchArrays(candidate.getAttribute('secondaryTags'), filterArray);
 
 
-                        if ((visible || matchVisible) == true) {
+                        if ( matchVisible == true) {
 
-                            candidate.setAttribute('visible', matchVisible);
-                        }
+                            $(rep).css("opacity", 1);
+                        }else{
+						    $(rep).css("opacity", 0.1);
+
+						}
                     }
                 }
             }
