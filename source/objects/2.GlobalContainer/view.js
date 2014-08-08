@@ -5,7 +5,7 @@
 *
 */	
 
-Container.draw=function(external){
+GlobalContainer.draw=function(external){
 	var rep=this.getRepresentation();
 	
 	/* manual check for a changed name - we need to save time ;-)*/
@@ -31,7 +31,7 @@ Container.draw=function(external){
 }
 
 
-Container.updateInnerHeight = function() {
+GlobalContainer.updateInnerHeight = function() {
 	
 	var rep=this.getRepresentation();
 
@@ -51,7 +51,7 @@ Container.updateInnerHeight = function() {
 }
 
 
-Container.createRepresentation = function(parent) { 	
+GlobalContainer.createRepresentation = function(parent) { 	
 	
 	var rep = GUI.svg.other(parent,"foreignObject");
 
@@ -67,12 +67,12 @@ Container.createRepresentation = function(parent) {
 	
 }
 
-Container.adjustControls = function() {
+GlobalContainer.adjustControls = function() {
 	this.updateInnerHeight();
 	GeneralObject.adjustControls.call(this);
 }
 
-Container.drawContent = function(rep){
+GlobalContainer.drawContent = function(rep){
 
 	var that = this;
 
@@ -80,7 +80,7 @@ Container.drawContent = function(rep){
 
 	var compiled = _.template($( "script#container-template" ).html());
 
-	 var heading = "Container";
+	 var heading = "GlobalContainer";
 
     var templateData = {
         heading : heading
@@ -358,7 +358,7 @@ Container.drawContent = function(rep){
 }
 
 
-Container.rename = function(newName){
+GlobalContainer.rename = function(newName){
 
 	var rep=this.getRepresentation();
 
@@ -366,7 +366,7 @@ Container.rename = function(newName){
 		
 }
 
-Container.addFiles = function(files){
+GlobalContainer.addFiles = function(files){
 
 	var rep=this.getRepresentation();
 	
@@ -445,7 +445,7 @@ Container.addFiles = function(files){
 	}	
 }
 
-Container.upd = function(){
+GlobalContainer.upd = function(){
 
 	this.getFiles();
 

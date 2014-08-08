@@ -5,7 +5,7 @@
 *
 */
 
-Container.afterServerCall = function(files){
+GlobalContainer.afterServerCall = function(files){
 
 	files = JSON.parse(files);
 
@@ -15,14 +15,14 @@ Container.afterServerCall = function(files){
 
 }
 
-Container.getFiles = function(){
+GlobalContainer.getFiles = function(){
 		
-	this.serverCall("getAllFileObjects", this.id, Container.afterServerCall);
+	this.serverCall("getAllFileObjects", this.id, GlobalContainer.afterServerCall);
 		
 }
 
 
-Container.searchAndFilter = function(files){
+GlobalContainer.searchAndFilter = function(files){
 	
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
@@ -123,7 +123,7 @@ Container.searchAndFilter = function(files){
 }
 
 
-Container.sortFiles = function(files){ //bubble sort
+GlobalContainer.sortFiles = function(files){ //bubble sort
 
 	var sortingCriterion = this.getAttribute('sortingCriterion');
 	var sortingOrder = this.getAttribute('sortingOrder');

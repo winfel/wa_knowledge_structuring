@@ -357,10 +357,10 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
 
 UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
-  var shouldInclude = [ "Container#HMI#60#45#500#5#searchByTag;true#searchByName;false#name;HMI#locked;true#searchString;HMI#height;300",
-                        "Container#ESS#600#45#500#5#searchByTag;true#searchByName;false#name;ESS#locked;true#searchString;ESS#height;300",
-                        "Container#MaA#60#400#500#5#searchByTag;true#searchByName;false#name;MaA#locked;true#searchString;MaA#height;300",
-                        "Container#SWT#600#400#500#5#searchByTag;true#searchByName;false#name;SWT#locked;true#searchString;SWT#height;300"];
+  var shouldInclude = [ "GlobalContainer#HMI#60#45#500#5#searchByTag;true#searchByName;false#name;HMI#locked;true#searchString;HMI#height;300",
+                        "GlobalContainer#ESS#600#45#500#5#searchByTag;true#searchByName;false#name;ESS#locked;true#searchString;ESS#height;300",
+                        "GlobalContainer#MaA#60#400#500#5#searchByTag;true#searchByName;false#name;MaA#locked;true#searchString;MaA#height;300",
+                        "GlobalContainer#SWT#600#400#500#5#searchByTag;true#searchByName;false#name;SWT#locked;true#searchString;SWT#height;300"];
 
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };

@@ -8,23 +8,23 @@
 var Modules=require('../../server.js');
 
 /**
- * Container
+ * GlobalContainer
  * @class
  * @classdesc Common elements for view and server
  */
 
-var Container=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
+var GlobalContainer=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
 /**
  * Registers the object (attributes and actions).
  *
- * @this {Container}
+ * @this {GlobalContainer}
  * @see Client/ObjectManager.js
  * @see objects/1.GeneralObject/common.js
- * @see objects/2.Container/view.js
+ * @see objects/2.GlobalContainer/view.js
  * @param {string} type The type of the object
  */
-Container.register=function(type){
+GlobalContainer.register=function(type){
 	
 	// Registering the object
 	
@@ -52,7 +52,7 @@ Container.register=function(type){
     }});
 
 
-	this.registerAttribute('name', {type: 'text', standard: 'Container', changedFunction: function(object, value) {
+	this.registerAttribute('name', {type: 'text', standard: 'GlobalContainer', changedFunction: function(object, value) {
 		var obj = {id:object.id, name:value}; 
 		object.rename(value);
 		
@@ -83,39 +83,39 @@ Container.register=function(type){
 /**
  * TODO
  *
- * @this {Container}
- * @see objects/2.Container/view.js
+ * @this {GlobalContainer}
+ * @see objects/2.GlobalContainer/view.js
  */
-Container.execute=function(){
+GlobalContainer.execute=function(){
 
 }
 
 /**
  * Changes the name of the object to the given parameter newValue.
  *
- * @this {Container}
+ * @this {GlobalContainer}
  * @param {string} newValue
  * @see objects/1.GeneralObject/common.js
  * @see objects/1.GeneralObject/client.js
  */
-Container.intelligentRename=function(newValue){
+GlobalContainer.intelligentRename=function(newValue){
 	var objectName = this.getAttribute("name");
 	var that = this;
 	this.getContentAsString(function(oldValue){
 		if ( newValue.length > 30 )
 		{ newValue = newValue.substring(0, 30); }
 	
-		if ( objectName == "Container" || objectName == oldValue )
+		if ( objectName == "GlobalContainer" || objectName == oldValue )
 		{ that.setAttribute("name", newValue); }
 	});
 }
 
 
-Container.register('Container');
-Container.isCreatable=true;
+GlobalContainer.register('GlobalContainer');
+GlobalContainer.isCreatable=true;
 
-Container.contentURLOnly = false; //content is only accessible via URL
+GlobalContainer.contentURLOnly = false; //content is only accessible via URL
 
-Container.category='Active';
+GlobalContainer.category='Active';
 
-module.exports=Container;
+module.exports=GlobalContainer;

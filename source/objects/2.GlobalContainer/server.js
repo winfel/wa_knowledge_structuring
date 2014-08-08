@@ -45,7 +45,7 @@ theObject.getAllFileObjects.public = true;
 
 theObject.onEnter=function(object,oldData,newData){
      
-     /* Todo: Add dragged file to Container */
-     //console.log('Enter container');
+     /* Todo: Add dragged file to GlobalContainer */
+     //console.log('Enter GlobalContainer');
  
  }
