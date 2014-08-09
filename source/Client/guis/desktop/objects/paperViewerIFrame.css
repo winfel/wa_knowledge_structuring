@@ -142,3 +142,37 @@ body.twopage > div:nth-child(even) {
   background-position: center;
   color: transparent;
 }
+
+.comment {
+  position: absolute;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-notes.png");
+  background-position: top left;
+  background-repeat: no-repeat;
+  max-width: 400px;
+}
+
+.comment p {
+  display: none;
+}
+
+.comment.opened {
+  background-color: #FFEB55;
+  padding: 5px 7px;
+  width: auto;
+  height: auto;
+}
+
+.comment.opened p {
+  margin: 0px;
+  padding: 3px 0;
+  display: block;
+}
+
+.comment.opened p.commentHeader {
+  font-weight: bold;
+  margin-left: 40px;
+  padding-bottom: 10px;
+}

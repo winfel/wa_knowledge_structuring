@@ -54,9 +54,13 @@ Viewer.initGUI = function(rep) {
   var highlightMenu = $(".highlightMenu", viewerContainer).first();
 
   var initializeTextHighlighter = function() {
+    // Remove all previous event handlers.
+    $(".buttonAreaLeft .btn", viewerContainer).off();
+    $(".btn", highlightMenu).off();
 
     //get the iframe contents and apply the textHighlighter
     var frameDocument = $("#iframe-" + rep.id).contents();
+
 
     // do not load highlighter for about:blank, but if error happens, ignore
     try {
@@ -86,8 +90,8 @@ Viewer.initGUI = function(rep) {
                 .attr('title', 'by ' + GUI.username);
 
         // save highlights to server
-        var jsonStr = highlighter.serializeHighlights();
-        self.setAttribute('highlights', jsonStr);
+//        var jsonStr = highlighter.serializeHighlights();
+//        self.setAttribute('highlights', jsonStr);
 
         // Enable the highlight buttons
         $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", false);
@@ -101,9 +105,8 @@ Viewer.initGUI = function(rep) {
           highlightMenu.hide();
         });
 
-        highlightMenu.click(function() {
+        highlightMenu.on("click", function() {
           highlightMenu.hide();
-
           // Disable the highlight buttons
           $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", true);
         });
@@ -119,7 +122,6 @@ Viewer.initGUI = function(rep) {
           highlightMenuTimer = setTimeout(function() {
             highlightMenu.hide();
           }, 250);
-
         });
       }
     });
@@ -127,21 +129,26 @@ Viewer.initGUI = function(rep) {
     // Get the highlighter object
     highlighter = frameDocument.getHighlighter();
 
-    // Remove selected highlightings...
-    frameDocument.on("click", function(event) {
+    // Remove old selected text...
+    $(".highlighted.selected", frameDocument).each(function(index, element) {
+      highlighter.removeHighlights(element);
+    });
 
+    // Remove selected highlightings...
+    frameDocument.on("mousedown", function(event) {
       if (selection && event.target != selection) {
         // Remove the selected (not highlighted) text.
         $(".highlighted.selected", frameDocument).each(function(index, element) {
           highlighter.removeHighlights(element);
         });
-
-        // Update the highlights on the server.
-        var jsonStr = highlighter.serializeHighlights();
-        self.setAttribute('highlights', jsonStr);
+        selection = null;
 
         // Disable the highlight buttons
         $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", true);
+        highlightMenu.hide();
+
+        // Reset the highlightings
+        self.loadHighlights();
       }
     });
 
@@ -222,16 +229,24 @@ Viewer.initGUI = function(rep) {
       });
     };
 
+    self.linkCommentToHighlights = function() {
+
+    };
+
     self.loadHighlights = function() {
       var jsonStr = self.getAttribute('highlights');
       if (jsonStr != undefined && jsonStr != '') {
         highlighter.removeHighlights();
         highlighter.deserializeHighlights(jsonStr);
         window.setTimeout(self.addAudioToHighlights, 50);
+        window.setTimeout(self.linkCommentToHighlights, 50);
       }
     };
 
     self.saveHighlights = function() {
+      // Before we save it. Remove helper css classes
+      $(".highlighted", frameDocument).removeClass("selected remotehover");
+
       var jsonStr = highlighter.serializeHighlights();
       self.setAttribute('highlights', jsonStr);
     };
@@ -266,11 +281,85 @@ Viewer.initGUI = function(rep) {
       self.saveHighlights();
     });
 
+    var createCommentOnViewer = function(user, data) {
+
+      var commentContainer = $("<div>").addClass("comment")
+              .css("top", data.offset.top);
+
+      commentContainer.html('<p class="commentHeader" title="' + data.date.toLocaleString() + '">' + user + ' wrote</p>' +
+              '<p>' + data.text + '</p>');
+
+      commentContainer.on("click", function(event) {
+        var target = $(event.target);
+        if(target.hasClass("commentHeader") || target.hasClass("comment"))
+          $(this).toggleClass("opened");
+      });
+
+      frameDocument.on("click", function(event) {
+        var target = $(event.target);
+        if(!target.hasClass("comment") && !target.parent("div").hasClass("comment"))
+          commentContainer.removeClass("opened");
+      });
+
+
+      $("body", frameDocument).append(commentContainer);
+    };
+
+    var addComment = function(element, callback) {
+      var theDialogContainer = $("<div>");
+      theDialogContainer.html('<textarea class="addCommentText" style="width: 96%; height: 98%;"></textarea>');
+
+      var theDialog = theDialogContainer.dialog({
+        title: "Type your comment...",
+        height: 300,
+        width: 350,
+        modal: true,
+        buttons: {
+          "Submit": function() {
+            var text = $(".addCommentText", theDialogContainer).val().trim();
+
+            if (text == "") {
+              alert("Your comment is empty. Try again with some letters!");
+            } else {
+              var data = {
+                'text': text,
+                'offset': element.offset(),
+                'date': new Date()
+              };
+
+              //DBManager.addDocument(self, "comments", data);
+
+              createCommentOnViewer(GUI.username, data);
+
+              theDialog.dialog("close");
+            }
+          },
+          "Cancel": function() {
+            theDialog.dialog("close");
+          }
+        },
+        close: function() {
+          // Do something after closing...
+        }
+      });
+
+      $(".ui-widget-overlay").css("z-index", 15000);
+      theDialogContainer.parent("div").css("z-index", 15001);
+
+      theDialog.dialog("open");
+    };
+
     $(".btnAddComment", viewerContainer).on("click", function() {
-      $(".highlighted.selected", frameDocument)
-              .toggleClass("selected")
-              .toggleClass("strike");
-      self.saveHighlights();
+      console.log("CLICKED");
+      var selected = $(".highlighted.selected", frameDocument);
+
+      addComment(selected, function() {
+        selected.removeClass("selected")
+                .addClass("commented")
+                .attr('data-commentobject');
+
+        self.saveHighlights();
+      });
     });
 
     $(".btnAddAudio", viewerContainer)
@@ -285,7 +374,6 @@ Viewer.initGUI = function(rep) {
                 self.saveHighlights();
               });
             });
-
   };
 
   // activate highlighter for iframe when iframe document is loaded
@@ -521,6 +609,10 @@ Viewer.deselectHandler = function() {
   $("div.moveOverlay", rep).show();
 };
 
+/**
+ * 
+ * @returns {undefined}
+ */
 Viewer.onMoveStart = function() {
   GeneralObject.onMoveStart();
 
@@ -528,6 +620,10 @@ Viewer.onMoveStart = function() {
   $("div.moveOverlay", rep).show();
 };
 
+/**
+ * 
+ * @returns {undefined}
+ */
 Viewer.onMoveEnd = function() {
   GeneralObject.onMoveEnd();
 
@@ -535,7 +631,10 @@ Viewer.onMoveEnd = function() {
   $("div.moveOverlay", rep).hide();
 };
 
-
+/**
+ * 
+ * @returns {undefined}
+ */
 Viewer.resizeHandler = function() {
 
   this.setDimensions(this.getViewWidth(), this.getViewHeight());
@@ -545,6 +644,10 @@ Viewer.resizeHandler = function() {
   this.adjustPaper();
 };
 
+/**
+ * 
+ * @returns {undefined}
+ */
 Viewer.adjustPaper = function() {
   var iframe = $("#iframe-" + this.getAttribute("id"));
   var contents = iframe.contents();
