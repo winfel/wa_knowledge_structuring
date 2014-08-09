@@ -97,6 +97,7 @@ Modules.Dispatcher      = require('./Server/Dispatcher.js');
 Modules.WebServer       = require('./Server/WebServerE.js');
 Modules.SocketServer    = require('./Server/SocketServer.js');
 Modules.UserManager     = require('./Server/UserManager.js');
+Modules.DBManager       = require('./Server/DBManager.js');
 Modules.Helper          = require('./Server/Helper.js');
 Modules.EventBus        = require("./Server/EventBus.js");
 Modules.BuildTool       = require('./Server/BuildTool.js');
