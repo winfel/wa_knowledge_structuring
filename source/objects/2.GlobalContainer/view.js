@@ -61,6 +61,8 @@ GlobalContainer.createRepresentation = function(parent) {
 	
 	this.drawContent(rep);
 	
+	this.setAttribute('locked', true);
+	
 	this.upd();
 	
 	return rep;
@@ -408,9 +410,10 @@ GlobalContainer.addFiles = function(files){
 			img = "text.png";
 		}
 		
-		$(rep).find("#sortablefiles").append('<li id=representation_for_'+id+' class=ui-state-default tabindex="-1">'+n+'</li>');
-		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" src="../../guis.common/images/fileicons/'+img+'" />');
-	
+		$(rep).find("#sortablefiles").append('<li id=representation_for_'+id+' class="ui-widget-content" tabindex="-1" draggable="true">'+n+'</li>');
+		
+		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" src="../../guis.common/images/fileicons/'+img+'">');
+		
 		$(rep).find("#sortablefiles li").css("margin", "3px 3px 3px 0");
 		$(rep).find("#sortablefiles li").css("padding", "1px");
 		$(rep).find("#sortablefiles li").css("float", "left");
@@ -420,7 +423,22 @@ GlobalContainer.addFiles = function(files){
 		$(rep).find("#sortablefiles li").css("font-size", "1em");
 		$(rep).find("#sortablefiles li").css("text-align", "center");
 		$(rep).find("#sortablefiles li").css("vertical-align", "middle");	
-			
+		$(rep).find("#sortablefiles li").css("background", "#d3d3d3");	
+		
+		$(rep).find("#sortablefiles li").draggable({
+			helper: 'clone',
+			revert: 'invalid',
+			appendTo: 'body'
+		});
+		
+		$(rep).find("#representation_for_"+id).hover(
+			function() {
+				$(this).css("background", "#f5f5f5");
+			}, function() {
+				$(this).css("background", "#d3d3d3");	
+			}
+		);
+
 		$(rep).find("#representation_for_"+id).bind("contextmenu", function(event) { 
 			event.preventDefault();
 			$("div.favourite-menu").remove();
@@ -434,15 +452,8 @@ GlobalContainer.addFiles = function(files){
 			});
 		});
 		
-		
-		$(rep).find("#representation_for_"+id).mousedown(function(e){
-			
-			$("div.favourite-menu").remove();
-			this.focus();
-				
-		});
-		
 	}	
+		
 }
 
 GlobalContainer.upd = function(){

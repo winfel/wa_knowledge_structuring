@@ -96,20 +96,20 @@ $(function() {
 		}
 	}
 		
-		/**
-		 * register event handlers for drag and drop events (using body to ensure all events are captured)
-		 */
-		$("body").get(0).addEventListener("drop", drop, false);
-		
-		
-		$("body").get(0).addEventListener("dragenter", function(e) {
-			e.stopPropagation();
-			  e.preventDefault();
-		}, false);
-		
-		$("body").get(0).addEventListener("dragover", function(e) {
-			e.stopPropagation();
-			  e.preventDefault();
-		}, false);
+	/**
+	 * register event handlers for drag and drop events (using body to ensure all events are captured)
+	 */
+	$("body").get(0).addEventListener("drop", drop, false);
+	
+	
+	$("body").get(0).addEventListener("dragenter", function(e) {
+		e.stopPropagation();
+		  e.preventDefault();
+	}, false);
+	
+	$("body").get(0).addEventListener("dragover", function(e) {
+		e.stopPropagation();
+		  e.preventDefault();
+	}, false);
 	
 });
