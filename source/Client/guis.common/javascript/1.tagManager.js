@@ -8,11 +8,12 @@
  
  //var _ = require('underscore');
 
-GUI.tagManager= new function() {
+GUI.tagManager = new function() {
 	
 	var secTags = [];
 	
-	var mainTags = [];
+	// list containing all existing main tags
+	this.mainTags = [];
 	
 	this.$sortableOptions = {
 				items: "> li",
@@ -30,7 +31,10 @@ GUI.tagManager= new function() {
 			};	
 
 	this.createMainTag = function(mainTag){
+		var that = GUI.tagManager;
 		console.log("createMainTag");
+		//save the newly created tag in the database  
+		Modules.TagManager.updMainTags(mainTag, that.mainTags.length+1);
 	}
 
 	this.deleteMainTag = function(mainTag){
@@ -71,6 +75,18 @@ GUI.tagManager= new function() {
 		
 		// sets the the content of the dialog (html)
 		this.setDialogContent();
+		
+		Modules.TagManager.getMainTagsAndSecTags(function(mainTagList){
+			that.mainTags = mainTagList;
+			
+			var mainTagTemplate = $("#main-tag-tmpl").html();
+			$("#main-tag-container").append(_.template( mainTagTemplate, { items : mainTagList} ));
+			
+			that.bindEvents();			
+			that.enableEditable();			
+			that.enableSortable();
+			
+		});
 			 
 	}
 	
@@ -143,7 +159,7 @@ GUI.tagManager= new function() {
 			
 			$( this ).next().find('.editable').click();
 			
-			 that.createMainTag(mainTagToBeCreated);	
+			that.createMainTag(mainTagToBeCreated);	
 		});	
 	}
 	
@@ -168,23 +184,14 @@ GUI.tagManager= new function() {
 	 * @param {int} [height] Height of the dialog
 	 * @param {bool} [passThrough] Additional options for the dialog
 	 */
-	this.open = function(width, height, passThrough) {
-	
-		var tests = [ { id: "1", name: "Human-Machine Interaction", secTags: ["Didactics of Informatics","Computer Graphics","Visualization","Image Processing","Human-Computer Interaction","Computers and Society","Computing in Context"] },
-					    { id: "2", name: "Software Technologies", secTags: ["Model Driven Software Engineering", "Knowledge-Based Systems","Electronic Commerce","Databases", "Information Systems", "Software Engineering","Computational Intelligence","Specification and Modelling"] },
-					    { id: "3", name: "Embedded Systems", secTags: ["Distributed Embedded Systems", "Computer Engineering", "Custom Computing", "Computer Networks", "Swarm Robotics"] },
-					    { id: "4", name: "Models and Algorithms", secTags: ["Cryptography", "Algorithms", "Complexity", "Theory of Distributed Systems", "Swarm Intelligence"] },
-						{ id: "5", name: "Software Technologies 2", secTags: ["Model Driven Software Engineering", "Knowledge- Based Systems", "Electronic Commerce","Databases", "Information Systems", "Software Engineering","Computational Intelligence","Specification and Modelling"] },
-					    { id: "6", name: "Embedded Systems 2", secTags: ["Distributed Embedded Systems", "Computer Engineering", "Custom Computing", "Computer Networks", "Swarm Robotics"] },
-					    { id: "7", name: "Models and Algorithms 2", secTags: ["Cryptography", "Algorithms", "Complexity", "Theory of Distributed Systems", "Swarm Intelligence"]	}];
-			
-		//TODO: get Tags from the DB
-			
+	this.open = function(width, height, passThrough) {		
+		var that = GUI.tagManager;
+		
 		GUI.tagManager.init(); 
 		  
 		var buttons = {};
 		
-		buttons[GUI.translate("save")] = function(domContent){
+		buttons[GUI.translate("close")] = function(domContent){
 			
 			//that.saveChanges();
 			
@@ -192,18 +199,7 @@ GUI.tagManager= new function() {
 
 		GUI.dialog("Tag Manager", this.dialogDom, buttons, width, passThrough);
 		
-		var mainTagTemplate = $("#main-tag-tmpl").html();
-		$("#main-tag-container").append(_.template( mainTagTemplate, { items : tests} ));
-
-		var that = GUI.tagManager;
-		
-		that.bindEvents();
-		
-		that.enableEditable();
-		
-		that.enableSortable();	
-		
-		$("#main-tag-container").find( "h2" ).css("font-size", "12.5px");
+		//$("#main-tag-container").find( "h2" ).css("font-size", "12.5px");
 				
 	}	
 }

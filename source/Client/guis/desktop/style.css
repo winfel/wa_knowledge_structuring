@@ -911,6 +911,129 @@ button#btn-previous {margin-left: 133px;}
 /* end tag dialog */
 
 
+/ * tag manager */
+
+.portlet {
+	width: 200px !important;
+	float: left;
+	margin: 0 1em 1em 0;
+	padding: 0.3em;
+	background-color: #F0F0F0 ;
+	min-height: 64px;
+}
+.portlet-header {
+	padding: 0.2em 0.3em;
+	margin-bottom: 0.5em;
+	position: relative;
+	min-height: 50px;
+}
+.portlet-toggle, .portlet-delete {
+	position: absolute;
+	top: 50%;
+	right: 0;
+	margin-top: -8px;
+}
+
+.portlet-delete {
+	margin-right: 15px;
+}
+
+.portlet-content {
+	padding: 0.4em;
+}
+.portlet-placeholder {
+	border: 1px dotted black;
+	margin: 0 1em 1em 0;
+	height: 50px;
+}	 
+
+#main-tag-container h2{
+	font-size: 12.5px
+}
+
+div.editable {
+	width:80%;
+	cursor: default !important;
+}
+div.tagValue {
+	width:90%;
+}
+form.editableInput {
+	height: 21px;
+	padding: 0px;
+	display: inline;
+}
+
+.portlet-new-main-tag {
+	text-align: center;
+	vertical-align: middle;
+	border: 1px dotted black;
+	color: #C0c0c0;
+	cursor: pointer;
+}
+
+.portlet-new-sec-tag {
+	text-align: center;
+	vertical-align: middle;
+	border: 1px dotted black;
+	color: #C0c0c0;
+	cursor: pointer;
+}
+
+.connectedSortable {
+	min-height: 30px;
+
+}
+
+.managetags .custom-state-active { 
+	background: #eee; 
+}
+
+.managetags  li { 
+	float: left; 
+	width: 98%; 
+	padding: 0.4em; 
+	margin: 0 0.4em 0.4em 0; 
+	text-align: center;
+}
+
+.managetags  li h5 { 
+	margin: 0; 
+	cursor: move; 
+	min-height: 30px; 
+	padding: 0.4em; 
+	width: 90%; 
+	float: left;
+}
+
+.managetags  li a { 
+	float: right; 
+}
+
+.managetags  li img { 
+	width: 100%; 
+	cursor: move; 
+}	
+
+span.portlet-toggle, span.portlet-delete, span.sec-tag-delete {
+	cursor: pointer;
+}
+
+.editableInput input[type=text]{
+	width: 90% !important;
+}
+
+.portlet {
+	width: 200px !important;
+	float: left;
+	margin: 0 1em 1em 0;
+	padding: 0.3em;
+	background-color: #F0F0F0 ;
+	min-height: 64px;
+}
+
+/* end tag manager */
+
 
 .favourite-menu {
     z-index:1000;
