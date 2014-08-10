@@ -20,6 +20,11 @@ GUI.initSVG = function() {
 	$("#content").svg();
 	var canvas = $("#content svg");
 	$(canvas).attr('id', 'canvas');
+	
+	$(canvas).css({
+	      "width":  "2000px",
+	      "height": "1240px"
+	    });
 
 	var contentSVG = $("#content").svg('get');
 	GUI.svg = contentSVG;

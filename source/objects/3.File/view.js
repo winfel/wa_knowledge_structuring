@@ -99,7 +99,7 @@ File.getIconText = function() {
 }
 
 File.setTag = function() {
-	GUI.tagManager.open(this, 600, 600, false);	
+	GUI.tagAssigner.open(this, 600, 600, false);	
 }
 
 File.createRepresentation = function(parent) {

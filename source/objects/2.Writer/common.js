@@ -10,13 +10,15 @@ var Modules=require('../../server.js');
 var Writer=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
 Writer.register=function(type){
-	
+	var that = this;
 	// Registering the object
 	
 	GeneralObject=Modules.ObjectManager.getPrototype('GeneralObject');
 	GeneralObject.register.call(this,type);
 	
-	this.registerAttribute('paper', {type:'text', standard:'[somepaperid]'});
+	this.registerAttribute('paper', {type:'text', standard:'[somepaperid]', changedFunction: function(object, value) {
+		Modules.ObjectManager.loadRoom(object.getAttribute("inRoom"));
+    }});
 	
 	this.standardData.width=210*3;
 	this.standardData.height=297*3;

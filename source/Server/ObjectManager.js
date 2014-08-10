@@ -16,6 +16,10 @@
 
 "use strict";
 
+
+var TRASH_ROOM  = 'trash';
+var PAPER_SPACE  = 'PaperSpace';
+
 var fs = require('fs');
 var _ = require('lodash');
 var tokenChecker = require("./TokenChecker.js");
@@ -55,11 +59,10 @@ ObjectManager.registerType = function (type, constr) {
  */
 ObjectManager.remove = function (obj) {
 
-	//Send remove to connector
+	// Send remove to connector
+	Modules.Connector.removeObject(obj.inRoom, obj.id, obj.context);
 
-	Modules.Connector.remove(obj.inRoom, obj.id, obj.context);
-
-	//Inform clients about remove.
+	// Inform clients about remove.
 	obj.updateClients('objectDelete');
 
 }
@@ -100,23 +103,21 @@ ObjectManager.getPrototypeFor = ObjectManager.getPrototype;
  *
  */
 function buildObjectFromObjectData(objectData, roomID, type) {
-
+    
 	if (!objectData) {
 		Modules.Log.error('No object data!');
 	}
 
 	var type = type || objectData.type;
-
-	//get the object's prototype
-
+	
+	// get the object's prototype
 	var proto = ObjectManager.getPrototypeFor(type);
 
-	//build a new object
-
+	// build a new object
 	var obj = Object.create(proto);
 	obj.init(objectData.id);
 
-	//set the object's attributes and rights
+	// set the object's attributes and rights
 	obj.setAll(objectData.attributes);
 	obj.rights = objectData.rights;
 	obj.id = objectData.id;
@@ -124,11 +125,11 @@ function buildObjectFromObjectData(objectData, roomID, type) {
 	obj.inRoom = roomID;
 	obj.set('type', type);
 
-	if (!runtimeData[obj.id])runtimeData[obj.id] = {}; //create runtime data for this object if there is none
+	if (!runtimeData[obj.id]) runtimeData[obj.id] = {}; // create runtime data for this object if there is none
 
 	obj.runtimeData = runtimeData[obj.id];
 
-    if(typeof obj.afterCreation == "function"){
+    if (typeof obj.afterCreation == "function") {
         obj.afterCreation();
     }
 
@@ -141,29 +142,26 @@ function buildObjectFromObjectData(objectData, roomID, type) {
  *  gets an Object by a given id and its context (context is user credentials)
  *
  *  Attention. EVERY call of getObject returns a different object on every call.
- *   The consequence of this is, that you cannot add properties to the object!
- *   If you want to save runtime data, use the runtimeData property.
+ *  The consequence of this is, that you cannot add properties to the object!
+ *  If you want to save runtime data, use the runtimeData property.
  *
  *  @param  roomID  the roomID of the chosen room
- *  @param  objectID    the objectID of the chosen object
- *  @param  context user credentials
- *
+ *  @param  objectID the objectID of the chosen object
+ *  @param  context  user credentials
+ *  @param  callback 
  *  @return object the now created object
  */
-ObjectManager.getObject = function (roomID, objectID, context) {
+ObjectManager.getObject = function (roomID, objectID, context, callback) {
+	if (!context)  throw new Error('Missing context in ObjectManager.getObject');
+	if (!callback) throw new Error('Missing callback in ObjectManager.getObject');
 
-	if (!context) throw new Error('Missing context in ObjectManager.getObject');
-
-	var objectData = Modules.Connector.getObjectData(roomID, objectID, context);
-
-	if (!objectData) return false;
-
-	var object = buildObjectFromObjectData(objectData, roomID);
-
-	object.context = context;
-
-	return object;
-
+	Modules.Connector.getObjectData(roomID, objectID, context, function (objectData) {
+		if(typeof objectData != 'undefined' && objectData != false){
+		    var object = buildObjectFromObjectData(objectData, roomID, objectData.type);
+		    object.context = context;
+		    callback(object);
+	    }
+	});
 }
 
 /**
@@ -172,7 +170,7 @@ ObjectManager.getObject = function (roomID, objectID, context) {
  *  gets an inventory of all objects in a room by roomID and context. Context
  *  is user credentials.
  *
- *  This function can either be called synchronous or asyncronous.
+ *  This function can either be called synchronous or asynchronous.
  *
  * @param roomID    The roomID of the room that should be used to gather the inventory
  * @param context   The user credentials
@@ -207,22 +205,18 @@ ObjectManager.getObjects = function (roomID, context, callback) {
 		return inventory;
 
 	} else {
-		//async.
+		// async.
 
 		Modules.Connector.getInventory(roomID, context, function (objectsData) {
 
 			for (var i in objectsData) {
 				var objectData = objectsData[i];
-
-				var object = buildObjectFromObjectData(objectData, roomID);
-
+				var object = buildObjectFromObjectData(objectData, roomID, objectData.type);
 				object.context = context;
-
 				inventory.push(object);
 			}
 
 			callback(inventory);
-
 		});
 	}
 }
@@ -246,46 +240,58 @@ ObjectManager.getInventory = ObjectManager.getObjects;
  *  @param  content
  *  @param  context     user credentials
  *  @param  callback    the callback function
- *
- *
  **/
 ObjectManager.createObject = function (roomID, type, attributes, content, context, callback) {
-
-
-	//TODO send error to client if there is a rights issue here
-
+	
+    // TODO send error to client if there is a rights issue here
 	var proto = this.getPrototypeFor(type);
-
 	Modules.Connector.createObject(roomID, type, proto.standardData, context, function (id) {
-		var object = ObjectManager.getObject(roomID, id, context);
-
-		//set default attributes
-		var defaultAttributes = object.standardData;
-		for (var key in defaultAttributes) {
-			var value = defaultAttributes[key];
-			object.setAttribute(key, value);
-		}
-
-		object.setAttribute('name', type);
-
-		// SciWoAr added owner of an object
-		Modules.UserManager.modifyRole(null,
-										{object : object, 
-										role : {name : "Manager"},
-										username : context.user.username},
-										true);
-
-		for (var key in attributes) {
-			var value = attributes[key];
-			object.setAttribute(key, value);
-		}
-
-		if (content) {
-			object.setContent(content);
-		}
-
-		Modules.EventBus.emit("room::" + roomID + "::action::createObject", {objectID: id});
-		callback(false, object);
+	    
+		ObjectManager.getObject(roomID, id, context, function (object) {
+		    
+		    // set default attributes
+            var defaultAttributes = object.standardData;
+            for (var key in defaultAttributes) {
+                var value = defaultAttributes[key];
+                object.setAttribute(key, value);
+            }
+	
+			object.setAttribute('name', type);
+	
+			// SciWoAr added owner of an object
+			Modules.UserManager.modifyRole(null,
+											{object : object, 
+											role : {name : "Manager"},
+											username : context.user.username},
+											true);
+			
+			for (var key in attributes) {
+                var value = attributes[key];
+                object.setAttribute(key, value);
+            }
+	
+			if (content) {
+				object.setContent(content);
+			}
+			
+			if (type == PAPER_SPACE) {
+			    
+			    // create a new pad
+	            Modules.EtherpadController.pad.createPad({
+	                padID : attributes['padID']
+	            }, function(error, data) {
+	                
+	                if (error) {
+	                    console.warn("ObjectManager.createObject Error pad.getText: " + error.message);
+	                } else {
+	                    // console.log("ObjectManager.createObject pad was successfully created");
+	                }
+	            });
+			}
+	
+			Modules.EventBus.emit("room::" + roomID + "::action::createObject", {objectID: id});
+			callback(false, object);
+		});		
 	});
 }
 
@@ -469,9 +475,9 @@ ObjectManager.getRoom = function (roomID, context, callback, oldRoomId) {
 	if (!context) throw new Error('Missing context in ObjectManager.getRoom');
 
 	Modules.Connector.getRoomData(roomID, context, function (data) {
-		var obj = buildObjectFromObjectData(data, roomID, 'Room');
-		obj.context = context;
-		callback(obj);
+		var room = buildObjectFromObjectData(data, roomID, 'Room');
+		room.context = context;
+		callback(room);
 	}, oldRoomId);
 
 }
@@ -551,6 +557,41 @@ var mayReadMultiple = function (fromRoom, files, context, cb) {
  * 5. Update object link targets
  */
 ObjectManager.duplicateNew = function (data, context, cbo) {
+    // console.log(JSON.stringify(data));
+	var fromRoom = data.fromRoom;
+	var toRoom = data.toRoom;
+	var objectIDs = data.objects;
+	var objectAttributes = data.attributes;
+	var duplicate = data.duplicate;
+	
+	if (duplicate) {
+	    // duplicate button was pressed in the client side
+	    Modules.Connector.duplicateObjects(fromRoom, toRoom, objectIDs, context, function (err, idList) {
+	         
+	        for (var i = 0; i < idList.length; i++) {
+	            var id = idList[i];
+	            
+	            ObjectManager.getObject(fromRoom, id, context, function (object) {
+	                // inform the client about the new created object
+	                object.persist();
+	             }); 
+	            
+	         }
+	        
+	        cbo(err, idList);
+	    });
+	   
+	} else {
+	    // moving objects between rooms
+	    Modules.Connector.moveObjects(fromRoom, toRoom, objectIDs, objectAttributes, context, cbo);
+	}
+}
+
+/**
+ * THIS METHOD IS DEPRECATED 
+ * USE duplicateNew INSTEAD
+ */
+ObjectManager.duplicateNew2 = function (data, context, cbo) {
 	var cut = data.cut;
 
 	var attributes = data.attributes || {};
@@ -594,13 +635,15 @@ ObjectManager.duplicateNew = function (data, context, cbo) {
 		//find all unique objects - als traverse the linked objects
 		var uniqueObjects = {};
 		var findUniqueRelatedObjectsIds = function (objectId) {
-			var object = ObjectManager.getObject(fromRoom, objectId, context);
-			if (!object) return;
-			if (! (objectId in uniqueObjects)) {
-				uniqueObjects[objectId] = object;
-				var linkedObjects = object.getObjectsToDuplicate();
-				linkedObjects.forEach(findUniqueRelatedObjectsIds);
-			}
+			ObjectManager.getObject(fromRoom, objectId, context, function(object){
+				if (!object) return;
+				if (! (objectId in uniqueObjects)) {
+					uniqueObjects[objectId] = object;
+					var linkedObjects = object.getObjectsToDuplicate();
+					linkedObjects.forEach(findUniqueRelatedObjectsIds);
+				}
+			});
+			
 		}
 		objectKeys.forEach(findUniqueRelatedObjectsIds);
 
@@ -723,7 +766,9 @@ ObjectManager.duplicateNew = function (data, context, cbo) {
 }
 
 
-//deleteObject
+// Deletes an object:
+//  1) If the object is in the trash room it is deleted completely from the database
+//  2) If it is in any other room it is moved to the trash room
 ObjectManager.deleteObject = function (data, context, callback) {
 	var that = this;
 
@@ -734,32 +779,28 @@ ObjectManager.deleteObject = function (data, context, callback) {
 		if (err) callback(err, null);
 		else {
 			if (hasRights) {
-				var object = ObjectManager.getObject(roomID, objectID, context);
-				if (!object) {
-					callback(new Error('Object not found ' + objectID), null);
-					return;
-				}
+				ObjectManager.getObject(roomID, objectID, context, function(object) {
+				    
+				    if (!object) {
+	                    callback(new Error('Object not found ' + objectID), null);
+	                    return;
+	                }
 
-				Modules.EventBus.emit("room::" + roomID + "::" + objectID + "::delete", data);
-				var historyEntry = {
-					'oldRoomID': roomID,
-					'oldObjectId': objectID,
-					'roomID': 'trash',
-					'action': 'delete'
-				}
-
-				Modules.Connector.getTrashRoom(context, function (toRoom) {
-					Modules.Connector.duplicateObject(roomID, toRoom.id, objectID, context, function (err, newId, oldId) {
-						object.remove();
-						historyEntry["objectID"] = newId;
-
-						var transactionId = data.transactionId;
-
-						that.history.add(transactionId, data.userId, historyEntry);
-					});
-
+	                Modules.EventBus.emit("room::" + roomID + "::" + objectID + "::delete", data);
+	                var historyEntry = {
+	                    'oldRoomID': roomID,
+	                    'oldObjectId': objectID,
+	                    'roomID': TRASH_ROOM,
+	                    'action': 'delete'
+	                }
+	                
+	                Modules.Connector.getTrashRoom(context, function (toRoom) {
+    	                object.remove();             
+                        var transactionId = data.transactionId;
+                        that.history.add(transactionId, data.userId, historyEntry);
+	                });
+	                              
 				});
-
 			} else {
 				callback(new Error('No rights to delete object: ' + objectID), null);
 			}

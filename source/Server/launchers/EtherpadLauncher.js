@@ -66,7 +66,7 @@ if(os.type().indexOf("Windows") > -1) {
       //var cmd = "node";
       //var parm = "node_modules\\ep_etherpad-lite\\node\\server.js";
       
-      console.log("running " + cmd );
+      console.log("executing " + cmd );
     
       var child = exec(cmd, [], { cwd: path, detached: true });
       

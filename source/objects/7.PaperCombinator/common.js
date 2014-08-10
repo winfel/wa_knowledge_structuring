@@ -14,8 +14,8 @@ var Modules = require('../../server.js');
  * @classdesc Common elements for view and server
  */
 
-var PaperObject = Object.create(Modules.ObjectManager.getPrototype('IconObject'));
-
+var PaperCombinator = Object.create(Modules.ObjectManager.getPrototype('IconObject'));
+PaperCombinator.isCreatable = false;
 /**
  * Registers the object (actions).
  * 
@@ -25,7 +25,7 @@ var PaperObject = Object.create(Modules.ObjectManager.getPrototype('IconObject')
  * @see objects/1.GeneralObject/common.js
  * @param {string} type The type of the object
  */
-PaperObject.register = function(type) {
+PaperCombinator.register = function(type) {
 
   // Registering the object
   IconObject = Modules.ObjectManager.getPrototype('IconObject');
@@ -33,20 +33,13 @@ PaperObject.register = function(type) {
 
   var self = this;
 
-  this.registerAction('Follow', function(object) {
-
-    object.execute();
-
-  }, true);
-
-  this.registerAction('Open in new window', function(object) {
-
-    object.execute(true);
-
-  }, true);
+  this.makeSensitive();
 
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
   this.registerAttribute('bigIcon', {hidden: true});
+  this.registerAttribute('textcontent', {type: 'text'});
+  this.registerAttribute('count', {type: 'number', min: 0, standard:0});
+
 }
 
 /**
@@ -58,26 +51,13 @@ PaperObject.register = function(type) {
  * @see objects/1.GeneralObject/common.js
  * @param {boolean} openInNewWindow
  */
-PaperObject.execute = function(openInNewWindow) {
-  var destination = this.getAttribute('destination');
+PaperCombinator.execute = function(openInNewWindow) {
 
-  if (!destination) {
-    var random = new Date().getTime() - 1296055327011;
-
-    this.setAttribute('destination', random);
-    destination = random;
-  }
-
-  if (openInNewWindow) {
-    window.open(destination);
-  } else {
-    ObjectManager.loadPaperWriter(destination, false, 'left');
-  }
 }
 
-PaperObject.register('PaperObject');
-PaperObject.isCreatable = true;
+PaperCombinator.register('PaperCombinator');
+PaperCombinator.isCreatable = true;
 
-PaperObject.category = 'Files';
+PaperCombinator.category = 'Files';
 
-module.exports = PaperObject;
+module.exports = PaperCombinator;

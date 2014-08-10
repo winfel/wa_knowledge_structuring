@@ -49,6 +49,10 @@ var TagManager = function() {
     Dispatcher.registerCall('getSecTags', function(socket, data, responseID) {
 		that.getSecTags(socket, data.mainTag); 
 	});
+    
+    Dispatcher.registerCall('getMainTagsAndSecTags', function(socket, data, responseID) {
+		that.getMainTagsAndSecTags(socket);
+	});
    
     Dispatcher.registerCall('updSecTags', function(socket, data, responseID) {
 		that.updSecTags(socket, data.mainTag, data.secTag); 
@@ -100,6 +104,23 @@ var TagManager = function() {
 			
 		} );
 		 
+	};
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.getMainTagsAndSecTags = function(socket) {
+	  			
+		var dbMainTags = db.get('MainTags');
+		
+		dbMainTags.find( {}, [], function(e, mainTagsAndSecTags){
+			
+			Modules.SocketServer.sendToSocket(socket, "getMainTagsAndSecTags", mainTagsAndSecTags);
+			
+		} );
+	 
 	};
 	
 	/**

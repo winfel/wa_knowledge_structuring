@@ -1134,16 +1134,17 @@ $(function() {
 
 				/* positioning of popup and arrow */
 
-				var x = $(self.target).position().left+self.options.positionOffsetX;
-				var y = $(self.target).position().top+$(self.target).outerHeight()+self.options.positionOffsetY;
-
+				var x = $(self.target).offset().left+self.options.positionOffsetX;
+				var y = $(self.target).offset().top+$(self.target).outerHeight()+self.options.positionOffsetY;
+        
 				if (x+$(self.el).width() > $(window).width()) {
 
 					x = $(window).width()-$(self.el).width()-4;
-
 					/* arrow right */
 
-					var arrowPos = $(window).width()-$(self.target).position().left-self.options.arrowOffsetRight;
+					var arrowPos = $(window).width()-$(self.target).offset().left-self.options.arrowOffsetRight;
+          
+          $("div[class*='jPopover_arrow']").css("left", "");
 
 					$(self.el).find("div.jPopover_arrow").css("right", arrowPos+"px");
 					$(self.el).find("div.jPopover_arrow_border").css("right", arrowPos+"px");
@@ -1153,6 +1154,8 @@ $(function() {
 				} else {
 					/* arrow left */
 
+          $("div[class*='jPopover_arrow']").css("right", "");
+          
 					$(self.el).find("div.jPopover_arrow").css("left", "8px");
 					$(self.el).find("div.jPopover_arrow_border").css("left", "8px");
 					$(self.el).find("div.jPopover_arrow_border_inner").css("left", "8px");

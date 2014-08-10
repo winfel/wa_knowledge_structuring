@@ -1,0 +1,4 @@
+GlobalContainer.setTranslations('de',{
+
+}
+);

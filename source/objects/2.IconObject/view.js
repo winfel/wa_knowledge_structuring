@@ -1,3 +1,5 @@
+var VERY_BIG_ICON = 128;
+
 IconObject.createRepresentation = function(parent) {
 	
 	var rep = GUI.svg.group(parent,this.getAttribute('id'));
@@ -5,6 +7,9 @@ IconObject.createRepresentation = function(parent) {
 	var size = 32;
 	if (this.getAttribute("bigIcon")) {
 		size = 64;
+	} 
+	if (this.getAttribute("verybigIcon")) {
+		size = VERY_BIG_ICON;
 	} 
 	var rect = GUI.svg.rect(rep, 0, 0, size, size);
 	$(rect).attr("fill", "transparent");
@@ -30,8 +35,11 @@ IconObject.draw=function(external){
 	var rep=this.getRepresentation();
 
 	this.drawDimensions(external);
-
-	if (this.getAttribute("bigIcon")) {
+	if (this.getAttribute("verybigIcon")) {
+		this.setViewWidth(VERY_BIG_ICON);
+		this.setViewHeight(VERY_BIG_ICON);
+	}
+	else if (this.getAttribute("bigIcon")) {
 		this.setViewWidth(64);
 		this.setViewHeight(64);
 	} else {
@@ -190,7 +198,11 @@ IconObject.renderText = function (text){
 	
 	var rep = this.getRepresentation();
 	
-	if (this.getAttribute("bigIcon")) {
+	if (this.getAttribute("verybigIcon")) {
+		var startX = 128;
+		var widthHalf = 64;
+	}
+	else if (this.getAttribute("bigIcon")) {
 		var startX = 78;
 		var widthHalf = 32;
 	} else {
@@ -250,8 +262,11 @@ IconObject.updateIcon=function(){
 	var newURL=this.getStatusIcon();
 	var rep=this.getRepresentation();
 
-
-	if (this.getAttribute("bigIcon")) {
+	if (this.getAttribute("verybigIcon")) {
+		this.setViewWidth(VERY_BIG_ICON);
+		this.setViewHeight(VERY_BIG_ICON);
+	}
+	else if (this.getAttribute("bigIcon")) {
 		this.setViewWidth(64);
 		this.setViewHeight(64);
 	} else {

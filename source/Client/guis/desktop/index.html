@@ -1,11 +1,4 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Webarena 1.0</title>
-
-    <meta content="minimum-scale=1.0, initial-scale=1.0, width=device-width, maximum-scale=1, user-scalable=no" name="viewport">
-    <meta content="yes" name="apple-mobile-web-app-capable">
+{{#extend "head"}}
     <link rel="apple-touch-icon" sizes="72x72" href="/guis.common/images/ipad_icon.png">
 
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
@@ -43,6 +36,9 @@
 
     <script type="text/javascript" src="/guis.common/libraries/recorder.js"></script>
     <script type="text/javascript" src="/guis.common/libraries/setupRecorder.js"></script>
+
+
+<script src="/guis.common/javascript/0.loadTab.js"></script>
 
 
     <script src="/config.default.js"></script>
@@ -119,6 +115,7 @@
     <link type="text/css" href="/guis/desktop/rightmanager.css" rel="Stylesheet">
     <link type="text/css" href="/guis/desktop/objects/paperViewer.css" rel="Stylesheet">
     <link type="text/css" href="/guis/desktop/objects/paperWriter.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/css/verTabs.css" rel="Stylesheet">
 
     <script type="text/javascript" src="/guis/desktop/main.js"></script>
     <script>
@@ -166,12 +163,20 @@
         return $.fn.textWidth.fakeEl.width();
       };
     </script>
-  </head>
-  <body>
+{{/extend}}
     <div id="header">
       <div class="header_right"></div>
       <div class="header_left"></div>
+  <div class="header_tabs">
+    <div class="ui-tabs ui-widget ui-widget-content ui-corner-all header-tabs" id="tabs_content"> DEMO Content </div>
     </div>
+  <div class="header_tabs_sidebar animate">
+    <div id="header_toggle_sidebar">
+      <img id="header_toggle_sidebar_hide" title="Hide sidebar" src="/guis.common/images/arrow-right.png" alt="" style="width: 18px; height: 18px;">
+      <img id="header_toggle_sidebar_show" title="Show sidebar" src="/guis.common/images/arrow-left.png" alt="" style="width: 18px; height: 18px; display: none;">
+    </div>
+  </div>
+</div>
 
     <div id="couplingNavigation"></div>
 
@@ -181,9 +186,8 @@
       <div id="sidebar_title"><span></span></div>
       <div id="sidebar_content">
         <div>
+
           <div id="inspector"></div>
-
-
           <div id="rightmanager" class="jDesktopInspector">
             <div class="jDesktopInspector_main rightmanagerSelected">
               <div class="jDesktopInspector_pageHead">Object:</div>
@@ -255,14 +259,16 @@
                 <div class="jDesktopInspector_pageHead">Object:</div>
                 <div class="jDesktopInspector_page jDesktopInspector_page_0">
                   <div class="jDesktopInspector_section">
-                    <div class="jDesktopInspector_element">No Object selected!</div>
+                <div class="jDesktopInspector_element">Please select a Subroom or PaperSpace to use the rightmanager!</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+ 
           <div id="chat"></div>
           <div id="bug">                    
+
 
             <div>
               Ist Ihnen bei der Benutzung ein Fehler aufgefallen? Teilen Sie uns ihn doch bitte mit.<br />
@@ -276,13 +282,31 @@
             <div id="bug_report">
 
               <span>Was wollten Sie tun?</span>
-              <textarea id="bug_task"></textarea>
+          <textarea id="bug_task" style="
+    border-right-width: 0px;
+    border-bottom-width: 0px;
+    border-left-width: 0px;
+    border-top-width: 0px;
+    padding-right: 5px;
+    padding-left: 5px;
+"></textarea>
 
               <span>Welches Problem ist aufgetreten?</span>
-              <textarea id="bug_problem"></textarea>
+          <textarea id="bug_problem" style="
+    padding-right: 5px;
+    border-right-width: 0px;
+    padding-left: 5px;
+    border-left-width: 0px;
+    margin-bottom: 0px;
+"></textarea>
 
               <span>Ihre Email-Adresse:</span>
-              <input type="email" id="bug_email" />
+          <input type="email" id="bug_email" style="
+    padding-right: 5px;
+    border-right-width: 0px;
+    border-left-width: 0px;
+    padding-left: 5px;
+" />
 
               <p><input type="submit" value="Senden" id="bug_submit" /></p>
 
@@ -291,9 +315,54 @@
             <div id="bug_result"></div>
 
           </div>
+	  <div id="search" class="jDesktopInspector">
+            <div class="jDesktopInspector_main content">
+            
+              <div class="jDesktopInspector_pageHead" id="search_title">Search</div>
+              <div class="jDesktopInspector_page jDesktopInspector_page_1" id="rm_rolesPage">
+                <div class="jDesktopInspector_section" id="rm_roles"></div>
+                <div class="jDesktopInspector_section">                                                             							
+                  <div class="jDesktopInspector_element">
+                    <input id="searchFileId" name="searchFileName" type="text" size="15" value="" >
+                    <div class= "jDesktopInspector_button_right">										
+                      <input id="searchButton" type="button" value="Search">
+					   <input id="resetButton" type="button" value="Reset">
         </div>
+                    <br style="clear: both">									
       </div>
     </div>
+              </div>
+
+              <div class="rightmanager-role-separator"></div>
+			  <div class="jDesktopInspector_pageHead" id="prim_search_title">Filter By Primary Tag</div>
+			  </br>
+			<div class= "jDesktopInspector_button_right" >
+			<select id="primButton">
+					<option value=" ">Select</option>
+					<option value="Human-Machine Interaction">Human-Machine Interaction</option>
+					<option value="Software Technologies">Software Technologies</option>
+					<option value="Algorithm">Algorithm</option>
+					<option value="Embedded Systems">Embedded Systems</option>
+			</select>
+			<div class="rightmanager-role-separator"></div>
+			<div class="jDesktopInspector_section" id="title_Sec_tag"></div>
+             <div class="jDesktopInspector_section" id="Sec_tag">
+            
+            </div>  
+			<div class= "jDesktopInspector_button_right" id="filterButton">										
+                     
+					  
+                    </div>
+			<div class="rightmanager-role-separator"></div>			
+          </div>
+          
+		</div>
+      </div>
+
+    </div>
+	
+  </div>
+</div>
 
     <div id="actionsheet"></div>
     <div id="error_bg"></div>
@@ -335,7 +404,7 @@
     <div id="login_background" style="display: none">&nbsp;</div>
     <div id="login" style="display: none;">
 
-      <div class="login_title" id="login_title">WebArena 1.0</div>
+  <div class="login_title" id="login_title">Cooperative Writing (COW)</div>
 
       <div class="login_error"></div>
 
@@ -421,7 +490,53 @@
       <input class="discussion-input" placeholder=Texteingabe>
       </div>
     </script>
-    <!-- END: Underscore Template Definition. -->
 
-  </body>
-</html>
+<script type="text/template" id="container-template">
+  <table class="headline" bgcolor=#CCFFFF><tr>
+  <th id ="containername" width="350"><%- heading %></th>
+  <th id ="buttons" width="125">
+  <button>Refresh</button>
+  <button>Search/Filter</button>
+  <button>Sort</button>
+  </th>
+  </tr></table>
+  <div id="containment-wrapper">
+  <ul id="sortablefiles">
+  </ul>
+  </div>
+</script>
+
+<script type="text/html" id='secondary-tag-tmpl'>		
+     <li class='ui-widget-content' data-sectag='<%= secTag %>'>
+		<h5 class='ui-widget-header tagValue editable'><%= secTag %></h5>
+		<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
+	</li>      	
+</script>
+<script type="text/html" id='main-tag-tmpl'>
+
+	<% _.each(items,function(item,key,list){ %>
+		
+		<div class='portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all' data-maintag='<%= item.name %>'>
+			<div class='portlet-header ui-widget-header ui-corner-all'>
+				<span class='ui-icon ui-icon-trash portlet-delete'></span>
+				<span class='ui-icon ui-icon-plusthick portlet-toggle'></span>
+				<div class='editable'><%= item.name %></div>
+			</div>
+			<div class='portlet-content' style='display: none'>
+				<div class='ui-widget-content portlet-new-sec-tag'>
+					<h2>Create New Sec Tag</h2>
+				</div>
+				<ul class='managetags ui-helper-reset ui-helper-clearfix connectedSortable'>
+					<% for(var tag in item.secTags) { %>								
+						 <li class='ui-widget-content' data-sectag='<%= item.secTags[tag] %>'>
+							<h5 class='ui-widget-header tagValue editable'><%= item.secTags[tag] %></h5>
+							<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
+						</li>
+				   <% } %>
+				</ul>
+			</div>
+		</div>
+	<% }) %>
+
+</script>	
+    <!-- END: Underscore Template Definition. -->

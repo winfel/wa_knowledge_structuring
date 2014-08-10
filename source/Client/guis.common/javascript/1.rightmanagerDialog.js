@@ -4,7 +4,7 @@
 
 GUI.rightmanagerDialog = new function() {
 
-  var rightsObjects = ["PaperObject", "Subroom"]; // It is used...
+  var rightsObjects = ["PaperSpace", "Subroom"]; // It is used...
 
   var rmd;
   var rmdTabs;
@@ -92,7 +92,7 @@ GUI.rightmanagerDialog = new function() {
    */
   this.show = function(theObject) {
     var that = GUI.rightmanagerDialog;
-
+ 
     // Check whether this object is supposed to have a right manager dialog or not.
     if (rightsObjects.indexOf(theObject.type) >= 0) {
       // Load roles 
@@ -162,7 +162,7 @@ GUI.rightmanagerDialog = new function() {
       var deleteImg = $("<img>");
       deleteImg.attr({
         alt: "Delete",
-        src: "/guis.common/images/oxygen/16x16/actions/edit-delete.png"
+        src: "/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png"
       });
       deleteImg.on("click", function(event) {
         listItem.remove(); // Remove the tab 

@@ -4,7 +4,7 @@
  * Object providing functions for tagging	
  */
 
-GUI.tagManager= new function() {
+GUI.tagAssigner = new function() {
 
 	
 	// list containing all existing main tags
@@ -22,7 +22,7 @@ GUI.tagManager= new function() {
 	// the file object currently processed
 	var webarenaObject;
 	
-	// the dialog content of the dialog (its html)
+	// the content of the dialog (its html)
 	var dialogHtml = "";
 	
 	// selector for the container for unassigned secondary tags 
@@ -154,7 +154,7 @@ GUI.tagManager= new function() {
 	
 
 	this.bindEvents = function(){
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		
 		//click event handler for the buttons which represent the main tags
 		//sets the main tag of the file object to the clicked main tag
@@ -197,7 +197,7 @@ GUI.tagManager= new function() {
 		// event handler for the input field for creation of custom main tags
 		// creates new main tag and assigns it to the file object		
 		$("#custom-Main-tag").die().live("keyup", function(event) {
-			var that = GUI.tagManager;
+			var that = GUI.tagAssigner;
 			var customMainTagValue = $(this).val();
 			
 			if (event.keyCode == 13 && customMainTagValue != "") {
@@ -259,7 +259,7 @@ GUI.tagManager= new function() {
 		// event handler for the input field for creation of custom secondary tags
 		// creates new secondary tag and assigns it to the file object		
 		$("#custom-Sec-tag").die().live("keyup", function(event) {
-			var that = GUI.tagManager;
+			var that = GUI.tagAssigner;
 			var customSecTagValue = $(this).val();
 			
 			if (event.keyCode == 13 && customSecTagValue != "") {
@@ -286,7 +286,7 @@ GUI.tagManager= new function() {
 		//click event handler for the "next" button
 	    //switches to the next page
 	    $( "#btn-next" ).die().live("click", function(){
-	    	var that = GUI.tagManager;
+	    	var that = GUI.tagAssigner;
 	    	
 	    	//restriction in the case the current page is set the end page
 			if(that.currentPage == that.totalPages) return; 
@@ -300,7 +300,7 @@ GUI.tagManager= new function() {
 	    //click event handler for the "previous" button
 	    //switches to the previous page
 		$( "#btn-previous" ).die().live("click", function(){
-			var that = GUI.tagManager;
+			var that = GUI.tagAssigner;
 			
 			//restriction in the case the current page is set to first page
 			if(that.currentPage == 1) return;
@@ -313,7 +313,7 @@ GUI.tagManager= new function() {
 		
 
 		$( "#del-tag" ).die().live("click", function(e){
-			var that = GUI.tagManager;
+			var that = GUI.tagAssigner;
 			
 			 e.preventDefault();			 
 			 
@@ -348,7 +348,7 @@ GUI.tagManager= new function() {
 	// sets the list main tags to the all existing main tags 
 	// which are retrieved from the database, filters them and draws them
 	this.setMainTags = function(list) {
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		
 		that.mainTags = list;
 		
@@ -359,7 +359,7 @@ GUI.tagManager= new function() {
 	// sets the list of unassigned secondary tags to the secondary tags 
 	//which are retrieved from the database, filters them and draws them
 	this.setSecondaryTags = function(list){
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		
 		if(list != undefined && list.length > 0){
 			
@@ -376,7 +376,7 @@ GUI.tagManager= new function() {
 	
 	//removes already assigned secondary tags from the list of all unassigned secondary tags (edit mode)
 	this.filterSecondaryTags = function (list){
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		$.each(list, function( index, value ) {		
 			that.removeListItem( that.unassignedSecTags, value);
 			
@@ -387,7 +387,7 @@ GUI.tagManager= new function() {
 	
 	//returns unassigned secondary tags for the current page
 	this.getCurrentPageTags = function(){
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		
 		var startIndex = (that.currentPage-1) * that.tagsPerPage;
 		
@@ -403,7 +403,7 @@ GUI.tagManager= new function() {
 	// moves secondary tag from the list of unassigned tags into the list of assigned tags
 	// called when tag is assigned
 	this.moveIntoListOfAssignedTags = function( value ) {
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		
 		that.removeListItem(that.unassignedSecTags, value);
 		
@@ -417,7 +417,7 @@ GUI.tagManager= new function() {
 	// moves secondary tag from the list of assigned tags into the list of unassigned tags
 	// called when tag is unassigned
 	this.moveIntoListOfUnassignedTags = function( value ) {
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		
 		//that.unassignedSecTags.sort();
 		that.removeListItem(that.assignedSecTags, value);
@@ -432,7 +432,7 @@ GUI.tagManager= new function() {
 
 	// updates paging parameters in case there is assignment or unassignment of a tag 
 	this.updatePagingParameters = function(){
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		
 		that.totalPages = Math.ceil( this.unassignedSecTags.length / this.tagsPerPage);
 		
@@ -444,7 +444,7 @@ GUI.tagManager= new function() {
 	
 	//draws the current page unassigned tags  
 	this.drawUnassignedTags = function(){
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		
 		that.$containerUnassignedSecondaryTags.html("");
 		
@@ -462,7 +462,7 @@ GUI.tagManager= new function() {
 	//draws the assigned tags
 	this.drawAssignedTags = function(){
 	
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		var container = that.$containerAssignedSecondaryTags.find('.tags');
 		container.html("");
 		
@@ -477,7 +477,7 @@ GUI.tagManager= new function() {
 	
 	this.drawTag = function(value, container, s){
 	
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		
 		if(s=="assigned"){
 		
@@ -504,7 +504,7 @@ GUI.tagManager= new function() {
 	//draws the main tags
 	this.drawMainTags = function(){
 		
-		var that = GUI.tagManager; 
+		var that = GUI.tagAssigner; 
 			
 		that.$containerMainTags.find( "button" ).remove();
 		
@@ -542,7 +542,7 @@ GUI.tagManager= new function() {
 	//makes the containers for assigned and unassigned tags droppable
 	this.makeContainersDroppable = function() { 
 		
-		var that = GUI.tagManager; 
+		var that = GUI.tagAssigner; 
 		
 		// let the container for assigned tags be droppable,
 		//accepting the unassigned tag items
@@ -550,7 +550,7 @@ GUI.tagManager= new function() {
 		  accept: "#unassignedTags > li",
 		  activeClass: "ui-state-highlight",
 		  drop: function( event, ui ) {
-			  //var that = GUI.tagManager; 
+			  //var that = GUI.tagAssigner; 
 			  that.assignTag( ui.draggable );				
 			
 		  }
@@ -562,7 +562,7 @@ GUI.tagManager= new function() {
 		  accept: "#document li",
 		  activeClass: "custom-state-active",
 		  drop: function( event, ui ) {
-			  //var that = GUI.tagManager; 
+			  //var that = GUI.tagAssigner; 
 			  that.unassignTag( ui.draggable );
 			
 		  }
@@ -571,7 +571,7 @@ GUI.tagManager= new function() {
 	
 	// assign tag to the file object
 	this.assignTag = function( $item ) {
-		var that = GUI.tagManager; 
+		var that = GUI.tagAssigner; 
 		$item.fadeOut(function() {
 			
 			var $list = $( "ul", that.$containerAssignedSecondaryTags );  
@@ -592,7 +592,7 @@ GUI.tagManager= new function() {
 	
 	// unassign tag from the file object object
 	this.unassignTag = function( $item ) {
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		
 		$item.fadeOut(function() {
 			
@@ -610,7 +610,7 @@ GUI.tagManager= new function() {
 
 	// update the main tag and secondary tag atrributes of the file object
 	this.saveChanges = function (){
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 
 		that.webarenaObject.setAttribute('mainTag',that.mainTag);
 		
@@ -634,15 +634,21 @@ GUI.tagManager= new function() {
 	 */
 	this.open = function(webarenaObject, width, height, passThrough) {
 
-		var that = GUI.tagManager;
+		var that = GUI.tagAssigner;
 		
 		that.init(webarenaObject);
 		     	
 		var buttons = {};
 		
 		buttons[GUI.translate("save")] = function(domContent){
-			
-			that.saveChanges();
+						
+			if(that.mainTag != ""){
+				that.saveChanges();
+				return true;
+			} else {
+				alert("You must set at least the main tag ");
+				return false;
+			}
 			
 		};
 

@@ -52,6 +52,21 @@ var TagManager = new function() {
 		'mainTag': mainTag
 	});
   };
+  
+  /**
+   * 
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.getMainTagsAndSecTags = function(callback) {
+
+    Dispatcher.registerCall("getMainTagsAndSecTags", function(data) {
+      callback(data);
+      Dispatcher.removeCall("getMainTagsAndSecTags");
+    });
+
+    Modules.SocketClient.serverCall('getMainTagsAndSecTags');
+  };
 
   /**
    * 

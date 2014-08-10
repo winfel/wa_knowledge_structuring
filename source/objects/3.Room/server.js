@@ -12,29 +12,29 @@ var Modules=require('../../server.js');
 
 
 //is called when ANY object is repositioned within a room
-theObject.evaluatePositionFor=function(object,data){
-	
-	//when the object is structuring or sensitive ("the background"), its onObjectMove function is called
-	
-	if (object.onObjectMove) return object.onObjectMove(data);
-	
-	//let the moved object be evaluated by every structuring or sensitive object in the room
-	
-	var inventory=this.getInventory();
-	
-	for (var i in inventory){
-		var obj=inventory[i];
-		if (obj.isStructuring() || obj.isSensitive()) {
-			obj.evaluateObject(object,data);
-		}
-	}
-	
+theObject.evaluatePositionFor = function(object, data) {
+
+    // when the object is structuring or sensitive ("the background"), its
+    // onObjectMove function is called
+
+    if (object.onObjectMove) return object.onObjectMove(data);
+
+    // let the moved object be evaluated by every structuring or sensitive
+    // object in the room
+
+    this.getInventoryAsync(function(inventory) {
+        for ( var i in inventory) {
+            var obj = inventory[i];
+            if (obj.isStructuring() || obj.isSensitive()) {
+                obj.evaluateObject(object, data);
+            }
+        }
+    });
 }
 
 //sets active objects to their positions
-theObject.placeActiveObjects=function(){
-	
-	var objects=this.getInventory();
+theObject.placeActiveObjects = function() {
+	var objects = this.getInventory();
 	
 	var positions={};
 	
@@ -158,19 +158,22 @@ theObject.placeActiveObjects=function(){
 	
 }
 
-theObject.getInventory=function(){
-	return Modules.ObjectManager.getObjects(this.id,this.context);
+theObject.getInventory = function() {
+    console.warn("Depricated!! use the Async version");
+    
+    throw new Error("Depricated!! use the Async version");
+    return Modules.ObjectManager.getObjects(this.id, this.context);
 }
 
-theObject.getInventoryAsync = function(cb){
+theObject.getInventoryAsync = function(cb) {
     return Modules.ObjectManager.getObjects(this.id, this.context, cb);
 }
 
-theObject.createObject=function(type,callback){	
+theObject.createObject = function(type, callback) {
     return Modules.ObjectManager.createObject(this.id, type, false, false, this.context.socket, false, callback);
 }
 
-theObject.saveUserPaintingData=function(content,callback){
+theObject.saveUserPaintingData=function(content,callback) {
 	var self = this;
 	
 	if (content.substr(0,22)=='data:image/png;base64,'){

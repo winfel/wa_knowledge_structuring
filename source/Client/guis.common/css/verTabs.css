@@ -1,0 +1,6 @@
+.header-tabs .ui-tabs-nav { position: fixed; top: 33px; left: 0px; right: 0px; background: #DDE0E5; border: none; height: 22.5px;}
+.header-tabs .ui-tabs-nav li {  border-right-width: 0 !important; margin: 0 -1px .2em 0; height: 22.5px;cursor: pointer; }
+.header-tabs .ui-tabs-nav li a {font-size: 8pt; vertical-align: top; pointer-events: none; }
+.header-tabs li.ui-tabs-active { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; background: white !important; border-bottom: none; height: 22.5px;}
+#tabs_content {background: none !important; border: none;}
+#header > div.header_tabs {height: 27px;}
