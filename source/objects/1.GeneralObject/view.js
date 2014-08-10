@@ -1556,7 +1556,7 @@ GeneralObject.selectedClickHandler = function(event) {
     this.deselect();
   } else {
 
-    var x = this.getViewBoundingBoxX() + this.getViewBoundingBoxWidth() / 2;
+    var x = this.getViewBoundingBoxX() + this.getViewBoundingBoxWidth();
     var y = this.getViewBoundingBoxY();
 
     if (GUI.couplingModeActive) {
