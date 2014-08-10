@@ -58,7 +58,7 @@ GUI.showActionsheet = function(x, y, webarenaObject, isWebarenaObject) {
 
             var newButton = document.createElement("div");
             if(isWebarenaObject){
-                $(newButton).html(webarenaObject.translate('en', action));
+                $(newButton).html(webarenaObject.translate(GUI.currentLanguage, action));
             } else {
 
             }
@@ -97,7 +97,7 @@ GUI.showActionsheet = function(x, y, webarenaObject, isWebarenaObject) {
         $.each(webarenaObject.actions, function(key, action) {
             var newButton = document.createElement("div");
 
-            $(newButton).html(action.actionName );
+            $(newButton).html(GUI.translate(action.actionName));
 
 
             $(newButton).addClass("actionsheet_button");
