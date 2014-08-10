@@ -38,7 +38,7 @@ var TagManager = function() {
     Modules = theModules;
     
     db = require('monk')(Modules.MongoDBConfig.getURI());
-    fillCurrentDbWithTestData();
+    // fillCurrentDbWithTestData();
     
     var Dispatcher = Modules.Dispatcher;
 
