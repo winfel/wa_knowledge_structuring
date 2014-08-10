@@ -485,7 +485,7 @@ $.fn.dontScrollParent = function() {
 
 <script type="text/html" id='secondary-tag-tmpl'>		
      <li class='ui-widget-content' data-sectag='<%= secTag %>'>
-		<h5 class='ui-widget-header tagValue editable'><%= secTag %></h5>
+		<h5 class='ui-widget-header tagValue editable-sec'><%= secTag %></h5>
 		<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
 	</li>      	
 </script>
@@ -506,7 +506,7 @@ $.fn.dontScrollParent = function() {
 				<ul class='managetags ui-helper-reset ui-helper-clearfix connectedSortable'>
 					<% for(var tag in item.secTags) { %>								
 						 <li class='ui-widget-content' data-sectag='<%= item.secTags[tag] %>'>
-							<h5 class='ui-widget-header tagValue editable'><%= item.secTags[tag] %></h5>
+							<h5 class='ui-widget-header tagValue editable-sec'><%= item.secTags[tag] %></h5>
 							<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
 						</li>
 				   <% } %>

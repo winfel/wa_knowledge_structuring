@@ -15,11 +15,32 @@ GUI.tagManager = new function() {
 	// list containing all existing main tags
 	this.mainTags = [];
 	
+	//the operation to be performed in db
+	//possible values "edit" or "create"
+	this.mainTagOperation = "";
+	this.secTagOperation = "";
+	
+	this.oldMainTagName = "";
+	
+	this.currentMainTag = "";
+	
+	this.oldMainTag = "";
+	this.newMainTag = "";
+	
+	
 	this.$sortableOptions = {
 				items: "> li",
 				connectWith: ".connectedSortable",
 				receive: function ( event, ui) {
-					console.log(ui.item.data('sectag'));
+					var that = GUI.tagManager;
+					that.newMainTag = ui.item.closest('.portlet').find('.editable').html();
+					var secTag = ui.item.find('.editable-sec').html();
+					that.moveSecTag(that.oldMainTag, that.newMainTag, secTag);
+					
+				},
+				start: function(event, ui) {
+					var that = GUI.tagManager;
+					that.oldMainTag = ui.item.closest('.portlet').find('.editable').html();
 				}
 			};
 		
@@ -36,17 +57,39 @@ GUI.tagManager = new function() {
 		//save the newly created tag in the database  
 		Modules.TagManager.updMainTags(mainTag, that.mainTags.length+1);
 	}
+	
+	this.updMainTagName = function(oldName, newName){
+		var that = GUI.tagManager;
+		console.log("createMainTag");
+		//save the newly created tag in the database  
+		Modules.TagManager.updMainTagName(oldName, newName);
+	}
 
 	this.deleteMainTag = function(mainTag){
 		console.log("deleteMainTag");
+		Modules.TagManager.deleteMainTag(mainTag);
 	}
 	
-	this.createSecondaryTag = function(secondaryTag, mainTag){
-		console.log("createSecondaryTag");
+	this.createSecondaryTag = function(mainTag, secondaryTag){
+		console.log("createSecondaryTag");		
+		Modules.TagManager.updSecTags(mainTag, secondaryTag);		
 	}
 	
-	this.deleteSecondaryTag = function(secondaryTag, mainTag){
+	this.updSecTagName = function(mainTag, oldName, newName){
+		var that = GUI.tagManager;
+		//save the newly created tag in the database  
+		Modules.TagManager.updSecTagName(mainTag, oldName, newName);
+	}
+	
+	this.moveSecTag = function(oldMainTag, newMainTag, secTag){
+		var that = GUI.tagManager;
+		//save the newly created tag in the database  
+		Modules.TagManager.moveSecTag(oldMainTag, newMainTag, secTag);
+	}
+	
+	this.deleteSecondaryTag = function(mainTag, secondaryTag){
 		console.log("deleteSecondaryTag");
+		Modules.TagManager.deleteSecTags(mainTag, secondaryTag);
 	}
 	
 		
@@ -60,11 +103,32 @@ GUI.tagManager = new function() {
 		var that = GUI.tagManager;
 		$('.editable').editable( 
 			function(value, settings) { 
-					 console.log(value);
+					 console.log(value);					
+					 if(that.mainTagOperation == "create"){
+						 that.createMainTag(value);
+						 that.mainTagOperation = "";
+					 } else{
+						 var oldName = this.revert;
+						 that.updMainTagName(oldName, value);
+					 }
 					 return value;
 			},  
 			that.$editableOptions
 		 );
+		$('.editable-sec').editable( 
+				function(value, settings) { 
+						 console.log(value);						 
+						 if(that.secTagOperation == "create"){
+							 that.createSecondaryTag(that.currentMainTag, value);
+							 that.secTagOperation = "";
+						 } else{
+							 var oldName = this.revert;
+							 that.updSecTagName(that.currentMainTag, oldName, value);
+						 }
+						 return value;
+				},  
+				that.$editableOptions
+			 );
 		
 	}
 			
@@ -104,7 +168,7 @@ GUI.tagManager = new function() {
 		$( "#main-tag-container" ).delegate(".portlet-delete","click", function() {
 		    var that = GUI.tagManager;
 		    
-		    var mainTagToBeDeleted = "";
+		    var mainTagToBeDeleted = $(this).parent().find('.editable').html();
 		    
 		    var icon = $( this );
 		    icon.closest( ".portlet" ).remove();
@@ -115,12 +179,12 @@ GUI.tagManager = new function() {
 		$( "#main-tag-container" ).delegate(".sec-tag-delete","click", function() {
 			var that = GUI.tagManager;
 			
-			var mainTag = "";
-			var secondaryTagToBeDeleted = "";
+			var mainTag = $(this).closest('.portlet').find('.editable').html();
+			var secondaryTagToBeDeleted = $(this).parent().find('.editable-sec').html();
 			
 		    var icon = $( this )
 		    icon.closest( "li" ).remove();
-		    that.deleteSecondaryTag(secondaryTagToBeDeleted, mainTag);			  
+		    that.deleteSecondaryTag(mainTag, secondaryTagToBeDeleted);			  
 		});
 		
 					
@@ -140,8 +204,21 @@ GUI.tagManager = new function() {
 				   
 			that.enableEditable();
 			
-			$listToInsertInto.find('.editable').first().click();
-			that.createSecondaryTag(secondaryTagToBeCreated, mainTag);		
+			that.secTagOperation = "create";
+			//that.currentMainTag = $(this).closest('.portlet').data('maintag');
+			that.currentMainTag = $(this).closest('.portlet').find('.editable').html();
+			
+			$listToInsertInto.find('.editable-sec').first().click();
+			
+			
+			//that.createSecondaryTag(secondaryTagToBeCreated, mainTag);		
+		});
+		
+		$( "#main-tag-container" ).delegate(".editable-sec","click", function() {
+		 	
+			//that.currentMainTag = $(this).closest('.portlet').data('maintag');
+			that.currentMainTag = $(this).closest('.portlet').find('editable').html();
+				
 		});
 		
 		
@@ -157,10 +234,13 @@ GUI.tagManager = new function() {
 		
 			that.enableSortable();  
 			
+			that.mainTagOperation = "create";
 			$( this ).next().find('.editable').click();
 			
-			that.createMainTag(mainTagToBeCreated);	
-		});	
+			//that.createMainTag(mainTagToBeCreated);	
+		});
+		
+		
 	}
 	
 	

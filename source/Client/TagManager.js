@@ -105,6 +105,48 @@ var TagManager = new function() {
 		'mainTag': mainTag,
 		'newId': newId,
 	});
+  }
+  
+      /**
+   * 
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.updMainTagName = function(oldName, newName) {
+
+    Modules.SocketClient.serverCall('updMainTagName', {
+		'oldName': oldName,
+		'newName': newName,
+	});
+  };
+  
+  /**
+   * 
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.updSecTagName = function(mainTag, oldName, newName) {
+
+    Modules.SocketClient.serverCall('updSecTagName', {
+    	'mainTag': mainTag,
+		'oldName': oldName,
+		'newName': newName,
+	});
+  };
+  
+  
+  /**
+   * 
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.moveSecTag = function(oldMainTag, newMainTag, secTag) {
+
+    Modules.SocketClient.serverCall('moveSecTag', {
+    	'oldMainTag': oldMainTag,
+		'newMainTag': newMainTag,
+		'secTag': secTag,
+	});
   };
   
   /**
