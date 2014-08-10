@@ -19,11 +19,6 @@ and open the template in the editor.
   background-color: white;
 }
 
-.paperViewer .btn {
-  margin: 3px;
-  padding: 4px;
-}
-
 .paperViewer.fullscreen {
   position: absolute;
   top: 0;
@@ -36,12 +31,6 @@ and open the template in the editor.
 .paperViewer .paperViewerHeader {
   background: -moz-linear-gradient(center top, #BEBEBE 0%, #9E9E9E 100%) repeat scroll 0 0 transparent;
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #3E3E3E), color-stop(1, #1E1E1E));
-}
-
-.paperViewer .paperViewerHeader > div {
-  height: 32px;
-  display: inline-block;
-  vertical-align: top;
 }
 
 .paperViewerHeader table {
@@ -68,7 +57,7 @@ and open the template in the editor.
   color: #3D3D3D;
   font-size: 12px;
   position: absolute;
-  top: 7px;
+  top: 4px;
   white-space: nowrap;
 }
 
@@ -94,7 +83,7 @@ and open the template in the editor.
 
 .paperViewer .moveOverlay {
   position: absolute;
-  top: 32px;
+  top: 28px;
   left: 0;
   width: 100%;
   height: 100%;
@@ -117,7 +106,15 @@ and open the template in the editor.
   opacity: 1;
 }
 
-.highlightMenu .btn {
+.audioMenu {
+  position: absolute;
+  top: 100px;
+  left: 100px;
+  padding: 2px 5px;
+}
+
+.highlightMenu .btn,
+.audioMenu .btn {
   position: relative;
 }
 

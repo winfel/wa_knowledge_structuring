@@ -462,7 +462,7 @@ Viewer.initGUI = function(rep) {
 
   var resizeTimer;
   $(window).on("resize", function() {
-    // Resize the viewer in fullscreen mode only every 50 ms.
+    // Resize the viewer in fullscreen mode only every 25 ms.
     if (toggled) {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function() {
@@ -539,6 +539,7 @@ Viewer.createRepresentation = function(parent) {
   $body.append(header);
 
   $(".buttonAreaLeft", header).html(
+          '<div class="btn-group">' +
           '<input disabled="disabled" type="image" class="btn btnFill" title="Highlight the current selection (background color)." src="/guis.common/images/oxygen/16x16/actions/format-fill-color.png" />' +
           '<input disabled="disabled" type="image" class="btn btnStrike" title="Strike through the current selection." src="/guis.common/images/oxygen/16x16/actions/format-text-strikethrough.png" />' +
           '<input disabled="disabled" type="image" class="btn btnScratchout" title="Scratch out the current selection." src="/guis.common/images/oxygen/16x16/actions/format-text-scratch-out.png" />' +
@@ -546,8 +547,18 @@ Viewer.createRepresentation = function(parent) {
           '<input disabled="disabled" type="image" class="btn btnAddComment" title="Add a comment for this selection." src="/guis.common/images/oxygen/16x16/actions/view-pim-notes-add.png" />' +
           '<input disabled="disabled" type="image" class="btn btnAddAudio" title="Add an audio comment for this selection." src="/guis.common/images/oxygen/16x16/actions/media-record.png" />' +
           //'<input disabled="disabled" type="image" class="btn btnRemove" title="Remove this highlighting." src="/guis.common/images/oxygen/16x16/actions/media-record.png" />' +
+          '</div>' +
           ''
           );
+
+  $(".buttonAreaRight", header).html(
+          '<div class="btn-group">' +
+          '<input type="image" class="btn btnTwopage" title="Two page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-new.png" />' +
+          '<input type="image" class="btn btnSinglepage" title="Single page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-close.png" style="display: none;" />' +
+          '<input type="image" class="btn btnFullscreen" title="Fullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
+          '<input type="image" class="btn btnRestore" title="Restore Screen" src="/guis.common/images/oxygen/16x16/actions/view-restore.png" style="display: none;" />' +
+          '</div>' +
+          '');
 
   var highlightMenu = $("<div>");
   highlightMenu.addClass("highlightMenu jPopover");
@@ -556,18 +567,30 @@ Viewer.createRepresentation = function(parent) {
 
   $body.append(highlightMenu);
 
+  var audioMenu = $("<div>");
+  audioMenu.addClass("audioMenu jPopover");
+  audioMenu.html(
+          '<div class="btn-group">' +
+          '<input disabled="disabled" type="image" class="btn btnStartRecording" title="Stop recording." src="/guis.common/images/oxygen/16x16/actions/media-recording-stopped.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnStopRecording" title="Start recording." src="/guis.common/images/oxygen/16x16/actions/media-recording.png" />' +
+          '</div>' +
+          '<div class="btn-group">' +
+          '<input disabled="disabled" type="image" class="btn btnPlay" title="Play" src="/guis.common/images/oxygen/16x16/actions/media-playback-start.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnPause" title="Pause" src="/guis.common/images/oxygen/16x16/actions/media-playback-pause.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnStop" title="Stop" src="/guis.common/images/oxygen/16x16/actions/media-playback-stop.png" />' +
+          '</div>' +
+          '<div class="btn-group">' +
+          '<input disabled="disabled" type="image" class="btn btnUpload" title="Upload the recording to the server." src="/guis.common/images/oxygen/16x16/places/network-workgroup.png" />' +
+          '</div>' +
+          ''
+          );
+
+  //$body.append(audioMenu);
+
   this.drawTitle((file ? file.getAttribute("name") : ""));
-
-  $(".buttonAreaRight", header).html(
-          '<input type="image" class="btn btnTwopage" title="Two page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-new.png" />' +
-          '<input type="image" class="btn btnSinglepage" title="Single page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-close.png" style="display: none;" />' +
-          '<input type="image" class="btn btnFullscreen" title="Fullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
-          '<input type="image" class="btn btnRestore" title="Restore Screen" src="/guis.common/images/oxygen/16x16/actions/view-restore.png" style="display: none;" />' +
-          '');
-
-  //this.createRepresentationAjax($body);
   this.createRepresentationIframe($body);
 
+  // Various / helper stuff...
   var borderBottom = $("<div>");
   borderBottom.addClass("paperViewerFooter");
   $body.append(borderBottom);
@@ -576,6 +599,7 @@ Viewer.createRepresentation = function(parent) {
   moveOverlay.addClass("moveOverlay");
   $body.append(moveOverlay);
 
+  // Init other GUI stuff (highlighter, events, ...)
   this.initGUI(rep);
 
   return rep;

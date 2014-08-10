@@ -108,35 +108,6 @@ body.twopage > div:nth-child(even) {
   box-shadow: 0 0 100px 50px red;
 }
 
-#highlightmenu {
-  border: 1px solid black;
-  width: auto;
-  height: auto;
-  position: absolute;
-  top: -100px;
-  left: -100px;
-  background: white;
-  white-space: nowrap;
-}
-#highlightmenu div.closegap {
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 100%;
-  height: 5px;
-}
-#highlightmenu button#removeHighlighting {
-  background-image: url("/guis.common/images/oxygen/16x16/actions/draw-eraser.png");
-  background-repeat: no-repeat;
-  color: transparent;
-}
-#highlightmenu button#addAudioComment {
-  background-image: url("/guis.common/images/oxygen/16x16/devices/audio-input-microphone.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  color: transparent;
-}
-
 .comment {
   position: absolute;
   left: 3px;
