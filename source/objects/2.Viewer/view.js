@@ -48,6 +48,7 @@ Viewer.initGUI = function(rep) {
   var toggled = false;
   var selection;
 
+  var iframe = $("#iframe-" + rep.id);
   var viewerContainer = $('[data-id="paperViewer-' + rep.id + '"]');
 
   var highlightMenuTimer;
@@ -59,8 +60,8 @@ Viewer.initGUI = function(rep) {
     $(".btn", highlightMenu).off();
 
     //get the iframe contents and apply the textHighlighter
-    var frameDocument = $("#iframe-" + rep.id).contents();
 
+    var frameDocument = iframe.contents();
 
     // do not load highlighter for about:blank, but if error happens, ignore
     try {
@@ -113,8 +114,10 @@ Viewer.initGUI = function(rep) {
 
         $(".highlighted.selected", frameDocument).hover(function(event) {
           // Hover in
+          var scrollTop = $(frameDocument).scrollTop();
+
           highlightMenu.css("left", event.pageX - highlightMenu.width() / 2);
-          highlightMenu.css("top", event.pageY - 10);
+          highlightMenu.css("top", event.pageY - 10 - scrollTop);
           highlightMenu.show();
         }, function(event) {
           // Hover out      
@@ -230,7 +233,41 @@ Viewer.initGUI = function(rep) {
     };
 
     self.linkCommentToHighlights = function() {
+      DBManager.getDocuments(self, "comments", function(docs) {
 
+        for (var i in docs) {
+          (function(doc) {
+            // Javascript has no block scope... Let's use the function scope instead!
+            var commentContainer = createCommentOnViewer(doc.user, doc.data);
+            commentContainer = $(commentContainer);
+            commentContainer.off("hover");
+
+            var commentHighlight = $(".highlighted.commented[data-comment='" + doc.data.hash + "']", frameDocument)[0];
+
+            if (commentHighlight) {
+              commentHighlight = $(commentHighlight);
+              commentHighlight.off("hover");
+
+              // Highlight the highlighting
+              commentContainer.hover(function() {
+                commentHighlight.addClass('remotehover');
+              }, function() {
+                commentHighlight.removeClass('remotehover');
+              });
+
+              // Highlight the comment
+              commentHighlight.hover(function() {
+                commentContainer.addClass('remotehover');
+              }, function() {
+                commentContainer.removeClass('remotehover');
+              });
+            } else {
+              // 
+              commentContainer.addClass("noreference");
+            }
+          })(docs[i]);
+        }
+      });
     };
 
     self.loadHighlights = function() {
@@ -283,26 +320,48 @@ Viewer.initGUI = function(rep) {
 
     var createCommentOnViewer = function(user, data) {
 
-      var commentContainer = $("<div>").addClass("comment")
-              .css("top", data.offset.top);
+      var commentId = "comment_" + data.hash;
+      var commentContainer = $("#" + commentId, frameDocument)[0];
 
-      commentContainer.html('<p class="commentHeader" title="' + data.date.toLocaleString() + '">' + user + ' wrote</p>' +
-              '<p>' + data.text + '</p>');
+      if (!commentContainer) {
+        var frameBody = $("body", frameDocument);
+        // Check if there is already a comment object at the same position.
+        var count = $('.comment[data-top-initial*="' + data.offset.top + '"]', frameBody).length;
 
-      commentContainer.on("click", function(event) {
-        var target = $(event.target);
-        if(target.hasClass("commentHeader") || target.hasClass("comment"))
-          $(this).toggleClass("opened");
-      });
+        // Create a new one...
+        commentContainer = $("<div>");
+        commentContainer.attr("data-top-initial", data.offset.top);
 
-      frameDocument.on("click", function(event) {
-        var target = $(event.target);
-        if(!target.hasClass("comment") && !target.parent("div").hasClass("comment"))
-          commentContainer.removeClass("opened");
-      });
+        data.offset.top += (10 * count);
+        data.offset.left += (15 * count);
 
+        commentContainer.addClass("comment")
+                .css("top", data.offset.top)
+                .css("left", data.offset.left)
+                .attr("id", "comment_" + data.hash);
+        commentContainer.html('<p class="commentHeader" title="' + data.date.toLocaleString() + '">' + user + ' wrote</p>' +
+                '<p>' + data.text + '</p>');
 
-      $("body", frameDocument).append(commentContainer);
+        // Show/Hide the comment on a click.
+        commentContainer.on("click", function(event) {
+          var target = $(event.target);
+          if (target.attr("id") == commentId || target.hasClass("commentHeader"))
+            $(this).toggleClass("opened");
+        });
+
+        // Hide it once you click somewhere withing the iframe.
+        frameDocument.on("click", function(event) {
+          var target = $(event.target);
+
+          if (target.attr("id") != commentId && target.parent("div").attr("id") != commentId)
+            commentContainer.removeClass("opened");
+        });
+
+        // Append the comment to the body
+        frameBody.append(commentContainer);
+      }
+
+      return commentContainer;
     };
 
     var addComment = function(element, callback) {
@@ -321,15 +380,25 @@ Viewer.initGUI = function(rep) {
             if (text == "") {
               alert("Your comment is empty. Try again with some letters!");
             } else {
+
+              var scaleFactor = iframe.data("scaleFactor");
+              var gridSize = 20;
+
+              var offset = element.offset();
+              offset.top = Math.floor(Math.floor(offset.top / scaleFactor / gridSize) * gridSize);
+              offset.left = 0;
+
+              var date = new Date();
               var data = {
                 'text': text,
-                'offset': element.offset(),
-                'date': new Date()
+                'offset': offset,
+                'date': date,
+                'hash': MD5(text + "_" + date.getTime())
               };
 
-              //DBManager.addDocument(self, "comments", data);
+              DBManager.addDocument(self, "comments", data);
 
-              createCommentOnViewer(GUI.username, data);
+              callback(data);
 
               theDialog.dialog("close");
             }
@@ -343,20 +412,24 @@ Viewer.initGUI = function(rep) {
         }
       });
 
-      $(".ui-widget-overlay").css("z-index", 15000);
-      theDialogContainer.parent("div").css("z-index", 15001);
+      var zindex = theDialogContainer.parent("div").css("z-index");
+      if (iframe.data("fullscreen") && zindex < 12000) {
+        zindex = 12000;
+        $(".ui-widget-overlay").css("z-index", zindex);
+        theDialogContainer.parent("div").css("z-index", zindex + 1);
+      }
 
       theDialog.dialog("open");
     };
 
     $(".btnAddComment", viewerContainer).on("click", function() {
-      console.log("CLICKED");
+
       var selected = $(".highlighted.selected", frameDocument);
 
-      addComment(selected, function() {
+      addComment(selected, function(data) {
         selected.removeClass("selected")
-                .addClass("commented")
-                .attr('data-commentobject');
+                .addClass("commented commented")
+                .attr('data-comment', data.hash);
 
         self.saveHighlights();
       });
@@ -377,9 +450,8 @@ Viewer.initGUI = function(rep) {
   };
 
   // activate highlighter for iframe when iframe document is loaded
-  $(rep).find('iframe').load(initializeTextHighlighter);  // Non-IE
-  $(rep).find('iframe').ready(initializeTextHighlighter); // IE
-
+  iframe.load(initializeTextHighlighter);  // Non-IE
+  iframe.ready(initializeTextHighlighter); // IE
 
   // Buttons on the top right of the viewer.
   var btnFullscreen = $(".btnFullscreen", rep).first();
@@ -390,12 +462,12 @@ Viewer.initGUI = function(rep) {
 
   var resizeTimer;
   $(window).on("resize", function() {
-    // Resize the viewer in fullscreen mode only every 50 ms.
+    // Resize the viewer in fullscreen mode only every 25 ms.
     if (toggled) {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(function() {
         self.adjustPaper();
-      }, 50);
+      }, 25);
     }
   });
 
@@ -467,6 +539,7 @@ Viewer.createRepresentation = function(parent) {
   $body.append(header);
 
   $(".buttonAreaLeft", header).html(
+          '<div class="btn-group">' +
           '<input disabled="disabled" type="image" class="btn btnFill" title="Highlight the current selection (background color)." src="/guis.common/images/oxygen/16x16/actions/format-fill-color.png" />' +
           '<input disabled="disabled" type="image" class="btn btnStrike" title="Strike through the current selection." src="/guis.common/images/oxygen/16x16/actions/format-text-strikethrough.png" />' +
           '<input disabled="disabled" type="image" class="btn btnScratchout" title="Scratch out the current selection." src="/guis.common/images/oxygen/16x16/actions/format-text-scratch-out.png" />' +
@@ -474,8 +547,18 @@ Viewer.createRepresentation = function(parent) {
           '<input disabled="disabled" type="image" class="btn btnAddComment" title="Add a comment for this selection." src="/guis.common/images/oxygen/16x16/actions/view-pim-notes-add.png" />' +
           '<input disabled="disabled" type="image" class="btn btnAddAudio" title="Add an audio comment for this selection." src="/guis.common/images/oxygen/16x16/actions/media-record.png" />' +
           //'<input disabled="disabled" type="image" class="btn btnRemove" title="Remove this highlighting." src="/guis.common/images/oxygen/16x16/actions/media-record.png" />' +
+          '</div>' +
           ''
           );
+
+  $(".buttonAreaRight", header).html(
+          '<div class="btn-group">' +
+          '<input type="image" class="btn btnTwopage" title="Two page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-new.png" />' +
+          '<input type="image" class="btn btnSinglepage" title="Single page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-close.png" style="display: none;" />' +
+          '<input type="image" class="btn btnFullscreen" title="Fullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
+          '<input type="image" class="btn btnRestore" title="Restore Screen" src="/guis.common/images/oxygen/16x16/actions/view-restore.png" style="display: none;" />' +
+          '</div>' +
+          '');
 
   var highlightMenu = $("<div>");
   highlightMenu.addClass("highlightMenu jPopover");
@@ -484,18 +567,30 @@ Viewer.createRepresentation = function(parent) {
 
   $body.append(highlightMenu);
 
+  var audioMenu = $("<div>");
+  audioMenu.addClass("audioMenu jPopover");
+  audioMenu.html(
+          '<div class="btn-group">' +
+          '<input disabled="disabled" type="image" class="btn btnStartRecording" title="Stop recording." src="/guis.common/images/oxygen/16x16/actions/media-recording-stopped.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnStopRecording" title="Start recording." src="/guis.common/images/oxygen/16x16/actions/media-recording.png" />' +
+          '</div>' +
+          '<div class="btn-group">' +
+          '<input disabled="disabled" type="image" class="btn btnPlay" title="Play" src="/guis.common/images/oxygen/16x16/actions/media-playback-start.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnPause" title="Pause" src="/guis.common/images/oxygen/16x16/actions/media-playback-pause.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnStop" title="Stop" src="/guis.common/images/oxygen/16x16/actions/media-playback-stop.png" />' +
+          '</div>' +
+          '<div class="btn-group">' +
+          '<input disabled="disabled" type="image" class="btn btnUpload" title="Upload the recording to the server." src="/guis.common/images/oxygen/16x16/places/network-workgroup.png" />' +
+          '</div>' +
+          ''
+          );
+
+  //$body.append(audioMenu);
+
   this.drawTitle((file ? file.getAttribute("name") : ""));
-
-  $(".buttonAreaRight", header).html(
-          '<input type="image" class="btn btnTwopage" title="Two page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-new.png" />' +
-          '<input type="image" class="btn btnSinglepage" title="Single page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-close.png" style="display: none;" />' +
-          '<input type="image" class="btn btnFullscreen" title="Fullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
-          '<input type="image" class="btn btnRestore" title="Restore Screen" src="/guis.common/images/oxygen/16x16/actions/view-restore.png" style="display: none;" />' +
-          '');
-
-  //this.createRepresentationAjax($body);
   this.createRepresentationIframe($body);
 
+  // Various / helper stuff...
   var borderBottom = $("<div>");
   borderBottom.addClass("paperViewerFooter");
   $body.append(borderBottom);
@@ -504,6 +599,7 @@ Viewer.createRepresentation = function(parent) {
   moveOverlay.addClass("moveOverlay");
   $body.append(moveOverlay);
 
+  // Init other GUI stuff (highlighter, events, ...)
   this.initGUI(rep);
 
   return rep;
@@ -532,6 +628,11 @@ Viewer.createRepresentationIframe = function($body) {
   this.setDocument(this.getAttribute('file'));
 };
 
+/**
+ * 
+ * @param {type} title
+ * @returns {undefined}
+ */
 Viewer.drawTitle = function(title) {
   var rep = this.getRepresentation();
 
@@ -551,42 +652,25 @@ Viewer.drawTitle = function(title) {
 
 var getPaperUrl = 'http://' + window.location.hostname + ':8080/getPaper';
 
+/**
+ * 
+ * @param {type} documentId
+ * @returns {undefined}
+ */
 Viewer.setDocument = function(documentId) {
   $("#iframe-" + this.getAttribute("id")).attr("src", getPaperUrl + "/" + this.getRoom().id + "/" + (documentId && documentId != "[somefileid]" ? documentId : "0") + '/' + ObjectManager.userHash);
 };
 
+/**
+ * 
+ * @param {type} documentId
+ * @returns {undefined}
+ */
 Viewer.reloadDocument = function(documentId) {
   var file = ObjectManager.getObject(documentId);
 
   this.drawTitle((file ? file.getAttribute("name") : ""));
   this.setDocument(documentId);
-};
-
-Viewer.createRepresentationAjax = function($body) {
-  var request = $.ajax({
-    url: 'http://' + window.location.hostname + ':8080/getPaper/public/cd7e6155-3a12-49c7-9bbd-a8e3098bd65d.html/',
-    cache: false
-  });
-
-  request.done(function(html) {
-    $body.append(html.replace(/sidebar/g, "sidebar-paper"));
-
-    // Adding another container for scaling...
-    var $scaleContainer = $("<div>");
-    $scaleContainer.attr("id", "scale-container");
-
-    var $pageContainer = $("#page-container", $body);
-
-    // Move all page to the new scale container...
-    $scaleContainer.append($pageContainer.children("div.pd"));
-
-    // Finally append the scale container.
-    $pageContainer.append($scaleContainer);
-  });
-
-  request.fail(function(jqXHR, textStatus) {
-    console.log("I am sorry, I was not able to load the requested paper.");
-  });
 };
 
 /**
@@ -688,14 +772,16 @@ Viewer.adjustPaper = function() {
 
   var scaleFactor = (width / papersWidth);
 
-  if (iframe.data("fullscreen") && scaleFactor > 1.5)
+  if (iframe.data("fullscreen") && scaleFactor > 1.5) {
+    // Move the scaleContainer a little bit to the right and overwrite the scale factor.
+    // 5 is just some constant, which was determined by try and error...
+    scaleContainer.css("margin-left", (width * (scaleFactor - 1.5)) / 5);
     scaleFactor = 1.5;
+  } else {
+    scaleContainer.css("margin-left", "");
+  }
 
-  if (iframe.data("fullscreen") && scaleFactor < 1)
-    scaleContainer.addClass("origin-top-left");
-  else
-    scaleContainer.removeClass("origin-top-left");
-
+  iframe.data("scaleFactor", scaleFactor);
 
   scaleContainer.css("transform", "scale(" + scaleFactor + ")");
   scaleContainer.css("-webkit-transform", "scale(" + scaleFactor + ")");
@@ -721,4 +807,5 @@ Viewer.adjustPaper = function() {
     $("[data-page-no]", contents).css("transform", "none");
     $("[data-page-no]", contents).css("-webkit-transform", "none");
   }
+
 };

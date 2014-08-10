@@ -18,10 +18,17 @@ var DBManager = {};
  * @param {type} data
  * @returns {undefined}
  */
-DBManager.getDocuments = function(socket, data) {  
+DBManager.getDocuments = function(socket, data) {
   var dbCollection = db.get(data.collection);
-  
-  dbCollection.find({objectid: String(data.object.id)}, {}, function(e, docs) {
+
+  // If data.column is defined, use it as the attribute to look for.
+  var obj = {};
+  if (data.column)
+    obj[data.column] = String(data.object.id);
+  else
+    obj["objectid"] = String(data.object.id);
+
+  dbCollection.find(obj, {}, function(e, docs) {
     Modules.SocketServer.sendToSocket(socket, "dbDocuments" + data.object.id, docs);
   });
 };
