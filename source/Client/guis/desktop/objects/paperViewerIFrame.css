@@ -6,7 +6,7 @@ Author     : Patrick
 */
 
 body {
-  transform-origin: 0 0;
+  transform-origin: top left;
 }
 
 body > div {
@@ -14,7 +14,7 @@ body > div {
 }
 
 body.fullscreen {
-  transform-origin: top center;
+  transform-origin: top left;
 }
 
 body.fullscreen.origin-top-left {
@@ -22,13 +22,7 @@ body.fullscreen.origin-top-left {
 }
 
 body.fullscreen > div {
-  margin: 0 auto !important;
-}
-
-body.twopage > div {
-  /*float: left;*/
-  /*transform: scale(0.5);*/
-  /*-webkit-transform: transform(-0.5%, -0.5%) scale(0.5);*/
+  /*margin: 0 auto !important;*/
 }
 
 body.twopage > div:nth-child(odd) {
@@ -145,13 +139,20 @@ body.twopage > div:nth-child(even) {
 
 .comment {
   position: absolute;
-  left: 0;
+  left: 3px;
   width: 32px;
   height: 32px;
-  background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-notes.png");
+  background-color: transparent;
+  background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated1.png");
   background-position: top left;
   background-repeat: no-repeat;
+  border: 1px solid transparent;
   max-width: 400px;
+}
+
+.comment:hover {
+  z-index: 2;
+  background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated2.png");
 }
 
 .comment p {
@@ -159,10 +160,14 @@ body.twopage > div:nth-child(even) {
 }
 
 .comment.opened {
+  border: 1px solid #F5C800;
+  border-radius: 5px;
   background-color: #FFEB55;
+  background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated2.png");
   padding: 5px 7px;
   width: auto;
   height: auto;
+  z-index: 2;
 }
 
 .comment.opened p {

@@ -6,22 +6,25 @@
 var Modules = false;
 
 /**
- * Object providing functions for Database management.
+ * Object providing functions for database management.
  */
 var DBManager = {};
 
 /**
+ * Gets all documents from the given collection of a specific object.
  * 
  * @param {type} object
  * @param {type} collection
  * @param {type} callback
+ * @param {type} [column]     Optional.
  * @returns {undefined}
  */
-DBManager.getDocuments = function(object, collection, callback) {
+DBManager.getDocuments = function(object, collection, callback, column) {
 
   Dispatcher.registerCall("dbDocuments" + object.id, function(documents) {
     // call the callback
-    callback(documents);
+    if(callback)
+      callback(documents);
     // deregister
     Dispatcher.removeCall("dbDocuments" + object.id);
   });
@@ -29,11 +32,13 @@ DBManager.getDocuments = function(object, collection, callback) {
   // The responce should be some sort of broadcast to users with a manager role...
   Modules.SocketClient.serverCall('dbGetDocuments', {
     'collection': collection,
-    'object': {id: object.id, type: object.type}
+    'object': {id: object.id, type: object.type},
+    'column': column
   });
 };
 
 /**
+ * Adds the given data object to the collection, given by its name.
  * 
  * @param {type} object
  * @param {type} collection
