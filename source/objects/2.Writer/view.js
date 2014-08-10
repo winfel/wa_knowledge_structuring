@@ -5,38 +5,27 @@
 *
 */
 
-Writer.draw=function(external){
-
-	var rep=this.getRepresentation();
-	
-	this.drawDimensions(external);
-	
-	this.setViewWidth(this.getAttribute('width'));
-	this.setViewHeight(this.getAttribute('height'));
-
-	$(rep).attr("layer", this.getAttribute('layer'));
-
-	var that=this;
-	
-	this.updateContent();
-	
+Writer.draw = function(external) {
+    var rep = this.getRepresentation();
+    this.drawDimensions(external);
+    this.setViewWidth(this.getAttribute('width'));
+    this.setViewHeight(this.getAttribute('height'));
+    $(rep).attr("layer", this.getAttribute('layer'));
+    this.updateContent();
 }
 
-
 Writer.updateContent = function() {
-	
-	var rep=this.getRepresentation();
-	
-	this.getContentAsString(function(text){
+    var rep = this.getRepresentation();
 
-		if(text!=that.oldContent){
-			$(rep).find("body").html(text);
-		}
-		
-		that.oldContent=text;
-		
-	});
-	
+    this.getContentAsString(function(text) {
+
+        if (text != that.oldContent) {
+            $(rep).find("body").html(text);
+        }
+
+        that.oldContent = text;
+
+    });
 }
 
 Writer.createRepresentation = function(parent) {
@@ -53,6 +42,7 @@ Writer.createRepresentation = function(parent) {
     
     var iFrame = $(pWriter.find("iframe"));
     var iframe_loaded = false;
+    
     iFrame.one('load', function(){
 		iframe_loaded = true;
     });
@@ -60,8 +50,8 @@ Writer.createRepresentation = function(parent) {
     iFrame.attr('src', 'http://' + window.location.hostname + ':9001/p/' + this.getAttribute('paper') + '?userName=' +  encodeURIComponent(GUI.userid));
 	//iFrame.attr('src', 'http://beta.etherpad.org/webArenaDemo' + this.getAttribute('paper') + '?showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=false');
 
-	window.setTimeout(function(){
-		if(!iframe_loaded) {
+	window.setTimeout(function() {
+		if (!iframe_loaded) {
 			alert('Maybe etherpad is not installed / started at this server...');
 		}
 	}, 20000);

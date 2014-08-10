@@ -17,6 +17,14 @@ var RightManager = new function() {
    */
   this.init = function(theModules) {
     Dispatcher = theModules.Dispatcher;
+
+    Dispatcher.registerCall("umBroadcastDeleteObjectFromTabs", function(data){
+      GUI.tabs.removeTab(data.objectID);
+    });
+
+    Dispatcher.registerCall("umBroadcastNameChange", function(data){
+      GUI.tabs.updateNameOfTabWithID(data.object.id, data.object.name);
+    });
   };
 
   /**
@@ -60,8 +68,6 @@ var RightManager = new function() {
    * @returns {undefined}
    */
   this.getRights = function(object, role, user, callback) {
-    console.log("Client getRights called!");
-
     Dispatcher.registerCall("rmObjectRights" + object.id, function(data) {
       callback(data.availableRights, data.checkedRights);
       Dispatcher.removeCall("rmObjectRights" + object.id);

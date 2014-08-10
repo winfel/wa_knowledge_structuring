@@ -902,7 +902,7 @@ fileConnector.getObjectDataByFile=function(roomID,objectID){
 	if (path.existsSync(filename)) {
 		
 		data.attributes.hasContent=true;
-		data.attributes.contentAge=new Date().getTime();
+		//data.attributes.contentAge=new Date().getTime(); --->deactivated to enable date sorting
 	}
 
 	return data;

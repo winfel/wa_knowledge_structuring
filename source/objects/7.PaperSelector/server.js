@@ -17,6 +17,23 @@ theObject.createNew = function() {
     p.createNew(null);
 }
 
+theObject.onEnter=function(object,oldData,newData){
+    var that = this;
+
+    // get id of the chapter
+    var id = object.getAttribute('chapterID');
+
+    // FIXME: send to writer
+    var currentRoom = that.getCurrentRoom();
+
+    // get writer
+    Modules.ObjectManager.getObject(currentRoom,object.getAttribute('writer'),object.context, function(o){
+        if(o != false){
+            o.setAttribute('paper',id);
+        }
+    });
+}
+
 theObject.createReview = function() {
     // TODO
 }

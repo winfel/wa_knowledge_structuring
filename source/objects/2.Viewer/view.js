@@ -691,7 +691,7 @@ var getPaperUrl = 'http://' + window.location.hostname + ':8080/getPaper';
  * @returns {undefined}
  */
 Viewer.setDocument = function(documentId) {
-  $("#iframe-" + this.getAttribute("id")).attr("src", getPaperUrl + "/" + this.getRoom().id + "/" + (documentId && documentId != "[somefileid]" ? documentId : "0"));
+  $("#iframe-" + this.getAttribute("id")).attr("src", getPaperUrl + "/" + this.getRoom().id + "/" + (documentId && documentId != "[somefileid]" ? documentId : "0") + '/' + ObjectManager.userHash);
 };
 
 /**

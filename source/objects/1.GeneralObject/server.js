@@ -47,34 +47,31 @@ theObject.makeSensitive = function() {
       newData[field] = changeData['new'][field] || this.getAttribute(field);
     }
 
-    var inventory = this.getRoom().getInventory();
+    var self = this;
+    this.getRoom(function (room) {
+        room.getInventoryAsync(function(inventory) {
+            
+            for (var i in inventory) {
+                var object = inventory[i];
 
-    for (var i in inventory) {
+                if (object.id == self.id) {
+                  continue;
+                }
 
-      var object = inventory[i];
+                var bbox = object.getBoundingBox();
 
-      if (object.id == this.id)
-        continue;
+                // determine intersections
+                var oldIntersects = self.bBoxIntersects(oldData.x, oldData.y, oldData.width, oldData.height, bbox.x, bbox.y, bbox.width, bbox.height);
+                var newIntersects = self.bBoxIntersects(newData.x, newData.y, newData.width, newData.height, bbox.x, bbox.y, bbox.width, bbox.height);
 
-      var bbox = object.getBoundingBox();
-
-      //determine intersections
-
-      var oldIntersects = this.bBoxIntersects(oldData.x, oldData.y, oldData.width, oldData.height, bbox.x, bbox.y, bbox.width, bbox.height);
-      var newIntersects = this.bBoxIntersects(newData.x, newData.y, newData.width, newData.height, bbox.x, bbox.y, bbox.width, bbox.height);
-
-      //handle move
-
-      if (oldIntersects && newIntersects)
-        this.onMoveWithin(object, newData);
-      if (!oldIntersects && !newIntersects)
-        this.onMoveOutside(object, newData);
-      if (oldIntersects && !newIntersects)
-        this.onLeave(object, newData);
-      if (!oldIntersects && newIntersects)
-        this.onEnter(object, newData);
-    }
-
+                // handle move
+                if (oldIntersects && newIntersects)   self.onMoveWithin(object, newData);
+                if (!oldIntersects && !newIntersects) self.onMoveOutside(object, newData);
+                if (oldIntersects && !newIntersects)  self.onLeave(object, newData);
+                if (!oldIntersects && newIntersects)  self.onEnter(object, newData);
+              }     
+        });
+    });
   }
 
 
@@ -260,8 +257,11 @@ theObject.getAttributeSet = function() {
  *	send a message to a client (identified by its socket)
  */
 theObject.updateClient = function(socket, mode) {
-  if (!mode)
+    
+  if (!mode) {
     mode = 'objectUpdate';
+  }
+  
   var object = this;
   process.nextTick(function() {
     var SocketServer = Modules.SocketServer;
@@ -293,8 +293,9 @@ theObject.persist = function() {
  */
 theObject.updateClients = function(mode) {
 
-  if (!mode)
+  if (!mode) {
     mode = 'objectUpdate';
+  }
 
   var connections = Modules.UserManager.getConnectionsForRoom(this.inRoom);
 
@@ -319,25 +320,25 @@ theObject.hasContent = function() {
  *	set a new content. If the content is base64 encoded png data,
  *	it is decoded first.
  */
-theObject.setContent = function(content, callback) {
+theObject.setContent = function(content, callback) {	
+	var that = this;
+	if ((typeof content) != "object" && content.substr(0, 22) == 'data:image/png;base64,') {
+	
+	var base64Data = content.replace(/^data:image\/png;base64,/, ""),
+		content = new Buffer(base64Data, 'base64');
+	}
+	
+	Modules.Connector.saveContent(this.inRoom, this.id, content, function(){
+		that.set('hasContent', !!content);
+		that.set('contentAge', new Date().getTime());
 
-  console.log(content);
-
-  if ((typeof content) != "object" && content.substr(0, 22) == 'data:image/png;base64,') {
-
-    var base64Data = content.replace(/^data:image\/png;base64,/, ""),
-            content = new Buffer(base64Data, 'base64');
-  }
-
-  Modules.Connector.saveContent(this.inRoom, this.id, content, callback, this.context);
-
-  this.set('hasContent', !!content);
-  this.set('contentAge', new Date().getTime());
-
-  //send object update to all listeners
-  this.persist();
-  this.updateClients('contentUpdate');
+		//send object update to all listeners
+		that.persist();
+		that.updateClients('contentUpdate');
+		if (callback) { callback(); }
+	}, this.context, false);
 }
+
 theObject.setContent.public = true;
 theObject.setContent.neededRights = {
   write: true
@@ -369,16 +370,16 @@ theObject.getCurrentUserName = function() {
  *	get the object's content
  */
 theObject.getContent = function(callback) {
-  if (!this.context)
-    throw new Error('Missing context in GeneralObject.getContent');
+	if (!this.context)
+		throw new Error('Missing context in GeneralObject.getContent');
 
-  var content = Modules.Connector.getContent(this.inRoom, this.id, this.context);
-
-  if (_.isFunction(callback))
-    callback(content);
-  else
-    return content;
-
+	Modules.Connector.getContent(this.inRoom, this.id, this.context, function(content){
+		if (_.isFunction(callback)) {
+			callback(content);
+		} else {
+			return content;
+		}
+	});
 }
 theObject.getContent.public = true;
 theObject.getContent.neededRights = {
@@ -458,32 +459,27 @@ theObject.evaluatePosition = function(key, value, oldvalue) {
 }
 
 theObject.evaluatePositionInt = function(data) {
-
-  var room = this.getRoom();
-
-  if (!room)
-    return;
-
-  room.evaluatePositionFor(this, data);
-
+    var self = this;
+    this.getRoom(function (room) {
+      
+    if (!room) {
+        return;
+    }
+    
+    room.evaluatePositionFor(self, data); 
+  });
 }
 
-
 theObject.getRoom = function(callback) {
+  if (callback == undefined) return console.warn("GeneralObject/server.js getRoom callback is undefined!!");
+    
+  if (!this.context) return callback(false);
 
-  if (!this.context)
-    return;
-
-  //search the room in the context and return the room this object is in
-
-  for (var index in this.context.rooms) {
-    var test = this.context.rooms[index];
-    if (test && test.hasObject && test.hasObject(this)) {
-      return test;
-    }
-  }
-
-  return false;
+  Modules.ObjectManager.getRoom(this.getAttribute('inRoom'), this.context, function(room) {
+      if (room) callback(room);
+      else callback(false);
+  }, false); 
+  
 }
 
 theObject.getBoundingBox = function() {

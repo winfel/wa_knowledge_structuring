@@ -603,8 +603,10 @@ GUI.dialog = function(heading, content, buttons, dialogWidth, passThrough) {
 
   $.each(buttons, function(title, callback) {
     buttons2[title] = function() {
-      callback(dialogContent);
-      $(this).dialog("close");
+      var result = callback(dialogContent);
+      if(result == undefined || result == true){
+    	  $(this).dialog("close");
+      }
     };
   });
 

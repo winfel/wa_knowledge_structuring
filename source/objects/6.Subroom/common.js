@@ -45,6 +45,20 @@ Subroom.register=function(type){
 		
 	},true);
 	
+	this.registerAction('Store in Tab-List', function(object) {
+    var destination = object.getAttribute('destination');
+
+    if (!destination) {
+      var random = new Date().getTime() - 1296055327011;
+
+      object.setAttribute('destination', random);
+      destination = random;
+    }
+
+    GUI.tabs.addTab(object.getAttribute('name')+" (Room)",object.getAttribute('destination'),object.id);
+    GUI.tabs.redrawTabContent();
+
+  }, true);
 }
 
 /**
@@ -56,22 +70,37 @@ Subroom.register=function(type){
  * @see objects/1.GeneralObject/common.js
  * @param {boolean} openInNewWindow
  */
-Subroom.execute = function(openInNewWindow) {
-
+ Subroom.execute = function(openInNewWindow) {
+    
     var destination = this.getAttribute('destination');
+    var that = this;
 
     // TODO this must be done serverside in the connector
     if (!destination) {
-        var random = new Date().getTime() - 1296055327011;
-
-        this.setAttribute('destination', random);
+        var random = new Date().getTime() - 1296055327011;        
+        this.setAttribute('destination', random.toString());
         destination = random;
+        
+        GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
+        GUI.tabs.redrawTabContent();
     }
 
     if (openInNewWindow) {
+    	GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
+        GUI.tabs.redrawTabContent();
         window.open(destination);
+
     } else {
-        ObjectManager.loadRoom(destination, false, ObjectManager.getIndexOfObject(this.getAttribute('id')));
+
+        Modules.RightManager.hasAccess("read", { id: this.id, type: this.type}, GUI.username, function(result) {
+          if(result) {
+            ObjectManager.loadRoom(destination, false, ObjectManager.getIndexOfObject(that.getAttribute('id')));
+        }else{
+            var audio = new Audio('/guis.common/sounds/cant_touch_this.mp3');
+            audio.play();
+        }
+        });
+        
     }
 }
 
