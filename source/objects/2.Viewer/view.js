@@ -90,10 +90,6 @@ Viewer.initGUI = function(rep) {
                 .addClass('at_time_' + (new Date()).getTime())
                 .attr('title', 'by ' + GUI.username);
 
-        // save highlights to server
-//        var jsonStr = highlighter.serializeHighlights();
-//        self.setAttribute('highlights', jsonStr);
-
         // Enable the highlight buttons
         $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", false);
 
@@ -324,20 +320,20 @@ Viewer.initGUI = function(rep) {
       var commentContainer = $("#" + commentId, frameDocument)[0];
 
       if (!commentContainer) {
-        var frameBody = $("body", frameDocument);
+        var page = $("#" + data.page, frameDocument);
         // Check if there is already a comment object at the same position.
-        var count = $('.comment[data-top-initial*="' + data.offset.top + '"]', frameBody).length;
+        var count = $('.comment[data-top-initial*="' + data.position.top + '"]', page).length;
 
         // Create a new one...
         commentContainer = $("<div>");
-        commentContainer.attr("data-top-initial", data.offset.top);
+        commentContainer.attr("data-top-initial", data.position.top);
 
-        data.offset.top += (10 * count);
-        data.offset.left += (15 * count);
+        data.position.top += (10 * count);
+        data.position.left += (15 * count);
 
         commentContainer.addClass("comment")
-                .css("top", data.offset.top)
-                .css("left", data.offset.left)
+                .css("top", data.position.top)
+                .css("left", data.position.left)
                 .attr("id", "comment_" + data.hash);
         commentContainer.html('<p class="commentHeader" title="' + data.date.toLocaleString() + '">' + user + ' wrote</p>' +
                 '<p>' + data.text + '</p>');
@@ -358,12 +354,41 @@ Viewer.initGUI = function(rep) {
         });
 
         // Append the comment to the body
-        frameBody.append(commentContainer);
+        $(".pc", page).append(commentContainer);
       }
 
       return commentContainer;
     };
 
+    /**
+     * 
+     * @param {type} elem
+     * @param {type} parent
+     * @returns {}
+     */
+    var sumOffsetParent = function(elem, parent) {
+      if (!elem)
+        elem = this;
+
+      var x = 0;
+      var y = 0;
+
+      while (elem != parent) {
+        x += elem.offsetLeft;
+        y += elem.offsetTop;
+
+        elem = elem.offsetParent;
+      }
+
+      return {left: x, top: y};
+    };
+
+    /**
+     * 
+     * @param {type} element
+     * @param {type} callback
+     * @returns {undefined}
+     */
     var addComment = function(element, callback) {
       var theDialogContainer = $("<div>");
       theDialogContainer.html('<textarea class="addCommentText" style="width: 96%; height: 98%;"></textarea>');
@@ -380,18 +405,21 @@ Viewer.initGUI = function(rep) {
             if (text == "") {
               alert("Your comment is empty. Try again with some letters!");
             } else {
-
-              var scaleFactor = iframe.data("scaleFactor");
+              
               var gridSize = 20;
 
-              var offset = element.offset();
-              offset.top = Math.floor(Math.floor(offset.top / scaleFactor / gridSize) * gridSize);
-              offset.left = 0;
+              var page = element.parents(".pf");
+              var pageid = page.attr("id");
+
+              var position = sumOffsetParent(element[0].offsetParent, page[0]);
+              position.top = Math.floor(Math.floor(position.top / gridSize) * gridSize) + 30;
+              position.left = 0;
 
               var date = new Date();
               var data = {
                 'text': text,
-                'offset': offset,
+                'page': pageid,
+                'position': position,
                 'date': date,
                 'hash': MD5(text + "_" + date.getTime())
               };
@@ -412,6 +440,7 @@ Viewer.initGUI = function(rep) {
         }
       });
 
+      // z-index fix for the fullscreen mode.
       var zindex = theDialogContainer.parent("div").css("z-index");
       if (iframe.data("fullscreen") && zindex < 12000) {
         zindex = 12000;
@@ -435,18 +464,22 @@ Viewer.initGUI = function(rep) {
       });
     });
 
-    $(".btnAddAudio", viewerContainer)
-            .on("mousedown", startRecording)
-            .on("mouseup", function() {
-              stopRecording(function(newObject) {
-                $(".highlighted.selected", frameDocument)
-                        .removeClass("selected")
-                        .addClass('audio')
-                        .attr('data-audioobject', newObject.getAttribute('id'));
+    $(".btnAddAudio", viewerContainer).
+            on("click", function() {
 
-                self.saveHighlights();
-              });
             });
+
+//            .on("mousedown", startRecording)
+//            .on("mouseup", function() {
+//              stopRecording(function(newObject) {
+//                $(".highlighted.selected", frameDocument)
+//                        .removeClass("selected")
+//                        .addClass('audio')
+//                        .attr('data-audioobject', newObject.getAttribute('id'));
+//
+//                self.saveHighlights();
+//              });
+//            });
   };
 
   // activate highlighter for iframe when iframe document is loaded
@@ -554,15 +587,15 @@ Viewer.createRepresentation = function(parent) {
   $(".buttonAreaRight", header).html(
           '<div class="btn-group">' +
           '<input type="image" class="btn btnTwopage" title="Two page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-new.png" />' +
-          '<input type="image" class="btn btnSinglepage" title="Single page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-close.png" style="display: none;" />' +
-          '<input type="image" class="btn btnFullscreen" title="Fullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
+          '<input type="image" class="btn btnSinglepage firstChild" title="Single page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-close.png" style="display: none;" />' +
+          '<input type="image" class="btn btnFullscreen lastChild" title="Fullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
           '<input type="image" class="btn btnRestore" title="Restore Screen" src="/guis.common/images/oxygen/16x16/actions/view-restore.png" style="display: none;" />' +
           '</div>' +
           '');
 
   var highlightMenu = $("<div>");
   highlightMenu.addClass("highlightMenu jPopover");
-  highlightMenu.append($(".buttonAreaLeft .btn", header).clone());
+  highlightMenu.append($(".buttonAreaLeft > div", header).clone());
   $(".btn", highlightMenu).prop("disabled", false);
 
   $body.append(highlightMenu);
@@ -571,12 +604,12 @@ Viewer.createRepresentation = function(parent) {
   audioMenu.addClass("audioMenu jPopover");
   audioMenu.html(
           '<div class="btn-group">' +
-          '<input disabled="disabled" type="image" class="btn btnStartRecording" title="Stop recording." src="/guis.common/images/oxygen/16x16/actions/media-recording-stopped.png" />' +
-          '<input disabled="disabled" type="image" class="btn btnStopRecording" title="Start recording." src="/guis.common/images/oxygen/16x16/actions/media-recording.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnStartRecording lastChild" title="Stop recording." src="/guis.common/images/oxygen/16x16/actions/media-recording-stopped.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnStopRecording firstChild" title="Start recording." src="/guis.common/images/oxygen/16x16/actions/media-recording.png" />' +
           '</div>' +
           '<div class="btn-group">' +
           '<input disabled="disabled" type="image" class="btn btnPlay" title="Play" src="/guis.common/images/oxygen/16x16/actions/media-playback-start.png" />' +
-          '<input disabled="disabled" type="image" class="btn btnPause" title="Pause" src="/guis.common/images/oxygen/16x16/actions/media-playback-pause.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnPause firstChild" title="Pause" src="/guis.common/images/oxygen/16x16/actions/media-playback-pause.png" />' +
           '<input disabled="disabled" type="image" class="btn btnStop" title="Stop" src="/guis.common/images/oxygen/16x16/actions/media-playback-stop.png" />' +
           '</div>' +
           '<div class="btn-group">' +
@@ -733,79 +766,18 @@ Viewer.resizeHandler = function() {
  * @returns {undefined}
  */
 Viewer.adjustPaper = function() {
-  var iframe = $("#iframe-" + this.getAttribute("id"));
-  var contents = iframe.contents();
+  var iframe = $('#iframe-' + this.getAttribute('id'));
+  //var frameDocument = iframe.contents();
 
-  var scaleContainer = $("body", contents);
-  var firstPage = $("[data-page-no]", contents).first();
+  if (iframe[0].contentWindow.pdf2htmlEX) {
+    var pdfviewer = iframe[0].contentWindow.pdf2htmlEX.defaultViewer;
 
-  if (!firstPage)
-    return;
+    pdfviewer.rescale(1, false);
+    pdfviewer.fit_width();
 
-  // page dimensions
-  var pageWidth = firstPage.width();
-  var pageHeight = firstPage.height();
-
-  // paper dimensions (including all pages...)
-  var papersWidth = pageWidth;
-  var papersHeight = scaleContainer.height();
-
-  if (!papersWidth || !papersHeight)
-    return;
-
-  var width, height;
-
-  if (iframe.data("fullscreen")) {
-    scaleContainer.addClass("fullscreen");
-    width = $("body").width();
-    height = $("body").height();
-
-    // Make sure the document fits in the window
-    if ($(document).width() > $(window).width()) {
-      width = $(window).width() - 30;
+    if (this.getAttribute('twopage'))
+    {
+      pdfviewer.rescale(0.5, true);
     }
-  } else {
-    scaleContainer.removeClass("fullscreen");
-    width = this.getAttribute('width') - 30;
-    height = this.getAttribute('height') - 30;
   }
-
-  var scaleFactor = (width / papersWidth);
-
-  if (iframe.data("fullscreen") && scaleFactor > 1.5) {
-    // Move the scaleContainer a little bit to the right and overwrite the scale factor.
-    // 5 is just some constant, which was determined by try and error...
-    scaleContainer.css("margin-left", (width * (scaleFactor - 1.5)) / 5);
-    scaleFactor = 1.5;
-  } else {
-    scaleContainer.css("margin-left", "");
-  }
-
-  iframe.data("scaleFactor", scaleFactor);
-
-  scaleContainer.css("transform", "scale(" + scaleFactor + ")");
-  scaleContainer.css("-webkit-transform", "scale(" + scaleFactor + ")");
-
-  if (this.getAttribute("twopage")) {
-    // Adjust pages for two page mode
-    var translateFactorXeven = (-pageWidth / 4);
-    var translateFactorYeven = (-pageHeight / 4);
-
-    var translateFactorXodd = (pageWidth / 4);
-    var translateFactorYodd = (-pageHeight / 4);
-
-    $("[data-page-no]:even", contents).each(function(index) {
-      $(this).css("transform", "translate(" + translateFactorXeven + "px, " + (translateFactorYeven - (index * (pageHeight * 1.5))) + "px) scale(0.5)");
-      $(this).css("-webkit-transform", "translate(" + translateFactorXeven + "px, " + (translateFactorYeven - (index * (pageHeight * 1.5))) + "px) scale(0.5)");
-    });
-
-    $("[data-page-no]:odd", contents).each(function(index) {
-      $(this).css("transform", "translate(" + translateFactorXodd + "px, " + (translateFactorYodd - (index * (pageHeight * 1.5)) - pageHeight) + "px) scale(0.5)");
-      $(this).css("-webkit-transform", "translate(" + translateFactorXodd + "px, " + (translateFactorYodd - (index * (pageHeight * 1.5)) - pageHeight) + "px) scale(0.5)");
-    });
-  } else {
-    $("[data-page-no]", contents).css("transform", "none");
-    $("[data-page-no]", contents).css("-webkit-transform", "none");
-  }
-
 };
