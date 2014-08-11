@@ -63,8 +63,12 @@ var TagManager = function() {
 	});
 	
 	Dispatcher.registerCall('updMainTagName', function(socket, data, responseID) {
-		that.updMainTagName(socket, data.oldName, data.newName); 
+		that.updMainTagName(socket, data.tagID, data.newName); 
 	});
+	
+	Dispatcher.registerCall('deleteMainTag', function(socket, data, responseID) {
+        that.deleteMainTag(socket, data.tagID); 
+    });
 	
 	Dispatcher.registerCall('updSecTagName', function(socket, data, responseID) {
 		that.updSecTagName(socket, data.mainTag, data.oldName, data.newName); 
@@ -76,10 +80,6 @@ var TagManager = function() {
 	
 	Dispatcher.registerCall('deleteSecTags', function(socket, data, responseID) {
 		that.deleteSecTags(socket, data.mainTag, data.secTag); 
-	});
-	
-	Dispatcher.registerCall('deleteMainTag', function(socket, data, responseID) {
-		that.deleteMainTag(socket, data.mainTag); 
 	});
  
   };
@@ -178,7 +178,7 @@ var TagManager = function() {
 			
 		dbMainTags.insert(
 			  { 
-				  id: newId,
+				  id: newId.toString(),
 				  name: newMainTag,				  
 			      secTags: [] 
 			  }
@@ -192,11 +192,11 @@ var TagManager = function() {
 	* @param {type} object
 	* @returns {undefined}
 	*/
-	this.updMainTagName = function(socket, oldName, newName) {
+	this.updMainTagName = function(socket, tagID, newName) {
 
 		var dbMainTags = db.get('MainTags');
 			
-		dbMainTags.update( {name: oldName}, { 
+		dbMainTags.update( {id: tagID.toString()}, { 
 			$set: { name:  newName } 
 	    });		
 	};
@@ -245,11 +245,8 @@ var TagManager = function() {
 	* @returns {undefined}
 	*/
 	this.deleteMainTag = function(socket, mainTag) {
-
 		var dbMainTags = db.get('MainTags');
-
-		dbMainTags.remove({name: mainTag},{justOne: true});
-
+		dbMainTags.remove({id: mainTag.toString()});
 	};
 	  
 };

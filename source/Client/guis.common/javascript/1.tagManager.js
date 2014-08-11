@@ -51,27 +51,27 @@ GUI.tagManager = new function() {
 					 onblur    : 'submit'
 			};	
 
-	this.createMainTag = function(mainTag){
+	this.createMainTag = function(mainTag, newId) {
 		var that = GUI.tagManager;
-		console.log("createMainTag");
-		//save the newly created tag in the database  
-		Modules.TagManager.updMainTags(mainTag, that.mainTags.length+1);
+		// console.log("createMainTag");
+		// save the newly created tag in the database  
+		Modules.TagManager.updMainTags(mainTag, newId);
 	}
 	
-	this.updMainTagName = function(oldName, newName){
+	this.updMainTagName = function(oldName, newName, tagID){
 		var that = GUI.tagManager;
-		console.log("createMainTag");
+		//console.log("createMainTag");
 		//save the newly created tag in the database  
-		Modules.TagManager.updMainTagName(oldName, newName);
+		Modules.TagManager.updMainTagName(oldName, newName, tagID);
 	}
 
-	this.deleteMainTag = function(mainTag){
-		console.log("deleteMainTag");
-		Modules.TagManager.deleteMainTag(mainTag);
+	this.deleteMainTag = function(mainTag, tagID){
+		//console.log("deleteMainTag");
+		Modules.TagManager.deleteMainTag(mainTag, tagID);
 	}
 	
 	this.createSecondaryTag = function(mainTag, secondaryTag){
-		console.log("createSecondaryTag");		
+		//console.log("createSecondaryTag");		
 		Modules.TagManager.updSecTags(mainTag, secondaryTag);		
 	}
 	
@@ -102,22 +102,43 @@ GUI.tagManager = new function() {
 	this.enableEditable = function() {
 		var that = GUI.tagManager;
 		$('.editable').editable( 
-			function(value, settings) { 
-					 console.log(value);					
-					 if(that.mainTagOperation == "create"){
-						 that.createMainTag(value);
+			function(value, settings) {
+			    
+    			    // if a MainTag with this name already exists, discard the new entry
+                    for (var index = 0; index < that.mainTags.length; ++index) {
+                        if (that.mainTags[index].name == value) {
+                        
+                            alert("A main tag with the specified name already exists");
+                            
+                            return this.revert;
+                        }
+                     }
+			    
+					 // console.log(value);					
+					 if (that.mainTagOperation == "create") {
+					     var newId = new Date().getTime() - 1296055327011;
+						 that.createMainTag(value, newId);
 						 that.mainTagOperation = "";
-					 } else{
+						 
+						 $(this).parent().find('#main-tag-id').data("tag-id", newId );
+					 } else {
 						 var oldName = this.revert;
-						 that.updMainTagName(oldName, value);
+						 var tagID = $(this).parent().find('#main-tag-id').data("tag-id");
+						 
+						 if (!tagID) {
+						     tagID = $(this).parent().find('#main-tag-id').html();;
+						 }
+						 
+						 that.updMainTagName(oldName, value, tagID);
 					 }
+					 
 					 return value;
 			},  
 			that.$editableOptions
 		 );
 		$('.editable-sec').editable( 
 				function(value, settings) { 
-						 console.log(value);						 
+						 // console.log(value);						 
 						 if(that.secTagOperation == "create"){
 							 that.createSecondaryTag(that.currentMainTag, value);
 							 that.secTagOperation = "";
@@ -133,7 +154,7 @@ GUI.tagManager = new function() {
 	}
 			
 	//initialization of the dialog
-	this.init = function(){
+	this.init = function() {
 			
 		var that = GUI.tagManager;
 		
@@ -149,7 +170,6 @@ GUI.tagManager = new function() {
 			that.bindEvents();			
 			that.enableEditable();			
 			that.enableSortable();
-			
 		});
 			 
 	}
@@ -164,15 +184,17 @@ GUI.tagManager = new function() {
 		    icon.closest( ".portlet" ).find( ".portlet-content" ).toggle();
 		});
 		
-		
-		$( "#main-tag-container" ).delegate(".portlet-delete","click", function() {
-		    var that = GUI.tagManager;
-		    
+		$( "#main-tag-container" ).delegate(".portlet-delete", "click", function() {
 		    var mainTagToBeDeleted = $(this).parent().find('.editable').html();
+		    
+		    var tagID = $(this).parent().find('#main-tag-id').html();
+		    if (!tagID) {
+		        tagID = $(this).parent().find('#main-tag-id').data("tag-id");
+		    }
 		    
 		    var icon = $( this );
 		    icon.closest( ".portlet" ).remove();
-		    that.deleteMainTag(mainTagToBeDeleted);		  
+		    GUI.tagManager.deleteMainTag(mainTagToBeDeleted, tagID);		  
 		});
 		
 		

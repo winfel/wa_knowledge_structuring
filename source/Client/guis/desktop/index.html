@@ -491,13 +491,14 @@ $.fn.dontScrollParent = function() {
 </script>
 <script type="text/html" id='main-tag-tmpl'>
 
-	<% _.each(items,function(item,key,list){ %>
+	<% _.each(items,function(item, key, list){ %>
 		
 		<div class='portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all' data-maintag='<%= item.name %>'>
 			<div class='portlet-header ui-widget-header ui-corner-all'>
 				<span class='ui-icon ui-icon-trash portlet-delete'></span>
 				<span class='ui-icon ui-icon-plusthick portlet-toggle'></span>
 				<div class='editable'><%= item.name %></div>
+                <span id="main-tag-id" style="display: none;"><%= item.id %></span>
 			</div>
 			<div class='portlet-content' style='display: none'>
 				<div class='ui-widget-content portlet-new-sec-tag'>

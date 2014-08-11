@@ -35,24 +35,6 @@ var TagManager = new function() {
     Modules.SocketClient.serverCall('getMainTags');
   };
   
-  
-    /**
-   * 
-   * @param {type} callback
-   * @returns {undefined}
-   */
-  this.getSecTags = function(mainTag, callback) {
-
-    Dispatcher.registerCall("getSecTags", function(data) {
-      callback(data);
-      Dispatcher.removeCall("getSecTags");
-    });
-
-    Modules.SocketClient.serverCall('getSecTags', {
-		'mainTag': mainTag
-	});
-  };
-  
   /**
    * 
    * @param {type} callback
@@ -66,32 +48,6 @@ var TagManager = new function() {
     });
 
     Modules.SocketClient.serverCall('getMainTagsAndSecTags');
-  };
-
-  /**
-   * 
-   * @param {type} callback
-   * @returns {undefined}
-   */
-  this.updSecTags = function(mainTag, secTag) {
-
-    Modules.SocketClient.serverCall('updSecTags', {
-		'mainTag': mainTag,
-		'secTag': secTag
-	});
-  };
-  
-   /**
-   * 
-   * @param {type} callback
-   * @returns {undefined}
-   */
-  this.deleteSecTags = function(mainTag, secTag) {
-
-    Modules.SocketClient.serverCall('deleteSecTags', {
-		'mainTag': mainTag,
-		'secTag': secTag
-	});
   };
   
     /**
@@ -112,12 +68,26 @@ var TagManager = new function() {
    * @param {type} callback
    * @returns {undefined}
    */
-  this.updMainTagName = function(oldName, newName) {
+  this.updMainTagName = function(oldName, newName, tagID) {
 
     Modules.SocketClient.serverCall('updMainTagName', {
 		'oldName': oldName,
 		'newName': newName,
+		'tagID': tagID
 	});
+  };
+  
+  /**
+   * 
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.deleteMainTag = function(mainTag, id) {
+
+    Modules.SocketClient.serverCall('deleteMainTag', {
+        'mainTag': mainTag,
+        'tagID': id
+    });
   };
   
   /**
@@ -154,11 +124,43 @@ var TagManager = new function() {
    * @param {type} callback
    * @returns {undefined}
    */
-  this.deleteMainTag = function(mainTag) {
+  this.updSecTags = function(mainTag, secTag) {
 
-    Modules.SocketClient.serverCall('deleteMainTag', {
-		'mainTag': mainTag
-	});
+    Modules.SocketClient.serverCall('updSecTags', {
+        'mainTag': mainTag,
+        'secTag': secTag
+    });
   };
+  
+   /**
+   * 
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.deleteSecTags = function(mainTag, secTag) {
+
+    Modules.SocketClient.serverCall('deleteSecTags', {
+        'mainTag': mainTag,
+        'secTag': secTag
+    });
+  };
+  
+
+   /**
+    * 
+    * @param {type} callback
+    * @returns {undefined}
+    */
+    this.getSecTags = function(mainTag, callback) {
+
+        Dispatcher.registerCall("getSecTags", function(data) {
+            callback(data);
+            Dispatcher.removeCall("getSecTags");
+        });
+
+        Modules.SocketClient.serverCall('getSecTags', {
+            'mainTag' : mainTag
+        });
+    };
   
 };
