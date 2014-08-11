@@ -141,6 +141,47 @@ UserManager.init = function(theModules) {
       });
   });
 
+  Dispatcher.registerCall('addNewFavourite', function(socket, data){
+
+		var connections = UserManager.connections;
+		
+		for (var i in connections) {
+		
+			if(connections[i].user.id == data.id){
+				if(typeof connections[i].user.favourites === "undefined"){
+					connections[i].user.favourites = new Array();
+				}
+				if(connections[i].user.favourites.indexOf(data.favourite) == -1){
+					connections[i].user.favourites.push(data.favourite);
+				}
+				
+			}
+		}
+		
+  });
+  
+    Dispatcher.registerCall('removeFavourite', function(socket, data){
+
+		var connections = UserManager.connections;
+		
+		for (var i in connections) {
+		
+			if(connections[i].user.id == data.id){
+			
+				if(typeof connections[i].user.favourites != "undefined"){
+				
+					var j = connections[i].user.favourites.indexOf(data.favourite);
+					
+					if(j != -1){
+						connections[i].user.favourites.splice(j, 1);
+					}	
+				}
+			}
+		}
+		
+  });
+  
+
   /* get all exiting access rights from the database */
   var collection = db.get('rights');
   collection.find({}, {}, function(e, docs) {

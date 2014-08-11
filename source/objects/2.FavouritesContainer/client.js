@@ -5,35 +5,33 @@
 *
 */
 
-GlobalContainer.afterServerCall = function(files){
+FavouritesContainer.afterServerCall = function(files){
 
 	files = JSON.parse(files);
-
+	
 	var id = files.pop();
 	var con = ObjectManager.getObject(id);
 	con.searchAndFilter(files);
 
 }
 
-
-GlobalContainer.getFiles = function(){
+FavouritesContainer.removeFavourite = function(fav){
 		
-	this.serverCall("getAllFileObjects", this.id, GlobalContainer.afterServerCall);
-		
-}
-
-
-GlobalContainer.sendNewFavourite = function(fav){
-		
-	Modules.SocketClient.serverCall('addNewFavourite', {
+	Modules.SocketClient.serverCall('removeFavourite', {
 		'favourite': fav,
 		'id': ObjectManager.user.id
 	});
 		
 }
 
+FavouritesContainer.getFiles = function(){
+		
+	this.serverCall("getAllFavouriteFileObjects", this.id, ObjectManager.user.id, FavouritesContainer.afterServerCall);
+		
+}
 
-GlobalContainer.searchAndFilter = function(files){
+
+FavouritesContainer.searchAndFilter = function(files){
 	
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
@@ -47,7 +45,7 @@ GlobalContainer.searchAndFilter = function(files){
 	var audio = this.getAttribute('searchForAudio');
 	var video = this.getAttribute('searchForVideo');
 	var text = this.getAttribute('searchForText');
-
+			
 	if(s.length == 0 || s == "" || s == 0){
 		filteredFiles1 = files;
 	}
@@ -55,7 +53,7 @@ GlobalContainer.searchAndFilter = function(files){
 	
 		var key;
 		for (key in files) { //filter name/tag with the given searchstring
-		
+				
 			var n = files[key].attributes.name;
 			var mainTag = files[key].attributes.mainTag;
 			var secTags = files[key].attributes.secondaryTags;
@@ -134,7 +132,7 @@ GlobalContainer.searchAndFilter = function(files){
 }
 
 
-GlobalContainer.sortFiles = function(files){ //bubble sort
+FavouritesContainer.sortFiles = function(files){ //bubble sort
 
 	var sortingCriterion = this.getAttribute('sortingCriterion');
 	var sortingOrder = this.getAttribute('sortingOrder');

@@ -5,7 +5,7 @@
 *
 */	
 
-GlobalContainer.draw=function(external){
+FavouritesContainer.draw=function(external){
 	var rep=this.getRepresentation();
 	
 	/* manual check for a changed name - we need to save time ;-)*/
@@ -31,7 +31,7 @@ GlobalContainer.draw=function(external){
 }
 
 
-GlobalContainer.updateInnerHeight = function() {
+FavouritesContainer.updateInnerHeight = function() {
 	
 	var rep=this.getRepresentation();
 
@@ -51,7 +51,7 @@ GlobalContainer.updateInnerHeight = function() {
 }
 
 
-GlobalContainer.createRepresentation = function(parent) { 	
+FavouritesContainer.createRepresentation = function(parent) { 	
 	
 	var rep = GUI.svg.other(parent,"foreignObject");
 
@@ -61,20 +61,18 @@ GlobalContainer.createRepresentation = function(parent) {
 	
 	this.drawContent(rep);
 	
-	this.setAttribute('locked', true);
-	
 	this.upd();
 	
 	return rep;
 	
 }
 
-GlobalContainer.adjustControls = function() {
+FavouritesContainer.adjustControls = function() {
 	this.updateInnerHeight();
 	GeneralObject.adjustControls.call(this);
 }
 
-GlobalContainer.drawContent = function(rep){
+FavouritesContainer.drawContent = function(rep){
 
 	var that = this;
 
@@ -82,7 +80,7 @@ GlobalContainer.drawContent = function(rep){
 
 	var compiled = _.template($( "script#container-template" ).html());
 
-	 var heading = "GlobalContainer";
+	 var heading = "FavouritesContainer";
 
     var templateData = {
         heading : heading
@@ -130,6 +128,7 @@ GlobalContainer.drawContent = function(rep){
 	$(rep).find("#containment-wrapper").css("height", "300px");
 	$(rep).find("#containment-wrapper").css("padding", "9px");
 	$(rep).find("#containment-wrapper").css("overflow", "auto");
+	$(rep).find("#containment-wrapper").css("text-align", "center");
 	
 
 	/* add Search/Filter-Popover */
@@ -360,7 +359,7 @@ GlobalContainer.drawContent = function(rep){
 }
 
 
-GlobalContainer.rename = function(newName){
+FavouritesContainer.rename = function(newName){
 
 	var rep=this.getRepresentation();
 
@@ -368,17 +367,30 @@ GlobalContainer.rename = function(newName){
 		
 }
 
-GlobalContainer.addFiles = function(files){
-	
+FavouritesContainer.addFiles = function(files){
+
 	var that = this;
 
 	var rep=this.getRepresentation();
-	
-	$(rep).find("#sortablefiles").html("");
-		
+
+	if(files.length == 0){
+		$(rep).find("#sortablefiles").html("Add your favourite files by right click on any file in the global space containers!");
+		return;
+	}
+	else{
+		$(rep).find("#sortablefiles").html("");
+	}
+			
+			
 	var key;
 	for(key in files){
 	
+		var id = files[key].attributes.id;
+		
+		if($(rep).find("#representation_for_"+id).length > 0){ 
+			continue;
+		}
+			
 		var name = files[key].attributes.name;
 		var n = name.split('.')[0];
 		var type = name.split('.')[1];
@@ -386,8 +398,6 @@ GlobalContainer.addFiles = function(files){
 		if(n.length>13){
 			n = n.substring(0,10)+ "...";
 		}
-	
-		var id = files[key].attributes.id;
 		
 		var mime = files[key].attributes.mimeType;
 		var img;
@@ -426,13 +436,7 @@ GlobalContainer.addFiles = function(files){
 		$(rep).find("#sortablefiles li").css("text-align", "center");
 		$(rep).find("#sortablefiles li").css("vertical-align", "middle");	
 		$(rep).find("#sortablefiles li").css("background", "#d3d3d3");	
-		
-		$(rep).find("#sortablefiles li").draggable({
-			helper: 'clone',
-			revert: 'invalid',
-			appendTo: 'body'
-		});
-		
+			
 		$(rep).find("#representation_for_"+id).hover(
 			function() {
 				$(this).css("background", "#f5f5f5");
@@ -445,14 +449,19 @@ GlobalContainer.addFiles = function(files){
 			event.preventDefault();
 			$("div.addremove-menu").remove();
 			var id = this.id.split("_")[2];
-			$("<div id=menu_for_"+id+" class='addremove-menu'>Add to favourites</div>")
+			$("<div id=menu_for_"+id+" class='addremove-menu'>Remove from favourites</div>")
 			.appendTo("body")
 			.css({top: event.pageY + "px", left: event.pageX + "px"})
 			.on("click", function(event){
-					
-				that.sendNewFavourite(this.id.split("_")[2]);
-				
+						
+				$(rep).find("#representation_for_"+this.id.split("_")[2]).remove();
+								
 				$("div.addremove-menu").remove();
+				
+				that.removeFavourite(this.id.split("_")[2]);
+				
+				that.upd();
+				
 			});
 		});
 		
@@ -460,7 +469,7 @@ GlobalContainer.addFiles = function(files){
 		
 }
 
-GlobalContainer.upd = function(){
+FavouritesContainer.upd = function(){
 
 	this.getFiles();
 

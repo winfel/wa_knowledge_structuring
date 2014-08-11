@@ -1035,10 +1035,11 @@ span.portlet-toggle, span.portlet-delete, span.sec-tag-delete {
 /* end tag manager */
 
 
-.favourite-menu {
+.addremove-menu {
     z-index:1000;
     position: absolute;
     background-color:#d3d3d3;
     border: 1px solid black;
     padding: 2px;
+    cursor: pointer;
 }
