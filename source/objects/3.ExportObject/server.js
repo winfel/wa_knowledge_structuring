@@ -133,7 +133,26 @@ theObject.onEnter=function(object,oldData,newData) {
 	}
 
 	this.fireEvent('enter',object);
+};
+
+/**
+ * returns near papers; on server only async with callback
+ */
+theObject.getSurroundingPapers = function(callback) {
+	if(callback) {
+		this.getRoom().getInventory(function(inventory){
+			var papers = new Array();
+			for(var i in inventory) {
+				if(inventory[i].getType() == 'PaperSpace'
+					|| inventory[i].getType() == 'PaperChapter'
+					|| inventory[i].getType() == 'PaperObject')
+				papers.push(inventory[i]);
 			}
+			callback(papers);
+		});
+			}
+	return [];
+};
 
 module.exports = theObject;
 
