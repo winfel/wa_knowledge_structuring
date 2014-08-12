@@ -4,11 +4,12 @@
 *    @author Felix Winkelnkemper, University of Paderborn, 2011
 *
 */
+var POSITION_AWARENESS_DISTANCE = 100;
 
 ExportObject.draw = function(external) {
 	var that = this;
 	GeneralObject.draw.call(this,external);
-	
+
 	this.setViewWidth(60*2);
 	this.setViewHeight(60*2);
 
@@ -22,6 +23,56 @@ ExportObject.draw = function(external) {
 	}
 	
 	//this.createPixelMap();
+	this.drawPaperConnectors();
+};
+
+/**
+ * draws a line to each PaperObject the ExportObject is aware of
+ */
+ExportObject.drawPaperConnectors = function() {
+	var that = this;
+	var rep = this.getRepresentation();
+	// calculate center and radius of ExportObject
+	var cw = this.getViewWidth() / 2,
+		ch = this.getViewHeight() / 2,
+		cx = this.getViewX() + cw,
+		cy = this.getViewY() + ch,
+		r = Math.max(cw, ch);
+
+	$(rep).find('.PaperConnectors').remove();
+	this.getSurroundingPapers().forEach(function(i) {
+		// calculate center and distance of objects
+		var p_cw = i.getViewWidth() / 2,
+			p_ch = i.getViewHeight() / 2,
+			p_cx = i.getViewX() + p_cw,
+			p_cy = i.getViewY() + p_ch,
+			d = Math.sqrt(Math.pow(p_cx-cx, 2) + Math.pow(p_cy-cy, 2));
+		if(d-Math.max(p_cw, p_ch)-r < POSITION_AWARENESS_DISTANCE) {
+			// calculate distance from rectangular border to center of PaperObject
+			var p_rx = Math.min(p_cw, Math.abs((p_cx-cx) / (p_cy-cy) * p_ch)),
+				p_ry = Math.min(p_ch, Math.abs((p_cy-cy) / (p_cx-cx) * p_cw)),
+				p_r = Math.sqrt(p_rx*p_rx + p_ry*p_ry);
+			$(GUI.svg.line(rep,
+				cw,ch, //start
+				p_cx-cx+cw,p_cy-cy+ch, //end
+				{
+					strokeWidth: 5,
+					stroke:'black',
+					opacity:0.5,
+					'stroke-dasharray': '0,'+r+','+(d-p_r-r)+',9999',
+					//'stroke-dashoffset': -r,
+				}))
+			.addClass('PaperConnectors');
+		}
+	});
+};
+
+/**
+ * listen to moves to update PaperConnectors
+ */
+ExportObject.moveHandler = function() {
+	GeneralObject.moveHandler.call(this);
+	this.drawPaperConnectors();
 };
 
 /* get the width of the objects bounding box */
@@ -46,26 +97,28 @@ ExportObject.getIconText = function() {
 
 ExportObject.createRepresentation = function(parent) {
 	var that = this;
-	//console.log('ExportObject.createRepresentation');
-	//var rep2 = IconObject.createRepresentation.call(this, parent);
 	var newParent = GUI.svg.group(parent, this.getAttribute('id'));
-//	var rep = GUI.svg.group(parent,this.getAttribute('id'));
 
-	var rep = GUI.svg.circle(newParent, 60, 60, 60, {
+	var radius = 60; // Math.min(this.getViewWidth(), this.getViewHeight())/2;
+	var rep = GUI.svg.circle(newParent, radius, radius, radius, {
 		fill: '#D6E8B0', 
 		stroke: '#91B34C',
 		strokeWidth: 2
 	});
-	GUI.svg.image(newParent, 28,28, 64,64, this.getIconPath());
-	//GUI.svg.add(newParent, IconObject.createRepresentation.call(this, newParent));
+	GUI.svg.image(newParent, radius-32,radius-32, 64,64, this.getIconPath());
 
-/*	rep.dataObject=this;
-
-	$(rep).attr("id", this.getAttribute('id'));*/
-
-	//this.initGUI(rep);
+	// listen to moves of all (existing) PaperObjects
+	this.getSurroundingPapers().forEach(function(i) {
+		var temp = i.moveHandler;
+		i.moveHandler = function(){
+			temp.call(i);
+			that.drawPaperConnectors();
+		};
+	});
 
 
 	return newParent;
-	
+
+
+
 };
