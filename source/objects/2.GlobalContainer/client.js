@@ -27,9 +27,22 @@ GlobalContainer.sendNewFavourite = function(fav){
 		
 	Modules.SocketClient.serverCall('addNewFavourite', {
 		'favourite': fav,
-		'id': ObjectManager.user.id
+		'name': ObjectManager.user.username
 	});
 		
+}
+
+
+GlobalContainer.changeMainTag = function(objectId, newTag, roomId){
+
+	var d = {
+		id : objectId,
+		tag : newTag,
+		room : roomId
+	};
+
+	this.serverCall("changeMainTag", d);
+
 }
 
 
@@ -60,10 +73,11 @@ GlobalContainer.searchAndFilter = function(files){
 			var mainTag = files[key].attributes.mainTag;
 			var secTags = files[key].attributes.secondaryTags;
 			
-			if(secTags == 0){
+			if(secTags == 0 || typeof secTags == "undefined"){
 				secTags = new Array();
 			}
-			if(mainTag != ""){
+			
+			if(mainTag != "" && typeof mainTag != "undefined"){
 				secTags.push(mainTag);
 			}
 

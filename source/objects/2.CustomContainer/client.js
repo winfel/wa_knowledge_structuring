@@ -85,10 +85,11 @@ CustomContainer.searchAndFilter = function(files){
 			var mainTag = files[key].attributes.mainTag;
 			var secTags = files[key].attributes.secondaryTags;
 			
-			if(secTags == 0){
+			if(secTags == 0 || typeof secTags == "undefined"){
 				secTags = new Array();
 			}
-			if(mainTag != ""){
+			
+			if(mainTag != "" && typeof mainTag != "undefined"){
 				secTags.push(mainTag);
 			}
 

@@ -131,6 +131,35 @@ GlobalContainer.drawContent = function(rep){
 	$(rep).find("#containment-wrapper").css("padding", "9px");
 	$(rep).find("#containment-wrapper").css("overflow", "auto");
 	$(rep).find("#containment-wrapper").css("text-align", "center");
+	
+	$(rep).find("#containment-wrapper").droppable({
+      drop: function( event, ui ) {
+	  	
+			if($(rep).find("#"+ui.draggable.context.id).length == 0){ //not existing in this container
+			
+				var r = confirm("Do you really want to change the main Tag of this object to "+$(rep).find("#containername").html()+"?");
+				if (r == true) {
+				
+					var objectId = ui.draggable.context.id.split("_")[2];
+					
+					var t = ui.draggable.context.innerHTML;
+					var i = t.indexOf("content");
+					t = t.slice(i, t.length).split(" ")[0].split("=")[1];
+					t = t.substring(0, t.length - 1);
+					var room = t.substring(1, t.length);
+					
+					that.changeMainTag(objectId, $(rep).find("#containername").html(), room);
+					
+					var objects = ObjectManager.getObjects();
+					var key;
+					for(key in objects){
+						var o = ObjectManager.getObject(key);
+						o.upd();
+					}
+				}
+			}
+      }
+    });
 
 	/* add Search/Filter-Popover */
 	$(body).find( "button:first" ).next().jPopover({
@@ -388,6 +417,7 @@ GlobalContainer.addFiles = function(files){
 		var name = files[key].attributes.name;
 		var n = name.split('.')[0];
 		var type = name.split('.')[1];
+		var room = files[key].attributes.inRoom;
 		
 		if(n.length>13){
 			n = n.substring(0,10)+ "...";
@@ -420,7 +450,7 @@ GlobalContainer.addFiles = function(files){
 		
 		$(rep).find("#sortablefiles").append('<li id=representation_for_'+id+' class="ui-widget-content" tabindex="-1">'+n+'</li>');
 		
-		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" src="../../guis.common/images/fileicons/'+img+'">');
+		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" content="'+room+'" src="../../guis.common/images/fileicons/'+img+'">');
 		
 		$(rep).find("#sortablefiles li").css("margin", "3px 3px 3px 0");
 		$(rep).find("#sortablefiles li").css("padding", "1px");
