@@ -130,7 +130,7 @@ GlobalContainer.drawContent = function(rep){
 	$(rep).find("#containment-wrapper").css("height", "300px");
 	$(rep).find("#containment-wrapper").css("padding", "9px");
 	$(rep).find("#containment-wrapper").css("overflow", "auto");
-	
+	$(rep).find("#containment-wrapper").css("text-align", "center");
 
 	/* add Search/Filter-Popover */
 	$(body).find( "button:first" ).next().jPopover({
@@ -374,7 +374,13 @@ GlobalContainer.addFiles = function(files){
 
 	var rep=this.getRepresentation();
 	
-	$(rep).find("#sortablefiles").html("");
+	if(files.length == 0){
+		$(rep).find("#sortablefiles").html("This Container shows all files which are tagged with the main Tag "+$(rep).find("#containername").html()+"!");
+		return;
+	}
+	else{
+		$(rep).find("#sortablefiles").html("");
+	}
 		
 	var key;
 	for(key in files){
