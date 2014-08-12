@@ -39,6 +39,7 @@ ExportObject.drawPaperConnectors = function() {
 		cy = this.getViewY() + ch,
 		r = Math.max(cw, ch);
 
+	this.awareOfPapers = new Array();
 	$(rep).find('.PaperConnectors').remove();
 	this.getSurroundingPapers().forEach(function(i) {
 		// calculate center and distance of objects
@@ -48,6 +49,7 @@ ExportObject.drawPaperConnectors = function() {
 			p_cy = i.getViewY() + p_ch,
 			d = Math.sqrt(Math.pow(p_cx-cx, 2) + Math.pow(p_cy-cy, 2));
 		if(d-Math.max(p_cw, p_ch)-r < POSITION_AWARENESS_DISTANCE) {
+			that.awareOfPapers.push(i);
 			// calculate distance from rectangular border to center of PaperObject
 			var p_rx = Math.min(p_cw, Math.abs((p_cx-cx) / (p_cy-cy) * p_ch)),
 				p_ry = Math.min(p_ch, Math.abs((p_cy-cy) / (p_cx-cx) * p_cw)),
@@ -65,6 +67,13 @@ ExportObject.drawPaperConnectors = function() {
 			.addClass('PaperConnectors');
 		}
 	});
+
+	if(this.awareOfPapers.length>0) {
+		$(rep).find('.ExportOption').show();
+	}
+	else {
+		$(rep).find('.ExportOption').hide();
+	}
 };
 
 /**
@@ -116,9 +125,40 @@ ExportObject.createRepresentation = function(parent) {
 		};
 	});
 
+	this.createExportIcons(newParent);
 
 	return newParent;
+};
 
+/**
+ * creates an icon for each export option
+ */
+ExportObject.createExportIcons = function(rep) {
+	var that = this;
+	//var rep = this.getRepresentation();
+	// TODO: get export options not from attribute
+	var exportOptions = this.getAttributes().exportFormat.options;
+	var exportIconPaths = new Array();
+	for(var i in exportOptions) {
+		//exportIconPaths[i] = this.getIconPath() + '/' + exportOptions[i];
+		exportIconPaths[i] = '/guis.common/images/fileicons/' + exportOptions[i].substr(0,5) + '.png';
+	}
 
+	var newRadius = Math.max(23, 23 / Math.sin(Math.PI/exportIconPaths.length)),
+		cx = 60, cy = 60;
+	for(var i in exportOptions) {
+		// new group for that icon
+		var box = GUI.svg.group(rep, {
+			transform: 'translate(' +
+				(cx + Math.sin(Math.PI/exportIconPaths.length * 2 * i) * newRadius - 16) + ',' +
+				(cy + Math.cos(Math.PI/exportIconPaths.length * 2 * i) * newRadius - 16) + ')',
+			width: 32,
+			height: 32,
+		});
+		// the icon
+		GUI.svg.image(box,
+			0,0,
+			32,32, exportIconPaths[i]);
 
+	}
 };
