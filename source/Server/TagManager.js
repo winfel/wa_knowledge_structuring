@@ -1,10 +1,13 @@
-//var db = require('monk')('localhost/WebArena');
+
 var db = false;
 var Modules = false;
 
+var CONTAINER_ID = "containerID";
+var CONTAINER_WIDTH = 500;
+var CONTAINER_HEIGHT = 300;
+
 var fillCurrentDbWithTestData = function() {
 
-	
 	/* clear table */
 	db.get('MainTags').drop();
 	
@@ -25,14 +28,12 @@ var fillCurrentDbWithTestData = function() {
 	
 };
 
-
-
 var TagManager = function() {
+    
 	var that = this;
 	
    /**
-   *		The function is needed to initialize the TagManager
-   *
+   * The function is needed to initialize the TagManager
    */
   this.init = function(theModules) {
     Modules = theModules;
@@ -58,16 +59,53 @@ var TagManager = function() {
 		that.updSecTags(socket, data.mainTag, data.secTag); 
 	});
 	
+    /**
+     * Creates a new Tag
+     * 
+     * @param {Object} socket 
+     * @param {Object} data the info of the new Tag
+     * @param {Object} responseID id to respond to the client
+     */
 	Dispatcher.registerCall('updMainTags', function(socket, data, responseID) {
-		that.updMainTags(socket, data.mainTag, data.newId); 
+		// for every Main Tag a GlobalContainer object is created
+		var context = Modules.UserManager.getConnectionBySocket(socket);
+		that.createGlobalContainer(context, data, function (error, object) {
+		    if (!error) {
+		        that.updMainTags(data.mainTag, data.newId, object.id); 
+		    }
+		});
 	});
 	
 	Dispatcher.registerCall('updMainTagName', function(socket, data, responseID) {
-		that.updMainTagName(socket, data.tagID, data.newName); 
+		that.updMainTagName(data.tagID, data.newName, function(error, containerID) {
+		    if (!error) {
+                var context = Modules.UserManager.getConnectionBySocket(socket);
+                
+                // let's modify the container associated with this main Tag
+                Modules.ObjectManager.getObject('public', containerID, context, function (object) {
+                    object.setAttribute('name', data.newName);
+                    //object.persist();
+                });
+            }
+		}); 
 	});
 	
+	/**
+	 * Deletes a Main Tag
+	 * 
+	 * @param {Object} socket 
+     * @param {Object} data the info of the new Tag
+     * @param {Object} responseID id to respond to the client
+	 */
 	Dispatcher.registerCall('deleteMainTag', function(socket, data, responseID) {
-        that.deleteMainTag(socket, data.tagID); 
+        that.deleteMainTag(socket, data.tagID, function (error, containerID) {
+            if (!error) {
+                var context = Modules.UserManager.getConnectionBySocket(socket);
+                
+                // let's delete the container associated with this main Tag
+                that.deleteGlobalContainer(containerID, context);
+            }
+        }); 
     });
 	
 	Dispatcher.registerCall('updSecTagName', function(socket, data, responseID) {
@@ -81,7 +119,22 @@ var TagManager = function() {
 	Dispatcher.registerCall('deleteSecTags', function(socket, data, responseID) {
 		that.deleteSecTags(socket, data.mainTag, data.secTag); 
 	});
- 
+	
+	// we create our context
+	var context = {
+            user: { username : "root"}
+    };
+	
+	// Check if there are tags without Container
+	// If there are any; then let's create the containers
+	that.createMissingContainers(context, function (newContainers) {
+	    if (true) {
+	    //if (newContainers > 0) {
+	        // Order the containers
+	        that.OrderContainers(context); 
+	    }
+	});
+	
   };
   
 	/**
@@ -90,15 +143,11 @@ var TagManager = function() {
 	* @returns {undefined}
 	*/
 	this.getMainTags = function(socket) {
-	  			
 		var dbMainTags = db.get('MainTags');
 		
-		dbMainTags.find( {}, ["id", "name"], function(e, mainTags){
-			
+		dbMainTags.find( {}, ["id", "name"], function(e, mainTags) {
 			Modules.SocketServer.sendToSocket(socket, "getMainTags", mainTags);
-			
 		} );
-	 
 	};
 	
 	/**
@@ -107,15 +156,11 @@ var TagManager = function() {
 	* @returns {undefined}
 	*/
 	this.getSecTags = function(socket, mainTag) {
-	  		
 		var dbMainTags = db.get('MainTags');
 		
-		dbMainTags.find( {name: mainTag}, ["secTags"] , function(e, secTags){
-			
+		dbMainTags.find( {name: mainTag}, ["secTags"] , function(e, secTags) {
 			Modules.SocketServer.sendToSocket(socket, "getSecTags", secTags);
-			
 		} );
-		 
 	};
 	
 	/**
@@ -124,13 +169,10 @@ var TagManager = function() {
 	* @returns {undefined}
 	*/
 	this.getMainTagsAndSecTags = function(socket) {
-	  			
 		var dbMainTags = db.get('MainTags');
 		
-		dbMainTags.find( {}, [], function(e, mainTagsAndSecTags){
-			
+		dbMainTags.find( {}, [], function(e, mainTagsAndSecTags) {
 			Modules.SocketServer.sendToSocket(socket, "getMainTagsAndSecTags", mainTagsAndSecTags);
-			
 		} );
 	 
 	};
@@ -141,14 +183,11 @@ var TagManager = function() {
 	* @returns {undefined}
 	*/
 	this.updSecTags = function(socket, mainTag, newSecTag) {
-
 		var dbMainTags = db.get('MainTags');
-
-		dbMainTags.update( {name: mainTag}, { 
-												$addToSet: { secTags:  newSecTag } 
-										    }
-		                 );
-
+		dbMainTags.update({name: mainTag}, { 
+		    $addToSet: { secTags:  newSecTag } 
+			}
+		);
 	};
 	
 	/**
@@ -157,14 +196,11 @@ var TagManager = function() {
 	* @returns {undefined}
 	*/
 	this.deleteSecTags = function(socket, mainTag, SecTag) {
-
 		var dbMainTags = db.get('MainTags');
-
 		dbMainTags.update( {name: mainTag}, { 
-												$pull: { secTags:  SecTag } 
-										    }
-		                 );
-
+								$pull: { secTags:  SecTag } 
+						    }
+        );
 	};
 	
 	/**
@@ -172,33 +208,16 @@ var TagManager = function() {
 	* @param {type} object
 	* @returns {undefined}
 	*/
-	this.updMainTags = function(socket, newMainTag, newId) {
-
+	this.updMainTags = function(newMainTag, newId, containerID) {
 		var dbMainTags = db.get('MainTags');
-			
 		dbMainTags.insert(
 			  { 
 				  id: newId.toString(),
-				  name: newMainTag,				  
+				  name: newMainTag,	
+				  containerID: containerID, // every main Tag is associated with one container
 			      secTags: [] 
 			  }
 		);	
-		
-	};
-	
-	
-	/**
-	* 
-	* @param {type} object
-	* @returns {undefined}
-	*/
-	this.updMainTagName = function(socket, tagID, newName) {
-
-		var dbMainTags = db.get('MainTags');
-			
-		dbMainTags.update( {id: tagID.toString()}, { 
-			$set: { name:  newName } 
-	    });		
 	};
 	
 	/**
@@ -207,7 +226,6 @@ var TagManager = function() {
 	* @returns {undefined}
 	*/
 	this.updSecTagName = function(socket, mainTag, oldName, newName) {
-
 		var dbMainTags = db.get('MainTags');
 		
 		//delete the old secondary tag
@@ -226,7 +244,6 @@ var TagManager = function() {
 	* @returns {undefined}
 	*/
 	this.moveSecTag = function(socket, oldMainTag, newMainTag, secTag) {
-
 		var dbMainTags = db.get('MainTags');
 		
 		//delete the old secondary tag
@@ -238,16 +255,167 @@ var TagManager = function() {
 		});
 	};
 	
+   /**
+    * Modifies a Tag
+    * 
+    * @param {type} object
+    * @returns {undefined}
+    */
+    this.updMainTagName = function(tagID, newName, callback) {
+        var dbMainTags = db.get('MainTags');
+        
+        var promise = dbMainTags.findOne({id: tagID.toString()});
+        promise.on('complete', function(err, obj) {
+            if (err) callback(true, null);
+            else {
+                var containerID = obj.containerID;
+                
+                var promise2 = dbMainTags.update( {id: tagID.toString()}, { 
+                    $set: { name:  newName } 
+                }); 
+                promise2.on('complete', function(err, obj) {
+                    if (err) callback(true, null);
+                    else callback(false, containerID);
+                });
+            }
+        });
+    };
 	
 	/**
+	* Delete a Tag 
 	* 
 	* @param {type} object
 	* @returns {undefined}
 	*/
-	this.deleteMainTag = function(socket, mainTag) {
+	this.deleteMainTag = function(socket, mainTag, callback) {
 		var dbMainTags = db.get('MainTags');
-		dbMainTags.remove({id: mainTag.toString()});
+		
+		var promise = dbMainTags.findOne({id: mainTag.toString()});
+		promise.on('complete', function(err, obj) {
+            if (err) callback(true, null);
+            else {
+                var containerID = obj.containerID;
+                
+                var promise2 = dbMainTags.remove({id: mainTag.toString()});
+                promise2.on('complete', function(err, obj) {
+                    if (err) callback(true, null);
+                    else callback(false, containerID);
+                });
+            }
+        });
 	};
+	
+	/**
+	 * Creates a GlobalContainer 
+	 * 
+	 * @param {type} context 
+	 * @param {type} data
+	 * @param {type} callback
+	 */
+	this.createGlobalContainer = function(context, data, callback) {
+	    var attr = {
+	            height : CONTAINER_HEIGHT,
+	            width  : CONTAINER_WIDTH,
+	            name   : data.mainTag
+	    };
+	    
+	    Modules.ObjectManager.createObject('public', 'GlobalContainer', attr, false, context, callback);
+	};
+	
+	/**
+	 * Deletes a global container
+	 */
+	this.deleteGlobalContainer = function(containerID, context) {
+	    Modules.ObjectManager.getObject('public', containerID, context, function (obj) {
+	        Modules.ObjectManager.remove(obj);
+	    });
+	}
+	
+	/**
+	 * Creates missing containers
+	 */
+	this.createMissingContainers = function(context, callback) {
+	    var dbMainTags = db.get('MainTags');
+	    var newContaiinersCounter = 0;
+	    
+	    dbMainTags.find( {}, function (err, docs) {
+	        if (err) console.log("createMissingContainers::ERROR " + err);
+	        else {
+	            
+	            function recursive(i) {
+	                if (i < docs.length) {
+	                    var tag = docs[i];
+	                    
+	                    if (tag.containerID == undefined || tag.containerID == "") {
+	                        that.createGlobalContainer(context, { mainTag: tag.name }, function(err, obj) {
+	                            dbMainTags.update( {id: tag.id.toString()}, { 
+	                                $set: { containerID:  obj.id } 
+	                            }, function(err, o) {
+	                                console.log("Updated tag: " + tag.name + " with container ID: " + obj.id );
+	                                newContaiinersCounter++;
+	                                recursive(i + 1);
+	                            });  
+	                        });
+	                    } else {
+	                        recursive(i + 1);
+	                    }
+	                } else {
+	                    callback(newContaiinersCounter);
+	                }
+	            }
+	            
+	            recursive(0);
+	        }
+	    });
+	}
+	
+	/**
+	 * Order the containers
+	 */
+	this.OrderContainers = function(context) {
+	    var dbMainTags = db.get('MainTags');
+        
+        dbMainTags.find({}, [CONTAINER_ID], function(e, mainTags) {
+            if (e) console.log("OrderContainers::ERROR " + e);
+            else {
+                var containerPerLine = 3;
+                var horizontalGap = 40;
+                var verticalGap = 15;
+               
+                var cX = 60;
+                var cY = 45;
+                
+                var horizontalCounter = 0;
+                
+                function recursive(i) {
+                    if (i < mainTags.length) {
+                        var containerID = mainTags[i].containerID;
+                        
+                        Modules.ObjectManager.getObject('public', containerID, context, function (object) {
+                            if (object) {
+                                object.setAttribute('x', cX);
+                                object.setAttribute('y', cY);
+                                
+                                cX += horizontalGap + CONTAINER_WIDTH;
+                                
+                                horizontalCounter++;
+                                
+                                if (horizontalCounter == containerPerLine) {
+                                    horizontalCounter = 0;
+                                    cX = 60; // new line
+                                    cY += verticalGap + CONTAINER_HEIGHT;
+                                }
+                            }
+                            
+                            recursive(i + 1);
+                        });
+                    }
+                }
+                
+                recursive(0);
+            }
+        });
+	}
 	  
 };
 

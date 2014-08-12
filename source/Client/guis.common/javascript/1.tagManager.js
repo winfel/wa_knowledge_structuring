@@ -103,16 +103,19 @@ GUI.tagManager = new function() {
 		var that = GUI.tagManager;
 		$('.editable').editable( 
 			function(value, settings) {
+			        var oldName = this.revert;
 			    
-    			    // if a MainTag with this name already exists, discard the new entry
-                    for (var index = 0; index < that.mainTags.length; ++index) {
-                        if (that.mainTags[index].name == value) {
-                        
-                            alert("A main tag with the specified name already exists");
+			         if (oldName != value) {
+        			     // if a MainTag with this name already exists, discard the new entry
+                         for (var index = 0; index < that.mainTags.length; ++index) {
+                            if (that.mainTags[index].name == value) {
                             
-                            return this.revert;
-                        }
-                     }
+                                alert("A main tag with the specified name already exists");
+                                
+                                return this.revert;
+                            }
+                         }
+			         }
 			    
 					 // console.log(value);					
 					 if (that.mainTagOperation == "create") {
@@ -122,7 +125,6 @@ GUI.tagManager = new function() {
 						 
 						 $(this).parent().find('#main-tag-id').data("tag-id", newId );
 					 } else {
-						 var oldName = this.revert;
 						 var tagID = $(this).parent().find('#main-tag-id').data("tag-id");
 						 
 						 if (!tagID) {

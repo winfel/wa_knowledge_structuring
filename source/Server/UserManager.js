@@ -373,25 +373,25 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
       }
 
       /* if not found: create it */
-      if(!found){
-        Modules.ObjectManager.createObject(data.roomID, oType, attr, oContent, context, function(error, obj, addAtts) {
+            if (!found) {
+                Modules.ObjectManager.createObject(data.roomID, oType, attr, oContent, context, function(error, obj, addAtts) {
 
-          if(typeof addAtts != 'undefined'){
-          addAtts.forEach(function(item){
+                    if (typeof addAtts != 'undefined') {
+                        addAtts.forEach(function(item) {
 
-            if(typeof item != 'undefined'){
-              var attToken2   = item.split(';');
+                            if (typeof item != 'undefined') {
+                                var attToken2 = item.split(';');
 
-              var attName2    = attToken2[0];
-              var attValue2   = attToken2[1];
+                                var attName2 = attToken2[0];
+                                var attValue2 = attToken2[1];
 
-              obj.setAttribute(attName2,attValue2); 
+                                obj.setAttribute(attName2, attValue2);
+                            }
+                        });
+                    }
+
+                }, additionalAtts);
             }
-          });
-          }
-
-          },additionalAtts);
-      }
       });
 
     });
@@ -404,7 +404,7 @@ UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
                         "GlobalContainer#MaA#60#400#500#5#searchByTag;true#searchByName;false#name;MaA#locked;true#searchString;MaA#height;300",
                         "GlobalContainer#SWT#600#400#500#5#searchByTag;true#searchByName;false#name;SWT#locked;true#searchString;SWT#height;300"];
 
-  UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
+  UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, []);
 };
 
 UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {

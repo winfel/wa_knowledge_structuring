@@ -129,7 +129,7 @@ Modules.InternalDispatcher = require('./Server/apihandler/InternalDispatcher.js'
 //DAO (Data Access Object) 
 Modules.UserDAO  = require('./Server/db/UserDAO.js');
 
-// Objects can gain access to the Modules (on the server side) by requireing this file
+// Objects can gain access to the Modules (on the server side) by requiring this file
 module.exports = Modules;
 
 // Initialize all Modules if there is a init-function
