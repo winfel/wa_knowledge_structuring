@@ -3,8 +3,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>{{title}}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{{title}}}</title>
+    <meta content="minimum-scale=1.0, initial-scale=1.0, width=device-width, maximum-scale=1, user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
     <meta name="description" content="">
     <meta name="author" content="">
 
@@ -12,19 +13,10 @@
     <link type="text/css" href="/guis.common/bootstrap/css/bootstrap.min.css" rel="Stylesheet">
     <link type="text/css" href="/guis.common/bootstrap/css/bootstrap-responsive.min.css" rel="Stylesheet">
 
+    {{{block "head"}}}
   </head>
 
   <body>
-  
-      <form id="logOut_form" action="/logout" method="get"></form>
-	  <div class="navbar navbar-fixed-top">
-	    <div class="navbar-inner">
-	      <div class="container-fluid">
-	        <ul id="global-nav" class="nav pull-left"><a href="#" class="brand">Welcome {{everyauth.user.username}}</a></ul>
-	        <button id="btn-logout" class="btn btn-primary" type="submit" form="logOut_form"><i class="icon-lock icon-white"></i>Sign Out</button>
-	      </div>
-	    </div>
-	  </div>
 
     {{{body}}}
 

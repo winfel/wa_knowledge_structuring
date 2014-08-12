@@ -38,7 +38,7 @@ var TagManager = function() {
     Modules = theModules;
     
     db = require('monk')(Modules.MongoDBConfig.getURI());
-    fillCurrentDbWithTestData();
+    // fillCurrentDbWithTestData();
     
     var Dispatcher = Modules.Dispatcher;
 
@@ -49,6 +49,10 @@ var TagManager = function() {
     Dispatcher.registerCall('getSecTags', function(socket, data, responseID) {
 		that.getSecTags(socket, data.mainTag); 
 	});
+    
+    Dispatcher.registerCall('getMainTagsAndSecTags', function(socket, data, responseID) {
+		that.getMainTagsAndSecTags(socket);
+	});
    
     Dispatcher.registerCall('updSecTags', function(socket, data, responseID) {
 		that.updSecTags(socket, data.mainTag, data.secTag); 
@@ -58,12 +62,24 @@ var TagManager = function() {
 		that.updMainTags(socket, data.mainTag, data.newId); 
 	});
 	
-	Dispatcher.registerCall('deleteSecTags', function(socket, data, responseID) {
-		that.deleteSecTags(socket, data.mainTag, data.secTag); 
+	Dispatcher.registerCall('updMainTagName', function(socket, data, responseID) {
+		that.updMainTagName(socket, data.tagID, data.newName); 
 	});
 	
 	Dispatcher.registerCall('deleteMainTag', function(socket, data, responseID) {
-		that.deleteMainTag(socket, data.mainTag); 
+        that.deleteMainTag(socket, data.tagID); 
+    });
+	
+	Dispatcher.registerCall('updSecTagName', function(socket, data, responseID) {
+		that.updSecTagName(socket, data.mainTag, data.oldName, data.newName); 
+	});
+	
+	Dispatcher.registerCall('moveSecTag', function(socket, data, responseID) {
+		that.moveSecTag(socket, data.oldMainTag, data.newMainTag, data.secTag); 
+	});
+	
+	Dispatcher.registerCall('deleteSecTags', function(socket, data, responseID) {
+		that.deleteSecTags(socket, data.mainTag, data.secTag); 
 	});
  
   };
@@ -100,6 +116,23 @@ var TagManager = function() {
 			
 		} );
 		 
+	};
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.getMainTagsAndSecTags = function(socket) {
+	  			
+		var dbMainTags = db.get('MainTags');
+		
+		dbMainTags.find( {}, [], function(e, mainTagsAndSecTags){
+			
+			Modules.SocketServer.sendToSocket(socket, "getMainTagsAndSecTags", mainTagsAndSecTags);
+			
+		} );
+	 
 	};
 	
 	/**
@@ -144,13 +177,11 @@ var TagManager = function() {
 		var dbMainTags = db.get('MainTags');
 			
 		dbMainTags.insert(
-		   [
 			  { 
-				  id: newId,
+				  id: newId.toString(),
 				  name: newMainTag,				  
 			      secTags: [] 
 			  }
-		   ]	
 		);	
 		
 	};
@@ -161,12 +192,61 @@ var TagManager = function() {
 	* @param {type} object
 	* @returns {undefined}
 	*/
-	this.deleteMainTag = function(socket, mainTag) {
+	this.updMainTagName = function(socket, tagID, newName) {
 
 		var dbMainTags = db.get('MainTags');
+			
+		dbMainTags.update( {id: tagID.toString()}, { 
+			$set: { name:  newName } 
+	    });		
+	};
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.updSecTagName = function(socket, mainTag, oldName, newName) {
 
-		dbMainTags.remove({name: mainTag},{justOne: true});
+		var dbMainTags = db.get('MainTags');
+		
+		//delete the old secondary tag
+		dbMainTags.update( {name: mainTag}, {
+		    $pull: { secTags:  oldName }
+		});
+		dbMainTags.update( {name: mainTag}, {
+		   $addToSet: { secTags:  newName }
+		});
+	};
+	
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.moveSecTag = function(socket, oldMainTag, newMainTag, secTag) {
 
+		var dbMainTags = db.get('MainTags');
+		
+		//delete the old secondary tag
+		dbMainTags.update( {name: oldMainTag}, {
+		    $pull: { secTags:  secTag }
+		});
+		dbMainTags.update( {name: newMainTag}, {
+		   $addToSet: { secTags:  secTag }
+		});
+	};
+	
+	
+	/**
+	* 
+	* @param {type} object
+	* @returns {undefined}
+	*/
+	this.deleteMainTag = function(socket, mainTag) {
+		var dbMainTags = db.get('MainTags');
+		dbMainTags.remove({id: mainTag.toString()});
 	};
 	  
 };

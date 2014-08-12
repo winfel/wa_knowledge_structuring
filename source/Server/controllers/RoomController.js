@@ -154,13 +154,14 @@ RoomController.sendRoom = function (socket, roomID) {
 	
     Modules.ObjectManager.getRoom(roomID, context, function (room) { //the room object
 
-        room.updateClient(socket);				//and send it to the client
+        room.updateClient(socket); // and send it to the client
 
         Modules.ObjectManager.getInventory(roomID, context, function (objects) {
             for (var i in objects) {
                 var object = objects[i];
-                object.updateClient(socket, 'objectUpdate');	//the object data
-                if (object.hasContent()) {		//and its content if there is some
+                object.updateClient(socket, 'objectUpdate'); // the object data
+                
+                if (object.hasContent()) { // and its content if there is some
                     object.updateClient(socket, 'contentUpdate', object.hasContent(socket));
                 }
             }

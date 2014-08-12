@@ -110,20 +110,20 @@ GeneralObject.startNoAnimationTimer = function() {
  * @deprecated still used?
  */
 GeneralObject.updateGUI = function() {
-
-  //check if we are allowed to paint
-
-  if (!ObjectManager)
-    return;
+  console.log("deprecated");  
+  
+  // check if we are allowed to paint
+  if (!ObjectManager) {
+      return;
+  }
+  
   if (!ObjectManager.hasObject(this)) {
-    debug(this + ' not in inventory');
-    return;
+      debug(this + ' not in inventory');
+      return;
   }
 
   this.draw();
-
   GUI.updateGUI(this);
-
 }
 
 /**
@@ -1556,7 +1556,7 @@ GeneralObject.selectedClickHandler = function(event) {
     this.deselect();
   } else {
 
-    var x = this.getViewBoundingBoxX() + this.getViewBoundingBoxWidth() / 2;
+    var x = this.getViewBoundingBoxX() + this.getViewBoundingBoxWidth();
     var y = this.getViewBoundingBoxY();
 
     if (GUI.couplingModeActive) {

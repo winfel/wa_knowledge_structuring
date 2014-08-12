@@ -39,6 +39,10 @@ GUI.sidebar.elementConfig = {
     order: 3,
     title: GUI.translate("Bugreport"),
   },
+  "search": {
+    order: 4,
+    title: GUI.translate("Search"),
+  },
 };
 
 /**
@@ -68,7 +72,7 @@ GUI.sidebar.openPage = function(element, button) {
 
   /* check if the given element name exists */
   if (GUI.sidebar.elementConfig[element] == undefined) {
-    console.error("Open Sidebar: Unknown element ID");
+    //console.error("Open Sidebar: Unknown element ID");
     return;
   }
 
@@ -97,8 +101,6 @@ GUI.sidebar.openPage = function(element, button) {
     GUI.sidebar.openSidebar();
 
   }
-
-  console.log("openpage: " + left);
 
   GUI.sidebar.transformX($("#sidebar_content").children("div"), left);
 
@@ -130,12 +132,14 @@ GUI.sidebar.openPage = function(element, button) {
 GUI.sidebar.openSidebar = function() {
 
   GUI.sidebar.transformX($("#sidebar"), 0);
-  GUI.sidebar.transformX($("#header>.header_right"), -230);
+  GUI.sidebar.transformX($("#header>.header_right"), -250);
+  GUI.sidebar.transformX($("#header>.header_tabs_sidebar"), 0);
 
   GUI.sidebar.open = true;
 
-}
-
+  $("#header_toggle_sidebar_hide").show();
+  $("#header_toggle_sidebar_show").hide();
+};
 /**
  * Closes the sidebar
  * 
@@ -144,7 +148,8 @@ GUI.sidebar.openSidebar = function() {
 GUI.sidebar.closeSidebar = function(noReset) {
 
   GUI.sidebar.transformX($("#sidebar"), 230);
-  GUI.sidebar.transformX($("#header>.header_right"), 0);
+  GUI.sidebar.transformX($("#header>.header_right"), -20);
+  GUI.sidebar.transformX($("#header>.header_tabs_sidebar"), 230);
 
   GUI.sidebar.open = false;
 
@@ -154,7 +159,9 @@ GUI.sidebar.closeSidebar = function(noReset) {
 
   $(".sidebar_button").removeClass("active");
 
-}
+  $("#header_toggle_sidebar_hide").hide();
+  $("#header_toggle_sidebar_show").show();
+};
 
 /**
  * Saves the current sidebar state and hides it

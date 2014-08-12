@@ -9,7 +9,7 @@
  *   and the socket. Actual socket connections are handled by SocketServer
  */
 "use strict";
-
+// DEMO TeST Comment
 var db = false;
 var DEBUG_OF_USERMANAGEMENT = false;
 
@@ -30,7 +30,8 @@ UserManager.connections = {};
  */
 UserManager.init = function(theModules) {
   Modules = theModules;
-  
+  var that = this;
+
   db = require('monk')(Modules.MongoDBConfig.getURI());
   
   var Dispatcher = Modules.Dispatcher;
@@ -49,9 +50,137 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('umAddUser', UserManager.addUser);
   Dispatcher.registerCall('umRemoveUser', UserManager.removeUser);
 
+  Dispatcher.registerCall('umSetDataOfSpaceWithDest', UserManager.setDataOfSpaceWithDest);
+  Dispatcher.registerCall('umGetDataOfSpaceWithDest', UserManager.getDataOfSpaceWithDest);
+  Dispatcher.registerCall('umRemoveDataOfSpaceWithDest', UserManager.removeDataOfSpaceWithDest);
+
   Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);
 
+  Dispatcher.registerCall('enterPublicSpace', UserManager.enterPublicSpace);
+  Dispatcher.registerCall('enterPrivateSpace', UserManager.enterPrivateSpace);
+
   Dispatcher.registerCall('umIsManager', UserManager.isManager);
+  Dispatcher.registerCall('umisValidUser', UserManager.isValidUser);
+
+  Dispatcher.registerCall('umDeleteObjectFromTabs', function(socket, data){
+    for (var i in that.connections) {
+      Modules.SocketServer.sendToSocket(that.connections[i].socket, "umBroadcastDeleteObjectFromTabs", data);
+    }
+  });
+  
+  Dispatcher.registerCall('umBroadcastNameChange', function(socket, data){
+    var object = data;
+
+    for (var i in that.connections) {
+      Modules.SocketServer.sendToSocket(that.connections[i].socket, "umBroadcastNameChange", data);
+    }
+
+  });
+
+
+  Dispatcher.registerCall('umGetTabCache', function(socket, data){
+    var responseObject = {};
+
+    var tabsDB = db.get('tabs');
+    tabsDB.find({username:data.username}, {}, function(e, docs){
+      if(typeof docs != 'undefined' && docs.length > 0){
+        responseObject.username   = data.username;
+        responseObject.objectlist = docs[0].objectlist;
+        responseObject.initTabs   = docs[0].initTabs;
+        responseObject.cache      = [];
+
+        var runs = 1;
+        var objectCache = db.get('objectCache');
+        responseObject.objectlist.forEach(function(entryInCache){
+
+          /* for each entry in cache: get important data and store it in the
+          response object */
+          objectCache.find({id:entryInCache},{},function(e,docs){
+            if(typeof docs != 'undefined' && docs.length > 0){
+
+              responseObject.cache.push({id:docs[0].id,
+                isPO:docs[0].isPO,
+                name:docs[0].name,
+                dest:docs[0].dest
+              });
+
+              if(runs == responseObject.objectlist.length){
+                // data has been gathered: send it back
+                Modules.SocketServer.sendToSocket(socket, "umGetTabCache" + data.username, responseObject);
+              }
+              runs++;
+            } // end of if
+
+          }); // end of objectCache.find
+        }); // end of objectlist.foreach
+
+        } /* end of if */ else{
+          console.log("No tabs were saved for this username");
+        }
+      }); // end of tabsDb.find
+  });
+
+  Dispatcher.registerCall('umStoreTabCache', function(socket, data){
+      var tabsDB = db.get('tabs');
+      // drop old objectlist
+      tabsDB.remove({username:data.username});
+
+      // push new objectlist
+      tabsDB.insert({username:data.username, objectlist:data.objectlist, initTabs:data.initTabs});
+
+      // update objectcache
+      var objectCache = db.get('objectCache');
+      data.cache.forEach(function(cacheEntry){
+        objectCache.remove({id:cacheEntry.id});
+
+        objectCache.insert({id:cacheEntry.id,
+          isPO:cacheEntry.isPO,
+          name:cacheEntry.name,
+          dest:cacheEntry.dest
+        });
+      });
+  });
+
+  Dispatcher.registerCall('addNewFavourite', function(socket, data){
+
+		var connections = UserManager.connections;
+		
+		for (var i in connections) {
+		
+			if(connections[i].user.id == data.id){
+				if(typeof connections[i].user.favourites === "undefined"){
+					connections[i].user.favourites = new Array();
+				}
+				if(connections[i].user.favourites.indexOf(data.favourite) == -1){
+					connections[i].user.favourites.push(data.favourite);
+				}
+				
+			}
+		}
+		
+  });
+  
+    Dispatcher.registerCall('removeFavourite', function(socket, data){
+
+		var connections = UserManager.connections;
+		
+		for (var i in connections) {
+		
+			if(connections[i].user.id == data.id){
+			
+				if(typeof connections[i].user.favourites != "undefined"){
+				
+					var j = connections[i].user.favourites.indexOf(data.favourite);
+					
+					if(j != -1){
+						connections[i].user.favourites.splice(j, 1);
+					}	
+				}
+			}
+		}
+		
+  });
+  
 
   /* get all exiting access rights from the database */
   var collection = db.get('rights');
@@ -174,25 +303,167 @@ UserManager.login = function(socketOrUser, data) {
 };
 
 UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
-  UserManager.enterRoom(socketOrUser, data, responseID);
+  //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
+  var shouldInclude = [ PAPER_WRITER+"#Writer#20#100#700#2#locked;true#paper;"+data.roomID,
+                        "SimpleText#WritingAreaInfo#20#45#100#2#height;30#content;Writing Area:",
+                        "SimpleText#ReferenceInfo#800#45#100#2#height;30#content;References:",
+                        "Container#References#800#100#500#2#locked;true#height;455",
+                        "SimpleText#DefineInfo#800#600#190#2#height;30#content;Sort the PaperChapters from left to right to give them an order",
+                        "SimpleText#DefineInfo2#255#600#190#2#height;30#content;Place a chapter inside the selector to load it",
+                        "SimpleText#DefineInfo3#800#650#190#2#height;30#content;Note: At the moment you need to double-click a chapter to run the ordering algorithm...",
+                        "PaperSelector#Selector#655#700#1#1#locked;true"/*,
+                        "Line#TestLine#690#553#0#1#height;148",
+                        "PaperChapter#Chapter1#880#650#1#1#chapterID;"+data.roomID*/];
+  UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
+};
 
+UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, responseID, shouldInclude){
+  UserManager.enterRoom(socketOrUser, data, responseID);
   var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
   var context = UserManager.connections[userID];
 
   Modules.ObjectManager.getObjects(data.roomID, context, function(inventory) {
-    for (var aux in inventory) {
+
+    shouldInclude.forEach(function(item){
+      var token = item.split('#');
+
+      var oType = token[0];
+      var oName = token[1];
+      var oX    = token[2];
+      var oY    = token[3];
+      var oWidth= token[4];
+      var oAttsL= token[5];
+      var oAtts = [];
+      var oHeight = -1;
+      var oContent = "ERROR - Content not defined";
+  
+      var additionalAtts = []; 
+      for(var i = 6; i < oAttsL+6-1; i++){
+        if(typeof token[i] != 'undefined'){
+          var attToken = token[i].split(';');
+
+          var attName   = attToken[0];
+          var attValue  = attToken[1];
+
+          if(attName.indexOf('content') > -1){
+            oContent = attValue;
+          }else if(attName.indexOf('height') > -1){
+            oHeight = attValue;
+          }else{
+            additionalAtts.push(attName+";"+attValue);
+          }
+        }
+      }
+
+      var attr;
+      if(oHeight == -1){ 
+        attr = {x: oX, y: oY, width: oWidth, name: oName , paper: data.roomID};
+      }else{
+        attr = {x: oX, y: oY, width: oWidth, height: oHeight, name: oName , paper: data.roomID};
+      }
+
+      var found = false;
+      /* it it already there? */
+      for (var aux in inventory) {
       var obj = inventory[aux];
 
-      if (obj.type == PAPER_WRITER) {
-        return;
+        if(obj.getAttribute('name').indexOf(oName) > -1){
+          found = true;
+        }
       }
-    }
 
-    var attr = {x: "20", y: "45", width: "700", locked: true, paper: data.roomID};
-    Modules.ObjectManager.createObject(data.roomID, PAPER_WRITER, attr, false, context, function(error, obj) {
-      //Modules.Log.debug(obj);
+      /* if not found: create it */
+      if(!found){
+        Modules.ObjectManager.createObject(data.roomID, oType, attr, oContent, context, function(error, obj, addAtts) {
+
+          if(typeof addAtts != 'undefined'){
+          addAtts.forEach(function(item){
+
+            if(typeof item != 'undefined'){
+              var attToken2   = item.split(';');
+
+              var attName2    = attToken2[0];
+              var attValue2   = attToken2[1];
+
+              obj.setAttribute(attName2,attValue2); 
+            }
+          });
+          }
+
+          },additionalAtts);
+      }
+      });
+
     });
-  });
+  };
+
+UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
+  //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
+  var shouldInclude = [ "GlobalContainer#HMI#60#45#500#5#searchByTag;true#searchByName;false#name;HMI#locked;true#searchString;HMI#height;300",
+                        "GlobalContainer#ESS#600#45#500#5#searchByTag;true#searchByName;false#name;ESS#locked;true#searchString;ESS#height;300",
+                        "GlobalContainer#MaA#60#400#500#5#searchByTag;true#searchByName;false#name;MaA#locked;true#searchString;MaA#height;300",
+                        "GlobalContainer#SWT#600#400#500#5#searchByTag;true#searchByName;false#name;SWT#locked;true#searchString;SWT#height;300"];
+
+  UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
+};
+
+UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
+  //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
+  var shouldInclude = ["Textarea#PublicSpaceInfo#20#45#100#1#content;This is the private space of user "+
+                          UserManager.getConnectionBySocket(socketOrUser).user.username];
+
+  UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
+};
+
+UserManager.setDataOfSpaceWithDestServerSide = function(data){
+     var ss = db.get('SpaceStorage');
+
+     // if data is not included: store it
+    ss.find({'destination':data.destination,'key':data.key}, {}, function(e, docs){
+        if(typeof docs == 'undefined' || docs.length == 0){
+            ss.insert({'destination':data.destination, 'key':data.key, 'value':data.value});
+        }
+    });
+};
+
+UserManager.getDataOfSpaceWithDestServerSide = function(data, callback){
+     var ss = db.get('SpaceStorage');
+
+    ss.find({'destination':String(data.destination), 'key':String(data.key)}, {}, function(e, docs){
+      if(typeof docs != 'undefined' && docs.length > 0){
+        callback(docs);
+      }else{
+        callback("error");
+      }
+    });
+};
+
+UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID){
+     var ss = db.get('SpaceStorage');
+
+     // if data is not included: store it
+    ss.find({'destination':String(data.destination),'key':String(data.key)}, {}, function(e, docs){
+        if(typeof docs == 'undefined' || docs.length == 0){
+            ss.insert({'destination':data.destination, 'key':data.key, 'value':data.value});
+        }
+    });
+};
+
+UserManager.removeDataOfSpaceWithDest = function(socketOrUser, data, responseID){
+     var ss = db.get('SpaceStorage');
+
+     ss.remove({'destination': data.destination, 'key':data.key});
+};
+
+UserManager.getDataOfSpaceWithDest = function(socketOrUser, data, responseID){
+     var ss = db.get('SpaceStorage');
+    ss.find({'destination':data.destination, 'key':data.key}, {}, function(e, docs){
+      if(typeof docs != 'undefined' && docs.length > 0){
+        Modules.SocketServer.sendToSocket(socketOrUser, "umGetDataOfSpaceWithDest" + data.destination + data.key, docs);
+      }else{
+        Modules.SocketServer.sendToSocket(socketOrUser, "umGetDataOfSpaceWithDest" + data.destination + data.key, 'error');
+      }
+    });
 };
 
 /**
@@ -203,24 +474,16 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
  * @param {Object} responseID response ID.
  **/
 UserManager.enterRoom = function(socketOrUser, data, responseID) {
-  if (typeof socketOrUser.id == 'string')
-    var userID = socketOrUser.id;
-  else
-    var userID = socketOrUser;
-  // var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
-
-  if (data.index === undefined)
-    var index = 'left';
-  else
-    var index = data.index;
-  // var index = (data.index === undefined) ? 'left' : data.index;
+    var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
+    var index = (data.index === undefined) ? 'left' : data.index;
 
   var roomID = data.roomID;
 
   var connection = UserManager.connections[userID];
   var ObjectManager = Modules.ObjectManager;
 
-  //oldrooom is sent down to the connector, which may use it for parent creation
+    // oldrooom is sent down to the connector, which may use it for parent
+    // creation
   if (connection.rooms[index]) {
     var oldRoomId = connection.rooms[index].id;
   }
@@ -238,7 +501,8 @@ UserManager.enterRoom = function(socketOrUser, data, responseID) {
   // try to enter the room on the connector
   connector.mayEnter(roomID, connection, function(err, mayEnter) {
 
-    // if the connector responds true, the client is informed about the successful entering of the room
+        // if the connector responds true, the client is informed about the
+        // successful entering of the room
     // and all clients in the same rooms get new awarenessData.
     if (mayEnter) {
 
@@ -252,7 +516,9 @@ UserManager.enterRoom = function(socketOrUser, data, responseID) {
       //ObjectManager.sendChatMessages(roomID,socket);
 
       Modules.Dispatcher.respond(socket, responseID, false);
-      Modules.EventBus.emit("room::" + roomID + "::userEntered", {username: connection.user.username});
+            Modules.EventBus.emit("room::" + roomID + "::userEntered", {
+                username : connection.user.username
+            });
 
     } else {
       socketServer.sendToSocket(socket, 'error', 'User ' + user.username + ' may not enter ' + roomID);
@@ -625,6 +891,20 @@ UserManager.addUser = function(socket, data) {
  */
 UserManager.removeUser = function(socket, data) {
   UserManager.modifyUser(data.role, data.object, data.username, false);
+};
+
+/**
+ *  The function can be used to check wheter a user is valid (exists) or not
+ *  @param {Object} socket  Socket connection
+ *  @param {Object} data    Send data
+ *  @param {Sring} responseID  RespondId of the request
+ */
+UserManager.isValidUser = function(socket, data, responseID) {
+    Modules.UserDAO.usersByUserName(data.user, function(err, docs) {
+        var valid = (!err && docs.length > 0);
+        
+        Modules.SocketServer.respondToSocket(socket, responseID, valid);
+    })
 };
 
 /**

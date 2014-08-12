@@ -5,10 +5,10 @@
 *
 */
 
-PaperObject.getStatusIcon = function() {
+PaperChapter.getStatusIcon = function() {
 	return this.getIconPath() + "/paper";
 }
 
-PaperObject.getIconText = function() {
+PaperChapter.getIconText = function() {
     return this.getAttribute("name");
 }

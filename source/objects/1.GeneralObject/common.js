@@ -181,9 +181,15 @@ GeneralObject.register = function(type) {
   this.actionManager.init(this);
 
 
-  this.registerAttribute('id', {type: 'number', readonly: true});
+  this.registerAttribute('id', {type: 'text', readonly: true});
   this.registerAttribute('type', {type: 'text', readonly: true});
-  this.registerAttribute('name', {type: 'text'});
+  this.registerAttribute('name', {type: 'text', changedFunction: function(object, value) {
+      var obj = {id:object.id, name:value}; 
+      Modules.UserManager.broadcastNameChange(obj);
+
+      GUI.tabs.updateCache(object);
+      GUI.tabs.redrawTabContent();
+    }});
 
   this.registerAttribute('hasContent', {type: 'boolean', hidden: true, standard: false});
   this.registerAttribute('layer', {type: 'layer', readonly: false, category: 'Dimensions', changedFunction: function(object, value) {
@@ -202,7 +208,7 @@ GeneralObject.register = function(type) {
 
     }});
 
-  this.registerAttribute('height', {type: 'number', min: 5, standard: 100, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
+  this.registerAttribute('height', {type: 'number', min: 5, standard: 200, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
 
       if (object.resizeProportional()) {
         object.setAttribute("width", object.getAttribute("width") * (value / object.getAttribute("height")));
@@ -589,26 +595,27 @@ GeneralObject.registerAttribute = function(attribute, setter, type, min, max) {
  * @return {boolean} 
  */
 GeneralObject.setAttribute = function(attribute, value, forced, transactionId) {
+    if (this.mayChangeAttributes()) {
 
-
-  if (this.mayChangeAttributes()) {
-
-    //rights could also be checked in the attribute manager but HAVE to
-    //be checked on the server side.
+    // rights could also be checked in the attribute manager but HAVE to
+    // be checked on the server side.
 
     var ret = this.attributeManager.setAttribute(this, attribute, value, forced);
 
-    if (this.afterSetAttribute)
-      this.afterSetAttribute();
+    if (this.afterSetAttribute) {
+        this.afterSetAttribute();
+    }
 
     return ret;
 
   } else {
-    GUI.error('Missing rights', 'No right to change ' + attribute + ' on ' + this, this);
-    return false;
+      GUI.error('Missing rights', 'No right to change ' + attribute + ' on ' + this, this);
+      return false;
   }
 };
+
 GeneralObject.setAttribute.public = true;
+
 GeneralObject.setAttribute.neededRights = {
   write: true
 };

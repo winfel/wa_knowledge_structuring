@@ -67,7 +67,7 @@ try {
 		config[key] = value;
 	}
 } catch (e) {
-	console.log('Attention: No local config');
+	console.log('Attention: No local config: ' + e);
 }
 
 //make config available for modules
