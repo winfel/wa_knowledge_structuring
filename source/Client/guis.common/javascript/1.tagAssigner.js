@@ -204,7 +204,7 @@ GUI.tagAssigner = new function() {
 				
 				//if a MainTag with this name already exists, discard the new entry
 				for (var index = 0; index < that.mainTags.length; ++index) {
-					if(that.mainTags[index].name == customMainTagValue){
+					if (that.mainTags[index].name == customMainTagValue){
 					
 						//reset the value of the input field
 						$(this).val("");
@@ -250,9 +250,6 @@ GUI.tagAssigner = new function() {
 				
 				//reset the value of the input field
 				$(this).val("");
-				  
-				
-					
 			}
 			
 		});

@@ -5,7 +5,7 @@
 *
 */	
 
-GlobalContainer.draw=function(external){
+CustomContainer.draw=function(external){
 	var rep=this.getRepresentation();
 	
 	/* manual check for a changed name - we need to save time ;-)*/
@@ -31,7 +31,7 @@ GlobalContainer.draw=function(external){
 }
 
 
-GlobalContainer.updateInnerHeight = function() {
+CustomContainer.updateInnerHeight = function() {
 	
 	var rep=this.getRepresentation();
 
@@ -51,7 +51,7 @@ GlobalContainer.updateInnerHeight = function() {
 }
 
 
-GlobalContainer.createRepresentation = function(parent) { 	
+CustomContainer.createRepresentation = function(parent) { 	
 	
 	var rep = GUI.svg.other(parent,"foreignObject");
 
@@ -61,20 +61,18 @@ GlobalContainer.createRepresentation = function(parent) {
 	
 	this.drawContent(rep);
 	
-	this.setAttribute('locked', true);
-	
 	this.upd();
 	
 	return rep;
 	
 }
 
-GlobalContainer.adjustControls = function() {
+CustomContainer.adjustControls = function() {
 	this.updateInnerHeight();
 	GeneralObject.adjustControls.call(this);
 }
 
-GlobalContainer.drawContent = function(rep){
+CustomContainer.drawContent = function(rep){
 
 	var that = this;
 
@@ -82,7 +80,7 @@ GlobalContainer.drawContent = function(rep){
 
 	var compiled = _.template($( "script#container-template" ).html());
 
-	 var heading = "GlobalContainer";
+	 var heading = "CustomContainer";
 
     var templateData = {
         heading : heading
@@ -132,34 +130,6 @@ GlobalContainer.drawContent = function(rep){
 	$(rep).find("#containment-wrapper").css("overflow", "auto");
 	$(rep).find("#containment-wrapper").css("text-align", "center");
 	
-	$(rep).find("#containment-wrapper").droppable({
-      drop: function( event, ui ) {
-	  	
-			if($(rep).find("#"+ui.draggable.context.id).length == 0){ //not existing in this container
-			
-				var r = confirm("Do you really want to change the main Tag of this object to "+$(rep).find("#containername").html()+"?");
-				if (r == true) {
-				
-					var objectId = ui.draggable.context.id.split("_")[2];
-					
-					var t = ui.draggable.context.innerHTML;
-					var i = t.indexOf("content");
-					t = t.slice(i, t.length).split(" ")[0].split("=")[1];
-					t = t.substring(0, t.length - 1);
-					var room = t.substring(1, t.length);
-					
-					that.changeMainTag(objectId, $(rep).find("#containername").html(), room);
-					
-					var objects = ObjectManager.getObjects();
-					var key;
-					for(key in objects){
-						var o = ObjectManager.getObject(key);
-						o.upd();
-					}
-				}
-			}
-      }
-    });
 
 	/* add Search/Filter-Popover */
 	$(body).find( "button:first" ).next().jPopover({
@@ -389,7 +359,7 @@ GlobalContainer.drawContent = function(rep){
 }
 
 
-GlobalContainer.rename = function(newName){
+CustomContainer.rename = function(newName){
 
 	var rep=this.getRepresentation();
 
@@ -397,14 +367,14 @@ GlobalContainer.rename = function(newName){
 		
 }
 
-GlobalContainer.addFiles = function(files){
+CustomContainer.addFiles = function(files){
 	
 	var that = this;
 
 	var rep=this.getRepresentation();
 	
 	if(files.length == 0){
-		$(rep).find("#sortablefiles").html("This Container shows all files which are tagged with the main Tag "+$(rep).find("#containername").html()+"!");
+		$(rep).find("#sortablefiles").html("Add your files by dragging them here!");
 		return;
 	}
 	else{
@@ -417,7 +387,6 @@ GlobalContainer.addFiles = function(files){
 		var name = files[key].attributes.name;
 		var n = name.split('.')[0];
 		var type = name.split('.')[1];
-		var room = files[key].attributes.inRoom;
 		
 		if(n.length>13){
 			n = n.substring(0,10)+ "...";
@@ -450,7 +419,7 @@ GlobalContainer.addFiles = function(files){
 		
 		$(rep).find("#sortablefiles").append('<li id=representation_for_'+id+' class="ui-widget-content" tabindex="-1">'+n+'</li>');
 		
-		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" content="'+room+'" src="../../guis.common/images/fileicons/'+img+'">');
+		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" src="../../guis.common/images/fileicons/'+img+'">');
 		
 		$(rep).find("#sortablefiles li").css("margin", "3px 3px 3px 0");
 		$(rep).find("#sortablefiles li").css("padding", "1px");
@@ -463,12 +432,6 @@ GlobalContainer.addFiles = function(files){
 		$(rep).find("#sortablefiles li").css("vertical-align", "middle");	
 		$(rep).find("#sortablefiles li").css("background", "#d3d3d3");	
 		
-		$(rep).find("#sortablefiles li").draggable({
-			helper: 'clone',
-			revert: 'invalid',
-			appendTo: 'body'
-		});
-		
 		$(rep).find("#representation_for_"+id).hover(
 			function() {
 				$(this).css("background", "#f5f5f5");
@@ -476,27 +439,40 @@ GlobalContainer.addFiles = function(files){
 				$(this).css("background", "#d3d3d3");	
 			}
 		);
-
+		
 		$(rep).find("#representation_for_"+id).bind("contextmenu", function(event) { 
 			event.preventDefault();
 			$("div.addremove-menu").remove();
 			var id = this.id.split("_")[2];
-			$("<div id=menu_for_"+id+" class='addremove-menu'>Add to favourites</div>")
+			$("<div id=menu_for_"+id+" class='addremove-menu'>Remove</div>")
 			.appendTo("body")
 			.css({top: event.pageY + "px", left: event.pageX + "px"})
 			.on("click", function(event){
-					
-				that.sendNewFavourite(this.id.split("_")[2]);
-				
+						
+				$(rep).find("#representation_for_"+this.id.split("_")[2]).remove();
+								
 				$("div.addremove-menu").remove();
+				
+				var arr = that.getAttribute('files');
+				var key;
+				for(key in arr){
+					if(arr[key].attributes.id == this.id.split("_")[2]){
+						arr.splice(key, 1);
+					}
+				}
+				
+				that.setAttribute('files', arr);
+				
+				that.upd();
+				
 			});
 		});
-		
+
 	}	
 		
 }
 
-GlobalContainer.upd = function(){
+CustomContainer.upd = function(){
 
 	this.getFiles();
 

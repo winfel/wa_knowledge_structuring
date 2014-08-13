@@ -43,9 +43,12 @@ theObject.getAllFileObjects = function(id, cb){
 
 theObject.getAllFileObjects.public = true;
 
-theObject.onEnter=function(object,oldData,newData){
-     
-     /* Todo: Add dragged file to GlobalContainer */
-     //console.log('Enter GlobalContainer');
- 
- }
+theObject.changeMainTag = function(d){
+
+	Modules.ObjectManager.getObject(d.room, d.id, true, function(o){
+		o.setAttribute('mainTag', d.tag);
+	});
+
+}
+
+theObject.changeMainTag.public = true;

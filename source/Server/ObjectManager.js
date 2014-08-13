@@ -36,6 +36,54 @@ ObjectManager.history = require("./HistoryTracker.js").HistoryTracker(100);
 
 var enter = String.fromCharCode(10);
 
+/**
+ *  init
+ *
+ *  initializes the ObjectManager
+ *
+ *  @param theModules   reference to the server modules
+ *
+ **/
+ObjectManager.init = function (theModules) {
+    var that = this;
+    Modules = theModules;
+
+    //go through all objects, build its client code (the code for the client side)
+    //register the object types.
+
+    var processFunction = function(filename){
+        var fileinfo = filename.split('.');
+        var objName = fileinfo[1];
+        var filebase = __dirname + '/../objects/' + filename;
+
+        var obj = require(filebase + '/server.js');
+        obj.ObjectManager = Modules.ObjectManager;
+        obj.register(objName);
+
+        obj.localIconPath = function (selection) {
+            selection = (selection) ? '_' + selection : '';
+            return filebase + '/icon' + selection + '.png';
+        }
+    }
+
+    var files = this.getEnabledObjectTypes();
+    files.forEach(function (filename) {
+
+
+        if(Modules.Config.debugMode){
+            processFunction(filename);
+        } else {
+            try {
+                processFunction(filename)
+            } catch (e) {
+                Modules.Log.warn('Could not register ' + filename);
+                Modules.Log.warn(e.stack);
+            }
+        }
+
+    });
+}
+
 ObjectManager.toString = function () {
 	return 'ObjectManager (server)';
 }
@@ -49,6 +97,21 @@ ObjectManager.registerType = function (type, constr) {
 	prototypes[type] = constr;
 }
 
+/**
+ *  getPrototype / getPrototypeFor
+ *
+ *  gets the prototype (the class) of an object.
+ *
+ *  @param  the chosen object
+ *  @return the prototype (the class) of an object.
+ */
+ObjectManager.getPrototype = function (objType) {
+    if (prototypes[objType]) return prototypes[objType];
+    if (prototypes['GeneralObject']) return prototypes['GeneralObject'];
+    return;
+}
+
+ObjectManager.getPrototypeFor = ObjectManager.getPrototype;
 
 /**
  *  remove
@@ -64,76 +127,50 @@ ObjectManager.remove = function (obj) {
 
 	// Inform clients about remove.
 	obj.updateClients('objectDelete');
-
 }
 
-/**
- *  getPrototype / getPrototypeFor
- *
- *  gets the prototype (the class) of an object.
- *
- *  @param  the chosen object
- *  @return the prototype (the class) of an object.
- */
-ObjectManager.getPrototype = function (objType) {
-	if (prototypes[objType]) return prototypes[objType];
-	if (prototypes['GeneralObject']) return prototypes['GeneralObject'];
-	return;
-}
-
-ObjectManager.getPrototypeFor = ObjectManager.getPrototype;
-
-
-/**
- *  buildObjectFromObjectData
- *
- *  creates an object from given objectData. This objectData are the
- *  attributes saved on the persistance layer.
- *
- *  Attention. This is called on EVERY call of getObject so object you
- *  get by getObject is a different one on every call. The consequence
- *  of this is, that you cannot add properties to the object! If you
- *  want to save runtime data, use the runtimeData property.
- *
- *  @param objectData
- *  @param roomID
- *  @param type
- *
- *  @return the created object
- *
- */
-function buildObjectFromObjectData(objectData, roomID, type) {
+//Deletes an object:
+//1) If the object is in the trash room it is deleted completely from the database
+//2) If it is in any other room it is moved to the trash room
+ObjectManager.deleteObject = function (data, context, callback) {
+    var that = this;
     
-	if (!objectData) {
-		Modules.Log.error('No object data!');
-	}
-
-	var type = type || objectData.type;
-	
-	// get the object's prototype
-	var proto = ObjectManager.getPrototypeFor(type);
-
-	// build a new object
-	var obj = Object.create(proto);
-	obj.init(objectData.id);
-
-	// set the object's attributes and rights
-	obj.setAll(objectData.attributes);
-	obj.rights = objectData.rights;
-	obj.id = objectData.id;
-	obj.attributeManager.set(objectData.id, 'id', objectData.id);
-	obj.inRoom = roomID;
-	obj.set('type', type);
-
-	if (!runtimeData[obj.id]) runtimeData[obj.id] = {}; // create runtime data for this object if there is none
-
-	obj.runtimeData = runtimeData[obj.id];
-
-    if (typeof obj.afterCreation == "function") {
-        obj.afterCreation();
+    var roomID = data.roomID
+    var objectID = data.objectID;
+    
+    var afterRightsCheck = function (err, hasRights) {
+        if (err) callback(err, null);
+        else {
+            if (hasRights) {
+                ObjectManager.getObject(roomID, objectID, context, function(object) {
+                    
+                    if (!object) {
+                        callback(new Error('Object not found ' + objectID), null);
+                        return;
+                    }
+    
+                    Modules.EventBus.emit("room::" + roomID + "::" + objectID + "::delete", data);
+                    var historyEntry = {
+                        'oldRoomID': roomID,
+                        'oldObjectId': objectID,
+                        'roomID': TRASH_ROOM,
+                        'action': 'delete'
+                    }
+                    
+                    Modules.Connector.getTrashRoom(context, function (toRoom) {
+                        object.remove();             
+                        var transactionId = data.transactionId;
+                        that.history.add(transactionId, data.userId, historyEntry);
+                    });
+                                  
+                });
+            } else {
+                callback(new Error('No rights to delete object: ' + objectID), null);
+            }
+        }
     }
-
-	return obj;
+    
+    Modules.Connector.mayDelete(roomID, objectID, context, afterRightsCheck)
 }
 
 /**
@@ -355,54 +392,6 @@ ObjectManager.getEnabledObjectTypes = function () {
 }
 
 /**
- *  init
- *
- *  initializes the ObjectManager
- *
- *  @param theModules   reference to the server modules
- *
- **/
-ObjectManager.init = function (theModules) {
-	var that = this;
-	Modules = theModules;
-
-	//go through all objects, build its client code (the code for the client side)
-	//register the object types.
-
-    var processFunction = function(filename){
-        var fileinfo = filename.split('.');
-        var objName = fileinfo[1];
-        var filebase = __dirname + '/../objects/' + filename;
-
-        var obj = require(filebase + '/server.js');
-        obj.ObjectManager = Modules.ObjectManager;
-        obj.register(objName);
-
-        obj.localIconPath = function (selection) {
-            selection = (selection) ? '_' + selection : '';
-            return filebase + '/icon' + selection + '.png';
-        }
-    }
-
-	var files = this.getEnabledObjectTypes();
-	files.forEach(function (filename) {
-
-
-        if(Modules.Config.debugMode){
-            processFunction(filename);
-        } else {
-            try {
-                processFunction(filename)
-            } catch (e) {
-                Modules.Log.warn('Could not register ' + filename);
-                Modules.Log.warn(e.stack);
-            }
-        }
-
-	});
-}
-
-/**
  *  undo
  *
  *  Removes the last change
@@ -505,47 +494,6 @@ ObjectManager.countSubrooms = function (roomID, context) {
 
 	return counter;
 }
-
-
-/**
- *
- * When using "async" sometimes it is helpful to create a
- * callback wrapper that transforms "false" to an error.
- *
- * @param message - the error message
- * @param cb
- * @return {Function}
- */
-var falseToError = function (message, cb) {
-	return function (err, res) {
-		if (err) cb(err, null);
-		else if (!res) cb(new Error(message), null);
-		else cb(null, res);
-	}
-}
-
-/**
- * Check read rights for multiple files.
- *
- * @param fromRoom
- * @param files
- * @param context
- * @param cb
- */
-var mayReadMultiple = function (fromRoom, files, context, cb) {
-	var checks = [];
-	files.forEach(function (file) {
-		checks.push(function (cb2) {
-			Modules.Connector.mayRead(fromRoom,file, null, falseToError("Can't read file: " + file, cb2))
-		});
-	});
-
-	async.parallel(checks, function (err, res) {
-		if (err) cb(err, null);
-		else cb(null, true);
-	});
-}
-
 
 /**
  * 1. Get specified objects (or all of room)
@@ -765,49 +713,95 @@ ObjectManager.duplicateNew2 = function (data, context, cbo) {
 
 }
 
+/**
+*
+* When using "async" sometimes it is helpful to create a
+* callback wrapper that transforms "false" to an error.
+*
+* @param message - the error message
+* @param cb
+* @return {Function}
+*/
+var falseToError = function (message, cb) {
+   return function (err, res) {
+       if (err) cb(err, null);
+       else if (!res) cb(new Error(message), null);
+       else cb(null, res);
+   }
+}
 
-// Deletes an object:
-//  1) If the object is in the trash room it is deleted completely from the database
-//  2) If it is in any other room it is moved to the trash room
-ObjectManager.deleteObject = function (data, context, callback) {
-	var that = this;
+/**
+* Check read rights for multiple files.
+*
+* @param fromRoom
+* @param files
+* @param context
+* @param cb
+*/
+var mayReadMultiple = function (fromRoom, files, context, cb) {
+   var checks = [];
+   files.forEach(function (file) {
+       checks.push(function (cb2) {
+           Modules.Connector.mayRead(fromRoom,file, null, falseToError("Can't read file: " + file, cb2))
+       });
+   });
 
-	var roomID = data.roomID
-	var objectID = data.objectID;
+   async.parallel(checks, function (err, res) {
+       if (err) cb(err, null);
+       else cb(null, true);
+   });
+}
 
-	var afterRightsCheck = function (err, hasRights) {
-		if (err) callback(err, null);
-		else {
-			if (hasRights) {
-				ObjectManager.getObject(roomID, objectID, context, function(object) {
-				    
-				    if (!object) {
-	                    callback(new Error('Object not found ' + objectID), null);
-	                    return;
-	                }
+/**
+*  buildObjectFromObjectData
+*
+*  creates an object from given objectData. This objectData are the
+*  attributes saved on the persistance layer.
+*
+*  Attention. This is called on EVERY call of getObject so object you
+*  get by getObject is a different one on every call. The consequence
+*  of this is, that you cannot add properties to the object! If you
+*  want to save runtime data, use the runtimeData property.
+*
+*  @param objectData
+*  @param roomID
+*  @param type
+*
+*  @return the created object
+*
+*/
+function buildObjectFromObjectData(objectData, roomID, type) {
+   
+   if (!objectData) {
+       Modules.Log.error('No object data!');
+   }
 
-	                Modules.EventBus.emit("room::" + roomID + "::" + objectID + "::delete", data);
-	                var historyEntry = {
-	                    'oldRoomID': roomID,
-	                    'oldObjectId': objectID,
-	                    'roomID': TRASH_ROOM,
-	                    'action': 'delete'
-	                }
-	                
-	                Modules.Connector.getTrashRoom(context, function (toRoom) {
-    	                object.remove();             
-                        var transactionId = data.transactionId;
-                        that.history.add(transactionId, data.userId, historyEntry);
-	                });
-	                              
-				});
-			} else {
-				callback(new Error('No rights to delete object: ' + objectID), null);
-			}
-		}
-	}
+   var type = type || objectData.type;
+   
+   // get the object's prototype
+   var proto = ObjectManager.getPrototypeFor(type);
 
-	Modules.Connector.mayDelete(roomID, objectID, context, afterRightsCheck)
+   // build a new object
+   var obj = Object.create(proto);
+   obj.init(objectData.id);
+
+   // set the object's attributes and rights
+   obj.setAll(objectData.attributes);
+   obj.rights = objectData.rights;
+   obj.id = objectData.id;
+   obj.attributeManager.set(objectData.id, 'id', objectData.id);
+   obj.inRoom = roomID;
+   obj.set('type', type);
+
+   if (!runtimeData[obj.id]) runtimeData[obj.id] = {}; // create runtime data for this object if there is none
+
+   obj.runtimeData = runtimeData[obj.id];
+
+   if (typeof obj.afterCreation == "function") {
+       obj.afterCreation();
+   }
+
+   return obj;
 }
 
 module.exports = ObjectManager;

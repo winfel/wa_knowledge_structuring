@@ -5,48 +5,60 @@
 *
 */
 
-GlobalContainer.afterServerCall = function(files){
 
-	files = JSON.parse(files);
+CustomContainer.newFile = function(id){
+	
+	var o = ObjectManager.getObject(id);
+	
+	if(o.getAttribute('type') != "File"){
+		return;
+	}
+	
+	var files = this.getAttribute('files');
+	
+	if(files == 0 || files.length == 0){
+		files = new Array();
+	}	
+	else{
+		var key;
+		for(key in files){
+			if(files[key].attributes.id == id){
+				return;
+			}
+		}
+	}
+	
 
-	var id = files.pop();
-	var con = ObjectManager.getObject(id);
-	con.searchAndFilter(files);
-
+	var n = {
+		attributes : {
+			name : o.getAttribute('name'),
+			mainTag : o.getAttribute('mainTag'),
+			secondaryTags : o.getAttribute('secondaryTags'),
+			mimeType : o.getAttribute('mimeType'),
+			contentAge : o.getAttribute('contentAge'),
+			id : id
+		}
+	}
+	
+	files.push(n)
+	this.setAttribute('files', files);
+	this.searchAndFilter(files);	
+	
 }
 
 
-GlobalContainer.getFiles = function(){
+CustomContainer.getFiles = function(){
 		
-	this.serverCall("getAllFileObjects", this.id, GlobalContainer.afterServerCall);
+	var files = this.getAttribute('files');
 		
+	if(files == 0 || files.length == 0){
+		files = new Array();
+	}	
+	this.searchAndFilter(files);	
 }
 
 
-GlobalContainer.sendNewFavourite = function(fav){
-		
-	Modules.SocketClient.serverCall('addNewFavourite', {
-		'favourite': fav,
-		'name': ObjectManager.user.username
-	});
-		
-}
-
-
-GlobalContainer.changeMainTag = function(objectId, newTag, roomId){
-
-	var d = {
-		id : objectId,
-		tag : newTag,
-		room : roomId
-	};
-
-	this.serverCall("changeMainTag", d);
-
-}
-
-
-GlobalContainer.searchAndFilter = function(files){
+CustomContainer.searchAndFilter = function(files){
 	
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
@@ -148,7 +160,7 @@ GlobalContainer.searchAndFilter = function(files){
 }
 
 
-GlobalContainer.sortFiles = function(files){ //bubble sort
+CustomContainer.sortFiles = function(files){ //bubble sort
 
 	var sortingCriterion = this.getAttribute('sortingCriterion');
 	var sortingOrder = this.getAttribute('sortingOrder');

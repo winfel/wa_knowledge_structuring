@@ -8,28 +8,30 @@
 var Modules=require('../../server.js');
 
 /**
- * FavouritesContainer
+ * CustomContainer
  * @class
  * @classdesc Common elements for view and server
  */
 
-var FavouritesContainer=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
+var CustomContainer=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
 /**
  * Registers the object (attributes and actions).
  *
- * @this {FavouritesContainer}
+ * @this {CustomContainer}
  * @see Client/ObjectManager.js
  * @see objects/1.GeneralObject/common.js
- * @see objects/2.FavouritesContainer/view.js
+ * @see objects/2.CustomContainer/view.js
  * @param {string} type The type of the object
  */
-FavouritesContainer.register=function(type){
+CustomContainer.register=function(type){
 	
 	// Registering the object
 	
 	GeneralObject=Modules.ObjectManager.getPrototype('GeneralObject');
 	GeneralObject.register.call(this,type);
+	
+	this.makeSensitive();
 	
 	this.registerAttribute('width', {type: 'number', min: 420, standard: 475, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
 
@@ -52,7 +54,7 @@ FavouritesContainer.register=function(type){
     }});
 
 
-	this.registerAttribute('name', {type: 'text', standard: 'Favourites', changedFunction: function(object, value) {
+	this.registerAttribute('name', {type: 'text', standard: 'CustomContainer', changedFunction: function(object, value) {
 		var obj = {id:object.id, name:value}; 
 		object.rename(value);
 		
@@ -70,6 +72,8 @@ FavouritesContainer.register=function(type){
 	this.registerAttribute('searchForVideo', {type: 'boolean', hidden: true, standard: true});
 	this.registerAttribute('searchForText', {type: 'boolean', hidden: true, standard: true});
 	
+	this.registerAttribute('files', {hidden: true, standard: [] });
+	
 	this.registerAction('Edit',function(){
 		$.each(ObjectManager.getSelected(), function(key, object) {
 			object.execute();
@@ -81,39 +85,39 @@ FavouritesContainer.register=function(type){
 /**
  * TODO
  *
- * @this {FavouritesContainer}
- * @see objects/2.FavouritesContainer/view.js
+ * @this {CustomContainer}
+ * @see objects/2.CustomContainer/view.js
  */
-FavouritesContainer.execute=function(){
+CustomContainer.execute=function(){
 
 }
 
 /**
  * Changes the name of the object to the given parameter newValue.
  *
- * @this {FavouritesContainer}
+ * @this {CustomContainer}
  * @param {string} newValue
  * @see objects/1.GeneralObject/common.js
  * @see objects/1.GeneralObject/client.js
  */
-FavouritesContainer.intelligentRename=function(newValue){
+CustomContainer.intelligentRename=function(newValue){
 	var objectName = this.getAttribute("name");
 	var that = this;
 	this.getContentAsString(function(oldValue){
 		if ( newValue.length > 30 )
 		{ newValue = newValue.substring(0, 30); }
 	
-		if ( objectName == "Favourites" || objectName == oldValue )
+		if ( objectName == "CustomContainer" || objectName == oldValue )
 		{ that.setAttribute("name", newValue); }
 	});
 }
 
 
-FavouritesContainer.register('FavouritesContainer');
-FavouritesContainer.isCreatable=true;
+CustomContainer.register('CustomContainer');
+CustomContainer.isCreatable=true;
 
-FavouritesContainer.contentURLOnly = false; //content is only accessible via URL
+CustomContainer.contentURLOnly = false; //content is only accessible via URL
 
-FavouritesContainer.category='Active';
+CustomContainer.category='Active';
 
-module.exports=FavouritesContainer;
+module.exports=CustomContainer;
