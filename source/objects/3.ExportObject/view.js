@@ -14,8 +14,21 @@ ExportObject.draw = function(external) {
 	this.setViewHeight(60*2);
 
 	var rep = this.getRepresentation();
+	var inputPapers = that.getAttribute('inputPapers');
 
-	//$(rep).find("text").remove();
+	var connectorH = (inputPapers.length + 1) * 80;
+	$(rep).find('.PaperConnector').attr('points', 
+		[[-45,60-connectorH/2], [-10,60-connectorH/2], [-10,60], [-5,60], [-10,60], [-10,60+connectorH/2], [-45,60+connectorH/2]]
+	);
+
+	var px = this.get('x')-18 - 64;
+	var py = this.get('y') + 60-connectorH/2 + 8;
+	var inventory = this.getRoom().getInventory();
+
+	inputPapers.forEach(function(p,i) {
+		inventory[p].setAttribute('x', px);
+		inventory[p].setAttribute('y', py + 80 * i);
+	});
 
 	if(inputPapers.length>0) {
 		$(rep).find('.ExportOption').show();
@@ -23,7 +36,14 @@ ExportObject.draw = function(external) {
 	else {
 		$(rep).find('.ExportOption').hide();
 	}
-	
+
+	//$(rep).find("text").remove();
+
+	//if (!$(rep).hasClass("selected")) {
+	//	$(rep).find("rect").attr("stroke", this.getAttribute('linecolor'));
+	//	$(rep).find("rect").attr("stroke-width", this.getAttribute('linesize'));
+	//}
+
 	//this.createPixelMap();
 };
 
@@ -117,14 +137,12 @@ ExportObject.createRepresentation = function(parent) {
 	});
 	GUI.svg.image(newParent, radius-32,radius-32, 64,64, this.getIconPath());
 
-	// listen to moves of all (existing) PaperObjects
-	this.getSurroundingPapers().forEach(function(i) {
-		var temp = i.moveHandler;
-		i.moveHandler = function(){
-			temp.call(i);
-			that.drawPaperConnectors();
-		};
-	});
+	$(GUI.svg.polyline(newParent, [[-45,20], [-10,20], [-10,60], [-5,60], [-10,60], [-10,100], [-45,100]], {
+		fill: 'transparent',
+		stroke: 'gray',
+		strokeWidth: 1,
+	}))
+	.addClass('PaperConnector');
 
 	this.createExportIcons(newParent);
 
@@ -183,7 +201,7 @@ ExportObject.createExportIcons = function(rep) {
 			var paperstring = '';
 			that.getAttribute('inputPapers').forEach(function(paper) {
 				paperstring += paper + '\n';
-				});
+			});
 			window.alert('Export\n' + paperstring + 'to ' + $(this).data('exportFormat'));
 			event.stopPropagation();
 		});
