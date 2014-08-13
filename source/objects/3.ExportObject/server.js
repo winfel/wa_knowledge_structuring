@@ -10,7 +10,7 @@
 var theObject=Object.create(require('./common.js'));
 var Modules=require('../../server.js');
 
-theObject.onEnter=function(object,oldData,newData) {
+theObject.execute = function(object,oldData,newData) {
 	var that = this;
 	
 	//Modules.
@@ -133,8 +133,56 @@ theObject.onEnter=function(object,oldData,newData) {
 			});
 		}
 	}
+};
 
+theObject.onEnter = function(object,oldData,newData) {
+	var that = this;
+	var inputPapers = this.getAttribute('inputPapers');
+
+	if(!(object.getType() == 'PaperSpace'
+		|| object.getType() == 'PaperChapter'
+		|| object.getType() == 'PaperObject')) {
+		console.log('no paper');
+		return;
+	}
+
+	if(inputPapers.indexOf(object.getId()) != -1) {
+		return;
+	}
+	inputPapers.push(object.getId());
+
+	this.getRoom(function(room){
+		console.log('async sucks');
+		room.getInventoryAsync(function(inventory){
+			console.log('really sucks');
+
+			// sort papers by y coordinate
+			var y_coordinates = {};
+			inventory.forEach(function(i) {
+				y_coordinates[i.getId()] = i.get('y');
+			});
+			inputPapers.sort(function(a, b) {
+				return y_coordinates[a] - y_coordinates[b];
+			});
+
+			that.setAttribute('inputPapers', inputPapers);
+			that.persist();
+		});
+	});
 	this.fireEvent('enter',object);
+};
+
+theObject.onLeave = function(object,oldData,newData) {
+	var that = this;
+	var inputPapers = this.getAttribute('inputPapers');
+
+	if(inputPapers.indexOf(object.getId()) == -1) {
+		return;
+	}
+	inputPapers.splice(inputPapers.indexOf(object.getId()), 1);
+
+	that.setAttribute('inputPapers', inputPapers);
+	that.persist();
 };
 
 /**

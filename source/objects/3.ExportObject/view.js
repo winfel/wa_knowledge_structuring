@@ -17,13 +17,14 @@ ExportObject.draw = function(external) {
 
 	//$(rep).find("text").remove();
 
-	if (!$(rep).hasClass("selected")) {
-		$(rep).find("rect").attr("stroke", this.getAttribute('linecolor'));
-		$(rep).find("rect").attr("stroke-width", this.getAttribute('linesize'));
+	if(inputPapers.length>0) {
+		$(rep).find('.ExportOption').show();
+	}
+	else {
+		$(rep).find('.ExportOption').hide();
 	}
 	
 	//this.createPixelMap();
-	this.drawPaperConnectors();
 };
 
 /**
@@ -81,7 +82,7 @@ ExportObject.drawPaperConnectors = function() {
  */
 ExportObject.moveHandler = function() {
 	GeneralObject.moveHandler.call(this);
-	this.drawPaperConnectors();
+	//this.drawPaperConnectors();
 };
 
 /* get the width of the objects bounding box */
@@ -180,11 +181,9 @@ ExportObject.createExportIcons = function(rep) {
 		})
 		.mousedown(function(event) {
 			var paperstring = '';
-			if(that.awareOfPapers && that.awareOfPapers.length) {
-				that.awareOfPapers.forEach(function(paper) {
-					paperstring += paper.getId() + '\n';
+			that.getAttribute('inputPapers').forEach(function(paper) {
+				paperstring += paper + '\n';
 				});
-			}
 			window.alert('Export\n' + paperstring + 'to ' + $(this).data('exportFormat'));
 			event.stopPropagation();
 		});

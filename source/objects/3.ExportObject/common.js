@@ -40,6 +40,7 @@ ExportObject.register = function(type) {
 	this.registerAttribute('height',{hidden:true});
     this.registerAttribute('exportFormat', {type: 'selection', standard: 'text', 
         options: [ 'text', 'pdf', 'html', 'image_png', 'image_jpg', 'image_svg' ], category: 'Basic'});
+	this.registerAttribute('inputPapers', {type: 'list', standard: [], category: 'Basic'});
 };
 
 /**
