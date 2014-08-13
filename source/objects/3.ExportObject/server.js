@@ -23,8 +23,10 @@ theObject.onEnter=function(object,oldData,newData) {
 			hasContent : true,	// prevent calling justCreated() after object
 								// creation (would display file upload dialog)
 			name: filename,
+			visible: false,
 		}, data, that.context, function(dummy, newObject) {
 			newObject.set('mimeType',mimeType);
+			newObject.set('visible', true);
 			newObject.persist();
 		});
 	};
@@ -150,7 +152,7 @@ theObject.getSurroundingPapers = function(callback) {
 			}
 			callback(papers);
 		});
-			}
+	}
 	return [];
 };
 
