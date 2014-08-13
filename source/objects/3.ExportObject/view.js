@@ -155,10 +155,39 @@ ExportObject.createExportIcons = function(rep) {
 			width: 32,
 			height: 32,
 		});
+		// a rect for border
+		GUI.svg.rect(box,
+			0,
+			0,
+			32,32, {
+				fill: 'transparent',
+			});
 		// the icon
 		GUI.svg.image(box,
 			0,0,
 			32,32, exportIconPaths[i]);
+
+		// add funcionality
+		$(box)
+		.addClass('ExportOption')
+		.hide()
+		.data('exportFormat', exportOptions[i])
+		.hover(function(event) {
+			$('rect', this).attr({
+				stroke: 'grey',
+				'stroke-width': (event.type=='mouseenter'?'2px':'0'),
+			});
+		})
+		.mousedown(function(event) {
+			var paperstring = '';
+			if(that.awareOfPapers && that.awareOfPapers.length) {
+				that.awareOfPapers.forEach(function(paper) {
+					paperstring += paper.getId() + '\n';
+				});
+			}
+			window.alert('Export\n' + paperstring + 'to ' + $(this).data('exportFormat'));
+			event.stopPropagation();
+		});
 
 	}
 };
