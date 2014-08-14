@@ -5,6 +5,22 @@
 *
 */
 
+CustomContainer.options = {
+
+	searchString : "",
+	searchByName : true,
+	searchByTag : false,
+	searchForPDF : true,
+	searchForHTML : true,
+	searchForImage : true,
+	searchForAudio : true,
+	searchForVideo : true,
+	searchForText : true,
+	sortingCriterion : "By Name",
+	sortingOrder : "From A to Z"
+
+}
+
 
 CustomContainer.newFile = function(id){
 	
@@ -66,17 +82,17 @@ CustomContainer.searchAndFilter = function(files){
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
 	
-	var s = this.getAttribute('searchString');
-	var name = this.getAttribute('searchByName');
-	var tag = this.getAttribute('searchByTag');
-	var pdf = this.getAttribute('searchForPDF');
-	var html = this.getAttribute('searchForHTML');
-	var image = this.getAttribute('searchForImage');
-	var audio = this.getAttribute('searchForAudio');
-	var video = this.getAttribute('searchForVideo');
-	var text = this.getAttribute('searchForText');
-
-	if(s.length == 0 || s == "" || s == 0){
+	var s = this.options.searchString;
+	var name = this.options.searchByName;
+	var tag = this.options.searchByTag;
+	var pdf = this.options.searchForPDF;
+	var html = this.options.searchForHTML;
+	var image = this.options.searchForImage;
+	var audio = this.options.searchForAudio;
+	var video = this.options.searchForVideo;
+	var text = this.options.searchForText;
+	
+	if(typeof s === "undefined" || s == "" || s == 0){
 		filteredFiles1 = files;
 	}
 	else{
@@ -165,8 +181,8 @@ CustomContainer.searchAndFilter = function(files){
 
 CustomContainer.sortFiles = function(files){ //bubble sort
 
-	var sortingCriterion = this.getAttribute('sortingCriterion');
-	var sortingOrder = this.getAttribute('sortingOrder');
+	var sortingCriterion = this.options.sortingCriterion;
+	var sortingOrder = this.options.sortingOrder;
 	
 	var R1;
 	var R2;
