@@ -178,10 +178,10 @@ GlobalContainer.drawContent = function(rep){
 				searchByName = '<input id = "checkName_for'+that.id+'" type="checkbox"> Name &nbsp &nbsp ';
 			}
 			if(that.options.searchByTag){
-				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox" checked> Tag <br><br>';    
+				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox" checked> sec. Tag <br><br>';    
 			}
 			else{
-				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox"> Tag <br><br>';  
+				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox"> sec. Tag <br><br>';  
 			}
             
 		   

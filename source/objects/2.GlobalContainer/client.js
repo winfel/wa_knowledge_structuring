@@ -80,23 +80,17 @@ GlobalContainer.searchAndFilter = function(files){
 	if(typeof s === "undefined" || s == "" || s == 0){
 		filteredFiles1 = files;
 	}
-	else{
+	else{ //the user has entered a search string, search through all files and check if name and/or tag matches to the search string
 	
 		var key;
-		for (key in files) { //filter name/tag with the given searchstring
+		for (key in files) { 
 		
 			var n = files[key].attributes.name;
-			var mainTag = files[key].attributes.mainTag;
 			var secTags = files[key].attributes.secondaryTags;
 			
 			if(secTags == 0 || typeof secTags == "undefined"){
 				secTags = new Array();
 			}
-			
-			if(mainTag != "" && typeof mainTag != "undefined"){
-				secTags.push(mainTag);
-			}
-
 					
 			if(name){
 				if(n.indexOf(s) > -1){ //searchString part of the name of the object
@@ -116,7 +110,16 @@ GlobalContainer.searchAndFilter = function(files){
 	}
 		
 	var k;
-	for (k in filteredFiles1) { //filter files with the given types
+	for (k in filteredFiles1) {
+		
+		//search through all files and check if the mainTag matches to the name of the container
+		var mainTag = filteredFiles1[k].attributes.mainTag;
+		var n = this.getAttribute('name');
+		if(mainTag != n){
+			continue;
+		}
+		
+		 //filter files with the given types
 		var type = filteredFiles1[k].attributes.mimeType;
 	
 		if(pdf){
