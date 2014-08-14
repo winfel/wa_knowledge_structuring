@@ -295,6 +295,11 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
                                             role : {name : "Manager"},
                                             username : context.user.username},
                                             true);
+            
+            for (var key in attributes) {
+                var value = attributes[key];
+                object.setAttribute(key, value);
+            }
     
             if (content) {
                 object.setContent(content);
