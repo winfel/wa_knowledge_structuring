@@ -47,6 +47,7 @@ theObject.changeMainTag = function(d){
 
 	Modules.ObjectManager.getObject(d.room, d.id, true, function(o){
 		o.setAttribute('mainTag', d.tag);
+		o.setAttribute('secondaryTags', []);
 	});
 
 }

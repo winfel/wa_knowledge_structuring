@@ -142,42 +142,70 @@ UserManager.init = function(theModules) {
   });
 
   Dispatcher.registerCall('addNewFavourite', function(socket, data){
-
-		var connections = UserManager.connections;
+	
+	var dat = {
+		destination : "PrivateSpace"+data.name,
+		key :	"favourites",
+	};	
 		
-		for (var i in connections) {
+	UserManager.getDataOfSpaceWithDestServerSide(dat, function(d){
 		
-			if(connections[i].user.id == data.id){
-				if(typeof connections[i].user.favourites === "undefined"){
-					connections[i].user.favourites = new Array();
-				}
-				if(connections[i].user.favourites.indexOf(data.favourite) == -1){
-					connections[i].user.favourites.push(data.favourite);
-				}
-				
-			}
+		var arr = new Array();
+		
+		if(d == "error"){
+			console.log(d);
 		}
 		
+		if(d != "error"){
+			arr = d[0].value;
+			UserManager.removeDataOfSpaceWithDestServerSide(dat);
+		}
+		
+		if(arr.indexOf(data.favourite) == -1){
+			arr.push(data.favourite);
+		}
+		
+		var n = {
+			destination : "PrivateSpace"+data.name,
+			key : "favourites",
+			value : arr
+		}
+
+		UserManager.setDataOfSpaceWithDestServerSide(n);
+	});
+	
+
   });
   
     Dispatcher.registerCall('removeFavourite', function(socket, data){
-
-		var connections = UserManager.connections;
 		
-		for (var i in connections) {
-		
-			if(connections[i].user.id == data.id){
+		var dat = {
+			destination : "PrivateSpace"+data.name,
+			key :	"favourites",
+		};	
 			
-				if(typeof connections[i].user.favourites != "undefined"){
-				
-					var j = connections[i].user.favourites.indexOf(data.favourite);
-					
-					if(j != -1){
-						connections[i].user.favourites.splice(j, 1);
-					}	
-				}
+		UserManager.getDataOfSpaceWithDestServerSide(dat, function(d){
+			
+			var arr = new Array();
+			
+			if(d != "error"){
+				arr = d[0].value;
+				UserManager.removeDataOfSpaceWithDestServerSide(dat);
 			}
-		}
+			
+			var i = arr.indexOf(data.favourite);
+			if(i != -1){
+				arr.splice(i, 1);
+			}
+			
+			var n = {
+				destination : "PrivateSpace"+data.name,
+				key : "favourites",
+				value : arr
+			}
+
+			UserManager.setDataOfSpaceWithDestServerSide(n);
+		});
 		
   });
   
@@ -450,6 +478,12 @@ UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID){
 };
 
 UserManager.removeDataOfSpaceWithDest = function(socketOrUser, data, responseID){
+     var ss = db.get('SpaceStorage');
+
+     ss.remove({'destination': data.destination, 'key':data.key});
+};
+
+UserManager.removeDataOfSpaceWithDestServerSide = function(data){
      var ss = db.get('SpaceStorage');
 
      ss.remove({'destination': data.destination, 'key':data.key});

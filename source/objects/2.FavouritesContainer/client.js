@@ -18,15 +18,15 @@ FavouritesContainer.afterServerCall = function(files){
 FavouritesContainer.removeFavourite = function(fav){
 		
 	Modules.SocketClient.serverCall('removeFavourite', {
-		'favourite': fav,
-		'id': ObjectManager.user.id
+		favourite : fav,
+		name : ObjectManager.user.username
 	});
 		
 }
 
 FavouritesContainer.getFiles = function(){
 		
-	this.serverCall("getAllFavouriteFileObjects", this.id, ObjectManager.user.id, FavouritesContainer.afterServerCall);
+	this.serverCall("getAllFavouriteFileObjects", this.id, ObjectManager.user.username, FavouritesContainer.afterServerCall);
 		
 }
 
@@ -58,10 +58,11 @@ FavouritesContainer.searchAndFilter = function(files){
 			var mainTag = files[key].attributes.mainTag;
 			var secTags = files[key].attributes.secondaryTags;
 			
-			if(secTags == 0){
+			if(secTags == 0 || typeof secTags == "undefined"){
 				secTags = new Array();
 			}
-			if(mainTag != ""){
+			
+			if(mainTag != "" && typeof mainTag != "undefined"){
 				secTags.push(mainTag);
 			}
 
