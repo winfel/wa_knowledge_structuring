@@ -283,6 +283,8 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
     
     // console.log("-- merged= " + JSON.stringify(merged));
     
+    if (merged.name == 'unnamed') merged.name = type;
+    
     Modules.Connector.createObject(roomID, type, merged, context, function (id) {
         
         ObjectManager.getObject(roomID, id, context, function (object) {
@@ -298,11 +300,8 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
                 object.setContent(content);
             }
             
-            if (object.get('name') == 'unnamed') {
-                object.setAttribute('name', type);
-            } else {
-                object.persist();
-            }
+            // inform the client about the new created object
+            object.persist();
             
             if (type == PAPER_SPACE) {
                 
