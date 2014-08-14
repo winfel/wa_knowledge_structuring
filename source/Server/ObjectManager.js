@@ -279,57 +279,50 @@ ObjectManager.getInventory = ObjectManager.getObjects;
  *  @param  callback    the callback function
  **/
 ObjectManager.createObject = function (roomID, type, attributes, content, context, callback) {
-	
-    // TODO send error to client if there is a rights issue here
-	var proto = this.getPrototypeFor(type);
-	Modules.Connector.createObject(roomID, type, proto.standardData, context, function (id) {
-	    
-		ObjectManager.getObject(roomID, id, context, function (object) {
-		    
-		    // set default attributes
-            var defaultAttributes = object.standardData;
-            for (var key in defaultAttributes) {
-                var value = defaultAttributes[key];
-                object.setAttribute(key, value);
+    var merged = _.merge(this.getPrototypeFor(type).standardData, attributes);
+    
+    // console.log("-- merged= " + JSON.stringify(merged));
+    
+    Modules.Connector.createObject(roomID, type, merged, context, function (id) {
+        
+        ObjectManager.getObject(roomID, id, context, function (object) {
+            
+            // SciWoAr added owner of an object
+            Modules.UserManager.modifyRole(null,
+                                            {object : object, 
+                                            role : {name : "Manager"},
+                                            username : context.user.username},
+                                            true);
+    
+            if (content) {
+                object.setContent(content);
             }
-	
-			object.setAttribute('name', type);
-	
-			// SciWoAr added owner of an object
-			Modules.UserManager.modifyRole(null,
-											{object : object, 
-											role : {name : "Manager"},
-											username : context.user.username},
-											true);
-			
-			for (var key in attributes) {
-                var value = attributes[key];
-                object.setAttribute(key, value);
+            
+            if (object.get('name') == 'unnamed') {
+                object.setAttribute('name', type);
+            } else {
+                object.persist();
             }
-	
-			if (content) {
-				object.setContent(content);
-			}
-			
-			if (type == PAPER_SPACE) {
-			    
-			    // create a new pad
-	            Modules.EtherpadController.pad.createPad({
-	                padID : attributes['padID']
-	            }, function(error, data) {
-	                
-	                if (error) {
-	                    console.warn("ObjectManager.createObject Error pad.getText: " + error.message);
-	                } else {
-	                    // console.log("ObjectManager.createObject pad was successfully created");
-	                }
-	            });
-			}
-	
-			Modules.EventBus.emit("room::" + roomID + "::action::createObject", {objectID: id});
-			callback(false, object);
-		});		
-	});
+            
+            if (type == PAPER_SPACE) {
+                
+                // create a new pad
+                Modules.EtherpadController.pad.createPad({
+                    padID : attributes['padID']
+                }, function(error, data) {
+                    
+                    if (error) {
+                        console.warn("ObjectManager.createObject Error pad.getText: " + error.message);
+                    } else {
+                        // console.log("ObjectManager.createObject pad was successfully created");
+                    }
+                });
+            }
+    
+            Modules.EventBus.emit("room::" + roomID + "::action::createObject", {objectID: id});
+            callback(false, object);
+        });     
+    });
 }
 
 /**
