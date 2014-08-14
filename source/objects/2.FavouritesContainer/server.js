@@ -17,7 +17,7 @@ theObject.getAllFavouriteFileObjects = function(conId, name, cb){
 	var favourites = new Array();
 	
 	var dat = {
-		destination : "PrivateSpace"+name,
+		destination : name,
 		key :	"favourites",
 	};	
 		

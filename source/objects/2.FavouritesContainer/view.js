@@ -466,13 +466,13 @@ FavouritesContainer.addFiles = function(files){
 			.css({top: event.pageY + "px", left: event.pageX + "px"})
 			.on("click", function(event){
 						
+				that.removeFavourite(this.id.split("_")[2]);		
+						
 				$(rep).find("#representation_for_"+this.id.split("_")[2]).remove();
 								
 				$("div.addremove-menu").remove();
 				
-				that.removeFavourite(this.id.split("_")[2]);
-				
-				that.upd();
+				setTimeout(function(){ that.upd() }, 500);
 				
 			});
 		});

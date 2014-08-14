@@ -33,12 +33,26 @@ FavouritesContainer.afterServerCall = function(files){
 
 FavouritesContainer.removeFavourite = function(fav){
 		
-	Modules.SocketClient.serverCall('removeFavourite', {
-		favourite : fav,
-		name : ObjectManager.user.username
+	UserManager.getDataOfSpaceWithDest(ObjectManager.user.username, "favourites" , function(d){
+	
+		var arr = new Array();
+			
+		if(d != "error"){
+			var key;
+			for(key in d[0].value){
+				if(d[0].value[key] != fav){
+					arr.push(d[0].value[key]);
+				}
+			}
+			UserManager.removeDataOfSpaceWithDest(ObjectManager.user.username, "favourites");
+		}
+				
+		UserManager.setDataOfSpaceWithDest(ObjectManager.user.username, "favourites", arr);
+	
 	});
-		
+	
 }
+
 
 FavouritesContainer.getFiles = function(){
 		

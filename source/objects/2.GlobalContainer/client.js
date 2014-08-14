@@ -41,9 +41,24 @@ GlobalContainer.getFiles = function(){
 
 GlobalContainer.sendNewFavourite = function(fav){
 		
-	Modules.SocketClient.serverCall('addNewFavourite', {
-		'favourite': fav,
-		'name': ObjectManager.user.username
+	UserManager.getDataOfSpaceWithDest(ObjectManager.user.username, "favourites" , function(d){
+	
+		var arr = new Array();
+						
+		if(d != "error"){
+			var key;
+			for(key in d[0].value){
+				arr.push(d[0].value[key]);
+			}
+			UserManager.removeDataOfSpaceWithDest(ObjectManager.user.username, "favourites");
+		}
+		
+		if(arr.indexOf(fav) == -1){
+			arr.push(fav);
+		}
+				
+		UserManager.setDataOfSpaceWithDest(ObjectManager.user.username, "favourites", arr);
+	
 	});
 		
 }
