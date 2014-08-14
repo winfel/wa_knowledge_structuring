@@ -24,7 +24,11 @@ function startUserMedia(stream) {
 }
 
 function startRecording() {
-	recorder && recorder.record();
+  if(recorder) {
+    recorder.record();
+    return true;
+  }
+  return false;
 }
 
 function stopRecording(callback) {
@@ -76,7 +80,7 @@ function initAudio() {
 	});
 };
 
-window.addEventListener('load', initAudio);
+//window.addEventListener('load', initAudio);
 
 function testRecording() {
 	window.setTimeout(startRecording, 1000);

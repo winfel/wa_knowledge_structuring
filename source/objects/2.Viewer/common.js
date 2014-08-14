@@ -20,17 +20,20 @@ Viewer.register = function(type) {
       object.reloadDocument(value);
     }});
   this.registerAttribute('highlights', {type: 'text', standard: '', changedFunction: function(object, value) {
+      console.log(object);
       object.loadHighlights();
     }});
-  this.registerAttribute('twopage', {type: 'boolean', standard: false});
+  this.registerAttribute('twopage', {type: 'boolean', standard: false, changedFunction: function(object, value) {
+      object.adjustPaper();
+    }});
 
   this.standardData.width = 210 * 3;
   this.standardData.height = 297 * 3;
 };
 
-Viewer.alwaysOnTop = function () {
-	// if( documentShown )
-	return true;
+Viewer.alwaysOnTop = function() {
+  // if( documentShown )
+  return true;
 };
 
 //set restrictedMovingArea to true, if you want to enable interface interaction within
