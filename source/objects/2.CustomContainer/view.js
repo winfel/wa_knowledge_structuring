@@ -454,14 +454,15 @@ CustomContainer.addFiles = function(files){
 				$("div.addremove-menu").remove();
 				
 				var arr = that.getAttribute('files');
+				var newArr = new Array();
 				var key;
 				for(key in arr){
-					if(arr[key].attributes.id == this.id.split("_")[2]){
-						arr.splice(key, 1);
+					if(arr[key].attributes.id != this.id.split("_")[2]){
+						newArr.push(arr[key]);
 					}
 				}
 				
-				that.setAttribute('files', arr);
+				that.setAttribute('files', newArr);
 				
 				that.upd();
 				

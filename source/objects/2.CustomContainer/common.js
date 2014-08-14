@@ -72,7 +72,7 @@ CustomContainer.register=function(type){
 	this.registerAttribute('searchForVideo', {type: 'boolean', hidden: true, standard: true});
 	this.registerAttribute('searchForText', {type: 'boolean', hidden: true, standard: true});
 	
-	this.registerAttribute('files', {hidden: true, standard: [] });
+	this.registerAttribute('files', {type: 'list', multiple: true, hidden: true});
 	
 	this.registerAction('Edit',function(){
 		$.each(ObjectManager.getSelected(), function(key, object) {

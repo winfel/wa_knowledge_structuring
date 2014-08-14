@@ -16,33 +16,36 @@ CustomContainer.newFile = function(id){
 	
 	var files = this.getAttribute('files');
 	
-	if(files == 0 || files.length == 0){
-		files = new Array();
-	}	
-	else{
-		var key;
-		for(key in files){
-			if(files[key].attributes.id == id){
-				return;
+	var newFiles = new Array();
+	
+	var exist = false;
+	
+	var key;
+	for(key in files){
+		newFiles.push(files[key]);
+		if(files[key].attributes.id == id){
+			exist = true;
+		}
+	}
+	
+	if(!exist){
+
+		var n = {
+			attributes : {
+				name : o.getAttribute('name'),
+				mainTag : o.getAttribute('mainTag'),
+				secondaryTags : o.getAttribute('secondaryTags'),
+				mimeType : o.getAttribute('mimeType'),
+				contentAge : o.getAttribute('contentAge'),
+				id : id
 			}
 		}
+		
+		newFiles.push(n);
 	}
 	
-
-	var n = {
-		attributes : {
-			name : o.getAttribute('name'),
-			mainTag : o.getAttribute('mainTag'),
-			secondaryTags : o.getAttribute('secondaryTags'),
-			mimeType : o.getAttribute('mimeType'),
-			contentAge : o.getAttribute('contentAge'),
-			id : id
-		}
-	}
-	
-	files.push(n)
-	this.setAttribute('files', files);
-	this.searchAndFilter(files);	
+	this.setAttribute('files', newFiles);
+	this.searchAndFilter(newFiles);	
 	
 }
 
