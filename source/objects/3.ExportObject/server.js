@@ -23,8 +23,8 @@ theObject.exportAsFile = function(type) {
 	var createFile = function(filename, data, mimeType) {
 		var bbox = that.getBoundingBox();
 		Modules.ObjectManager.createObject(that.getRoomID(), "File", {
-			x: bbox.x + bbox.width,
-			y: bbox.y + bbox.height,
+			x: bbox.x + bbox.width + 53,
+			y: bbox.y, // + bbox.height,
 			hasContent : true,	// prevent calling justCreated() after object
 								// creation (would display file upload dialog)
 			name: filename,
