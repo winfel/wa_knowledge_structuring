@@ -45,8 +45,8 @@ FavouritesContainer.updateInnerHeight = function() {
 	$(rep).find("body").css("width", w-5+"px");
 	$(rep).find("body").css("border", "2px solid #ccc");
 	
-	$(rep).find("div").css("height", h-55+"px");
-	$(rep).find("div").css("width", w-25+"px");
+	$(rep).find("#containment-wrapper").css("height", h-55+"px");
+	$(rep).find("#containment-wrapper").css("width", w-25+"px");
 	
 }
 
@@ -386,6 +386,8 @@ FavouritesContainer.addFiles = function(files){
 
 	var rep=this.getRepresentation();
 
+	$(rep).find(".spinner").remove();
+	
 	if(files.length == 0){
 		$(rep).find("#sortablefiles").html("Add your favourite files by right click on any file in the global space containers!");
 		return;
@@ -484,6 +486,31 @@ FavouritesContainer.addFiles = function(files){
 }
 
 FavouritesContainer.upd = function(){
+
+	var rep=this.getRepresentation();
+	
+	$(rep).find(".ui-widget-content").remove();
+
+	$(rep).find("#containment-wrapper").prepend('<div class="spinner">'+
+		'<div class="spinner-container container1">'+
+		'<div class="circle1"></div>'+
+		'<div class="circle2"></div>'+
+		'<div class="circle3"></div>'+
+		'<div class="circle4"></div>'+
+		'</div>'+
+		'<div class="spinner-container container2">'+
+		'<div class="circle1"></div>'+
+		'<div class="circle2"></div>'+
+		'<div class="circle3"></div>'+
+		'<div class="circle4"></div>'+
+		'</div>'+
+		'<div class="spinner-container container3">'+
+		'<div class="circle1"></div>'+
+		'<div class="circle2"></div>'+
+		'<div class="circle3"></div>'+
+		'<div class="circle4"></div>'+
+		'</div>'+
+		'</div>');
 
 	this.getFiles();
 
