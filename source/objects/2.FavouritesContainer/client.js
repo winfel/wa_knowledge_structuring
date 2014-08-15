@@ -47,7 +47,7 @@ FavouritesContainer.removeFavourite = function(fav){
 			UserManager.removeDataOfSpaceWithDest(ObjectManager.user.username, "favourites");
 		}
 				
-		UserManager.setDataOfSpaceWithDest(ObjectManager.user.username, "favourites", arr);
+		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(ObjectManager.user.username, "favourites", arr) }, 500);
 	
 	});
 	

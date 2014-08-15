@@ -472,7 +472,9 @@ FavouritesContainer.addFiles = function(files){
 								
 				$("div.addremove-menu").remove();
 				
-				setTimeout(function(){ that.upd() }, 500);
+				if($(rep).find(".ui-widget-content").length == 0){
+					$(rep).find("#sortablefiles").html("Add your favourite files by right click on any file in the global space containers!");
+				}
 				
 			});
 		});

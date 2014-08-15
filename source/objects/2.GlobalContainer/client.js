@@ -57,7 +57,7 @@ GlobalContainer.sendNewFavourite = function(fav){
 			arr.push(fav);
 		}
 				
-		UserManager.setDataOfSpaceWithDest(ObjectManager.user.username, "favourites", arr);
+		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(ObjectManager.user.username, "favourites", arr) }, 500);
 	
 	});
 		
