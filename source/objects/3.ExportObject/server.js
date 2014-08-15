@@ -9,6 +9,7 @@
 
 var theObject=Object.create(require('./common.js'));
 var Modules=require('../../server.js');
+var exportableTypes = ['PaperSpace', 'PaperChapter', 'PaperObject']; // , 'File'
 
 theObject.execute = function(object,oldData,newData) {
 	var that = this;
@@ -139,9 +140,7 @@ theObject.onEnter = function(object,oldData,newData) {
 	var that = this;
 	var inputPapers = this.getAttribute('inputPapers');
 
-	if(!(object.getType() == 'PaperSpace'
-		|| object.getType() == 'PaperChapter'
-		|| object.getType() == 'PaperObject')) {
+	if(exportableTypes.indexOf(object.getType()) == -1) {
 		console.log('no paper');
 		return;
 	}
