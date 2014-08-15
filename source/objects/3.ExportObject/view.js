@@ -16,7 +16,7 @@ ExportObject.draw = function(external) {
 	var rep = this.getRepresentation();
 	var inputPapers = that.getAttribute('inputPapers');
 
-	var connectorH = (inputPapers.length + 1) * 80;
+	var connectorH = Math.max(1, inputPapers.length + 0.5) * 80;
 	$(rep).find('.PaperConnector').attr('points', 
 		[[-45,60-connectorH/2], [-10,60-connectorH/2], [-10,60], [-5,60], [-10,60], [-10,60+connectorH/2], [-45,60+connectorH/2]]
 	);
@@ -26,7 +26,7 @@ ExportObject.draw = function(external) {
 	var inventory = this.getRoom().getInventory();
 
 	inputPapers.forEach(function(p,i) {
-		inventory[p].setAttribute('x', px);
+		inventory[p].set('x', px);
 		inventory[p].setAttribute('y', py + 80 * i);
 	});
 
@@ -180,6 +180,8 @@ ExportObject.createExportIcons = function(rep) {
 			0,
 			32,32, {
 				fill: 'transparent',
+				stroke: 'grey',
+				'stroke-width': 0,
 			});
 		// the icon
 		GUI.svg.image(box,
