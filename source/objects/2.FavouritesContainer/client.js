@@ -188,8 +188,8 @@ FavouritesContainer.sortFiles = function(files){ //bubble sort
 		
 		files.sort(function(a, b){
 			
-			var aName = a.attributes.name;
-			var bName = b.attributes.name;
+			var aName = a.attributes.name.toLowerCase();
+			var bName = b.attributes.name.toLowerCase();
 			
 			if(aName < bName) return R1;
 			if(aName > bName) return R2;
@@ -220,7 +220,7 @@ FavouritesContainer.sortFiles = function(files){ //bubble sort
 			return 0;
 		});
 	}
-
+	
 	this.addFiles(files);
 	
 }
