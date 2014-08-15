@@ -43,6 +43,19 @@ ExportObject.register = function(type) {
 	this.registerAttribute('inputPapers', {type: 'list', standard: [], category: 'Basic'});
 };
 
+
+/**
+ * Exports connected input files
+ *
+ * @this {File}
+ * @see objects/1.GeneralObject/client.js
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/3.File/client.js
+ */
+ExportObject.execute=function(event){
+	this.exportAsFile();
+}
+
 /**
  * Returns always false.
  *

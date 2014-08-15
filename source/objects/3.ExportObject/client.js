@@ -22,3 +22,7 @@ ExportObject.getSurroundingPapers = function(callback) {
 	}
 	return papers;
 }
+
+ExportObject.exportAsFile = function(type) {
+	this.serverCall('exportAsFile', type);
+}

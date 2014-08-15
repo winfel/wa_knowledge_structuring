@@ -11,10 +11,14 @@ var theObject=Object.create(require('./common.js'));
 var Modules=require('../../server.js');
 var exportableTypes = ['PaperSpace', 'PaperChapter', 'PaperObject']; // , 'File'
 
-theObject.execute = function(object,oldData,newData) {
+theObject.exportAsFile = function(type) {
 	var that = this;
-	
-	//Modules.
+	if(!type) {
+		type = this.getAttribute('exportFormat');
+	}
+	var inputPaperIds = this.getAttribute('inputPapers'),
+		outputContent = [],
+		outputCount = 0;
 
 	var createFile = function(filename, data, mimeType) {
 		var bbox = that.getBoundingBox();
@@ -32,7 +36,43 @@ theObject.execute = function(object,oldData,newData) {
 		});
 	};
 
-	var exportToSth = function(object,fileExtension) {
+	var addContent = function(object, content) {
+		outputContent[inputPaperIds.indexOf(object.getId())] = content;
+		if(++outputCount == inputPaperIds.length) {
+			// all content is there, create a file object
+
+			if(type == 'html') {
+				// create a html file object
+				createFile(that.getId() + '.html', outputContent.join('\r\n'), 'text/html');
+			}
+			else if(type == 'txt') {
+				// create plain textfile
+				createFile(that.getId() + '.txt', outputContent.join('\r\n'), 'text/plain');
+			}
+			else if(type == 'pdf') {
+				// convert html to pdf
+				Modules.EtherpadController.convertToPdf(outputContent.join('\r\n'), function(pdfcontent) {
+					// create pdf file object in webarena
+					createFile(that.getId() + '.pdf', pdfcontent, 'application/pdf');
+				});
+			}
+			else {
+				var imgtype = type.substr(6);
+
+				// convert html to image
+				Modules.EtherpadController.convertToImage(outputContent.join('\r\n'), imgtype, function(imgcontent) {
+
+					// create image file object in webarena
+					createFile(object.getName() + '.' + imgtype, imgcontent, 'image/' + imgtype);
+				});
+			}
+		}
+	};
+
+	var getPaperContent = function(object, asText) {
+		if(!asText) {
+			asText = false;
+		}
 		var dbData = {'destination':object.getAttribute('destination'), 'key':"paperIDs"};
 		Modules.UserManager.getDataOfSpaceWithDestServerSide(dbData, function(chapterPadIDs) {
 
@@ -41,7 +81,7 @@ theObject.execute = function(object,oldData,newData) {
 				" the export object, you need to create a chapter, write something into it and, as soon as you wan't to export something, "+
 				"double click a chapter to run the ordering algorithm (this last step will be fixed in the final release of "+
 				" the COW aka HackArena aka HackATron...)";
-				createFile(object.getName() + '.html', errorText, 'text/html');
+				addContent(object, errorText);
 				return;
 			}
 
@@ -67,38 +107,11 @@ theObject.execute = function(object,oldData,newData) {
 						cPos++;
 					}
 					else {
+						// last round
 						if(data != null) {
 							summedText += data.html;
 						}
-
-						// create a file object
-
-						if(fileExtension == '.html') {
-							// create a html file object
-							createFile(object.getName() + fileExtension/*'.html'*/, summedText, 'text/html');
-						}
-						else if(fileExtension == '.txt') {
-							// create plain textfile
-							createFile(object.getName() + fileExtension, summedText, 'text/plain');
-						}
-						else if(fileExtension == '.pdf') {
-							// convert html to pdf
-							Modules.EtherpadController.convertToPdf(summedText, function(pdfcontent) {
-								// create pdf file object in webarena
-								createFile(object.getName() + fileExtension, pdfcontent, 'application/pdf');
-							});
-						}
-						else {
-							var imgtype = that.getAttribute('exportFormat').substr(6);
-
-							// convert html to image
-							Modules.EtherpadController.convertToImage(summedText, imgtype, function(imgcontent) {
-
-								// create image file object in webarena
-								createFile(object.getName() + '.' + imgtype, imgcontent, 'image/' + imgtype);
-							});
-						}
-
+						addContent(object, summedText);
 					}
 				});
 			}); // end for each paperchapter
@@ -106,34 +119,70 @@ theObject.execute = function(object,oldData,newData) {
 		});
 	};
 
-	// exporting of PaperSpaces to some format
-	if(object.get('type')=='PaperSpace') {
-		if(this.getAttribute('exportFormat')=='html') {
-			exportToSth(object,'.html');
+	var getChapterContent = function(object, asText) {
+		if(!asText) {
+			asText = false;
 		}
-		else if(this.getAttribute('exportFormat') == 'pdf') {
-			exportToSth(object,'.pdf');
-		}
-		else if(this.getAttribute('exportFormat').substr(0, 5) == 'image') {
-			exportToSth(object,'.image');
-		}
-		else {
-			exportToSth(object,'.txt');
-		}
-	}
+		var chapterPadID = object.getAttribute('chapterID');
+		// read the html from etherpad
+		Modules.EtherpadController.pad.getHTML( {
+			padID : chapterPadID,
+		}, function(error, data) {
+			var text = "";
+			if(error) {
+				console.error("PadID "+ chapterPadID + " >> Error pad.getText: ", error.message);
+				text = ("PadID "+ chapterPadID + " >> Error pad.getText: ", error.message);
+			}else if(data != null) {
+				text = data.html;
+			}
+			addContent(object, text);
+		});
+	};
 
-	// exporting of html-File-Objects to pdf
-	else if(object.get('type')=='File' && (object.getAttribute('mimeType')=='text/html' || object.getName().match(/\.html?$/i))) {
-		if(this.getAttribute('exportFormat')=='pdf') {
-			console.log('exporting normal html-file to pdf');
-			var html = object.getContentAsString();
-			// convert html to pdf
-			Modules.EtherpadController.convertToPdf(html, function(pdfcontent) {
-				// create pdf file object in webarena
-				createFile(object.getName().replace(/(\.html?)?$/i, '.pdf'), pdfcontent, 'application/pdf');
+	// get the real objects of input papers
+	this.getInputPapers(function(objects) {
+		objects.forEach(function(object) {
+			// for each object call getContent / addContent
+			if(object.getType()=='PaperSpace') {
+				getPaperContent(object, type == 'text');
+			}
+			else if(object.getType()=='PaperChapter') {
+				getChapterContent(object, type == 'text');
+			}
+			else if(object.getType()=='File' && type != 'text' && (object.getAttribute('mimeType')=='text/html' || object.getName().match(/\.html?$/i))) {
+				addContent(object, object.getContentAsString());
+			}
+			else if(object.getType()=='File' && type == 'text' && (object.getAttribute('mimeType')=='text/plain' || object.getName().match(/\.txt?$/i))) {
+				addContent(object, object.getContentAsString());
+			}
+			else {
+				addContent(object, '<div>Object currently not supported!<br />Id: ' + object.getId() + ', Type: ' + object.getType() + '</div>');
+			}
+		});
+	});
+};
+theObject.exportAsFile.public = true;
+
+/**
+ * gives the connected inputPapers as ordered object array to the callback
+ * because a lot of callbacks are needed to get the input papers of the current room
+ */
+theObject.getInputPapers = function(callback) {
+	var that = this;
+	var inputPapers = this.getAttribute('inputPapers'); // array of object ids
+	this.getRoom(function(room){
+		room.getInventoryAsync(function(inventory){
+
+			var returnObjects = [];
+			inventory.forEach(function(i) {
+				if(inputPapers.indexOf(i.getId()) != -1) {
+					returnObjects[inputPapers.indexOf(i.getId())] = i;
+				}
 			});
-		}
-	}
+			callback(returnObjects);
+
+		});
+	});
 };
 
 theObject.onEnter = function(object,oldData,newData) {
