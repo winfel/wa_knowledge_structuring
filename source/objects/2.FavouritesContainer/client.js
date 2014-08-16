@@ -21,14 +21,20 @@ FavouritesContainer.options = {
 
 }
 
+FavouritesContainer.Files = new Array();
+
 FavouritesContainer.afterServerCall = function(files){
 
 	files = JSON.parse(files);
 	
 	var id = files.pop();
 	var con = ObjectManager.getObject(id);
-	con.searchAndFilter(files);
-
+	
+	if(typeof con != "undefined"){
+		con.Files = files;
+		con.searchAndFilter(files);
+	}
+	
 }
 
 FavouritesContainer.removeFavourite = function(fav){

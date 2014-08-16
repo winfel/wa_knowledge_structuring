@@ -6,10 +6,10 @@ var CONTAINER_ID = "containerID";
 var CONTAINER_WIDTH = 500;
 var CONTAINER_HEIGHT = 300;
 var CONTAINERS_PER_LINE = 3;
-var HORIZONTAL_GAP = 40;
-var VERTICAL_GAP = 15;
-var INITIAL_X = 60;
-var INITAIL_Y = 45;
+var HORIZONTAL_GAP = 20;
+var VERTICAL_GAP = 20;
+var INITIAL_X = 30;
+var INITAIL_Y = 30;
 
 var freePlaces = []; // keeps track of the available gaps
 
@@ -383,7 +383,7 @@ var TagManager = function() {
 	 */
 	this.createMissingContainers = function(context, callback) {
 	    var dbMainTags = db.get('MainTags');
-	    var newContaiinersCounter = 0;
+	    var newContainersCounter = 0;
 	    
 	    dbMainTags.find( {}, function (err, docs) {
 	        if (err) console.log("createMissingContainers::ERROR " + err);
@@ -399,7 +399,7 @@ var TagManager = function() {
 	                                $set: { containerID:  obj.id } 
 	                            }, function(err, o) {
 	                                console.log("Updated tag: " + tag.name + " with container ID: " + obj.id );
-	                                newContaiinersCounter++;
+	                                newContainersCounter++;
 	                                recursive(i + 1);
 	                            });  
 	                        });
@@ -407,7 +407,7 @@ var TagManager = function() {
 	                        recursive(i + 1);
 	                    }
 	                } else {
-	                    callback(newContaiinersCounter);
+	                    callback(newContainersCounter);
 	                }
 	            }
 	            

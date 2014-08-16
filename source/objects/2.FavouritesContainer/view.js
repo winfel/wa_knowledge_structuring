@@ -271,7 +271,7 @@ FavouritesContainer.drawContent = function(rep){
 						//that.setAttribute('searchForVideo', checkboxVideo);
 						//that.setAttribute('searchForText', checkboxText);
 				
-						that.getFiles();
+						that.searchAndFilter(that.Files);
 				
 						/* Close popover */
 						popover.hide();
@@ -362,7 +362,7 @@ FavouritesContainer.drawContent = function(rep){
 				//that.setAttribute('sortingCriterion', select1Value);
 				//that.setAttribute('sortingOrder', select2Value);
 				
-				that.getFiles();
+				that.searchAndFilter(that.Files);
 							
 				/* Close popover */
 				popover.hide();

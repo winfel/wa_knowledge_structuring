@@ -133,32 +133,56 @@ GlobalContainer.drawContent = function(rep){
 	$(rep).find("#containment-wrapper").css("text-align", "center");
 	
 	$(rep).find("#containment-wrapper").droppable({
-      drop: function( event, ui ) {
-	  	
-			if($(rep).find("#"+ui.draggable.context.id).length == 0){ //not existing in this container
+		drop: function( event, ui ) {
+		
+			var objectId = ui.draggable.context.id.split("_")[2];
+			var selector = ui.draggable.context.id;
 			
-				var r = confirm("Do you really want to change the main Tag of this object to "+$(rep).find("#containername").html()+"?");
-				if (r == true) {
-				
-					var objectId = ui.draggable.context.id.split("_")[2];
-					
-					var t = ui.draggable.context.innerHTML;
-					var i = t.indexOf("content");
-					t = t.slice(i, t.length).split(" ")[0].split("=")[1];
-					t = t.substring(0, t.length - 1);
-					var room = t.substring(1, t.length);
-					
-					that.changeMainTag(objectId, $(rep).find("#containername").html(), room);
-					
-					var objects = ObjectManager.getObjects();
-					var key;
-					for(key in objects){
-						var o = ObjectManager.getObject(key);
-						o.upd();
-					}
+			var exist = false;
+			var key;
+			for(key in that.Files){
+				if(that.Files[key].attributes.id == objectId){
+					exist = true;
 				}
 			}
-      }
+		
+			if(!exist){
+			
+				var r = confirm("Do you really want to change the main Tag of this object to "+that.getAttribute('name')+"?");
+				if (r == true) {
+									
+					//erase the dragged file from the source Container:
+					var oldContainer = ObjectManager.getObject($("#"+selector).parent().parent().parent().parent().attr('id'));
+					
+					var f = new Array();
+					var k;
+					for(k in oldContainer.Files){
+						if(oldContainer.Files[k].attributes.id != objectId){
+							f.push(oldContainer.Files[k]);
+						}
+						else{
+							var n = oldContainer.Files[k];
+						}
+					}
+					oldContainer.Files = f;
+					oldContainer.searchAndFilter(f);
+			
+					
+					//add the dragged file to the target Container:
+					n.attributes.mainTag = that.getAttribute('name');
+					n.attributes.secondaryTags = [];
+					that.Files.push(n);
+
+					that.searchAndFilter(that.Files);
+					
+					
+					//change the mainTag of the dragged object:
+					var room = n.attributes.inRoom;
+					that.changeMainTag(objectId, that.getAttribute('name'), room);
+					
+				}
+			}
+		}
     });
 
 	/* add Search/Filter-Popover */
@@ -301,7 +325,7 @@ GlobalContainer.drawContent = function(rep){
 						//that.setAttribute('searchForVideo', checkboxVideo);
 						//that.setAttribute('searchForText', checkboxText);
 				
-						that.getFiles();
+						that.searchAndFilter(that.Files);
 				
 						/* Close popover */
 						popover.hide();
@@ -392,7 +416,7 @@ GlobalContainer.drawContent = function(rep){
 				//that.setAttribute('sortingCriterion', select1Value);
 				//that.setAttribute('sortingOrder', select2Value);
 				
-				that.getFiles();
+				that.searchAndFilter(that.Files);
 							
 				/* Close popover */
 				popover.hide();

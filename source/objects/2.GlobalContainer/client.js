@@ -21,13 +21,31 @@ GlobalContainer.options = {
 
 }
 
+GlobalContainer.Files = new Array();
+
 GlobalContainer.afterServerCall = function(files){
 
 	files = JSON.parse(files);
 
 	var id = files.pop();
 	var con = ObjectManager.getObject(id);
-	con.searchAndFilter(files);
+
+	if(typeof con != "undefined"){
+		//search through all files and check if the mainTag matches to the name of the container
+		var f = new Array();
+		var n = con.getAttribute('name');
+		var key;
+		for (key in files) { 
+			var mainTag = files[key].attributes.mainTag;
+			if(mainTag == n){
+				f.push(files[key]);
+			}
+		}
+		
+		con.Files = f;
+		
+		con.searchAndFilter(f);
+	}
 
 }
 
@@ -91,7 +109,7 @@ GlobalContainer.searchAndFilter = function(files){
 	var audio = this.options.searchForAudio;
 	var video = this.options.searchForVideo;
 	var text = this.options.searchForText;
-
+	
 	if(typeof s === "undefined" || s == "" || s == 0){
 		filteredFiles1 = files;
 	}
@@ -126,13 +144,6 @@ GlobalContainer.searchAndFilter = function(files){
 		
 	var k;
 	for (k in filteredFiles1) {
-		
-		//search through all files and check if the mainTag matches to the name of the container
-		var mainTag = filteredFiles1[k].attributes.mainTag;
-		var n = this.getAttribute('name');
-		if(mainTag != n){
-			continue;
-		}
 		
 		 //filter files with the given types
 		var type = filteredFiles1[k].attributes.mimeType;
@@ -239,7 +250,7 @@ GlobalContainer.sortFiles = function(files){ //bubble sort
 			return 0;
 		});
 	}
-
+	
 	this.addFiles(files);
 	
 }
