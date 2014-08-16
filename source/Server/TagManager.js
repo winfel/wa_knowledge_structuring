@@ -1,4 +1,6 @@
 
+var _ = require('underscore');
+
 var db = false;
 var Modules = false;
 
@@ -111,7 +113,17 @@ var TagManager = function() {
                 
                 // let's delete the container associated with this main Tag
                 that.deleteGlobalContainer(containerID, context, function(coordinates) {
-                    freePlaces.push(coordinates); 
+                    
+                    if (freePlaces.length == 0) freePlaces.push(coordinates);
+                    else {
+                        var index = _.sortedIndex(freePlaces, coordinates, 'y');
+                        var temp = freePlaces.slice(0, index);
+                        temp.push(coordinates); 
+                        freePlaces = _.union(temp, freePlaces.slice(index)); 
+                    }
+                    
+                    freePlaces.reverse();
+                    // console.log("++ freePlaces: " + JSON.stringify(freePlaces));
                 });
             }
         }); 
@@ -275,8 +287,10 @@ var TagManager = function() {
         
         var promise = dbMainTags.findOne({id: tagID.toString()});
         promise.on('complete', function(err, obj) {
-            if (err) callback(true, null);
-            else {
+            if (err || obj == null) {
+                console.log("updMainTagName::ERROR " + err);
+                callback(true, null);
+            } else {
                 var containerID = obj.containerID;
                 
                 var promise2 = dbMainTags.update( {id: tagID.toString()}, { 
@@ -350,6 +364,7 @@ var TagManager = function() {
                     
                     //console.log("*Data totalT= " + totalTags + ", div=" + div + ", rest=" + rest);
                 } else if (freePlaces.length > 0) {
+                    // TODO: Take the most upper 
                     var coordinates = freePlaces.pop(); 
                     
                     attr.x = coordinates.x;
@@ -445,7 +460,7 @@ var TagManager = function() {
                                 
                                 if (horizontalCounter == CONTAINERS_PER_LINE) {
                                     horizontalCounter = 0;
-                                    cX = 60; // new line
+                                    cX = INITIAL_X; // new line
                                     cY += VERTICAL_GAP + CONTAINER_HEIGHT;
                                 }
                             }
