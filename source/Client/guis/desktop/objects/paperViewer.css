@@ -124,8 +124,8 @@ and open the template in the editor.
 }
 
 /* Initially hidden button */
-.btnStopRecording,
-.btnPause {
+.btnPlaybackPause,
+.btnStopRecording {
   display: none;
 }
 

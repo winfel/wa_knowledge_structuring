@@ -20,7 +20,6 @@ Viewer.register = function(type) {
       object.reloadDocument(value);
     }});
   this.registerAttribute('highlights', {type: 'text', standard: '', changedFunction: function(object, value) {
-      console.log(object);
       object.loadHighlights();
     }});
   this.registerAttribute('twopage', {type: 'boolean', standard: false, changedFunction: function(object, value) {

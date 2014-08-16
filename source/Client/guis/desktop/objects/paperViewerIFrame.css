@@ -28,25 +28,31 @@ Author     : Patrick
     -moz-text-line-through-color: red;
     -moz-text-decoration-color: red;*/
 }
+
 .scratchout {
   background-image: url("/guis.common/images/scratchout.png") !important;
 }
+
 .glow {
   text-shadow: 0px 0px 10px red;
 }
+
 .quote {
   box-shadow: 0px 0px 10px 5px;
 }
+
 .quote:hover::before {
   content: "";
   position: absolute;
   margin-left:-0.5em;
 }
+
 .quote:hover::after {
   content: "";
   position: absolute;
   margin-left:0;
 }
+
 .audio:first-of-type::before {
   content: "";
   position: absolute;
@@ -59,41 +65,32 @@ Author     : Patrick
   border-radius: 20px;*/
 }
 
-.audioobject {
-  position: absolute;
-  left: 0;
-  background-image: url("/guis.common/images/oxygen/32x32/actions/media-playback-start.png");
-  background-repeat: no-repeat;
-  width: 32px;
-  height: 32px;
-  border-radius: 100%;
-  /*	border: 3px double black;
-  background: white;
-  border-radius: 1em;*/
-}
-
-.audioobject:hover {
-  z-index: 2;
-}
-
-.audioobject.playing {
-  background-image: url("/guis.common/images/oxygen/32x32/actions/media-playback-pause.png");
-}
-
 .remotehover {
   box-shadow: 0 0 100px 50px red;
 }
 
+.audioobject,
 .comment {
   position: absolute;
   left: 3px;
   width: 32px;
   height: 32px;
   background-color: transparent;
-  background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated1.png");
   background-position: top left;
   background-repeat: no-repeat;
   border: 1px solid transparent;
+}
+
+.audioobject {
+  background-image: url("/guis.common/images/oxygen/32x32/actions/media-playback-start.png");
+}
+
+.audioobject.playing {
+  background-image: url("/guis.common/images/oxygen/32x32/actions/media-playback-pause.png");
+}
+
+.comment {
+  background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated1.png");
   max-width: 400px;
 }
 
@@ -115,6 +112,7 @@ Author     : Patrick
   z-index: 2;
 }
 
+.audioobject:hover,
 .comment:hover {
   z-index: 2;
 }

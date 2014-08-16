@@ -180,27 +180,16 @@ Viewer.initGUI = function(rep) {
       highlighter.removeHighlights(element);
     });
 
-    var lastHoverButton;
-    $(".btn", highlightMenu).mouseleave(function(event) {
-      lastHoverButton = $(this);
-    });
-
     // Show the highlight menu
     highlightMenu.hover(function(event) {
-      //// Hover in
       clearTimeout(highlightMenuTimer);
-    }, function(event) {
-      if (!lastHoverButton.hasClass("btnStartRecording")) {
-        highlightMenu.hide();
-      }
+    }, function() {
+      highlightMenu.hide();
     });
 
     highlightMenu.on("click", function(event) {
-      if (!$(event.target).hasClass("btnStartRecording")) {
-        highlightMenu.hide();
-        // Disable the highlight buttons
-        $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", true);
-      }
+      highlightMenu.hide();
+      $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", true);
     });
 
     // Remove selected highlightings...
@@ -213,14 +202,11 @@ Viewer.initGUI = function(rep) {
         selection = null;
 
         // Disable the highlight buttons
+        $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", true);
+        highlightMenu.hide();
 
-        if (!$(event.target).hasClass("btnStartRecording")) {
-          $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", true);
-          highlightMenu.hide();
-
-          // Reset the highlightings
-          self.loadHighlights();
-        }
+        // Reset the highlightings
+        self.loadHighlights();
       }
     });
 
@@ -346,7 +332,11 @@ Viewer.initGUI = function(rep) {
      */
     var createCommentOnViewer = function(user, data) {
 
-      var commentId = "comment_" + data.hash;
+      var isAudio = (data.type.indexOf("audio") >= 0);
+      var commentClass = (isAudio ? "audioobject" : "comment");
+      var commentIdPrefix = (isAudio ? "audioobject_" : "comment_");
+
+      var commentId = commentIdPrefix + data.hash;
       var commentContainer = $("#" + commentId, frameDocument)[0];
 
       if (!commentContainer) {
@@ -354,28 +344,50 @@ Viewer.initGUI = function(rep) {
 
         // Create a new one...
         commentContainer = $("<div>")
-                .attr("id", "comment_" + data.hash)
+                .attr("id", commentIdPrefix + data.hash)
                 .attr("data-top-initial", data.position.top)
-                .addClass("comment");
+                .addClass(commentClass);
 
         // Insert the content
-        commentContainer.html('<p class="commentHeader" title="' + data.date.toLocaleString() + '">' + user + ' wrote</p>' +
-                '<p>' + data.text + '</p>');
+        if (isAudio) {
+          var wave = new Audio(data.message);
 
-        // Show/Hide the comment on a click.
-        commentContainer.on("click", function(event) {
-          var target = $(event.target);
-          if (target.attr("id") == commentId || target.hasClass("commentHeader"))
-            $(this).toggleClass("opened");
-        });
+          $(wave).on('playing', function() {
+            commentContainer.addClass('playing');
+          });
+          $(wave).on('pause', function() {
+            commentContainer.removeClass('playing');
+          });
+          $(wave).on('ended', function() {
+            // chrome has a replay bug; load fixes it
+            if (window.chrome) {
+              wave.load();
+            }
+          });
 
-        // Hide it once you click somewhere withing the iframe.
-        frameDocument.on("click", function(event) {
-          var target = $(event.target);
+          commentContainer.click(function() {
+            wave.paused ? wave.play() : wave.pause();
+          });
 
-          if (target.attr("id") != commentId && target.parent("div").attr("id") != commentId)
-            commentContainer.removeClass("opened");
-        });
+        } else {
+          commentContainer.html('<p class="commentHeader" title="' + data.date.toLocaleString() + '">' + user + ' wrote</p>' +
+                  '<p>' + data.message + '</p>');
+
+          // Show/Hide the comment on a click.
+          commentContainer.on("click", function(event) {
+            var target = $(event.target);
+            if (target.attr("id") == commentId || target.hasClass("commentHeader"))
+              $(this).toggleClass("opened");
+          });
+
+          // Hide it once you click somewhere withing the iframe.
+          frameDocument.on("click", function(event) {
+            var target = $(event.target);
+
+            if (target.attr("id") != commentId && target.parent("div").attr("id") != commentId)
+              commentContainer.removeClass("opened");
+          });
+        }
 
         // Append the comment to the body
         $(".pc", page).append(commentContainer);
@@ -424,6 +436,48 @@ Viewer.initGUI = function(rep) {
       });
     };
 
+    self.linkAudioCommentToHighlights = function() {
+      
+      console.log("linkAudioCommentToHighlights called");
+      
+      DBManager.getDocuments(self, "comments_audio", function(docs) {
+        
+        console.log("documents received!");
+        
+        for (var i in docs) {
+          (function(doc) {
+            // Javascript has no block scope... Let's use the function scope instead!
+            var commentContainer = createCommentOnViewer(doc.user, doc.data);
+            commentContainer = $(commentContainer);
+            commentContainer.off("hover");
+
+            var commentHighlight = $(".highlighted.audio[data-audioobject='" + doc.data.hash + "']", frameDocument)[0];
+
+            if (commentHighlight) {
+              commentHighlight = $(commentHighlight);
+              commentHighlight.off("hover");
+
+              // Highlight the highlighting
+              commentContainer.hover(function() {
+                commentHighlight.addClass('remotehover');
+              }, function() {
+                commentHighlight.removeClass('remotehover');
+              });
+
+              // Highlight the comment
+              commentHighlight.hover(function() {
+                commentContainer.addClass('remotehover');
+              }, function() {
+                commentContainer.removeClass('remotehover');
+              });
+            } else {
+              // 
+              commentContainer.addClass("noreference");
+            }
+          })(docs[i]);
+        }
+      });
+    };
     /**
      * 
      * @returns {undefined}
@@ -433,8 +487,9 @@ Viewer.initGUI = function(rep) {
       if (jsonStr != undefined && jsonStr != '') {
         highlighter.removeHighlights();
         highlighter.deserializeHighlights(jsonStr);
-        window.setTimeout(self.addAudioToHighlights, 50);
+        //window.setTimeout(self.addAudioToHighlights, 50);
         window.setTimeout(self.linkCommentToHighlights, 50);
+        window.setTimeout(self.linkAudioCommentToHighlights, 50);
       }
     };
 
@@ -477,13 +532,7 @@ Viewer.initGUI = function(rep) {
       self.saveHighlights();
     });
 
-    /**
-     * 
-     * @param {type} element
-     * @param {type} callback
-     * @returns {undefined}
-     */
-    var addComment = function(element, callback) {
+    var addCommentDialog = function(element, callback) {
       var theDialogContainer = $("<div>");
       theDialogContainer.html('<textarea class="addCommentText" style="width: 96%; height: 98%;"></textarea>');
 
@@ -504,7 +553,8 @@ Viewer.initGUI = function(rep) {
 
               var date = new Date();
               var data = {
-                'text': text,
+                'type': "text/plain",
+                'message': text,
                 'page': pageid,
                 'position': position,
                 'date': date,
@@ -542,68 +592,192 @@ Viewer.initGUI = function(rep) {
 
       var selected = $(".highlighted.selected", frameDocument);
 
-      addComment(selected, function(data) {
+      addCommentDialog(selected, function(data) {
         selected.removeClass("selected")
-                .addClass("commented commented")
+                .addClass("commented")
                 .attr('data-comment', data.hash);
 
         self.saveHighlights();
       });
     });
 
-    var btnStartRecording = $(".btnStartRecording", viewerContainer);
-    var btnStopRecording = $(".btnStopRecording", viewerContainer);
+    /**
+     * 
+     * @param {type} element
+     * @param {type} callback
+     * @returns {undefined}
+     */
+    var addAudioDialog = function(element, callback) {
+      var theDialogContainer = $('<div>');
+      theDialogContainer.html(
+              '<p></p>' +
+              '<ul>' +
+              '</ul>' +
+              '<div class="btn-group">' +
+              '<input type="image" class="btn btnStartRecording lastChild" title="Click to start recording." src="/guis.common/images/oxygen/32x32/actions/media-recording-stopped.png" />' +
+              '<input type="image" class="btn btnStopRecording firstChild" title="Recording... Click to stop recording." src="/guis.common/images/oxygen/32x32/actions/media-recording.png" />' +
+              '</div>' +
+              '<div class="btn-group">' +
+              '<input disabled="disabled" type="image" class="btn btnPlayback btnPlaybackStart" title="Click to play the audio file." src="/guis.common/images/oxygen/32x32/actions/media-playback-start.png" />' +
+              '<input disabled="disabled" type="image" class="btn btnPlayback btnPlaybackPause firstChild" title="Click to pause the audio file." src="/guis.common/images/oxygen/32x32/actions/media-playback-pause.png" />' +
+              '<input disabled="disabled" type="image" class="btn btnPlayback btnPlaybackStop" title="Click to stop the audio file." src="/guis.common/images/oxygen/32x32/actions/media-playback-stop.png" />' +
+              '</div>' +
+              ''
+              );
 
-    btnStartRecording.on("mouseenter", function(event) {
-      // Init only if the mouse enters for the first time!
-      initAudio();
-      btnStartRecording.off("mouseenter");
-    });
+      var audioObject;
+      var waveBase64;
+      var waveMimeType;
 
-    btnStartRecording.on("click", function(event) {
-      if (startRecording()) {
-        // Recording now...
-        $(".btnHighlight:not(.btnStopRecording)", viewerContainer).prop("disabled", true);
+      // Playback functions and buttons
+      var playbackStartPause = function() {
+        audioObject.paused ? audioObject.play() : audioObject.pause();
+      };
 
+      var playbackStop = function() {
+        audioObject.pause();
+        audioObject.currentTime = 0;
+      };
+
+      var btnPlaybackStart = $(".btnPlaybackStart", theDialogContainer);
+      var btnPlaybackPause = $(".btnPlaybackPause", theDialogContainer);
+
+      btnPlaybackStart.on("click", playbackStartPause);
+      btnPlaybackPause.on("click", playbackStartPause);
+      $(".btnPlaybackStop", theDialogContainer).on("click", playbackStop);
+
+      // Recording functions and buttons
+      var btnStartRecording = $(".btnStartRecording", theDialogContainer);
+      var btnStopRecording = $(".btnStopRecording", theDialogContainer);
+
+      btnStartRecording.on("click", function(event) {
+        if (startRecording()) {
+          btnStartRecording.toggle();
+          btnStopRecording.toggle();
+        } else {
+          var html = '<div><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 100px 0;"></span>'
+                  + 'If you want to use the audio comment funtionality, you have to grant me access to your microphone. '
+                  + 'Do you want me to ask for access again?'
+                  + '</p></div>';
+
+          $(html).dialog({title: 'No access to your microphone',
+            resizable: false, width: 400, height: 200, modal: true,
+            buttons: {
+              "Yes": function() {
+                initAudio();
+                $(this).dialog("close");
+              },
+              "No": function() {
+                $(this).dialog("close");
+              }
+            }
+          });
+        }
+      });
+
+      btnStopRecording.on("click", function(event) {
         btnStartRecording.toggle();
         btnStopRecording.toggle();
-      } else {
-        var html = '<div><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 100px 0;"></span>'
-                + 'If you want to use the audio comment funtionality, you have to grant me access to your microphone. '
-                + 'Do you want me to ask for access again?'
-                + '</p></div>';
 
-        $(html).dialog({
-          title: 'No access to your microphone',
-          resizable: false,
-          width: 400,
-          height: 200,
-          modal: true,
-          buttons: {
-            "Yes": function() {
-              initAudio();
-              $(this).dialog("close");
-            },
-            "No": function() {
-              $(this).dialog("close");
+        stopRecording(false, function(blob) {
+          // Create the audio object...
+          var reader = new FileReader();
+          reader.onloadend = function() {
+            // Store the base64 encoded wave file...
+            waveBase64 = reader.result;
+            waveMimeType = blob.type;
+            audioObject = new Audio(waveBase64);
+
+
+            if (audioObject) {
+              $(".btnPlayback", theDialogContainer).prop("disabled", false);
+
+              $(audioObject).on('stalled', function() {
+                audioObject.load();
+              });
+
+              $(audioObject).on('playing', function() {
+                btnPlaybackStart.hide();
+                btnPlaybackPause.show();
+              });
+
+              $(audioObject).on('pause', function() {
+                btnPlaybackStart.show();
+                btnPlaybackPause.hide();
+              });
+
+              $(audioObject).on('ended', function() {
+                // chrome has a replay bug; load fixes it
+                if (window.chrome) {
+                  audioObject.load();
+                }
+              });
             }
-          }
+          };
+
+          reader.readAsDataURL(blob);
         });
+      });
+
+      var theDialog = theDialogContainer.dialog({
+        title: "Create an audio comment...",
+        height: 300,
+        width: 350,
+        modal: true,
+        buttons: {
+          "Submit": function() {
+            if (waveBase64) {
+              var pageid = element.parents(".pf").attr("id");
+              var position = getGridPosition(element);
+
+              var date = new Date();
+              var data = {
+                'type': waveMimeType,
+                'message': waveBase64,
+                'page': pageid,
+                'position': position,
+                'date': date,
+                'hash': MD5(GUI.username + "_audioobject_" + date.getTime())
+              };
+
+              DBManager.addDocument(self, "comments_audio", data);
+
+              callback(data);
+
+              theDialog.dialog("close");
+            } else {
+              alert("Your haven't recorded anything yet!");
+            }
+          },
+          "Cancel": function() {
+            theDialog.dialog("close");
+          }
+        },
+        close: function() {
+          // Do something after closing...
+        }
+      });
+
+      // z-index fix for the fullscreen mode.
+      var zindex = theDialogContainer.parent("div").css("z-index");
+      if (iframe.data("fullscreen") && zindex < 12000) {
+        zindex = 12000;
+        $(".ui-widget-overlay").css("z-index", zindex);
+        theDialogContainer.parent("div").css("z-index", zindex + 1);
       }
-    });
 
-    btnStopRecording.on("click", function(event) {
-      $(".btnHighlight", viewerContainer).prop("disabled", false);
+      theDialog.dialog("open");
+    };
 
-      btnStartRecording.toggle();
-      btnStopRecording.toggle();
-      
-      stopRecording(function(newObject) {
+    $(".btnRecord", viewerContainer).on("click", function() {
+      initAudio();
+      var selected = $(".highlighted.selected", frameDocument);
+
+      addAudioDialog(selected, function(data) {
         $(".highlighted.selected", frameDocument)
                 .removeClass("selected")
                 .addClass('audio')
-                .attr('data-audioobject', newObject.getAttribute('id'));
-
+                .attr('data-audioobject', data.hash);
         self.saveHighlights();
       });
     });
@@ -646,8 +820,7 @@ Viewer.createRepresentation = function(parent) {
           '</div>' +
           '<div class="btn-group">' +
           '<input disabled="disabled" type="image" class="btn btnAddComment btnHighlight" title="Add a comment for this selection." src="/guis.common/images/oxygen/16x16/actions/view-pim-notes-add.png" />' +
-          '<input disabled="disabled" type="image" class="btn btnStartRecording btnHighlight lastChild" title="Click to start recording." src="/guis.common/images/oxygen/16x16/actions/media-recording-stopped.png" />' +
-          '<input disabled="disabled" type="image" class="btn btnStopRecording btnHighlight" title="Recording... Click to stop recording." src="/guis.common/images/oxygen/16x16/actions/media-recording.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnRecord btnHighlight" title="Click to start recording." src="/guis.common/images/oxygen/16x16/actions/media-record.png" />' +
           '</div>' +
           ''
           );

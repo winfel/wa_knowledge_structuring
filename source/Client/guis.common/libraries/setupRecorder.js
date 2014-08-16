@@ -31,11 +31,14 @@ function startRecording() {
   return false;
 }
 
-function stopRecording(callback) {
+function stopRecording(useHiddenFile, callback) {
 	recorder && recorder.stop();
 	// create WAV download link using audio data blob and upload file
 	recorder.exportWAV(function(blob) {
-		uploadFile(blob, callback);
+    if(useHiddenFile)
+      uploadFile(blob, callback);
+    else
+      callback(blob);
 	});
 	recorder.clear();
 }
