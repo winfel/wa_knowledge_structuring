@@ -456,6 +456,24 @@ CustomContainer.addFiles = function(files){
 			}
 		);
 		
+		$(rep).find("#representation_for_"+id).dblclick(function(event) {
+		
+			var objectId = event.currentTarget.id.split("_")[2];
+
+			var files = that.getAttribute('files');
+			
+			var n;
+			var k;
+			for(k in files){
+				if(files[k].attributes.id == objectId){
+					n = files[k];
+					break;
+				}
+			}
+			
+			window.open("/getContent/"+ObjectManager.getRoomID()+"/"+objectId+"/"+n.attributes.contentAge+"/"+ObjectManager.userHash, "_blank");
+		});
+		
 		$(rep).find("#representation_for_"+id).bind("contextmenu", function(event) { 
 			event.preventDefault();
 			$("div.addremove-menu").remove();

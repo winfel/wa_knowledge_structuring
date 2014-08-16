@@ -515,6 +515,22 @@ GlobalContainer.addFiles = function(files){
 				$(this).css("background", "#d3d3d3");	
 			}
 		);
+		
+		$(rep).find("#representation_for_"+id).dblclick(function(event) {
+		
+			var objectId = event.currentTarget.id.split("_")[2];
+
+			var n;
+			var k;
+			for(k in that.Files){
+				if(that.Files[k].attributes.id == objectId){
+					n = that.Files[k];
+					break;
+				}
+			}
+			
+			window.open("/getContent/"+n.inRoom+"/"+objectId+"/"+n.attributes.contentAge+"/"+ObjectManager.userHash, "_blank");
+		});
 
 		$(rep).find("#representation_for_"+id).bind("contextmenu", function(event) { 
 			event.preventDefault();
