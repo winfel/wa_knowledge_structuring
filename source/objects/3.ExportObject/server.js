@@ -11,20 +11,26 @@ var theObject=Object.create(require('./common.js'));
 var Modules=require('../../server.js');
 var exportableTypes = ['PaperSpace', 'PaperChapter', 'PaperObject']; // , 'File'
 
-theObject.exportAsFile = function(type) {
+theObject.exportAsFile = function(type, position) {
 	var that = this;
 	if(!type) {
 		type = this.getAttribute('exportFormat');
+	}
+	if(!position) {
+		var bbox = that.getBoundingBox();
+		position = {
+			x: bbox.x + bbox.width + 53,
+			y: bbox.y,
+		};
 	}
 	var inputPaperIds = this.getAttribute('inputPapers'),
 		outputContent = [],
 		outputCount = 0;
 
 	var createFile = function(filename, data, mimeType) {
-		var bbox = that.getBoundingBox();
 		Modules.ObjectManager.createObject(that.getRoomID(), "File", {
-			x: bbox.x + bbox.width + 53,
-			y: bbox.y, // + bbox.height,
+			x: position.x,
+			y: position.y,
 			hasContent : true,	// prevent calling justCreated() after object
 								// creation (would display file upload dialog)
 			name: filename,

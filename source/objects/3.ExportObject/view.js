@@ -135,6 +135,7 @@ ExportObject.createRepresentation = function(parent) {
 		stroke: '#91B34C',
 		strokeWidth: 2
 	});
+	$(rep).addClass('borderRect'); // the element with this class gets highlighted on selection
 	GUI.svg.image(newParent, radius-32,radius-32, 64,64, this.getIconPath());
 
 	$(GUI.svg.polyline(newParent, [[-45,20], [-10,20], [-10,60], [-5,60], [-10,60], [-10,100], [-45,100]], {
@@ -200,12 +201,39 @@ ExportObject.createExportIcons = function(rep) {
 			});
 		})
 		.mousedown(function(event) {
+			// avoid menu when clicking on this icon
+			event.preventDefault();
+			event.stopPropagation();
+			var theIconEl = $(this).find('image');
+			var startx = event.pageX, starty = event.pageY;
+			$('#content').on('mousemove.dragexport', function(event2){
+				theIconEl.attr('transform', 'translate('+(event2.pageX-startx)+','+(event2.pageY-starty)+')');
+				if(Math.abs(event2.pageX-startx) + Math.abs(event2.pageY-starty) > 8) {
+					theIconEl.data('moved', true);
+				}
+			});
+		})
+		.mouseup(function(event) {
+			$('#content').off('mousemove.dragexport');
+			var theIconEl = $(this).find('image');
+			theIconEl.attr('transform', 'translate(0,0)');
+			var offset = $('#content').offset();
+			if(theIconEl.data('moved')) {
+				theIconEl.data('moved', false);
+				that.exportAsFile($(this).data('exportFormat'), {
+					x: event.pageX - offset.left - 16,
+					y: event.pageY - offset.top - 16,
+				});
+			}
+		})
+		.dblclick(function(event) {
+			event.preventDefault();
+			event.stopPropagation();
 			var paperstring = '';
 			that.getAttribute('inputPapers').forEach(function(paper) {
 				paperstring += paper + '\n';
 			});
 			window.alert('Export\n' + paperstring + 'to ' + $(this).data('exportFormat'));
-			event.stopPropagation();
 		});
 
 	}
