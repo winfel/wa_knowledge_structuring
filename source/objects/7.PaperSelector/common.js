@@ -35,6 +35,9 @@ PaperSelector.register = function(type) {
 
   this.makeSensitive();
 
+  this.registerAttribute('width',{type: 'number', min: 128, standard: 128, hidden: true});
+  this.registerAttribute('height',{type: 'number', min: 128, standard: 128, hidden: true});
+  
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
   this.registerAttribute('bigIcon', {hidden: true});
   this.registerAttribute('verybigIcon', {hidden: false,standard:true});
