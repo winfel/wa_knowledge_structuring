@@ -270,7 +270,6 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
                         "Container#References#800#100#500#2#locked;true#height;455",
                         "SimpleText#DefineInfo#800#600#190#2#height;30#content;Sort the PaperChapters from left to right to give them an order",
                         "SimpleText#DefineInfo2#255#600#190#2#height;30#content;Place a chapter inside the selector to load it",
-                        "SimpleText#DefineInfo3#800#650#190#2#height;30#content;Note: At the moment you need to double-click a chapter to run the ordering algorithm...",
                         "PaperSelector#Selector#655#700#1#1#locked;false"/*,
                         "Line#TestLine#690#553#0#1#height;148",
                         "PaperChapter#Chapter1#880#650#1#1#chapterID;"+data.roomID*/];
