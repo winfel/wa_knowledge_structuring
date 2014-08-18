@@ -278,7 +278,7 @@ ObjectManager.getInventory = ObjectManager.getObjects;
  *  @param  context     user credentials
  *  @param  callback    the callback function
  **/
-ObjectManager.createObject = function (roomID, type, attributes, content, context, callback) {
+ObjectManager.createObject = function (roomID, type, attributes, content, context, callback, atts) {
     var merged = _.merge(this.getPrototypeFor(type).standardData, attributes);
     
     // console.log("-- merged= " + JSON.stringify(merged));
@@ -324,7 +324,7 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
             }
     
             Modules.EventBus.emit("room::" + roomID + "::action::createObject", {objectID: id});
-            callback(false, object);
+            callback(false, object, atts);
         });     
     });
 }
