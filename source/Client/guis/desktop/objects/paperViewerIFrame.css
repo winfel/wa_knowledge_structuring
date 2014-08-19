@@ -73,6 +73,14 @@ Author     : Patrick
 .comment {
   position: absolute;
   left: 3px;
+  margin-left:16px;
+}
+.audioobject::after,
+.comment::after {
+  content: "";
+  position: absolute;
+  top:-16px;
+  left:-16px;
   width: 32px;
   height: 32px;
   background-color: transparent;
@@ -81,20 +89,20 @@ Author     : Patrick
   border: 1px solid transparent;
 }
 
-.audioobject {
+.audioobject::after {
   background-image: url("/guis.common/images/oxygen/32x32/actions/media-playback-start.png");
 }
 
-.audioobject.playing {
+.audioobject.playing::after {
   background-image: url("/guis.common/images/oxygen/32x32/actions/media-playback-pause.png");
 }
 
-.comment {
+.comment::after {
   background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated1.png");
   max-width: 400px;
 }
 
-.comment.noreference {
+.comment.noreference::after {
   background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated1-noreference.png");
 }
 
@@ -106,10 +114,15 @@ Author     : Patrick
   border: 1px solid #F5C800;
   border-radius: 5px;
   background-color: #FFEB55;
+  background-position: top left;
+  background-repeat: no-repeat;
+  border: 1px solid transparent;
   padding: 5px 7px;
   width: auto;
   height: auto;
   z-index: 2;
+  margin-left:0;
+  margin-top:-16px;
 }
 
 .audioobject:hover,
@@ -117,14 +130,18 @@ Author     : Patrick
   z-index: 2;
 }
 
-.comment:hover,
+.comment:hover::after,
 .comment.opened {
   background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated2.png");
 }
 
-.comment.noreference:hover,
+.comment.noreference:hover::after,
 .comment.opened.noreference {
   background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated2-noreference.png");
+}
+
+.comment.opened::after {
+  background-image: none;
 }
 
 .comment.opened p {
