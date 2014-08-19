@@ -1035,8 +1035,28 @@ span.portlet-toggle, span.portlet-delete, span.sec-tag-delete {
 /* end tag manager */
 
 /* Container Objects */
-li.ui-draggable {
+.containerFileRepresentation {
 	list-style-type: none;
+	margin: 3px 3px 3px 0;
+	padding: 1px;
+	float: left;
+	width: 75px;
+	height: 75px;
+	line-height: 10px;
+	font-size: 1em;
+	text-align: center;
+	vertical-align: middle;
+	background: #d3d3d3;
+}
+.containerFileRepresentation > div.filename {
+	width:100%;
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+}
+
+.containerFileRepresentation:hover {
+	background: #f5f5f5;
 }
 /* end Container Objects */
 
