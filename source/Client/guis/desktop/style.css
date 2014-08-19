@@ -1034,6 +1034,11 @@ span.portlet-toggle, span.portlet-delete, span.sec-tag-delete {
 
 /* end tag manager */
 
+/* Container Objects */
+li.ui-draggable {
+	list-style-type: none;
+}
+/* end Container Objects */
 
 .addremove-menu {
     z-index:1000;
