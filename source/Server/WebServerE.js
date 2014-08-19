@@ -462,4 +462,10 @@ app.get('/paintings/:roomID/:user/:picID/:hash', function(req, res, next) {
   }
 });
 
+app.get('/write', function(req, res, next) {
+    res.set('Content-Type', 'text/plain');
+    res.send(200, 'Please create a chapter to write anything... \n(at the moment you need to reload the room)');
+});
+
+
 module.exports = WebServer;
