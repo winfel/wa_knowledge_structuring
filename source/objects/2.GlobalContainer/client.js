@@ -24,37 +24,30 @@ GlobalContainer.options = {
 GlobalContainer.Files = new Array();
 
 GlobalContainer.afterServerCall = function(files){
-
-	files = JSON.parse(files);
-
-	var id = files.pop();
-	var con = ObjectManager.getObject(id);
-
-	if(typeof con != "undefined"){
-		//search through all files and check if the mainTag matches to the name of the container
-		var f = new Array();
-		var n = con.getAttribute('name');
-		var key;
-		for (key in files) { 
-			var mainTag = files[key].attributes.mainTag;
-			if(mainTag == n){
-				f.push(files[key]);
-			}
+	var con = this;
+	//search through all files and check if the mainTag matches to the name of the container
+	var f = new Array();
+	var n = con.getAttribute('name');
+	for (var key in files) { 
+		var mainTag = files[key].attributes.mainTag;
+		if(mainTag == n){
+			f.push(files[key]);
 		}
-		
-		con.Files = f;
-		
-		con.searchAndFilter(f);
 	}
 
-}
+	con.Files = f;
+	con.searchAndFilter(f);
+};
 
 
 GlobalContainer.getFiles = function(){
-		
-	this.serverCall("getAllFileObjects", this.id, GlobalContainer.afterServerCall);
-		
-}
+	var that = this;
+	this.serverCall("getAllFileObjects", function(data){
+		//that.afterServerCall(data);
+		that.Files = data;
+		that.searchAndFilter(data);
+	});
+};
 
 
 GlobalContainer.sendNewFavourite = function(fav){
