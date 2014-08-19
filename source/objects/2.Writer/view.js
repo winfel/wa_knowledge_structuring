@@ -47,7 +47,28 @@ Writer.createRepresentation = function(parent) {
 		iframe_loaded = true;
     });
 
-    iFrame.attr('src', 'http://' + window.location.hostname + ':9001/p/' + this.getAttribute('paper') + '?userName=' +  encodeURIComponent(GUI.userid));
+    /* is there a chapter ? */
+    var inv = ObjectManager.getCurrentRoom().getInventory();
+    var foundChapter = false;
+    var amount = 0;
+    var chapterID = -1;
+
+    for (var i in inv) {
+        if(inv[i].type == "PaperChapter"){
+            foundChapter = true;
+            amount++;
+            chapterID = inv[i].getAttribute('chapterID');
+        }
+    } 
+
+
+    if(!foundChapter){
+        iFrame.attr('src', 'http://' + window.location.hostname + ':8080/write');  
+    }else{
+        this.setAttribute('paper',chapterID);
+        iFrame.attr('src', 'http://' + window.location.hostname + ':9001/p/' + chapterID + '?userName=' +  encodeURIComponent(GUI.userid)); 
+    }
+
 	//iFrame.attr('src', 'http://beta.etherpad.org/webArenaDemo' + this.getAttribute('paper') + '?showControls=true&showChat=false&showLineNumbers=true&useMonospaceFont=false');
 
 	window.setTimeout(function() {
