@@ -5,28 +5,64 @@
 *
 */
 
+FavouritesContainer.options = {
+
+	searchString : "",
+	searchByName : true,
+	searchByTag : false,
+	searchForPDF : true,
+	searchForHTML : true,
+	searchForImage : true,
+	searchForAudio : true,
+	searchForVideo : true,
+	searchForText : true,
+	sortingCriterion : "By Name",
+	sortingOrder : "From A to Z"
+
+}
+
+FavouritesContainer.Files = new Array();
+
 FavouritesContainer.afterServerCall = function(files){
 
 	files = JSON.parse(files);
 	
 	var id = files.pop();
 	var con = ObjectManager.getObject(id);
-	con.searchAndFilter(files);
-
+	
+	if(typeof con != "undefined"){
+		con.Files = files;
+		con.searchAndFilter(files);
+	}
+	
 }
 
 FavouritesContainer.removeFavourite = function(fav){
 		
-	Modules.SocketClient.serverCall('removeFavourite', {
-		'favourite': fav,
-		'id': ObjectManager.user.id
+	UserManager.getDataOfSpaceWithDest(ObjectManager.user.username, "favourites" , function(d){
+	
+		var arr = new Array();
+			
+		if(d != "error"){
+			var key;
+			for(key in d[0].value){
+				if(d[0].value[key] != fav){
+					arr.push(d[0].value[key]);
+				}
+			}
+			UserManager.removeDataOfSpaceWithDest(ObjectManager.user.username, "favourites");
+		}
+				
+		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(ObjectManager.user.username, "favourites", arr) }, 500);
+	
 	});
-		
+	
 }
+
 
 FavouritesContainer.getFiles = function(){
 		
-	this.serverCall("getAllFavouriteFileObjects", this.id, ObjectManager.user.id, FavouritesContainer.afterServerCall);
+	this.serverCall("getAllFavouriteFileObjects", this.id, ObjectManager.user.username, FavouritesContainer.afterServerCall);
 		
 }
 
@@ -36,17 +72,17 @@ FavouritesContainer.searchAndFilter = function(files){
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
 	
-	var s = this.getAttribute('searchString');
-	var name = this.getAttribute('searchByName');
-	var tag = this.getAttribute('searchByTag');
-	var pdf = this.getAttribute('searchForPDF');
-	var html = this.getAttribute('searchForHTML');
-	var image = this.getAttribute('searchForImage');
-	var audio = this.getAttribute('searchForAudio');
-	var video = this.getAttribute('searchForVideo');
-	var text = this.getAttribute('searchForText');
+	var s = this.options.searchString;
+	var name = this.options.searchByName;
+	var tag = this.options.searchByTag;
+	var pdf = this.options.searchForPDF;
+	var html = this.options.searchForHTML;
+	var image = this.options.searchForImage;
+	var audio = this.options.searchForAudio;
+	var video = this.options.searchForVideo;
+	var text = this.options.searchForText;
 			
-	if(s.length == 0 || s == "" || s == 0){
+	if(typeof s === "undefined" || s == "" || s == 0){
 		filteredFiles1 = files;
 	}
 	else{
@@ -58,10 +94,11 @@ FavouritesContainer.searchAndFilter = function(files){
 			var mainTag = files[key].attributes.mainTag;
 			var secTags = files[key].attributes.secondaryTags;
 			
-			if(secTags == 0){
+			if(secTags == 0 || typeof secTags == "undefined"){
 				secTags = new Array();
 			}
-			if(mainTag != ""){
+			
+			if(mainTag != "" && typeof mainTag != "undefined"){
 				secTags.push(mainTag);
 			}
 
@@ -134,8 +171,8 @@ FavouritesContainer.searchAndFilter = function(files){
 
 FavouritesContainer.sortFiles = function(files){ //bubble sort
 
-	var sortingCriterion = this.getAttribute('sortingCriterion');
-	var sortingOrder = this.getAttribute('sortingOrder');
+	var sortingCriterion = this.options.sortingCriterion;
+	var sortingOrder = this.options.sortingOrder;
 	
 	var R1;
 	var R2;
@@ -157,8 +194,8 @@ FavouritesContainer.sortFiles = function(files){ //bubble sort
 		
 		files.sort(function(a, b){
 			
-			var aName = a.attributes.name;
-			var bName = b.attributes.name;
+			var aName = a.attributes.name.toLowerCase();
+			var bName = b.attributes.name.toLowerCase();
 			
 			if(aName < bName) return R1;
 			if(aName > bName) return R2;
@@ -189,7 +226,7 @@ FavouritesContainer.sortFiles = function(files){ //bubble sort
 			return 0;
 		});
 	}
-
+	
 	this.addFiles(files);
 	
 }

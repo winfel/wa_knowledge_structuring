@@ -1,0 +1,4 @@
+Viewer.setTranslations('de',{
+
+}
+);

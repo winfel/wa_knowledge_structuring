@@ -490,6 +490,9 @@ function addUserToSection(that, user, sectionUsers, role, withDelete, forceMulti
   if (!that.objData)
     withDelete = false;
   
+  if(role.name == "Manager" && user == GUI.username){
+    withDelete = false;
+  }
         var checkedSpans, checkedUsers;
           
           if(that.checkedSpans[role.name]) {

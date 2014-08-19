@@ -5,6 +5,22 @@
 *
 */
 
+CustomContainer.options = {
+
+	searchString : "",
+	searchByName : true,
+	searchByTag : false,
+	searchForPDF : true,
+	searchForHTML : true,
+	searchForImage : true,
+	searchForAudio : true,
+	searchForVideo : true,
+	searchForText : true,
+	sortingCriterion : "By Name",
+	sortingOrder : "From A to Z"
+
+}
+
 
 CustomContainer.newFile = function(id){
 	
@@ -16,33 +32,36 @@ CustomContainer.newFile = function(id){
 	
 	var files = this.getAttribute('files');
 	
-	if(files == 0 || files.length == 0){
-		files = new Array();
-	}	
-	else{
-		var key;
-		for(key in files){
-			if(files[key].attributes.id == id){
-				return;
+	var newFiles = new Array();
+	
+	var exist = false;
+	
+	var key;
+	for(key in files){
+		newFiles.push(files[key]);
+		if(files[key].attributes.id == id){
+			exist = true;
+		}
+	}
+	
+	if(!exist){
+
+		var n = {
+			attributes : {
+				name : o.getAttribute('name'),
+				mainTag : o.getAttribute('mainTag'),
+				secondaryTags : o.getAttribute('secondaryTags'),
+				mimeType : o.getAttribute('mimeType'),
+				contentAge : o.getAttribute('contentAge'),
+				id : id
 			}
 		}
+		
+		newFiles.push(n);
 	}
 	
-
-	var n = {
-		attributes : {
-			name : o.getAttribute('name'),
-			mainTag : o.getAttribute('mainTag'),
-			secondaryTags : o.getAttribute('secondaryTags'),
-			mimeType : o.getAttribute('mimeType'),
-			contentAge : o.getAttribute('contentAge'),
-			id : id
-		}
-	}
-	
-	files.push(n)
-	this.setAttribute('files', files);
-	this.searchAndFilter(files);	
+	this.setAttribute('files', newFiles);
+	this.searchAndFilter(newFiles);	
 	
 }
 
@@ -63,17 +82,17 @@ CustomContainer.searchAndFilter = function(files){
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
 	
-	var s = this.getAttribute('searchString');
-	var name = this.getAttribute('searchByName');
-	var tag = this.getAttribute('searchByTag');
-	var pdf = this.getAttribute('searchForPDF');
-	var html = this.getAttribute('searchForHTML');
-	var image = this.getAttribute('searchForImage');
-	var audio = this.getAttribute('searchForAudio');
-	var video = this.getAttribute('searchForVideo');
-	var text = this.getAttribute('searchForText');
-
-	if(s.length == 0 || s == "" || s == 0){
+	var s = this.options.searchString;
+	var name = this.options.searchByName;
+	var tag = this.options.searchByTag;
+	var pdf = this.options.searchForPDF;
+	var html = this.options.searchForHTML;
+	var image = this.options.searchForImage;
+	var audio = this.options.searchForAudio;
+	var video = this.options.searchForVideo;
+	var text = this.options.searchForText;
+	
+	if(typeof s === "undefined" || s == "" || s == 0){
 		filteredFiles1 = files;
 	}
 	else{
@@ -162,8 +181,8 @@ CustomContainer.searchAndFilter = function(files){
 
 CustomContainer.sortFiles = function(files){ //bubble sort
 
-	var sortingCriterion = this.getAttribute('sortingCriterion');
-	var sortingOrder = this.getAttribute('sortingOrder');
+	var sortingCriterion = this.options.sortingCriterion;
+	var sortingOrder = this.options.sortingOrder;
 	
 	var R1;
 	var R2;
@@ -185,8 +204,8 @@ CustomContainer.sortFiles = function(files){ //bubble sort
 		
 		files.sort(function(a, b){
 			
-			var aName = a.attributes.name;
-			var bName = b.attributes.name;
+			var aName = a.attributes.name.toLowerCase();
+			var bName = b.attributes.name.toLowerCase();
 			
 			if(aName < bName) return R1;
 			if(aName > bName) return R2;
@@ -217,7 +236,7 @@ CustomContainer.sortFiles = function(files){ //bubble sort
 			return 0;
 		});
 	}
-
+	
 	this.addFiles(files);
 	
 }

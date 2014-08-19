@@ -97,10 +97,12 @@ Modules.Dispatcher      = require('./Server/Dispatcher.js');
 Modules.WebServer       = require('./Server/WebServerE.js');
 Modules.SocketServer    = require('./Server/SocketServer.js');
 Modules.UserManager     = require('./Server/UserManager.js');
+Modules.DBManager       = require('./Server/DBManager.js');
 Modules.Helper          = require('./Server/Helper.js');
 Modules.EventBus        = require("./Server/EventBus.js");
 Modules.BuildTool       = require('./Server/BuildTool.js');
 //Modules.TokenChecker  = require("./Server/TokenChecker");
+Modules.PdfEdit         = require('./Server/PdfEdit.js');
 
 // These object exist for every object type or every single object. They shall not be
 // modified directly but inherited (e.g. this.attributeManager=Object.create(AttributeManager));

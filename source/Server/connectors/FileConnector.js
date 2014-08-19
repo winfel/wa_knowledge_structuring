@@ -602,7 +602,7 @@ fileConnector.copyContentFromFile=function(roomID, objectID, sourceFilename, con
 */
 fileConnector.getContent=function(roomID,objectID,context,callback){
 	
-	this.Modules.Log.debug("Get content (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+	//this.Modules.Log.debug("Get content (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
 
 	var filebase=this.Modules.Config.filebase;
 	
@@ -629,7 +629,7 @@ fileConnector.getContent=function(roomID,objectID,context,callback){
 		}
 		
 	} catch (e) {
-		this.Modules.Log.debug("Could not read content from file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
+		//this.Modules.Log.debug("Could not read content from file (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(context)+"')");
 		if (callback == undefined) {
 			//sync
 			return false;
@@ -923,7 +923,11 @@ fileConnector.trimImage=function(roomID, objectID, context, callback) {
 
 	/* save content to temp. file */
 
-	var filename = __dirname+"/tmp/trim_"+roomID+"_"+objectID;
+	//var filename = __dirname+"/tmp/trim_"+roomID+"_"+objectID;
+	
+	var os = require('os');
+			
+	var filename = os.tmpdir()+"/image_preview_dimensions_"+roomID+"_"+objectID;
 
 	this.getContent(roomID,objectID,context,function(content) {
 
@@ -1196,9 +1200,12 @@ fileConnector.inlinePreviewProviders = {
 		'dimensions' : function(roomID, objectID, context, callback) {
 			
 			if (!context) throw new Error('Missing context in dimensions for image');
-
 			
-			var filename = __dirname+"/tmp/image_preview_dimensions_"+roomID+"_"+objectID;
+			//var filename = __dirname+"/tmp/image_preview_dimensions_"+roomID+"_"+objectID;
+			
+			var os = require('os');
+			
+			var filename = os.tmpdir()+"/image_preview_dimensions_"+roomID+"_"+objectID;
 
 			fileConnector.getContent(roomID,objectID,context,function(content) {
 				fs.writeFile(filename, Buffer(content), function (err) {

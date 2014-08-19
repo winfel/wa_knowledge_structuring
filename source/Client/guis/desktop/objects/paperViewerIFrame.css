@@ -1,0 +1,170 @@
+/*
+This css file is added to the header of the html document within the iframe.
+  
+Created on : 19.06.2014, 23:16:22
+Author     : Patrick
+*/
+
+.highlighted.selected {
+  background-color: #3399FF !important;
+}
+
+.strike, .glow, .scratchout, .quote {
+  background: none !important;
+}
+
+.strike {
+  text-line-through-mode: skip-white-space;
+  text-line-through-style: wave;
+  text-line-through-width: normal;
+  text-decoration: line-through;
+  text-decoration-line: wave;
+  -moz-text-line-through-mode: skip-white-space;
+  -moz-text-line-through-style: wave;
+  -moz-text-line-through-width: normal;
+  -moz-text-decoration-line: wave;
+  /*	text-line-through-color: red;
+    text-decoration-color: red;
+    -moz-text-line-through-color: red;
+    -moz-text-decoration-color: red;*/
+}
+
+.scratchout {
+  background-image: url("/guis.common/images/scratchout.png") !important;
+}
+
+.glow {
+  text-shadow: 0px 0px 10px red;
+}
+
+.quote {
+  box-shadow: 0px 0px 10px 5px;
+}
+
+.quote:hover::before {
+  content: "";
+  position: absolute;
+  margin-left:-0.5em;
+}
+
+.quote:hover::after {
+  content: "";
+  position: absolute;
+  margin-left:0;
+}
+
+.audio:first-of-type::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  width: 20px;
+  height: 20px;
+  background-image: url("/guis.common/images/oxygen/16x16/actions/text-speak.png");
+  /*background: blue;
+  border-radius: 20px;*/
+}
+
+.remotehover {
+  box-shadow: 0 0 100px 50px red;
+}
+
+.audioobject,
+.comment {
+  position: absolute;
+  left: 3px;
+  margin-left:16px;
+}
+.audioobject::after,
+.comment::after {
+  content: "";
+  position: absolute;
+  top:-16px;
+  left:-16px;
+  width: 32px;
+  height: 32px;
+  background-color: transparent;
+  background-position: top left;
+  background-repeat: no-repeat;
+  border: 1px solid transparent;
+}
+
+.audioobject::after {
+  background-image: url("/guis.common/images/oxygen/32x32/actions/media-playback-start.png");
+}
+
+.audioobject.playing::after {
+  background-image: url("/guis.common/images/oxygen/32x32/actions/media-playback-pause.png");
+}
+
+.comment::after {
+  background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated1.png");
+  max-width: 400px;
+}
+
+.comment.noreference::after {
+  background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated1-noreference.png");
+}
+
+.comment p {
+  display: none;
+}
+
+.comment.opened {
+  border: 1px solid #F5C800;
+  border-radius: 5px;
+  background-color: #FFEB55;
+  background-position: top left;
+  background-repeat: no-repeat;
+  border: 1px solid transparent;
+  padding: 5px 7px;
+  width: auto;
+  height: auto;
+  z-index: 2;
+  margin-left:0;
+  margin-top:-16px;
+}
+
+.audioobject:hover,
+.comment:hover {
+  z-index: 2;
+}
+
+.comment:hover::after,
+.comment.opened {
+  background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated2.png");
+}
+
+.comment.noreference:hover::after,
+.comment.opened.noreference {
+  background-image: url("/guis.common/images/oxygen/32x32/actions/view-pim-note-rotated2-noreference.png");
+}
+
+.comment.opened::after {
+  background-image: none;
+}
+
+.comment.opened p {
+  margin: 0px;
+  padding: 3px 0;
+  display: block;
+}
+
+.comment.opened p.commentHeader {
+  font-weight: bold;
+  margin-left: 40px;
+  padding-bottom: 10px;
+}
+
+#page-container {
+  background: none !important;
+  background-color: white !important;
+}
+
+#page-container > div {
+  margin: 0 !important;
+}
+
+.pf {
+  float: left;
+}

@@ -227,69 +227,117 @@ app.get('/getRoomHierarchy', function(req, res, next) {
   });
 });
 
+app.get("/getPaper/:roomID/:objectID/:hash", function(req, res, next) {
+	var context = {username: "dummy"};
+	res.set('Content-Type', 'text/html');
+	res.set('Content-Disposition', 'inline; filename="paper.html"');
+	if (req.params.objectID != '0')
+	{
+		Modules.Connector.getContent(req.params.roomID, req.params.objectID + '.html', req.context, function(data) {
+			if(data === false)
+			{
+				res.send(404, "no html content");
+				return;
+			}
+
+			res.send(200, new Buffer(data));
+		});
+	}
+	else
+	{
+		var data;
+		data = '<!DOCTYPE html>' +
+				'<html><head><title>Drag a document in here!</title></head>' +
+				'<body><div style="width: 388px; margin: 0 auto;">' +
+				'<img src="/guis.common/images/dragDocument.png" alt="Drag a document in here!" title="Drag a document in here!">' +
+				'</div></body></html>';
+
+		res.send(200, new Buffer(data));
+	}
+	return;
+});
+
+// p3 might specify a content age
 app.get('/getContent/:roomID/:objectID/:p3/:hash', function(req, res, next) {
+
+	// pdf file html preview
+  var objectAdditionalContent = req.params.objectID.match(/(.+?)\.(.+)/);
+  if (objectAdditionalContent) {
+    res.set('Content-Type', 'text/html');
+    res.set('Content-Disposition', 'inline; filename="preview.html"');
+		Modules.Connector.getContent(req.params.roomID, req.params.objectID, req.context, function(data) {
+			if(data === false)
+			{
+				res.send(404, "no html content");
+				return;
+			}
+			res.send(200, new Buffer(data));
+		});
+    return;
+  }
+
   Modules.ObjectManager.getObject(req.params.roomID, req.params.objectID, req.context, function(object) {
 
-    if (!object) {
-      Modules.Log.warn('Object not found (roomID: ' + req.params.roomID + ' objectID: ' + req.params.objectID + ')');
-      return res.send(404, 'Object not found');
-    }
+  if (!object) {
+    Modules.Log.warn('Object not found (roomID: ' + req.params.roomID + ' objectID: ' + req.params.objectID + ')');
+    return res.send(404, 'Object not found');
+  }
 
-    var mimeType = object.getAttribute('mimeType') || 'text/plain';
+  var mimeType = object.getAttribute('mimeType') || 'text/plain';
 
-    res.set('Content-Type', mimeType + '; charset=ISO-8859-1');
-    res.set('Content-Disposition', 'inline; filename="' + object.getAttribute("name") + '"');
+  res.set('Content-Type', mimeType + '; charset=ISO-8859-1');
+  res.set('Content-Disposition', 'inline; filename="' + object.getAttribute("name") + '"');
 
-    if (Modules.Connector.getContentStream !== undefined) {
+  if (Modules.Connector.getContentStream !== undefined) {
       var objStream = Modules.Connector.getContentStream(req.params.roomID, req.params.objectID, req.context);
-      objStream.pipe(res);
-      objStream.on("end", function() {
-        try {
-          res.send(200);
-        } catch (Ex) {
-          // console.log("paintings ex: " + err);
-        }
-      })
-    } else {
-      var data = object.getContent();
-      res.send(200, new Buffer(data));
-    }
-  });
+    objStream.pipe(res);
+    objStream.on("end", function() {
+      try {
+        res.send(200);
+      } catch (Ex) {
+        // console.log("paintings ex: " + err);
+      }
+    });
+  } else {
+    var data = object.getContent();
+    res.send(200, new Buffer(data));
+  }
+});
 });
 
 app.get('/getPreviewContent/:roomID/:objectID/:p3/:hash', function(req, res, next) {
   Modules.ObjectManager.getObject(req.params.roomID, req.params.objectID, req.context, function(object) {
 
-    if (!object) {
-      return  res.send(404, 'Object not found');
-    }
+  if (!object) {
+    return  res.send(404, 'Object not found');
+  }
 
-    object.getInlinePreviewMimeType(function(mimeType) {
-      object.getInlinePreview(function(data) {
+  object.getInlinePreviewMimeType(function(mimeType) {
+    object.getInlinePreview(function(data) {
 
-        if (!data) {
-          Modules.Log.warn('no inline preview found (roomID: ' + req.params.roomID + ' objectID: ' + req.params.objectID + ')');
-          if (mimeType.indexOf("image/") >= 0) {
-            fs.readFile(__dirname + '/../Client/guis.common/images/imageNotFound.png', function(err, data) {
+      if (!data) {
+        Modules.Log.warn('no inline preview found (roomID: ' + req.params.roomID + ' objectID: ' + req.params.objectID + ')');
+        if (mimeType.indexOf("image/") >= 0) {
+          fs.readFile(__dirname + '/../Client/guis.common/images/imageNotFound.png', function(err, data) {
 
-              if (err) {
-                Modules.Log.warn("Error loading imageNotFound.png file (" + req.path + ")");
-                return res.send(404, '404 Error loading imageNotFound.png file');
-              }
+            if (err) {
+              Modules.Log.warn("Error loading imageNotFound.png file (" + req.path + ")");
+              return res.send(404, '404 Error loading imageNotFound.png file');
+            }
 
-              res.set({'Content-Type': 'image/png', 'Content-Disposition': 'inline'});
-              res.send(200, data);
-            });
-          } else {
-            res.send(404, 'Object not found');
-          }
+            res.set({'Content-Type': 'image/png', 'Content-Disposition': 'inline'});
+            res.send(200, data);
+          });
         } else {
-          res.set({'Content-Type': 'text/plain', 'Content-Disposition': 'inline'});
-          res.send(200, new Buffer(data));
+          res.send(404, 'Object not found');
         }
-      }, mimeType, true);
-    });
+      } else {
+        res.set({'Content-Type': 'text/plain', 'Content-Disposition': 'inline'});
+        res.send(200, new Buffer(data));
+      }
+    }, mimeType, true);
   });
+});
 });
 
 // TODO: test this
@@ -328,14 +376,14 @@ app.get('/defaultJavascripts', function(req, res, next) {
 
     files = _.filter(files, function(fname) {
       return fileReg.test(fname);
-    })
+    });
 
     var etag = "";
 
     files.forEach(function(file) {
       var stats = fs.statSync('Client/guis.common/javascript/' + file);
       etag += stats.size + '-' + Date.parse(stats.mtime);
-    })
+    });
 
     if (req.get('if-none-match') === etag) {
       res.send(304);
@@ -343,8 +391,8 @@ app.get('/defaultJavascripts', function(req, res, next) {
       var readFileQ = Q.denodeify(fs.readFile);
 
       var promises = files.map(function(filename) {
-        return readFileQ('Client/guis.common/javascript/' + filename)
-      })
+        return readFileQ('Client/guis.common/javascript/' + filename);
+      });
 
       var combinedJS = "";
 
@@ -352,14 +400,14 @@ app.get('/defaultJavascripts', function(req, res, next) {
       Q.allSettled(promises).then(function(results) {
         results.forEach(function(result) {
           combinedJS += result.value + "\n";
-        })
+        });
 
         var mimeType = 'application/javascript';
         res.set({'Content-Type': mimeType, 'ETag': etag});
         res.send(200, combinedJS);
-      })
+      });
     }
-  })
+  });
 });
 
 app.get('/objects', function(req, res, next) {
@@ -381,14 +429,14 @@ app.get('/objectIcons/:objectType/:section?', function(req, res, next) {
 
 
 app.post('/setContent/:roomID/:objectID/:hash', function(req, res, next) {
-  var roomID = req.params.roomID
-  var objectID = req.params.objectID
+  var roomID = req.params.roomID;
+  var objectID = req.params.objectID;
 
   var historyEntry = {
     'objectID': roomID,
     'roomID': roomID,
     'action': 'setContent'
-  }
+  };
 
   Modules.ObjectManager.history.add(new Date().toDateString(), req.context.user.username, historyEntry)
   var formidable = require('formidable');
@@ -397,50 +445,62 @@ app.post('/setContent/:roomID/:objectID/:hash', function(req, res, next) {
   form.parse(req, function(err, fields, files) {
 
     Modules.ObjectManager.getObject(roomID, objectID, req.context, function(object) {
-      if (!object) {
-        Modules.Log.warn('Object not found (roomID: ' + roomID + ' objectID: ' + objectID + ')');
-        return res.send(404, 'Object not found');
+  if (!object) {
+    Modules.Log.warn('Object not found (roomID: ' + roomID + ' objectID: ' + objectID + ')');
+    return res.send(404, 'Object not found');
+  }
+
+    if (files.file.type.match(/^application\//i)) {
+      // firefox does not specify mime type, so guess from file ending
+      if (files.file.name.match(/\.pdf$/i)) {
+        files.file.type = 'application/pdf';
       }
+    }
 
-      object.copyContentFromFile(files.file.path, function() {
+    object.copyContentFromFile(files.file.path, function() {
 
-        object.set('hasContent', true);
-        object.set('contentAge', new Date().getTime());
-        object.set('mimeType', files.file.type);
+      object.set('hasContent', true);
+      object.set('contentAge', new Date().getTime());
+      object.set('mimeType', files.file.type);
 
-        /* check if content is inline displayable */
-        if (Modules.Connector.isInlineDisplayable(files.file.type)) {
+      /* check if content is inline displayable */
+      if (Modules.Connector.isInlineDisplayable(files.file.type)) {
 
-          object.set('preview', true);
-          object.persist();
+        object.set('preview', true);
+        object.persist();
 
-          /* get dimensions */
-          Modules.Connector.getInlinePreviewDimensions(roomID, objectID, files.file.type, true, function(width, height) {
+        /* get dimensions */
+        Modules.Connector.getInlinePreviewDimensions(roomID, objectID, files.file.type, true, function(width, height) {
 
-            if (width != false)
-              object.setAttribute("width", width);
-            if (height != false)
-              object.setAttribute("height", height);
-
-            //send object update to all listeners
-            object.persist();
-            object.updateClients('contentUpdate');
-
-            res.send(200);
-          });
-
-        } else {
-          object.set('preview', false);
+          if (width != false)
+            object.setAttribute("width", width);
+          if (height != false)
+            object.setAttribute("height", height);
 
           //send object update to all listeners
           object.persist();
           object.updateClients('contentUpdate');
 
           res.send(200);
-        }
-      });
+        });
+
+      } else {
+        object.set('preview', false);
+
+        //send object update to all listeners
+        object.persist();
+        object.updateClients('contentUpdate');
+
+        res.send(200);
+      }
     });
+
+    // convert pdf to html if neccessary
+    if (files.file.type == 'application/pdf') {
+      Modules.EventBus.emit('pdfAdded', {object: object, file: files.file});
+    }
   });
+});
 
 });
 
@@ -455,11 +515,17 @@ app.get('/paintings/:roomID/:user/:picID/:hash', function(req, res, next) {
       } catch (err) {
         // console.log("paintings ex: " + err);
       }
-    })
+    });
   } else {
     res.set('Content-Type', 'text/plain');
     res.send(200, 'Connector does not support PaintingStreams');
   }
 });
+
+app.get('/write', function(req, res, next) {
+    res.set('Content-Type', 'text/plain');
+    res.send(200, 'Please create a chapter to write anything... \n(at the moment you need to reload the room)');
+});
+
 
 module.exports = WebServer;

@@ -96,11 +96,13 @@ GUI.updateLayers = function() {
 
 		for (var i in objectsArray){
 			var obj = objectsArray[i];
-			
-			var rep = obj.getRepresentation();
-			
-			$(rep).prependTo("#room_"+index);
-			
+
+			// only reorder objects which are not alwaysOnTop
+			if(!obj.alwaysOnTop()) {
+				var rep = obj.getRepresentation();
+				// be careful: in case of foreignObject / iframe the content is reloaded then!
+				$(rep).prependTo("#room_"+index);
+			}
 		}
 	}
 	

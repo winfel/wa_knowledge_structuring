@@ -141,46 +141,6 @@ UserManager.init = function(theModules) {
       });
   });
 
-  Dispatcher.registerCall('addNewFavourite', function(socket, data){
-
-		var connections = UserManager.connections;
-		
-		for (var i in connections) {
-		
-			if(connections[i].user.id == data.id){
-				if(typeof connections[i].user.favourites === "undefined"){
-					connections[i].user.favourites = new Array();
-				}
-				if(connections[i].user.favourites.indexOf(data.favourite) == -1){
-					connections[i].user.favourites.push(data.favourite);
-				}
-				
-			}
-		}
-		
-  });
-  
-    Dispatcher.registerCall('removeFavourite', function(socket, data){
-
-		var connections = UserManager.connections;
-		
-		for (var i in connections) {
-		
-			if(connections[i].user.id == data.id){
-			
-				if(typeof connections[i].user.favourites != "undefined"){
-				
-					var j = connections[i].user.favourites.indexOf(data.favourite);
-					
-					if(j != -1){
-						connections[i].user.favourites.splice(j, 1);
-					}	
-				}
-			}
-		}
-		
-  });
-  
 
   /* get all exiting access rights from the database */
   var collection = db.get('rights');
@@ -307,11 +267,10 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
   var shouldInclude = [ PAPER_WRITER+"#Writer#20#100#700#2#locked;true#paper;"+data.roomID,
                         "SimpleText#WritingAreaInfo#20#45#100#2#height;30#content;Writing Area:",
                         "SimpleText#ReferenceInfo#800#45#100#2#height;30#content;References:",
-                        "Container#References#800#100#500#2#locked;true#height;455",
+                        "GlobalContainer#References#800#100#500#2#locked;true#height;455",
                         "SimpleText#DefineInfo#800#600#190#2#height;30#content;Sort the PaperChapters from left to right to give them an order",
                         "SimpleText#DefineInfo2#255#600#190#2#height;30#content;Place a chapter inside the selector to load it",
-                        "SimpleText#DefineInfo3#800#650#190#2#height;30#content;Note: At the moment you need to double-click a chapter to run the ordering algorithm...",
-                        "PaperSelector#Selector#655#700#1#1#locked;true"/*,
+                        "PaperSelector#Selector#655#700#1#1#locked;false"/*,
                         "Line#TestLine#690#553#0#1#height;148",
                         "PaperChapter#Chapter1#880#650#1#1#chapterID;"+data.roomID*/];
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
@@ -450,6 +409,12 @@ UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID){
 };
 
 UserManager.removeDataOfSpaceWithDest = function(socketOrUser, data, responseID){
+     var ss = db.get('SpaceStorage');
+
+     ss.remove({'destination': data.destination, 'key':data.key});
+};
+
+UserManager.removeDataOfSpaceWithDestServerSide = function(data){
      var ss = db.get('SpaceStorage');
 
      ss.remove({'destination': data.destination, 'key':data.key});

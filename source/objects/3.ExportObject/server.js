@@ -86,7 +86,7 @@ theObject.exportAsFile = function(type, position) {
 				var errorText = "Error: You don't have created a chapter that could be exported right now. <br> To use"+
 				" the export object, you need to create a chapter, write something into it and, as soon as you wan't to export something, "+
 				"double click a chapter to run the ordering algorithm (this last step will be fixed in the final release of "+
-				" the COW aka HackArena aka HackATron...)";
+				" the CoW aka HackArena aka HackATron...)";
 				addContent(object, errorText);
 				return;
 			}

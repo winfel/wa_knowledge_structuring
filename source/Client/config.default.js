@@ -8,7 +8,7 @@
 "use strict";
 
 var Config={
-	projectTitle:'Cooperative Writing (COW)',
+	projectTitle:'Cooperative Writing (CoW)',
 	language:'de',
 	presentationMode:false,
 	couplingMode:true,

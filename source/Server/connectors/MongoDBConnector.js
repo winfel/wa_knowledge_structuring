@@ -1287,7 +1287,11 @@ mongoConnector.trimImage = function(roomID, objectID, context, callback) {
     if (!context) this.Modules.Log.error("Missing context");
 
     /* save content to temp. file */
-    var filename = __dirname + "/tmp/trim_" + roomID + "_" + objectID;
+    //var filename = __dirname + "/tmp/trim_" + roomID + "_" + objectID;
+	
+	var os = require('os');
+			
+	var filename = os.tmpdir()+"/image_preview_dimensions_"+roomID+"_"+objectID;
 
     this.getContent(roomID, objectID, context, function(content) {
 
@@ -1541,7 +1545,11 @@ mongoConnector.inlinePreviewProviders = {
         'dimensions' : function(roomID, objectID, context, callback) {
             if (!context) throw new Error('Missing context in dimensions for image');
             
-            var filename =  path.resolve(__dirname, "../tmp/image_preview_dimensions_" + roomID + "_" + objectID);
+			//var filename =  path.resolve(__dirname, "../tmp/image_preview_dimensions_" + roomID + "_" + objectID);
+			
+			var os = require('os');
+			
+			var filename = os.tmpdir()+"/image_preview_dimensions_"+roomID+"_"+objectID;
 
             mongoConnector.getContent(roomID, objectID, context, function(content) {
                 

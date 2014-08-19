@@ -32,6 +32,10 @@ InternalDispatcher.init = function(theModules){
     Modules.EventBus.on("createObject", function(data){
         Modules.ObjectController.createObject(data, data.context, data.callback);
     });
+    
+    Modules.EventBus.on('pdfAdded', function(data){
+		Modules.PdfEdit.convertToHtml(data);
+    });
 };
 
 

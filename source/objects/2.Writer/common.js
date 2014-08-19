@@ -16,7 +16,7 @@ Writer.register=function(type){
 	GeneralObject=Modules.ObjectManager.getPrototype('GeneralObject');
 	GeneralObject.register.call(this,type);
 	
-	this.registerAttribute('paper', {type:'text', standard:'[somepaperid]', changedFunction: function(object, value) {
+	this.registerAttribute('paper', {type:'text', standard:'unset'/*'[somepaperid]'*/, changedFunction: function(object, value) {
 		Modules.ObjectManager.loadRoom(object.getAttribute("inRoom"));
     }});
 	

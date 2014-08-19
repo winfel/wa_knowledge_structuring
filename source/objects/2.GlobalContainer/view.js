@@ -45,8 +45,8 @@ GlobalContainer.updateInnerHeight = function() {
 	$(rep).find("body").css("width", w-5+"px");
 	$(rep).find("body").css("border", "2px solid #ccc");
 	
-	$(rep).find("div").css("height", h-55+"px");
-	$(rep).find("div").css("width", w-25+"px");
+	$(rep).find("#containment-wrapper").css("height", h-55+"px");
+	$(rep).find("#containment-wrapper").css("width", w-25+"px");
 	
 }
 
@@ -133,32 +133,56 @@ GlobalContainer.drawContent = function(rep){
 	$(rep).find("#containment-wrapper").css("text-align", "center");
 	
 	$(rep).find("#containment-wrapper").droppable({
-      drop: function( event, ui ) {
-	  	
-			if($(rep).find("#"+ui.draggable.context.id).length == 0){ //not existing in this container
+		drop: function( event, ui ) {
+		
+			var objectId = ui.draggable.context.id.split("_")[2];
+			var selector = ui.draggable.context.id;
 			
-				var r = confirm("Do you really want to change the main Tag of this object to "+$(rep).find("#containername").html()+"?");
-				if (r == true) {
-				
-					var objectId = ui.draggable.context.id.split("_")[2];
-					
-					var t = ui.draggable.context.innerHTML;
-					var i = t.indexOf("content");
-					t = t.slice(i, t.length).split(" ")[0].split("=")[1];
-					t = t.substring(0, t.length - 1);
-					var room = t.substring(1, t.length);
-					
-					that.changeMainTag(objectId, $(rep).find("#containername").html(), room);
-					
-					var objects = ObjectManager.getObjects();
-					var key;
-					for(key in objects){
-						var o = ObjectManager.getObject(key);
-						o.upd();
-					}
+			var exist = false;
+			var key;
+			for(key in that.Files){
+				if(that.Files[key].attributes.id == objectId){
+					exist = true;
 				}
 			}
-      }
+		
+			if(!exist){
+			
+				var r = confirm("Do you really want to change the main Tag of this object to "+that.getAttribute('name')+"?");
+				if (r == true) {
+									
+					//erase the dragged file from the source Container:
+					var oldContainer = ObjectManager.getObject($("#"+selector).parent().parent().parent().parent().attr('id'));
+					
+					var f = new Array();
+					var k;
+					for(k in oldContainer.Files){
+						if(oldContainer.Files[k].attributes.id != objectId){
+							f.push(oldContainer.Files[k]);
+						}
+						else{
+							var n = oldContainer.Files[k];
+						}
+					}
+					oldContainer.Files = f;
+					oldContainer.searchAndFilter(f);
+			
+					
+					//add the dragged file to the target Container:
+					n.attributes.mainTag = that.getAttribute('name');
+					n.attributes.secondaryTags = [];
+					that.Files.push(n);
+
+					that.searchAndFilter(that.Files);
+					
+					
+					//change the mainTag of the dragged object:
+					var room = n.attributes.inRoom;
+					that.changeMainTag(objectId, that.getAttribute('name'), room);
+					
+				}
+			}
+		}
     });
 
 	/* add Search/Filter-Popover */
@@ -171,84 +195,45 @@ GlobalContainer.drawContent = function(rep){
 
              var searchByName;
 			 var searchByTag;
-			 if(that.getAttribute('searchByName')){
+			 if(that.options.searchByName){
              	searchByName = '<input id = "checkName_for'+that.id+'" type="checkbox" checked> Name &nbsp &nbsp ';
 			}
 			else{
 				searchByName = '<input id = "checkName_for'+that.id+'" type="checkbox"> Name &nbsp &nbsp ';
 			}
-			if(that.getAttribute('searchByTag')){
-				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox" checked> Tag <br><br>';    
+			if(that.options.searchByTag){
+				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox" checked> sec. Tag <br><br>';    
 			}
 			else{
-				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox"> Tag <br><br>';  
+				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox"> sec. Tag <br><br>';  
 			}
-            
-		   
-		    var searchForPDF;
-			var searchForHTML;
-			var searchForImage;
-			var searchForAudio;
-			var searchForVideo;
-			var searchForText;
-			
-			
-            if(that.getAttribute('searchForPDF')){
-             	searchForPDF = '<input id = "checkPDF_for'+that.id+'" type="checkbox" checked> PDF<br>';
+
+			// add a checkbox and label for every searchFor-option
+			var searchFor = [];
+			for(var searchoption in that.options) {
+				var m = searchoption.match(/^searchFor(\w+)$/);
+				if(m) {
+					searchFor.push('<input id="check' + m[1] + '_for'+that.id+'" type="checkbox" ' + 
+						(that.options[searchoption]?'checked="checked"':'') + 
+						' style="float:left; margin-right:0.5em;" />' +
+						'<label for="check' + m[1] + '_for'+that.id+'">' + m[1] + '</label>');
+				}
 			}
-			else{
-				searchForPDF = '<input id = "checkPDF_for'+that.id+'" type="checkbox"> PDF<br>';
-			}
-			if(that.getAttribute('searchForHTML')){
-             	searchForHTML = '<input id = "checkHTML_for'+that.id+'" type="checkbox" checked> HTML<br>';
-			}
-			else{
-				searchForHTML = '<input id = "checkHTML_for'+that.id+'" type="checkbox"> HTML<br>';
-			}
-			if(that.getAttribute('searchForAudio')){
-             	searchForAudio = '<input id = "checkAudio_for'+that.id+'" type="checkbox" checked> Audio<br>';
-			}
-			else{
-				searchForAudio = '<input id = "checkAudio_for'+that.id+'" type="checkbox"> Audio<br>';
-			}
-			if(that.getAttribute('searchForVideo')){
-             	searchForVideo = '<input id = "checkVideo_for'+that.id+'" type="checkbox" checked> Video<br>';
-			}
-			else{
-				searchForVideo = '<input id = "checkVideo_for'+that.id+'" type="checkbox"> Video<br>';
-			}
-			if(that.getAttribute('searchForText')){
-             	searchForText = '<input id = "checkText_for'+that.id+'" type="checkbox" checked> Text<br>';
-			}
-			else{
-				searchForText = '<input id = "checkText_for'+that.id+'" type="checkbox"> Text<br>';
-			}
-			if(that.getAttribute('searchForImage')){
-				searchForImage = '<input id = "checkImage_for'+that.id+'" type="checkbox" checked> Image';
-			}
-            else{
-				searchForImage = '<input id = "checkImage_for'+that.id+'" type="checkbox"> Image';
-			}
-			
-			var s = that.getAttribute('searchString');
-			if(s==0){
+
+			var s = that.options.searchString;
+			if(s == 0 || s == ""){
 				s = "placeholder='search'";
 			}
 			else{
-				s = "value='"+that.getAttribute('searchString')+"'";
+				s = "value='"+that.options.searchString+"'";
 			}
 			
-		     var element = section.addElement('<input id = "textName_for'+that.id+'" type="text"'+s+'><p>Search by:</p>'+
+		     var element = section.addElement('<input id="textName_for'+that.id+'" type="text"'+s+'><p>Search by:</p>'+
                 		'<p>'+
                 		searchByName +
 						searchByTag+
                 		'<p>Search for:</p>'+
-                		searchForPDF +
-						searchForHTML +
-						searchForAudio +
-						searchForVideo +
-						searchForText +
-						searchForImage +
+                		searchFor.join('') +
                 		'</p>'+
                 		'<button id= "selectAll_'+that.id+'" type="submit" height="30">Select all</button>'+
                 		'<button id= "deselectAll_'+that.id+'" type="submit" height="30">Deselect all</button>'+
@@ -262,47 +247,43 @@ GlobalContainer.drawContent = function(rep){
 
 				/* Get value from textfield and selected checkboxes */
 				var textfieldValue = $('#textName_for'+that.id).val();
-				var checkboxName = $('#checkName_for'+that.id).prop('checked');
-				var checkboxTag = $('#checkTag_for'+that.id).prop('checked');
-				var checkboxPDF = $('#checkPDF_for'+that.id).prop('checked');
-				var checkboxHTML = $('#checkHTML_for'+that.id).prop('checked');
-				var checkboxAudio = $('#checkAudio_for'+that.id).prop('checked');
-				var checkboxVideo = $('#checkVideo_for'+that.id).prop('checked');
-				var checkboxText = $('#checkText_for'+that.id).prop('checked');
-				var checkboxImage = $('#checkImage_for'+that.id).prop('checked');
-			
 
-				if(textfieldValue != "" && !checkboxName && !checkboxTag){
+				// test if anything is selected
+				var anythingSelected = false;
+				for(var searchoption in that.options) {
+					var m = searchoption.match(/^searchFor(\w+)$/);
+					if(m) {
+						anythingSelected = anythingSelected || $('#check' + m[1] + '_for'+that.id).prop('checked');
+					}
+				}
+				var searchBySelected = $('#checkName_for'+that.id).prop('checked') ||
+					$('#checkTag_for'+that.id).prop('checked');
+
+				if(textfieldValue != "" && !searchBySelected){
 					alert('Please specify what you are looking for (name and/or tag)');		
 				}
-				else{
-					if(!checkboxPDF && !checkboxHTML && !checkboxImage && !checkboxAudio && !checkboxVideo && !checkboxText){
-							alert('Please specify what files you are looking for');
+				else if(!anythingSelected) {
+					alert('Please specify what files you are looking for');
+				}
+				else {
+					// save the values
+					that.options.searchString = textfieldValue;
+					for(var searchoption in that.options) {
+						var m = searchoption.match(/^search(For|By)(\w+)$/);
+						if(m) {
+							that.options[searchoption] = $('#check' + m[2] + '_for'+that.id).prop('checked');
+						}
 					}
-					else{
-				
-							that.setAttribute('searchString', textfieldValue);
-							that.setAttribute('searchByName', checkboxName);
-							that.setAttribute('searchByTag', checkboxTag);
-							that.setAttribute('searchForPDF', checkboxPDF);
-							that.setAttribute('searchForHTML', checkboxHTML);
-							that.setAttribute('searchForImage', checkboxImage);
-							that.setAttribute('searchForAudio', checkboxAudio);
-							that.setAttribute('searchForVideo', checkboxVideo);
-							that.setAttribute('searchForText', checkboxText);
-				
-							that.getFiles();
-				
-							/* Close popover */
-							popover.hide();
 
-					}
-					
+					that.searchAndFilter(that.Files);
+
+					/* Close popover */
+					popover.hide();
 				}
 			});
 
 			/* Click event for select all button in popover */
-			$('#selectAll_'+that.id).on("click",function(){				
+			$('#selectAll_'+that.id).on("click",function(){
 				$('#checkPDF_for'+that.id).prop('checked',true);
 				$('#checkHTML_for'+that.id).prop('checked',true);
 				$('#checkAudio_for'+that.id).prop('checked',true);
@@ -375,11 +356,14 @@ GlobalContainer.drawContent = function(rep){
 					
 				var select2 = document.getElementById('order_for'+that.id);
 				var select2Value = select2.options[select2.selectedIndex].text;
-										
-				that.setAttribute('sortingCriterion', select1Value);
-				that.setAttribute('sortingOrder', select2Value);
+							
+				that.options.sortingCriterion = select1Value;
+				that.options.sortingOrder = select2Value;	
+							
+				//that.setAttribute('sortingCriterion', select1Value);
+				//that.setAttribute('sortingOrder', select2Value);
 				
-				that.getFiles();
+				that.searchAndFilter(that.Files);
 							
 				/* Close popover */
 				popover.hide();
@@ -402,6 +386,8 @@ GlobalContainer.addFiles = function(files){
 	var that = this;
 
 	var rep=this.getRepresentation();
+	
+	$(rep).find(".spinner").remove();
 	
 	if(files.length == 0){
 		$(rep).find("#sortablefiles").html("This Container shows all files which are tagged with the main Tag "+$(rep).find("#containername").html()+"!");
@@ -448,20 +434,9 @@ GlobalContainer.addFiles = function(files){
 			img = "text.png";
 		}
 		
-		$(rep).find("#sortablefiles").append('<li id=representation_for_'+id+' class="ui-widget-content" tabindex="-1">'+n+'</li>');
+		$(rep).find("#sortablefiles").append('<li id="representation_for_'+id+'" class="ui-widget-content containerFileRepresentation" tabindex="-1" title="' + name + '"><div class="filename">'+name+'</div></li>');
 		
-		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" content="'+room+'" src="../../guis.common/images/fileicons/'+img+'">');
-		
-		$(rep).find("#sortablefiles li").css("margin", "3px 3px 3px 0");
-		$(rep).find("#sortablefiles li").css("padding", "1px");
-		$(rep).find("#sortablefiles li").css("float", "left");
-		$(rep).find("#sortablefiles li").css("width", "75px");
-		$(rep).find("#sortablefiles li").css("height", "75px");
-		$(rep).find("#sortablefiles li").css("line-height", "10px");
-		$(rep).find("#sortablefiles li").css("font-size", "1em");
-		$(rep).find("#sortablefiles li").css("text-align", "center");
-		$(rep).find("#sortablefiles li").css("vertical-align", "middle");	
-		$(rep).find("#sortablefiles li").css("background", "#d3d3d3");	
+		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" content="'+room+'" src="/guis.common/images/fileicons/'+img+'">');
 		
 		$(rep).find("#sortablefiles li").draggable({
 			helper: 'clone',
@@ -469,13 +444,21 @@ GlobalContainer.addFiles = function(files){
 			appendTo: 'body'
 		});
 		
-		$(rep).find("#representation_for_"+id).hover(
-			function() {
-				$(this).css("background", "#f5f5f5");
-			}, function() {
-				$(this).css("background", "#d3d3d3");	
+		$(rep).find("#representation_for_"+id).dblclick(function(event) {
+		
+			var objectId = event.currentTarget.id.split("_")[2];
+
+			var n;
+			var k;
+			for(k in that.Files){
+				if(that.Files[k].attributes.id == objectId){
+					n = that.Files[k];
+					break;
+				}
 			}
-		);
+			
+			window.open("/getContent/"+n.inRoom+"/"+objectId+"/"+n.attributes.contentAge+"/"+ObjectManager.userHash, "_blank");
+		});
 
 		$(rep).find("#representation_for_"+id).bind("contextmenu", function(event) { 
 			event.preventDefault();
@@ -498,6 +481,33 @@ GlobalContainer.addFiles = function(files){
 
 GlobalContainer.upd = function(){
 
+	var rep=this.getRepresentation();
+	
+	$(rep).find(".ui-widget-content").remove();
+	
+	$(rep).find(".spinner").remove();
+
+	$(rep).find("#containment-wrapper").prepend('<div class="spinner">'+
+		'<div class="spinner-container container1">'+
+		'<div class="circle1"></div>'+
+		'<div class="circle2"></div>'+
+		'<div class="circle3"></div>'+
+		'<div class="circle4"></div>'+
+		'</div>'+
+		'<div class="spinner-container container2">'+
+		'<div class="circle1"></div>'+
+		'<div class="circle2"></div>'+
+		'<div class="circle3"></div>'+
+		'<div class="circle4"></div>'+
+		'</div>'+
+		'<div class="spinner-container container3">'+
+		'<div class="circle1"></div>'+
+		'<div class="circle2"></div>'+
+		'<div class="circle3"></div>'+
+		'<div class="circle4"></div>'+
+		'</div>'+
+		'</div>');
+	
 	this.getFiles();
 
 }

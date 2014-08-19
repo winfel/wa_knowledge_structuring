@@ -1,0 +1,152 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 19.06.2014, 23:16:22
+    Author     : Patrick
+*/
+
+.overflowHidden {
+  overflow: hidden !important;
+}
+
+.collapsed {
+  visibility: collapse !important;
+}
+
+.paperViewer {
+  height: 100%;
+  position: relative;
+  border: 1px solid #9E9E9E;
+  background-color: white;
+}
+
+.paperViewer.fullscreen {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 11003;
+  background-color: white;
+}
+
+.paperViewer .paperViewerHeader {
+  background: -moz-linear-gradient(center top, #BEBEBE 0%, #9E9E9E 100%) repeat scroll 0 0 transparent;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #3E3E3E), color-stop(1, #1E1E1E));
+}
+
+.paperViewerHeader table {
+  width: 100%;
+}
+
+.paperViewerHeader .buttonAreaLeft {
+  white-space: nowrap;
+}
+
+.paperViewerHeader .buttonAreaRight {
+  white-space: nowrap;
+}
+
+.paperViewerHeader .titleArea {
+  width: 100%;
+  padding: 0 12px;
+  position: relative;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.paperViewerTitle {
+  color: #3D3D3D;
+  font-size: 12px;
+  position: absolute;
+  top: 4px;
+  white-space: nowrap;
+}
+
+.titleArea .moveArea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.titleArea .moveArea:hover {
+  cursor: move;
+}
+
+.paperViewerFooter {
+  position: fixed;
+  bottom: 0px;
+  height: 1px;
+  width: 100%;
+  border-bottom: 1px solid #9E9E9E;
+}
+
+.paperViewer .moveOverlay {
+  position: absolute;
+  top: 28px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+}
+
+.paperViewer #sidebar-paper {
+  display: none;
+}
+
+.highlightMenu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  opacity: 0.5;
+  padding: 2px 5px;
+}
+
+.highlightMenu:hover {
+  opacity: 1;
+}
+
+.audioMenu {
+  position: absolute;
+  top: 50px;
+  left: 10px;
+  padding: 2px 5px;
+}
+
+.highlightMenu .btn,
+.audioMenu .btn {
+  position: relative;
+}
+
+/* Initially hidden button */
+.btnPlaybackPause,
+.btnStopRecording {
+  display: none;
+}
+
+/* IFRAME solution... */
+.paperViewer iframe {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  overflow-x: hidden !important;
+  overflow-y: scroll !important;
+}
+
+/*  */
+.btn.firstChild {
+  margin-left: 0px;
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+}
+
+.btn.lastChild {
+  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
+}

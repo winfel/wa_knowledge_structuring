@@ -60,19 +60,19 @@ CustomContainer.register=function(type){
 		
     }});
 	
-	this.registerAttribute('sortingCriterion', {type: 'text', standard: 'By Name', hidden: true});
-	this.registerAttribute('sortingOrder', {type: 'text', standard: 'From A to Z', hidden: true});
-	this.registerAttribute('searchString', {type: 'text', hidden: true});
-	this.registerAttribute('searchByName', {type: 'boolean', hidden: true, standard: true});
-	this.registerAttribute('searchByTag', {type: 'boolean', hidden: true, standard: false});
-	this.registerAttribute('searchForPDF', {type: 'boolean', hidden: true, standard: true});
-	this.registerAttribute('searchForHTML', {type: 'boolean', hidden: true, standard: true});
-	this.registerAttribute('searchForImage', {type: 'boolean', hidden: true, standard: true});
-	this.registerAttribute('searchForAudio', {type: 'boolean', hidden: true, standard: true});
-	this.registerAttribute('searchForVideo', {type: 'boolean', hidden: true, standard: true});
-	this.registerAttribute('searchForText', {type: 'boolean', hidden: true, standard: true});
+	//this.registerAttribute('sortingCriterion', {type: 'text', standard: 'By Name', hidden: true});
+	//this.registerAttribute('sortingOrder', {type: 'text', standard: 'From A to Z', hidden: true});
+	//this.registerAttribute('searchString', {type: 'text', hidden: true});
+	//this.registerAttribute('searchByName', {type: 'boolean', hidden: true, standard: true});
+	//this.registerAttribute('searchByTag', {type: 'boolean', hidden: true, standard: false});
+	//this.registerAttribute('searchForPDF', {type: 'boolean', hidden: true, standard: true});
+	//this.registerAttribute('searchForHTML', {type: 'boolean', hidden: true, standard: true});
+	//this.registerAttribute('searchForImage', {type: 'boolean', hidden: true, standard: true});
+	//this.registerAttribute('searchForAudio', {type: 'boolean', hidden: true, standard: true});
+	//this.registerAttribute('searchForVideo', {type: 'boolean', hidden: true, standard: true});
+	//this.registerAttribute('searchForText', {type: 'boolean', hidden: true, standard: true});
 	
-	this.registerAttribute('files', {hidden: true, standard: [] });
+	this.registerAttribute('files', {type: 'list', multiple: true, hidden: true});
 	
 	this.registerAction('Edit',function(){
 		$.each(ObjectManager.getSelected(), function(key, object) {

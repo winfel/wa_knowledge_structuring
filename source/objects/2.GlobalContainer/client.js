@@ -5,29 +5,71 @@
 *
 */
 
-GlobalContainer.afterServerCall = function(files){
+GlobalContainer.options = {
 
-	files = JSON.parse(files);
-
-	var id = files.pop();
-	var con = ObjectManager.getObject(id);
-	con.searchAndFilter(files);
+	searchString : "",
+	searchByName : true,
+	searchByTag : false,
+	searchForPDF : true,
+	searchForHTML : true,
+	searchForImage : true,
+	searchForAudio : true,
+	searchForVideo : true,
+	searchForText : true,
+	sortingCriterion : "By Name",
+	sortingOrder : "From A to Z"
 
 }
+
+GlobalContainer.Files = new Array();
+
+GlobalContainer.afterServerCall = function(files){
+	var con = this;
+	//search through all files and check if the mainTag matches to the name of the container
+	var f = new Array();
+	var n = con.getAttribute('name');
+	for (var key in files) { 
+		var mainTag = files[key].attributes.mainTag;
+		if(mainTag == n){
+			f.push(files[key]);
+		}
+	}
+
+	con.Files = f;
+	con.searchAndFilter(f);
+};
 
 
 GlobalContainer.getFiles = function(){
-		
-	this.serverCall("getAllFileObjects", this.id, GlobalContainer.afterServerCall);
-		
-}
+	var that = this;
+	this.serverCall("getAllFileObjects", function(data){
+		//that.afterServerCall(data);
+		that.Files = data;
+		that.searchAndFilter(data);
+	});
+};
 
 
 GlobalContainer.sendNewFavourite = function(fav){
 		
-	Modules.SocketClient.serverCall('addNewFavourite', {
-		'favourite': fav,
-		'name': ObjectManager.user.username
+	UserManager.getDataOfSpaceWithDest(ObjectManager.user.username, "favourites" , function(d){
+	
+		var arr = new Array();
+						
+		if(d != "error"){
+			var key;
+			for(key in d[0].value){
+				arr.push(d[0].value[key]);
+			}
+			UserManager.removeDataOfSpaceWithDest(ObjectManager.user.username, "favourites");
+		}
+		
+		if(arr.indexOf(fav) == -1){
+			arr.push(fav);
+		}
+				
+		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(ObjectManager.user.username, "favourites", arr) }, 500);
+	
 	});
 		
 }
@@ -51,36 +93,30 @@ GlobalContainer.searchAndFilter = function(files){
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
 	
-	var s = this.getAttribute('searchString');
-	var name = this.getAttribute('searchByName');
-	var tag = this.getAttribute('searchByTag');
-	var pdf = this.getAttribute('searchForPDF');
-	var html = this.getAttribute('searchForHTML');
-	var image = this.getAttribute('searchForImage');
-	var audio = this.getAttribute('searchForAudio');
-	var video = this.getAttribute('searchForVideo');
-	var text = this.getAttribute('searchForText');
-
-	if(s.length == 0 || s == "" || s == 0){
+	var s = this.options.searchString;
+	var name = this.options.searchByName;
+	var tag = this.options.searchByTag;
+	var pdf = this.options.searchForPDF;
+	var html = this.options.searchForHTML;
+	var image = this.options.searchForImage;
+	var audio = this.options.searchForAudio;
+	var video = this.options.searchForVideo;
+	var text = this.options.searchForText;
+	
+	if(typeof s === "undefined" || s == "" || s == 0){
 		filteredFiles1 = files;
 	}
-	else{
+	else{ //the user has entered a search string, search through all files and check if name and/or tag matches to the search string
 	
 		var key;
-		for (key in files) { //filter name/tag with the given searchstring
+		for (key in files) { 
 		
 			var n = files[key].attributes.name;
-			var mainTag = files[key].attributes.mainTag;
 			var secTags = files[key].attributes.secondaryTags;
 			
 			if(secTags == 0 || typeof secTags == "undefined"){
 				secTags = new Array();
 			}
-			
-			if(mainTag != "" && typeof mainTag != "undefined"){
-				secTags.push(mainTag);
-			}
-
 					
 			if(name){
 				if(n.indexOf(s) > -1){ //searchString part of the name of the object
@@ -100,7 +136,9 @@ GlobalContainer.searchAndFilter = function(files){
 	}
 		
 	var k;
-	for (k in filteredFiles1) { //filter files with the given types
+	for (k in filteredFiles1) {
+		
+		 //filter files with the given types
 		var type = filteredFiles1[k].attributes.mimeType;
 	
 		if(pdf){
@@ -150,8 +188,8 @@ GlobalContainer.searchAndFilter = function(files){
 
 GlobalContainer.sortFiles = function(files){ //bubble sort
 
-	var sortingCriterion = this.getAttribute('sortingCriterion');
-	var sortingOrder = this.getAttribute('sortingOrder');
+	var sortingCriterion = this.options.sortingCriterion;
+	var sortingOrder = this.options.sortingOrder;
 	
 	var R1;
 	var R2;
@@ -173,8 +211,8 @@ GlobalContainer.sortFiles = function(files){ //bubble sort
 		
 		files.sort(function(a, b){
 			
-			var aName = a.attributes.name;
-			var bName = b.attributes.name;
+			var aName = a.attributes.name.toLowerCase();
+			var bName = b.attributes.name.toLowerCase();
 			
 			if(aName < bName) return R1;
 			if(aName > bName) return R2;
@@ -205,7 +243,7 @@ GlobalContainer.sortFiles = function(files){ //bubble sort
 			return 0;
 		});
 	}
-
+	
 	this.addFiles(files);
 	
 }

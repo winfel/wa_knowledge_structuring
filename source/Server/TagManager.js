@@ -1,10 +1,19 @@
 
+var _ = require('underscore');
+
 var db = false;
 var Modules = false;
 
 var CONTAINER_ID = "containerID";
 var CONTAINER_WIDTH = 500;
 var CONTAINER_HEIGHT = 300;
+var CONTAINERS_PER_LINE = 3;
+var HORIZONTAL_GAP = 20;
+var VERTICAL_GAP = 20;
+var INITIAL_X = 30;
+var INITAIL_Y = 30;
+
+var freePlaces = []; // keeps track of the available gaps
 
 var fillCurrentDbWithTestData = function() {
 
@@ -98,12 +107,24 @@ var TagManager = function() {
      * @param {Object} responseID id to respond to the client
 	 */
 	Dispatcher.registerCall('deleteMainTag', function(socket, data, responseID) {
-        that.deleteMainTag(socket, data.tagID, function (error, containerID) {
+        that.deleteMainTag(socket, data.tagID, function(error, containerID) {
             if (!error) {
                 var context = Modules.UserManager.getConnectionBySocket(socket);
                 
                 // let's delete the container associated with this main Tag
-                that.deleteGlobalContainer(containerID, context);
+                that.deleteGlobalContainer(containerID, context, function(coordinates) {
+                    
+                    if (freePlaces.length == 0) freePlaces.push(coordinates);
+                    else {
+                        var index = _.sortedIndex(freePlaces, coordinates, 'y');
+                        var temp = freePlaces.slice(0, index);
+                        temp.push(coordinates); 
+                        freePlaces = _.union(temp, freePlaces.slice(index)); 
+                    }
+                    
+                    freePlaces.reverse();
+                    // console.log("++ freePlaces: " + JSON.stringify(freePlaces));
+                });
             }
         }); 
     });
@@ -266,8 +287,10 @@ var TagManager = function() {
         
         var promise = dbMainTags.findOne({id: tagID.toString()});
         promise.on('complete', function(err, obj) {
-            if (err) callback(true, null);
-            else {
+            if (err || obj == null) {
+                console.log("updMainTagName::ERROR " + err);
+                callback(true, null);
+            } else {
                 var containerID = obj.containerID;
                 
                 var promise2 = dbMainTags.update( {id: tagID.toString()}, { 
@@ -314,20 +337,59 @@ var TagManager = function() {
 	 */
 	this.createGlobalContainer = function(context, data, callback) {
 	    var attr = {
+	            x: INITIAL_X,
+	            y: INITAIL_Y,
 	            height : CONTAINER_HEIGHT,
 	            width  : CONTAINER_WIDTH,
 	            name   : data.mainTag
 	    };
 	    
-	    Modules.ObjectManager.createObject('public', 'GlobalContainer', attr, false, context, callback);
+	    // calculates X and Y coordinates
+	    var dbMainTags = db.get('MainTags');
+	    dbMainTags.find({}, function (err, mainTags) {
+            if (err) console.log("createGlobalContainer::ERROR " + err);
+            else {
+                var totalTags = mainTags.length;
+                
+                if ((freePlaces.length == 0) && (totalTags > 0)) {
+                    var div = Math.floor(totalTags / CONTAINERS_PER_LINE);
+                    var rest = totalTags % CONTAINERS_PER_LINE;
+                
+                    if (rest == 0) {
+                        attr.y = INITAIL_Y + (div * (VERTICAL_GAP + CONTAINER_HEIGHT));
+                    } else {
+                        attr.y = INITAIL_Y + (div * (VERTICAL_GAP + CONTAINER_HEIGHT));
+                        attr.x = INITIAL_X + (rest * (HORIZONTAL_GAP + CONTAINER_WIDTH));
+                    }
+                    
+                    //console.log("*Data totalT= " + totalTags + ", div=" + div + ", rest=" + rest);
+                } else if (freePlaces.length > 0) {
+                    // TODO: Take the most upper 
+                    var coordinates = freePlaces.pop(); 
+                    
+                    attr.x = coordinates.x;
+                    attr.y = coordinates.y;
+                }
+            }
+            
+            //console.log("(x,y) = (" + attr.x + "," + attr.y + ")");
+            //console.log("data.mainTag = " + data.mainTag);
+            
+            Modules.ObjectManager.createObject('public', 'GlobalContainer', attr, false, context, callback);
+	    });
 	};
 	
 	/**
 	 * Deletes a global container
 	 */
-	this.deleteGlobalContainer = function(containerID, context) {
+	this.deleteGlobalContainer = function(containerID, context, callback) {
 	    Modules.ObjectManager.getObject('public', containerID, context, function (obj) {
+	        var coordinates = {
+	            x : obj.get('x'),
+	            y : obj.get('y')
+	        }; 
 	        Modules.ObjectManager.remove(obj);
+	        callback(coordinates);
 	    });
 	}
 	
@@ -336,7 +398,7 @@ var TagManager = function() {
 	 */
 	this.createMissingContainers = function(context, callback) {
 	    var dbMainTags = db.get('MainTags');
-	    var newContaiinersCounter = 0;
+	    var newContainersCounter = 0;
 	    
 	    dbMainTags.find( {}, function (err, docs) {
 	        if (err) console.log("createMissingContainers::ERROR " + err);
@@ -352,7 +414,7 @@ var TagManager = function() {
 	                                $set: { containerID:  obj.id } 
 	                            }, function(err, o) {
 	                                console.log("Updated tag: " + tag.name + " with container ID: " + obj.id );
-	                                newContaiinersCounter++;
+	                                newContainersCounter++;
 	                                recursive(i + 1);
 	                            });  
 	                        });
@@ -360,7 +422,7 @@ var TagManager = function() {
 	                        recursive(i + 1);
 	                    }
 	                } else {
-	                    callback(newContaiinersCounter);
+	                    callback(newContainersCounter);
 	                }
 	            }
 	            
@@ -378,12 +440,8 @@ var TagManager = function() {
         dbMainTags.find({}, [CONTAINER_ID], function(e, mainTags) {
             if (e) console.log("OrderContainers::ERROR " + e);
             else {
-                var containerPerLine = 3;
-                var horizontalGap = 40;
-                var verticalGap = 15;
-               
-                var cX = 60;
-                var cY = 45;
+                var cX = INITIAL_X;
+                var cY = INITAIL_Y;
                 
                 var horizontalCounter = 0;
                 
@@ -396,14 +454,14 @@ var TagManager = function() {
                                 object.setAttribute('x', cX);
                                 object.setAttribute('y', cY);
                                 
-                                cX += horizontalGap + CONTAINER_WIDTH;
+                                cX += HORIZONTAL_GAP + CONTAINER_WIDTH;
                                 
                                 horizontalCounter++;
                                 
-                                if (horizontalCounter == containerPerLine) {
+                                if (horizontalCounter == CONTAINERS_PER_LINE) {
                                     horizontalCounter = 0;
-                                    cX = 60; // new line
-                                    cY += verticalGap + CONTAINER_HEIGHT;
+                                    cX = INITIAL_X; // new line
+                                    cY += VERTICAL_GAP + CONTAINER_HEIGHT;
                                 }
                             }
                             
