@@ -39,6 +39,10 @@ PaperChapter.draw=function(external){
 		$(rep).find("rect").attr("stroke-width", this.getAttribute('linesize'));
 	}
 
+	$(rep).find('.chapNr').remove();
+	var factor = this.getViewWidth() / 64;
+	$(GUI.svg.text(rep, 19 * factor,50 * factor , GUI.svg.createText().string(this.getAttribute('order')))).addClass('chapNr');
+
 	if (!$(rep).hasClass("webarena_ghost")) {
 		
 		if (this.selected) {
