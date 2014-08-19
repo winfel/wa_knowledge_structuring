@@ -204,7 +204,7 @@ GUI.tagAssigner = new function() {
 				
 				//if a MainTag with this name already exists, discard the new entry
 				for (var index = 0; index < that.mainTags.length; ++index) {
-					if(that.mainTags[index].name == customMainTagValue){
+					if (that.mainTags[index].name == customMainTagValue){
 					
 						//reset the value of the input field
 						$(this).val("");
@@ -214,18 +214,19 @@ GUI.tagAssigner = new function() {
 					}
 				}
 					
-				if( that.assignedSecTags.length > 0 ) {
+				if ( that.assignedSecTags.length > 0 ) {
 					var response = confirm("By changing the main tag all previously assigned secondary tags will be removed. Do you want to apply the change?");
 					
-					if (response==false) return;
+					if (response == false) return;
 					
 					// remove all assigned tags
 					that.assignedSecTags = [];
 					that.drawAssignedTags();
 				}
 				
-				//save the newly created tag in the database  
-				Modules.TagManager.updMainTags(customMainTagValue, that.mainTags.length+1);
+				// save the newly created tag in the database  
+				var newId = new Date().getTime() - 1296055327011;
+				Modules.TagManager.updMainTags(customMainTagValue, newId);
 					
 				//get the complete list from mainTags from the Database and set them
 				Modules.TagManager.getMainTags(that.setMainTags);
@@ -249,9 +250,6 @@ GUI.tagAssigner = new function() {
 				
 				//reset the value of the input field
 				$(this).val("");
-				  
-				
-					
 			}
 			
 		});
@@ -640,9 +638,9 @@ GUI.tagAssigner = new function() {
 		     	
 		var buttons = {};
 		
-		buttons[GUI.translate("save")] = function(domContent){
+		buttons[GUI.translate("save")] = function(domContent) {
 						
-			if(that.mainTag != ""){
+			if (that.mainTag != "") {
 				that.saveChanges();
 				return true;
 			} else {

@@ -5,7 +5,7 @@
 *
 */
 
-GlobalContainer.options = {
+FavouritesContainer.options = {
 
 	searchString : "",
 	searchByName : true,
@@ -21,74 +21,53 @@ GlobalContainer.options = {
 
 }
 
-GlobalContainer.Files = new Array();
+FavouritesContainer.Files = new Array();
 
-GlobalContainer.afterServerCall = function(files){
-	var con = this;
-	//search through all files and check if the mainTag matches to the name of the container
-	var f = new Array();
-	var n = con.getAttribute('name');
-	for (var key in files) { 
-		var mainTag = files[key].attributes.mainTag;
-		if(mainTag == n){
-			f.push(files[key]);
-		}
+FavouritesContainer.afterServerCall = function(files){
+
+	files = JSON.parse(files);
+	
+	var id = files.pop();
+	var con = ObjectManager.getObject(id);
+	
+	if(typeof con != "undefined"){
+		con.Files = files;
+		con.searchAndFilter(files);
 	}
+	
+}
 
-	con.Files = f;
-	con.searchAndFilter(f);
-};
-
-
-GlobalContainer.getFiles = function(){
-	var that = this;
-	this.serverCall("getAllFileObjects", function(data){
-		//that.afterServerCall(data);
-		that.Files = data;
-		that.searchAndFilter(data);
-	});
-};
-
-
-GlobalContainer.sendNewFavourite = function(fav){
+FavouritesContainer.removeFavourite = function(fav){
 		
 	UserManager.getDataOfSpaceWithDest(ObjectManager.user.username, "favourites" , function(d){
 	
 		var arr = new Array();
-						
+			
 		if(d != "error"){
 			var key;
 			for(key in d[0].value){
-				arr.push(d[0].value[key]);
+				if(d[0].value[key] != fav){
+					arr.push(d[0].value[key]);
+				}
 			}
 			UserManager.removeDataOfSpaceWithDest(ObjectManager.user.username, "favourites");
-		}
-		
-		if(arr.indexOf(fav) == -1){
-			arr.push(fav);
 		}
 				
 		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(ObjectManager.user.username, "favourites", arr) }, 500);
 	
 	});
+	
+}
+
+
+FavouritesContainer.getFiles = function(){
+		
+	this.serverCall("getAllFavouriteFileObjects", this.id, ObjectManager.user.username, FavouritesContainer.afterServerCall);
 		
 }
 
 
-GlobalContainer.changeMainTag = function(objectId, newTag, roomId){
-
-	var d = {
-		id : objectId,
-		tag : newTag,
-		room : roomId
-	};
-
-	this.serverCall("changeMainTag", d);
-
-}
-
-
-GlobalContainer.searchAndFilter = function(files){
+FavouritesContainer.searchAndFilter = function(files){
 	
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
@@ -102,21 +81,27 @@ GlobalContainer.searchAndFilter = function(files){
 	var audio = this.options.searchForAudio;
 	var video = this.options.searchForVideo;
 	var text = this.options.searchForText;
-	
+			
 	if(typeof s === "undefined" || s == "" || s == 0){
 		filteredFiles1 = files;
 	}
-	else{ //the user has entered a search string, search through all files and check if name and/or tag matches to the search string
+	else{
 	
 		var key;
-		for (key in files) { 
-		
+		for (key in files) { //filter name/tag with the given searchstring
+				
 			var n = files[key].attributes.name;
+			var mainTag = files[key].attributes.mainTag;
 			var secTags = files[key].attributes.secondaryTags;
 			
 			if(secTags == 0 || typeof secTags == "undefined"){
 				secTags = new Array();
 			}
+			
+			if(mainTag != "" && typeof mainTag != "undefined"){
+				secTags.push(mainTag);
+			}
+
 					
 			if(name){
 				if(n.indexOf(s) > -1){ //searchString part of the name of the object
@@ -136,9 +121,7 @@ GlobalContainer.searchAndFilter = function(files){
 	}
 		
 	var k;
-	for (k in filteredFiles1) {
-		
-		 //filter files with the given types
+	for (k in filteredFiles1) { //filter files with the given types
 		var type = filteredFiles1[k].attributes.mimeType;
 	
 		if(pdf){
@@ -186,7 +169,7 @@ GlobalContainer.searchAndFilter = function(files){
 }
 
 
-GlobalContainer.sortFiles = function(files){ //bubble sort
+FavouritesContainer.sortFiles = function(files){ //bubble sort
 
 	var sortingCriterion = this.options.sortingCriterion;
 	var sortingOrder = this.options.sortingOrder;

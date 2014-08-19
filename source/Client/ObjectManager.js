@@ -663,6 +663,11 @@ ObjectManager.init = function() {
   Modules.Dispatcher.registerCall('error', function(data) {
     GUI.error("server error", data, false, true);
   });
+  
+  Modules.Dispatcher.registerCall('newObjectForCustomContainer', function(data) {
+    var con = ObjectManager.getObject(data.ContainerId);
+	con.newFile(data.objectId);
+  });
 
   Modules.Dispatcher.registerCall('inform', function(data) {
 

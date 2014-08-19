@@ -37,7 +37,7 @@ File.register=function(type){
 	IconObject=Modules.ObjectManager.getPrototype('IconObject');
 	IconObject.register.call(this,type);
 	
-	this.makeSensitive();
+	//this.makeSensitive();
 	
 	this.registerAttribute('bigIcon',{type:'boolean',standard:true,changedFunction: function(object) { 
 		object.updateIcon(); 

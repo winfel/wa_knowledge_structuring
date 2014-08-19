@@ -8,30 +8,30 @@
 var Modules=require('../../server.js');
 
 /**
- * GlobalContainer
+ * FavouritesContainer
  * @class
  * @classdesc Common elements for view and server
  */
 
-var GlobalContainer=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
+var FavouritesContainer=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
 /**
  * Registers the object (attributes and actions).
  *
- * @this {GlobalContainer}
+ * @this {FavouritesContainer}
  * @see Client/ObjectManager.js
  * @see objects/1.GeneralObject/common.js
- * @see objects/2.GlobalContainer/view.js
+ * @see objects/2.FavouritesContainer/view.js
  * @param {string} type The type of the object
  */
-GlobalContainer.register=function(type){
+FavouritesContainer.register=function(type){
 	
 	// Registering the object
 	
 	GeneralObject=Modules.ObjectManager.getPrototype('GeneralObject');
 	GeneralObject.register.call(this,type);
 	
-	this.registerAttribute('width', {type: 'number', min: 410, standard: 475, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
+	this.registerAttribute('width', {type: 'number', min: 420, standard: 475, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
 
       if (object.resizeProportional()) {
         object.setAttribute("height", object.getAttribute("height") * (value / object.getAttribute("width")));
@@ -52,7 +52,7 @@ GlobalContainer.register=function(type){
     }});
 
 
-	this.registerAttribute('name', {type: 'text', standard: 'GlobalContainer', changedFunction: function(object, value) {
+	this.registerAttribute('name', {type: 'text', standard: 'Favourites', changedFunction: function(object, value) {
 		var obj = {id:object.id, name:value}; 
 		object.rename(value);
 		
@@ -76,46 +76,44 @@ GlobalContainer.register=function(type){
 		});
 	}, true);
 	
-	this.makeSensitive();
-	
 }
 
 /**
  * TODO
  *
- * @this {GlobalContainer}
- * @see objects/2.GlobalContainer/view.js
+ * @this {FavouritesContainer}
+ * @see objects/2.FavouritesContainer/view.js
  */
-GlobalContainer.execute=function(){
+FavouritesContainer.execute=function(){
 
 }
 
 /**
  * Changes the name of the object to the given parameter newValue.
  *
- * @this {GlobalContainer}
+ * @this {FavouritesContainer}
  * @param {string} newValue
  * @see objects/1.GeneralObject/common.js
  * @see objects/1.GeneralObject/client.js
  */
-GlobalContainer.intelligentRename=function(newValue){
+FavouritesContainer.intelligentRename=function(newValue){
 	var objectName = this.getAttribute("name");
 	var that = this;
 	this.getContentAsString(function(oldValue){
 		if ( newValue.length > 30 )
 		{ newValue = newValue.substring(0, 30); }
 	
-		if ( objectName == "GlobalContainer" || objectName == oldValue )
+		if ( objectName == "Favourites" || objectName == oldValue )
 		{ that.setAttribute("name", newValue); }
 	});
 }
 
 
-GlobalContainer.register('GlobalContainer');
-GlobalContainer.isCreatable=true;
+FavouritesContainer.register('FavouritesContainer');
+FavouritesContainer.isCreatable=true;
 
-GlobalContainer.contentURLOnly = false; //content is only accessible via URL
+FavouritesContainer.contentURLOnly = false; //content is only accessible via URL
 
-GlobalContainer.category='Active';
+FavouritesContainer.category='Active';
 
-module.exports=GlobalContainer;
+module.exports=FavouritesContainer;

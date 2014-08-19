@@ -83,6 +83,9 @@ File.getStatusIcon = function() {
 			if (mimeType == 'application/pdf') typeIcon = "pdf";
 			if (mimeType.indexOf('mspowerpoint') != -1 || mimeType.indexOf('ms-powerpoint') != -1 || mimeType.indexOf('officedocument.presentationml') != -1) typeIcon = "powerpoint";
 			if (mimeType.indexOf('text') != -1) typeIcon = "text";
+			if (mimeType.indexOf('html') != -1) typeIcon = "html";
+			if (mimeType.indexOf('audio') != -1) typeIcon = "audio";
+			if (mimeType.indexOf('video') != -1) typeIcon = "video";
 			if (mimeType.indexOf('msword') != -1 || mimeType.indexOf('ms-word') != -1 || mimeType.indexOf('officedocument.wordprocessingml') != -1) typeIcon = "word";
 		}
 

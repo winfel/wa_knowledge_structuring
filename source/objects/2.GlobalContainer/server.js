@@ -11,29 +11,29 @@ var theObject=Object.create(require('./common.js'));
 var Modules=require('../../server.js');
 module.exports=theObject;
 
-theObject.getAllFileObjects = function(id, cb){
-
+theObject.getAllFileObjects = function(cb){
+	var that = this;
 	var fileObjects = new Array();
-	
+	var containerTag = that.getAttribute('name');
+
 	Modules.Connector.listRooms(function(n, rooms){
-		var l = rooms.length;
+		var l = rooms.length-1;
 		var counter = 0;
-		var key;
-		for(key in rooms){
+		for(var key in rooms){
+			if(rooms[key].id == 'trash') {
+				continue;
+			}
 			Modules.Connector.getInventory(rooms[key].id, true, function(inventory){
-				var k;
-				for(k in inventory){
-					if(inventory[k].type == "File" && inventory[k].inRoom != "trash"){
+				for(var k in inventory){
+					if(inventory[k].type == "File" && containerTag == inventory[k].attributes.mainTag){
 						fileObjects.push(inventory[k]);
 					}
 				}
-	
+
 				counter++;
-	
+
 				if(counter == l){
-					fileObjects.push(id);
-					var s = JSON.stringify(fileObjects);
-					cb(s);
+					cb(fileObjects);
 				}
 			
 			});
@@ -43,9 +43,13 @@ theObject.getAllFileObjects = function(id, cb){
 
 theObject.getAllFileObjects.public = true;
 
-theObject.onEnter=function(object,oldData,newData){
-     
-     /* Todo: Add dragged file to GlobalContainer */
-     //console.log('Enter GlobalContainer');
- 
- }
+theObject.changeMainTag = function(d){
+
+	Modules.ObjectManager.getObject(d.room, d.id, true, function(o){
+		o.setAttribute('mainTag', d.tag);
+		o.setAttribute('secondaryTags', []);
+	});
+
+}
+
+theObject.changeMainTag.public = true;

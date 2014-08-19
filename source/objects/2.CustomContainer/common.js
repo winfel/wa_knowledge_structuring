@@ -8,30 +8,32 @@
 var Modules=require('../../server.js');
 
 /**
- * GlobalContainer
+ * CustomContainer
  * @class
  * @classdesc Common elements for view and server
  */
 
-var GlobalContainer=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
+var CustomContainer=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
 /**
  * Registers the object (attributes and actions).
  *
- * @this {GlobalContainer}
+ * @this {CustomContainer}
  * @see Client/ObjectManager.js
  * @see objects/1.GeneralObject/common.js
- * @see objects/2.GlobalContainer/view.js
+ * @see objects/2.CustomContainer/view.js
  * @param {string} type The type of the object
  */
-GlobalContainer.register=function(type){
+CustomContainer.register=function(type){
 	
 	// Registering the object
 	
 	GeneralObject=Modules.ObjectManager.getPrototype('GeneralObject');
 	GeneralObject.register.call(this,type);
 	
-	this.registerAttribute('width', {type: 'number', min: 410, standard: 475, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
+	this.makeSensitive();
+	
+	this.registerAttribute('width', {type: 'number', min: 420, standard: 475, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
 
       if (object.resizeProportional()) {
         object.setAttribute("height", object.getAttribute("height") * (value / object.getAttribute("width")));
@@ -52,7 +54,7 @@ GlobalContainer.register=function(type){
     }});
 
 
-	this.registerAttribute('name', {type: 'text', standard: 'GlobalContainer', changedFunction: function(object, value) {
+	this.registerAttribute('name', {type: 'text', standard: 'CustomContainer', changedFunction: function(object, value) {
 		var obj = {id:object.id, name:value}; 
 		object.rename(value);
 		
@@ -70,52 +72,52 @@ GlobalContainer.register=function(type){
 	//this.registerAttribute('searchForVideo', {type: 'boolean', hidden: true, standard: true});
 	//this.registerAttribute('searchForText', {type: 'boolean', hidden: true, standard: true});
 	
+	this.registerAttribute('files', {type: 'list', multiple: true, hidden: true});
+	
 	this.registerAction('Edit',function(){
 		$.each(ObjectManager.getSelected(), function(key, object) {
 			object.execute();
 		});
 	}, true);
 	
-	this.makeSensitive();
-	
 }
 
 /**
  * TODO
  *
- * @this {GlobalContainer}
- * @see objects/2.GlobalContainer/view.js
+ * @this {CustomContainer}
+ * @see objects/2.CustomContainer/view.js
  */
-GlobalContainer.execute=function(){
+CustomContainer.execute=function(){
 
 }
 
 /**
  * Changes the name of the object to the given parameter newValue.
  *
- * @this {GlobalContainer}
+ * @this {CustomContainer}
  * @param {string} newValue
  * @see objects/1.GeneralObject/common.js
  * @see objects/1.GeneralObject/client.js
  */
-GlobalContainer.intelligentRename=function(newValue){
+CustomContainer.intelligentRename=function(newValue){
 	var objectName = this.getAttribute("name");
 	var that = this;
 	this.getContentAsString(function(oldValue){
 		if ( newValue.length > 30 )
 		{ newValue = newValue.substring(0, 30); }
 	
-		if ( objectName == "GlobalContainer" || objectName == oldValue )
+		if ( objectName == "CustomContainer" || objectName == oldValue )
 		{ that.setAttribute("name", newValue); }
 	});
 }
 
 
-GlobalContainer.register('GlobalContainer');
-GlobalContainer.isCreatable=true;
+CustomContainer.register('CustomContainer');
+CustomContainer.isCreatable=true;
 
-GlobalContainer.contentURLOnly = false; //content is only accessible via URL
+CustomContainer.contentURLOnly = false; //content is only accessible via URL
 
-GlobalContainer.category='Active';
+CustomContainer.category='Active';
 
-module.exports=GlobalContainer;
+module.exports=CustomContainer;

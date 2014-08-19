@@ -5,7 +5,7 @@
 *
 */	
 
-GlobalContainer.draw=function(external){
+FavouritesContainer.draw=function(external){
 	var rep=this.getRepresentation();
 	
 	/* manual check for a changed name - we need to save time ;-)*/
@@ -31,7 +31,7 @@ GlobalContainer.draw=function(external){
 }
 
 
-GlobalContainer.updateInnerHeight = function() {
+FavouritesContainer.updateInnerHeight = function() {
 	
 	var rep=this.getRepresentation();
 
@@ -51,7 +51,7 @@ GlobalContainer.updateInnerHeight = function() {
 }
 
 
-GlobalContainer.createRepresentation = function(parent) { 	
+FavouritesContainer.createRepresentation = function(parent) { 	
 	
 	var rep = GUI.svg.other(parent,"foreignObject");
 
@@ -61,20 +61,18 @@ GlobalContainer.createRepresentation = function(parent) {
 	
 	this.drawContent(rep);
 	
-	this.setAttribute('locked', true);
-	
 	this.upd();
 	
 	return rep;
 	
 }
 
-GlobalContainer.adjustControls = function() {
+FavouritesContainer.adjustControls = function() {
 	this.updateInnerHeight();
 	GeneralObject.adjustControls.call(this);
 }
 
-GlobalContainer.drawContent = function(rep){
+FavouritesContainer.drawContent = function(rep){
 
 	var that = this;
 
@@ -82,7 +80,7 @@ GlobalContainer.drawContent = function(rep){
 
 	var compiled = _.template($( "script#container-template" ).html());
 
-	 var heading = "GlobalContainer";
+	 var heading = "FavouritesContainer";
 
     var templateData = {
         heading : heading
@@ -132,58 +130,6 @@ GlobalContainer.drawContent = function(rep){
 	$(rep).find("#containment-wrapper").css("overflow", "auto");
 	$(rep).find("#containment-wrapper").css("text-align", "center");
 	
-	$(rep).find("#containment-wrapper").droppable({
-		drop: function( event, ui ) {
-		
-			var objectId = ui.draggable.context.id.split("_")[2];
-			var selector = ui.draggable.context.id;
-			
-			var exist = false;
-			var key;
-			for(key in that.Files){
-				if(that.Files[key].attributes.id == objectId){
-					exist = true;
-				}
-			}
-		
-			if(!exist){
-			
-				var r = confirm("Do you really want to change the main Tag of this object to "+that.getAttribute('name')+"?");
-				if (r == true) {
-									
-					//erase the dragged file from the source Container:
-					var oldContainer = ObjectManager.getObject($("#"+selector).parent().parent().parent().parent().attr('id'));
-					
-					var f = new Array();
-					var k;
-					for(k in oldContainer.Files){
-						if(oldContainer.Files[k].attributes.id != objectId){
-							f.push(oldContainer.Files[k]);
-						}
-						else{
-							var n = oldContainer.Files[k];
-						}
-					}
-					oldContainer.Files = f;
-					oldContainer.searchAndFilter(f);
-			
-					
-					//add the dragged file to the target Container:
-					n.attributes.mainTag = that.getAttribute('name');
-					n.attributes.secondaryTags = [];
-					that.Files.push(n);
-
-					that.searchAndFilter(that.Files);
-					
-					
-					//change the mainTag of the dragged object:
-					var room = n.attributes.inRoom;
-					that.changeMainTag(objectId, that.getAttribute('name'), room);
-					
-				}
-			}
-		}
-    });
 
 	/* add Search/Filter-Popover */
 	$(body).find( "button:first" ).next().jPopover({
@@ -202,24 +148,58 @@ GlobalContainer.drawContent = function(rep){
 				searchByName = '<input id = "checkName_for'+that.id+'" type="checkbox"> Name &nbsp &nbsp ';
 			}
 			if(that.options.searchByTag){
-				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox" checked> sec. Tag <br><br>';    
+				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox" checked> Tag <br><br>';    
 			}
 			else{
-				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox"> sec. Tag <br><br>';  
+				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox"> Tag <br><br>';  
 			}
-
-			// add a checkbox and label for every searchFor-option
-			var searchFor = [];
-			for(var searchoption in that.options) {
-				var m = searchoption.match(/^searchFor(\w+)$/);
-				if(m) {
-					searchFor.push('<input id="check' + m[1] + '_for'+that.id+'" type="checkbox" ' + 
-						(that.options[searchoption]?'checked="checked"':'') + 
-						' style="float:left; margin-right:0.5em;" />' +
-						'<label for="check' + m[1] + '_for'+that.id+'">' + m[1] + '</label>');
-				}
+            
+		   
+		    var searchForPDF;
+			var searchForHTML;
+			var searchForImage;
+			var searchForAudio;
+			var searchForVideo;
+			var searchForText;
+			
+			
+            if(that.options.searchForPDF){
+             	searchForPDF = '<input id = "checkPDF_for'+that.id+'" type="checkbox" checked> PDF<br>';
 			}
-
+			else{
+				searchForPDF = '<input id = "checkPDF_for'+that.id+'" type="checkbox"> PDF<br>';
+			}
+			if(that.options.searchForHTML){
+             	searchForHTML = '<input id = "checkHTML_for'+that.id+'" type="checkbox" checked> HTML<br>';
+			}
+			else{
+				searchForHTML = '<input id = "checkHTML_for'+that.id+'" type="checkbox"> HTML<br>';
+			}
+			if(that.options.searchForAudio){
+             	searchForAudio = '<input id = "checkAudio_for'+that.id+'" type="checkbox" checked> Audio<br>';
+			}
+			else{
+				searchForAudio = '<input id = "checkAudio_for'+that.id+'" type="checkbox"> Audio<br>';
+			}
+			if(that.options.searchForVideo){
+             	searchForVideo = '<input id = "checkVideo_for'+that.id+'" type="checkbox" checked> Video<br>';
+			}
+			else{
+				searchForVideo = '<input id = "checkVideo_for'+that.id+'" type="checkbox"> Video<br>';
+			}
+			if(that.options.searchForText){
+             	searchForText = '<input id = "checkText_for'+that.id+'" type="checkbox" checked> Text<br>';
+			}
+			else{
+				searchForText = '<input id = "checkText_for'+that.id+'" type="checkbox"> Text<br>';
+			}
+			if(that.options.searchForImage){
+				searchForImage = '<input id = "checkImage_for'+that.id+'" type="checkbox" checked> Image';
+			}
+            else{
+				searchForImage = '<input id = "checkImage_for'+that.id+'" type="checkbox"> Image';
+			}
+			
 			var s = that.options.searchString;
 			if(s == 0 || s == ""){
 				s = "placeholder='search'";
@@ -228,12 +208,17 @@ GlobalContainer.drawContent = function(rep){
 				s = "value='"+that.options.searchString+"'";
 			}
 			
-		     var element = section.addElement('<input id="textName_for'+that.id+'" type="text"'+s+'><p>Search by:</p>'+
+		     var element = section.addElement('<input id = "textName_for'+that.id+'" type="text"'+s+'><p>Search by:</p>'+
                 		'<p>'+
                 		searchByName +
 						searchByTag+
                 		'<p>Search for:</p>'+
-                		searchFor.join('') +
+                		searchForPDF +
+						searchForHTML +
+						searchForAudio +
+						searchForVideo +
+						searchForText +
+						searchForImage +
                 		'</p>'+
                 		'<button id= "selectAll_'+that.id+'" type="submit" height="30">Select all</button>'+
                 		'<button id= "deselectAll_'+that.id+'" type="submit" height="30">Deselect all</button>'+
@@ -247,43 +232,57 @@ GlobalContainer.drawContent = function(rep){
 
 				/* Get value from textfield and selected checkboxes */
 				var textfieldValue = $('#textName_for'+that.id).val();
+				var checkboxName = $('#checkName_for'+that.id).prop('checked');
+				var checkboxTag = $('#checkTag_for'+that.id).prop('checked');
+				var checkboxPDF = $('#checkPDF_for'+that.id).prop('checked');
+				var checkboxHTML = $('#checkHTML_for'+that.id).prop('checked');
+				var checkboxAudio = $('#checkAudio_for'+that.id).prop('checked');
+				var checkboxVideo = $('#checkVideo_for'+that.id).prop('checked');
+				var checkboxText = $('#checkText_for'+that.id).prop('checked');
+				var checkboxImage = $('#checkImage_for'+that.id).prop('checked');
+			
 
-				// test if anything is selected
-				var anythingSelected = false;
-				for(var searchoption in that.options) {
-					var m = searchoption.match(/^searchFor(\w+)$/);
-					if(m) {
-						anythingSelected = anythingSelected || $('#check' + m[1] + '_for'+that.id).prop('checked');
-					}
-				}
-				var searchBySelected = $('#checkName_for'+that.id).prop('checked') ||
-					$('#checkTag_for'+that.id).prop('checked');
-
-				if(textfieldValue != "" && !searchBySelected){
+				if(textfieldValue != "" && !checkboxName && !checkboxTag){
 					alert('Please specify what you are looking for (name and/or tag)');		
 				}
-				else if(!anythingSelected) {
-					alert('Please specify what files you are looking for');
-				}
-				else {
-					// save the values
-					that.options.searchString = textfieldValue;
-					for(var searchoption in that.options) {
-						var m = searchoption.match(/^search(For|By)(\w+)$/);
-						if(m) {
-							that.options[searchoption] = $('#check' + m[2] + '_for'+that.id).prop('checked');
-						}
+				else{
+					if(!checkboxPDF && !checkboxHTML && !checkboxImage && !checkboxAudio && !checkboxVideo && !checkboxText){
+							alert('Please specify what files you are looking for');
 					}
+					else{
+				
+						that.options.searchString = textfieldValue;
+						that.options.searchByName = checkboxName;
+						that.options.searchByTag = checkboxTag;
+						that.options.searchForPDF = checkboxPDF;
+						that.options.searchForHTML = checkboxHTML;
+						that.options.searchForImage = checkboxImage;
+						that.options.searchForAudio = checkboxAudio;
+						that.options.searchForVideo = checkboxVideo;
+						that.options.searchForText = checkboxText;
+				
+						//that.setAttribute('searchString', textfieldValue);
+						//that.setAttribute('searchByName', checkboxName);
+						//that.setAttribute('searchByTag', checkboxTag);
+						//that.setAttribute('searchForPDF', checkboxPDF);
+						//that.setAttribute('searchForHTML', checkboxHTML);
+						//that.setAttribute('searchForImage', checkboxImage);
+						//that.setAttribute('searchForAudio', checkboxAudio);
+						//that.setAttribute('searchForVideo', checkboxVideo);
+						//that.setAttribute('searchForText', checkboxText);
+				
+						that.searchAndFilter(that.Files);
+				
+						/* Close popover */
+						popover.hide();
 
-					that.searchAndFilter(that.Files);
-
-					/* Close popover */
-					popover.hide();
+					}
+					
 				}
 			});
 
 			/* Click event for select all button in popover */
-			$('#selectAll_'+that.id).on("click",function(){
+			$('#selectAll_'+that.id).on("click",function(){				
 				$('#checkPDF_for'+that.id).prop('checked',true);
 				$('#checkHTML_for'+that.id).prop('checked',true);
 				$('#checkAudio_for'+that.id).prop('checked',true);
@@ -356,10 +355,10 @@ GlobalContainer.drawContent = function(rep){
 					
 				var select2 = document.getElementById('order_for'+that.id);
 				var select2Value = select2.options[select2.selectedIndex].text;
-							
+						
 				that.options.sortingCriterion = select1Value;
 				that.options.sortingOrder = select2Value;	
-							
+						
 				//that.setAttribute('sortingCriterion', select1Value);
 				//that.setAttribute('sortingOrder', select2Value);
 				
@@ -373,7 +372,7 @@ GlobalContainer.drawContent = function(rep){
 }
 
 
-GlobalContainer.rename = function(newName){
+FavouritesContainer.rename = function(newName){
 
 	var rep=this.getRepresentation();
 
@@ -381,35 +380,38 @@ GlobalContainer.rename = function(newName){
 		
 }
 
-GlobalContainer.addFiles = function(files){
-	
+FavouritesContainer.addFiles = function(files){
+
 	var that = this;
 
 	var rep=this.getRepresentation();
-	
+
 	$(rep).find(".spinner").remove();
 	
 	if(files.length == 0){
-		$(rep).find("#sortablefiles").html("This Container shows all files which are tagged with the main Tag "+$(rep).find("#containername").html()+"!");
+		$(rep).find("#sortablefiles").html("Add your favourite files by right click on any file in the global space containers!");
 		return;
 	}
 	else{
 		$(rep).find("#sortablefiles").html("");
 	}
-		
+				
 	var key;
 	for(key in files){
 	
+		var id = files[key].attributes.id;
+		
+		if($(rep).find("#representation_for_"+id).length > 0){ 
+			continue;
+		}
+			
 		var name = files[key].attributes.name;
 		var n = name.split('.')[0];
 		var type = name.split('.')[1];
-		var room = files[key].attributes.inRoom;
 		
 		if(n.length>13){
 			n = n.substring(0,10)+ "...";
 		}
-	
-		var id = files[key].attributes.id;
 		
 		var mime = files[key].attributes.mimeType;
 		var img;
@@ -434,15 +436,28 @@ GlobalContainer.addFiles = function(files){
 			img = "text.png";
 		}
 		
-		$(rep).find("#sortablefiles").append('<li id="representation_for_'+id+'" class="ui-widget-content containerFileRepresentation" tabindex="-1" title="' + name + '"><div class="filename">'+name+'</div></li>');
+		$(rep).find("#sortablefiles").append('<li id=representation_for_'+id+' class="ui-widget-content" tabindex="-1">'+n+'</li>');
 		
-		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" content="'+room+'" src="/guis.common/images/fileicons/'+img+'">');
+		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" src="../../guis.common/images/fileicons/'+img+'">');
 		
-		$(rep).find("#sortablefiles li").draggable({
-			helper: 'clone',
-			revert: 'invalid',
-			appendTo: 'body'
-		});
+		$(rep).find("#sortablefiles li").css("margin", "3px 3px 3px 0");
+		$(rep).find("#sortablefiles li").css("padding", "1px");
+		$(rep).find("#sortablefiles li").css("float", "left");
+		$(rep).find("#sortablefiles li").css("width", "75px");
+		$(rep).find("#sortablefiles li").css("height", "75px");
+		$(rep).find("#sortablefiles li").css("line-height", "10px");
+		$(rep).find("#sortablefiles li").css("font-size", "1em");
+		$(rep).find("#sortablefiles li").css("text-align", "center");
+		$(rep).find("#sortablefiles li").css("vertical-align", "middle");	
+		$(rep).find("#sortablefiles li").css("background", "#d3d3d3");	
+			
+		$(rep).find("#representation_for_"+id).hover(
+			function() {
+				$(this).css("background", "#f5f5f5");
+			}, function() {
+				$(this).css("background", "#d3d3d3");	
+			}
+		);
 		
 		$(rep).find("#representation_for_"+id).dblclick(function(event) {
 		
@@ -464,14 +479,21 @@ GlobalContainer.addFiles = function(files){
 			event.preventDefault();
 			$("div.addremove-menu").remove();
 			var id = this.id.split("_")[2];
-			$("<div id=menu_for_"+id+" class='addremove-menu'>Add to favourites</div>")
+			$("<div id=menu_for_"+id+" class='addremove-menu'>Remove from favourites</div>")
 			.appendTo("body")
 			.css({top: event.pageY + "px", left: event.pageX + "px"})
 			.on("click", function(event){
-					
-				that.sendNewFavourite(this.id.split("_")[2]);
-				
+						
+				that.removeFavourite(this.id.split("_")[2]);		
+						
+				$(rep).find("#representation_for_"+this.id.split("_")[2]).remove();
+								
 				$("div.addremove-menu").remove();
+				
+				if($(rep).find(".ui-widget-content").length == 0){
+					$(rep).find("#sortablefiles").html("Add your favourite files by right click on any file in the global space containers!");
+				}
+				
 			});
 		});
 		
@@ -479,7 +501,7 @@ GlobalContainer.addFiles = function(files){
 		
 }
 
-GlobalContainer.upd = function(){
+FavouritesContainer.upd = function(){
 
 	var rep=this.getRepresentation();
 	
@@ -507,7 +529,7 @@ GlobalContainer.upd = function(){
 		'<div class="circle4"></div>'+
 		'</div>'+
 		'</div>');
-	
+
 	this.getFiles();
 
 }

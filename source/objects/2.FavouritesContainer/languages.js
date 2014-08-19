@@ -1,0 +1,4 @@
+FavouritesContainer.setTranslations('de',{
+
+}
+);
