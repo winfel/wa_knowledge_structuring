@@ -270,9 +270,7 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
                         "GlobalContainer#References#800#100#500#2#locked;true#height;455",
                         "SimpleText#DefineInfo#800#600#190#2#height;30#content;Sort the PaperChapters from left to right to give them an order",
                         "SimpleText#DefineInfo2#255#600#190#2#height;30#content;Place a chapter inside the selector to load it",
-                        "PaperSelector#Selector#655#700#1#1#locked;false"/*,
-                        "Line#TestLine#690#553#0#1#height;148",
-                        "PaperChapter#Chapter1#880#650#1#1#chapterID;"+data.roomID*/];
+                        "PaperSelector#Selector#655#700#128#0#"];
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 
