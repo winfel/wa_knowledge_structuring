@@ -152,6 +152,11 @@ RoomController.informAllInRoom = function (data, callback) {
 RoomController.sendRoom = function (socket, roomID) {
     var context = Modules.UserManager.getConnectionBySocket(socket);
 	
+    /*simple hack to prevent calling the method before startup the main system */
+    if(context == false){
+        return;
+    }
+
     Modules.ObjectManager.getRoom(roomID, context, function (room) { //the room object
 
         room.updateClient(socket); // and send it to the client
