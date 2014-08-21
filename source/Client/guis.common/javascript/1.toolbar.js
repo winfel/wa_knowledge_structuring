@@ -60,9 +60,9 @@ GUI.initToolbar = function() {
 
           $.each(object, function(key, object) {
 			
-			var name = object.translate(GUI.currentLanguage, object.type);
+			var name = (object.menuItemLabel != '') ? object.translate(GUI.currentLanguage, object.menuItemLabel) : object.translate(GUI.currentLanguage, object.type);
 			
-			if(name == "GlobalContainer"){ //Global Container cannot be created manually (they are created automatically when entering the global space)
+			if (name == "GlobalContainer") { //Global Container cannot be created manually (they are created automatically when entering the global space)
 				return true;
 			}
 
@@ -362,7 +362,7 @@ GUI.initToolbar = function() {
       var page = popover.addPage(GUI.translate("Welcome")+ " " + GUI.username);
       var section = page.addSection();
 
-      var btnSignout = section.addElement('<img src= "../../guis.common/images/lock.png" alt="" width="24" height="24" /> ' + GUI.translate("Sign out"));
+      var btnSignout = section.addElement('<img src= "../../guis.common/images/log_out.png" alt="" width="24" height="24" /> ' + GUI.translate("Sign out"));
       var clickSignout = function() {
         location.pathname = "/logout";
         popover.hide();
@@ -375,20 +375,13 @@ GUI.initToolbar = function() {
         popover.hide();
       };
 
-      var btnHome = section.addElement('<img src= "../../guis.common/images/level-up.png" alt="" width="24" height="24" /> ' + GUI.translate("Home"));
-      var clickHome = function() {
-        Modules.ObjectManager.goParent();
-        alert("Go parent");
-        popover.hide();
-      };
-
       var btnCoupling = section.addElement('<img src= "../../guis.common/images/coupling-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Coupling"));
       var clickCoupling = function() {
         GUI.enterCouplingMode();
         popover.hide();
       };
 	  
-	  var btnTagManager = section.addElement('<img src= "../../guis.common/images/Tag-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Tag Manager"));
+	  var btnTagManager = section.addElement('<img src= "../../guis.common/images/tag.png" alt="" width="24" height="24" /> ' + GUI.translate("Tag Manager"));
       var clickTagManager = function() {
         GUI.tagManager.open(800, 800,false);
         popover.hide();
@@ -397,15 +390,13 @@ GUI.initToolbar = function() {
       if (GUI.isTouchDevice) {
         $(btnSignout.getDOM()).bind("touchstart", clickSignout);
         $(btnPaste.getDOM()).bind("touchstart", clickPaste);
-        $(btnHome.getDOM()).bind("touchstart", clickHome);
         $(btnCoupling.getDOM()).bind("touchstart", clickCoupling);
-		 $(btnTagManager.getDOM()).bind("touchstart", clickTagManager);
+		$(btnTagManager.getDOM()).bind("touchstart", clickTagManager);
       } else {
         $(btnSignout.getDOM()).bind("click", clickSignout);
         $(btnPaste.getDOM()).bind("click", clickPaste);
-        $(btnHome.getDOM()).bind("click", clickHome);
         $(btnCoupling.getDOM()).bind("click", clickCoupling);
-		 $(btnTagManager.getDOM()).bind("click", clickTagManager);
+		$(btnTagManager.getDOM()).bind("click", clickTagManager);
       }
     }
   });

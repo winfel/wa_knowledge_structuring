@@ -62,5 +62,6 @@ ExportObject.isCreatable=true;
 ExportObject.moveByTransform = function(){return true;};
 
 ExportObject.category='Active';
+ExportObject.menuItemLabel = 'export.object';
 
 module.exports=ExportObject;

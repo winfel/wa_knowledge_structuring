@@ -236,6 +236,7 @@ File.isCreatable=true;
 File.moveByTransform = function(){return true;};
 
 File.category='Files';
+File.menuItemLabel = 'upload.file';
 
 /**
  * Checks if the object is shown always on top.
