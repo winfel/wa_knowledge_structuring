@@ -1,55 +1,60 @@
 /**
-*    Webarena - A web application for responsive graphical knowledge work
-*
-*    University of Paderborn, 2014
-*
-*/
+ * Webarena - A web application for responsive graphical knowledge work
+ * 
+ * University of Paderborn, 2014
+ * 
+ */
 
 "use strict";
 
-var theObject=Object.create(require('./common.js'));
-var Modules=require('../../server.js');
-module.exports=theObject;
+var theObject = Object.create(require('./common.js'));
+var Modules = require('../../server.js');
 
-theObject.getAllFileObjects = function(cb){
-	var that = this;
-	var fileObjects = new Array();
-	var containerTag = that.getAttribute('name');
+var TRASH_ROOM = 'trash';
 
-	Modules.Connector.listRooms(function(n, rooms){
-		var l = rooms.length-1;
-		var counter = 0;
-		for(var key in rooms){
-			if(rooms[key].id == 'trash') {
-				continue;
-			}
-			Modules.Connector.getInventory(rooms[key].id, true, function(inventory){
-				for(var k in inventory){
-					if(inventory[k].type == "File" && containerTag == inventory[k].attributes.mainTag){
-						fileObjects.push(inventory[k]);
-					}
-				}
+theObject.getAllFileObjects = function(cb) {
+    var that = this;
+    var fileObjects = new Array();
+    var containerTag = that.getAttribute('name');
 
-				counter++;
+    Modules.Connector.listRooms(function(n, rooms) {
+        
+        function recursive(i) {
+            if (i < rooms.length) {
+                var room = rooms[i];
+                
+                if (room.id == TRASH_ROOM) {
+                    recursive(i + 1);
+                } else {
+                    Modules.Connector.getInventory(room.id, true, function(inventory) {
+                        for (var k in inventory) {
+                            if (inventory[k].type == "File" && containerTag == inventory[k].attributes.mainTag) {
+                                fileObjects.push(inventory[k]);
+                            }
+                        }
+                        
+                        recursive(i + 1);
+                    });
+                }
+            } else {
+                cb(fileObjects);
+            }
+        }
+        
+        recursive(0);
+    });
+}
 
-				if(counter == l){
-					cb(fileObjects);
-				}
-			
-			});
-		}
-	});
+theObject.changeMainTag = function(d) {
+
+    Modules.ObjectManager.getObject(d.room, d.id, true, function(o) {
+        o.setAttribute('mainTag', d.tag);
+        o.setAttribute('secondaryTags', []);
+    });
+
 }
 
 theObject.getAllFileObjects.public = true;
-
-theObject.changeMainTag = function(d){
-
-	Modules.ObjectManager.getObject(d.room, d.id, true, function(o){
-		o.setAttribute('mainTag', d.tag);
-		o.setAttribute('secondaryTags', []);
-	});
-
-}
-
 theObject.changeMainTag.public = true;
+
+module.exports = theObject;
