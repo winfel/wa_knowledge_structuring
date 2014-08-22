@@ -51,7 +51,7 @@ module.exports={
         startFile: "start.bat"
     },
     wkhtmltox: {
-        path: ""
+        path: 'C:/Program Files/wkhtmltopdf/bin'
     },
     mongodb: {
               user: "",  
