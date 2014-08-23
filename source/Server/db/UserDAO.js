@@ -38,4 +38,9 @@ UserDAO.createUsers = function(newUserAttr, callback) {
     users.insert({username: newUserAttr.login, password: newUserAttr.password, e_mail: newUserAttr.e_mail }, callback);
 }
 
+UserDAO.updateUsersById = function(id, newUserAttr) {
+    var users = db.get('users');
+    users.update({_id:id}, {$set:newUserAttr});
+}
+
 module.exports = UserDAO;

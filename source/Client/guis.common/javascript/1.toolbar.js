@@ -380,6 +380,28 @@ GUI.initToolbar = function() {
         popover.hide();
       };
 
+		var selLanguage = section.addElement(GUI.translate("Language")).addWidget('selection');
+		selLanguage.setOptions(['de', 'en', 'es', 'cow']);
+		selLanguage.setValue(ObjectManager.getUser().preferredLanguage || GUI.currentLanguage);
+		selLanguage.onChange(function(sel) {
+			GUI.currentLanguage = sel;
+			ObjectManager.getUser().preferredLanguage = sel;
+			if(confirm(GUI.translate('To update the language of all elements of the page it has to be reloaded. Reload now?'))) {
+				location.reload();
+			}
+		});
+
+/*		// the color widget allows colors which shouldn't be allowed :-/
+		var selUserColor = section.addElement(GUI.translate("Your color")).addWidget('color');
+		selUserColor.setColor(ObjectManager.getUser().color);
+		selUserColor.onChange(function(sel) {
+			ObjectManager.getUser().color = sel;
+			if(confirm(GUI.translate('To update your color at all elements of the page it has to be reloaded. Reload now?'))) {
+				location.reload();
+			}
+		});
+*/
+
       var btnPaste = section.addElement('<img src= "../../guis.common/images/paste-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Paste"));
       var clickPaste = function() {
         alert("Paste");

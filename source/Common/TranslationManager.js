@@ -23,6 +23,10 @@ TranslationManager.addTranslations = function(language, translations) {
 }
 
 TranslationManager.get = function(language, text) {
+	if(language == 'cow') {
+		return Math.random()<=0.5?('M' + new Array( Math.round(2+Math.random()*8) ).join('u') + 'h'):('mo' + new Array( Math.round(2+Math.random()*8) ).join('o'));
+	}
+
     if (this.data[language] && this.data[language][text]) {
         return this.data[language][text];
     } 

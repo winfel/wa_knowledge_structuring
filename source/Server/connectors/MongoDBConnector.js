@@ -39,6 +39,7 @@ var paintings;
 */
 mongoConnector.init = function(theModules) {
 	var that = this;
+	Modules = theModules;
     that.Modules = theModules;
     monk = require('monk'); 
     console.log();
@@ -75,11 +76,20 @@ mongoConnector.login = function(username, password, externalSession, context, rp
     this.Modules.Log.debug("Login request for user '" + username + "'");
     
     var data = {};
-    data.username = username.toLowerCase();
-    data.password = password;
-    data.home = "public";
-    
-    rp(data);
+	data.username = username.toLowerCase();
+	data.password = password;
+	data.home = "public";
+
+	Modules.UserDAO.usersByUserName(data.username, function(err, users) {
+		if(!users || users.length==0) {
+			rp(false);
+		}
+		else {
+			data = users[0];
+			data.home = "public";
+			rp(data);
+		}
+	});
 }
 
 /**
@@ -252,6 +262,7 @@ function buildObjectFromDBObject (roomID, attr, callback) {
     data.attributes.inRoom = roomID;
     data.attributes.hasContent = false;
     
+    try {
     GridStore.exist(mongoConnector.db, attributes.id, function(err, result) {
     	if (err) { throw err; }
     	if (result) {
@@ -262,6 +273,11 @@ function buildObjectFromDBObject (roomID, attr, callback) {
     	
     	callback(data);
     });
+    } catch(ex) {
+		Modules.Log.warn(ex);
+		console.log('... this happens then and when and can be ignored.\nIvan or Alejandro will fix it... hopefully... ;-)');
+		console.dir(arguments);
+    }
 }
 /**
  *  Get room data or create room, if doesn't exist yet.
