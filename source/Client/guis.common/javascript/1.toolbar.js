@@ -1,8 +1,8 @@
 "use strict";
 
 /* SETTINGS */
-var popover_positionOffsetX = -12;
-var popover_positionOffsetY = 20;
+var popover_positionOffsetX = 8;
+var popover_positionOffsetY = 21;
 
 /**
  * Init. the toolbar
@@ -357,8 +357,20 @@ GUI.initToolbar = function() {
   $(menuButton).jPopover({
     positionOffsetX: popover_positionOffsetX,
     positionOffsetY: popover_positionOffsetY,
-    arrowOffsetRight: 30,
+    arrowOffsetRight: 12,
     onSetup: function(domEl, popover) {
+    
+		Object.defineProperty(popover.options, 'positionOffsetX', {
+			get:function() {
+				return -4 - popover_positionOffsetX + $("#header > .header_right").position().left;
+			}
+		});
+		Object.defineProperty(popover.options, 'arrowOffsetRight', {
+			get:function() {
+				return 30 + $("#header > .header_right").position().left;
+			}
+		});
+
       var page = popover.addPage(GUI.translate("Welcome")+ " " + GUI.username);
       var section = page.addSection();
 
