@@ -87,9 +87,11 @@ GUI.tagManager = new function() {
 		Modules.TagManager.moveSecTag(oldMainTag, newMainTag, secTag);
 	}
 	
-	this.deleteSecondaryTag = function(mainTag, secondaryTag){
+	this.deleteSecondaryTag = function(mainTag, secondaryTag, callback){
 		console.log("deleteSecondaryTag");
-		Modules.TagManager.deleteSecTags(mainTag, secondaryTag);
+		Modules.TagManager.deleteSecTags(mainTag, secondaryTag, function(obj){
+			callback(obj);
+		});
 	}
 	
 		
@@ -201,14 +203,22 @@ GUI.tagManager = new function() {
 		
 		
 		$( "#main-tag-container" ).delegate(".sec-tag-delete","click", function() {
+			var self = this;
 			var that = GUI.tagManager;
 			
 			var mainTag = $(this).closest('.portlet').find('.editable').html();
 			var secondaryTagToBeDeleted = $(this).parent().find('.editable-sec').html();
 			
-		    var icon = $( this )
-		    icon.closest( "li" ).remove();
-		    that.deleteSecondaryTag(mainTag, secondaryTagToBeDeleted);			  
+		    
+		    that.deleteSecondaryTag(mainTag, secondaryTagToBeDeleted, function(obj){
+		    	if(obj.result && obj.result == true){
+		    		var icon = $( self )
+				    icon.closest( "li" ).remove();
+		    	} else {
+		    		alert(obj.msg);
+		    	}
+		    	
+		    });			  
 		});
 		
 					
@@ -269,15 +279,9 @@ GUI.tagManager = new function() {
 	
 	
 	//sets the content of the dialog 
-	this.setDialogContent = function(){
-		
-		var content = '<div id="main-tag-container">';
-		    content+= '<div class="portlet portlet-new-main-tag">';
-			content+= '<h2>Create New Main Tag</h2>';
-			content+= '</div>';	    	
-			content+= '</div>';	   
-	
-		this.dialogDom = $(content);
+	this.setDialogContent = function(){		
+		var mainTagTemplate = $("#tag-manager-content-tmpl").html();
+		this.dialogDom = $(mainTagTemplate);
 	}
 	
 	
@@ -295,12 +299,10 @@ GUI.tagManager = new function() {
 		  
 		var buttons = {};
 		
-		buttons[GUI.translate("close")] = function(domContent){
+		buttons[GUI.translate("close")] = function(domContent){		
 			
-			//that.saveChanges();
-			
-		};
-
+		};		
+		
 		GUI.dialog("Tag Manager", this.dialogDom, buttons, width, passThrough);
 		
 		//$("#main-tag-container").find( "h2" ).css("font-size", "12.5px");

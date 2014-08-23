@@ -110,46 +110,8 @@ GUI.tagAssigner = new function() {
 	
 	//sets the content of the dialog for tag assignment/unassignment
 	this.setDialogContent = function(){
-		
-		var content = '<div id="tabs"  class="ui-tabs ui-widget ui-widget-content ui-corner-all" style="width: 565px">';
-			content+= '	<ul>';
-			content+= '		<li><a href="#mainTag">Main Tag</a></li>';
-			content+= '		<li><a href="#secondaryTags">Secondary Tag</a></li>';
-			content+= '	</ul>';
-			content+= '	<div id="mainTag">';
-			content+= '     <div class="custom-main-tag-holder">';
-			content+= '     	<label for="custom-Main-tag"><b>Custom tag:</b> </label>';
-		    content+= '			<input id="custom-Main-tag">';
-			content+= '		</div>';
-			content+= '	</div>';
-			content+= ' <div id="secondaryTags">';
-			content+= '		<div class="ui-widget ui-helper-clearfix" style="width: 555px">';
-			content+= '			<div class="unassignedTags">';
-			content+= '     	    <div class="inner-unassignedTags">';
-			content+= '					<ul id="unassignedTags" class="tags ui-helper-reset ui-helper-clearfix">';
-			content+= '					</ul>';
-			content+= '			    </div>';
-			content+= '			<div class="buttons-holder">';			
-			content+= '				<button id="btn-previous"><</button>';
-			content+= '				<button id="btn-next">></button>';
-			content+= '			</div>';
-			content+= '     	<div class="custom-sec-tag-holder">';
-			content+= '     		<label for="custom-Sec-tag"><b>Custom tag:</b> </label>';
-		    content+= '				<input id="custom-Sec-tag">';
-			content+= '			</div>';		
-			content+= '			</div>';
-			content+= '			<div id="document" class="ui-widget-content ui-state-default">';
-			content+= '				<h4 class="ui-widget-header"><span id="document-name"></span></h4>';
-			//content+= ' 	    	<ul class="tags ui-helper-reset" id="assignedTags">';
-			content+= ' 	    	<ul class="tags" id="assignedTags">';
-			content+= ' 	    	</ul>';
-			content+= '     	</div>';
-			content+= '     </div>';
-			content+= ' </div>';
-			content+= '</div>';
-			
-		this.dialogDom = $(content);
-		
+		var tagAssignerTemplate = $("#tag-assigner-content-tmpl").html();
+		this.dialogDom = $(tagAssignerTemplate);
 	}
 	
 
@@ -488,8 +450,7 @@ GUI.tagAssigner = new function() {
 		else{
 			$(
 			  '<li class="ui-widget-content" data-sectag="'+value+'">'+
-				  '<h5 class="ui-widget-header tagValue">'+value+'</h5>'+
-			//      '<a href="" id="del-tag" title="Delete this tag" class="ui-icon ui-icon-closethick">Delete image</a>'+
+				  '<h5 class="ui-widget-header tagValue">'+value+'</h5>'+			
 			  '</li>'
 			 ).appendTo(container);
 		
@@ -650,8 +611,12 @@ GUI.tagAssigner = new function() {
 			
 		};
 
+		var additionalOptions = {
+			closeOnEscape: false,
+			open: function(event, ui) { $(".ui-dialog-titlebar-close", ui.dialog).hide(); }	
+		}
 		
-		GUI.dialog("Tag Assigner", that.dialogDom, buttons, width, passThrough);
+		GUI.dialog("Tag Assigner", that.dialogDom, buttons, width, additionalOptions);
 
 		
 		// Initialize tabs

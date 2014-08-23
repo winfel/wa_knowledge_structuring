@@ -4,6 +4,7 @@ var _ = require('underscore');
 var db = false;
 var Modules = false;
 
+var FILE_TYPE_NAME = "File";
 var CONTAINER_ID = "containerID";
 var CONTAINER_WIDTH = 500;
 var CONTAINER_HEIGHT = 300;
@@ -138,7 +139,11 @@ var TagManager = function() {
 	});
 	
 	Dispatcher.registerCall('deleteSecTags', function(socket, data, responseID) {
-		that.deleteSecTags(socket, data.mainTag, data.secTag); 
+		that.deleteSecTags(socket, data.mainTag, data.secTag, function(result, msg){
+			
+			Modules.SocketServer.sendToSocket(socket, 'deleteSecTags', {"result": result, "msg": msg});
+			
+		}); 
 	});
 	
 	// we create our context
@@ -216,12 +221,33 @@ var TagManager = function() {
 	* @param {type} object
 	* @returns {undefined}
 	*/
-	this.deleteSecTags = function(socket, mainTag, SecTag) {
+	this.deleteSecTags = function(socket, mainTag, SecTag, callback) {
 		var dbMainTags = db.get('MainTags');
-		dbMainTags.update( {name: mainTag}, { 
-								$pull: { secTags:  SecTag } 
-						    }
-        );
+		var dbObjects = db.get('objects');
+		
+		var promise = dbObjects.find( {type: FILE_TYPE_NAME, secondaryTags : {$in : [SecTag]} });
+		
+		promise.on('complete', function(err, obj) {
+            if (err || obj == null) {
+                console.log("deleteSecTags::ERROR " + err);
+                //callback(true, null);
+            } else {
+                if(obj.length == 0){
+	            	var promise2 = dbMainTags.update( {name: mainTag}, { 
+	        			$pull: { secTags:  SecTag } 
+	        	    }); 
+	                promise2.on('complete', function(err, obj) {
+	                    if (err) 
+	                    	console.log("deleteSecTags::ERROR " + err);
+	                    	callback(true, null);
+	                    //else callback(false, null);
+	                });
+                } else {                	
+                	console.log("The secondary tag cannot be deleted since there are files tagged with this tag");
+                	callback(false, "The secondary tag cannot be deleted since there are files tagged with this tag");
+                } 
+            }        
+        });
 	};
 	
 	/**

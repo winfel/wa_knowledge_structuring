@@ -13,7 +13,7 @@
     <script type="text/javascript" src="/guis.common/libraries/moment.min.js"></script>
     <script type="text/javascript" src="/guis.common/libraries/lodash.min.js"></script>
     <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.autogrow.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jeditable.js"></script>
+    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jeditable-1.7.1.js"></script>    
     <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jeditable.autogrow.js"></script>
     <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.dotdotdot.js"></script>
 
@@ -505,8 +505,69 @@
   </div>
 </script>
 
-<script type="text/html" id='secondary-tag-tmpl'>		
-     <li class='ui-widget-content' data-sectag='<%= secTag %>'>
+<!-- BEGIN: Tag Assigner Underscore Templates  -->
+
+<script type="text/html" id='tag-assigner-content-tmpl'>
+<div id="tabs"  class="ui-tabs ui-widget ui-widget-content ui-corner-all" style="width: 565px">
+	<ul>
+		<li><a href="#mainTag">Main Tag</a></li>
+		<li><a href="#secondaryTags">Secondary Tag</a></li>
+	</ul>
+	<div id="mainTag">
+		<div class="custom-main-tag-holder">
+			<label for="custom-Main-tag"><b>Custom tag:</b> </label>
+			<input id="custom-Main-tag">
+		</div>
+	</div>
+	<div id="secondaryTags">
+		<div class="ui-widget ui-helper-clearfix" style="width: 555px">
+			<div class="unassignedTags">
+				<div class="inner-unassignedTags">
+					<ul id="unassignedTags" class="tags ui-helper-reset ui-helper-clearfix">
+					</ul>
+				</div>
+				<div class="buttons-holder">			
+					<button id="btn-previous"><</button>
+					<button id="btn-next">></button>
+				</div>			
+				<div class="custom-sec-tag-holder">
+					<label for="custom-Sec-tag"><b>Custom tag:</b> </label>
+					<input id="custom-Sec-tag">
+				</div>	
+			</div>
+			<div id="document" class="ui-widget-content ui-state-default">
+				<h4 class="ui-widget-header"><span id="document-name"></span></h4>
+				<ul class="tags ui-helper-reset" id="assignedTags">
+				<ul class="tags" id="assignedTags"></ul>
+			</div>
+		</div>
+	</div>
+</div>
+</script>
+
+<!-- END: Tag Assigner Underscore Templates -->
+
+<!-- BEGIN: Tag Manager Underscore Templates  -->
+
+<script type="text/html" id='tag-manager-content-tmpl'>
+	<div id="main-tag-container">
+		<div class="portlet portlet-new-main-tag ui-corner-all">
+			<h2>Create New Main Tag</h2>
+		</div>	    	
+	</div>	
+</script>
+
+
+<script type="text/html" id='tag-manager-content-tmpl'>
+	<div id="main-tag-container">
+		<div class="portlet portlet-new-main-tag ui-corner-all">
+			<h2>Create New Main Tag</h2>
+		</div>	    	
+	</div>	
+</script>
+
+<script type="text/html" id='secondary-tag-tmpl'>	
+    <li class='ui-widget-content' data-sectag='<%= secTag %>'>
 		<h5 class='ui-widget-header tagValue editable-sec'><%= secTag %></h5>
 		<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
 	</li>      	
@@ -517,14 +578,14 @@
 		
 		<div class='portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all' data-maintag='<%= item.name %>'>
 			<div class='portlet-header ui-widget-header ui-corner-all'>
-				<span class='ui-icon ui-icon-trash portlet-delete'></span>
+				
 				<span class='ui-icon ui-icon-plusthick portlet-toggle'></span>
 				<div class='editable'><%= item.name %></div>
                 <span id="main-tag-id" style="display: none;"><%= item.id %></span>
 			</div>
 			<div class='portlet-content' style='display: none'>
-				<div class='ui-widget-content portlet-new-sec-tag'>
-					<h2>Create New Sec Tag</h2>
+				<div class='ui-widget-content portlet-new-sec-tag ui-corner-all'>
+					<h2>Create New Secondary Tag</h2>
 				</div>
 				<ul class='managetags ui-helper-reset ui-helper-clearfix connectedSortable'>
 					<% for(var tag in item.secTags) { %>								
@@ -539,4 +600,7 @@
 	<% }) %>
 
 </script>	
-    <!-- END: Underscore Template Definition. -->
+
+<!-- END: Tag Manager Underscore Templates -->
+
+<!-- END: Underscore Template Definition. -->

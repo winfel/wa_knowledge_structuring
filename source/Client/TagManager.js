@@ -137,8 +137,13 @@ var TagManager = new function() {
    * @param {type} callback
    * @returns {undefined}
    */
-  this.deleteSecTags = function(mainTag, secTag) {
+  this.deleteSecTags = function(mainTag, secTag, callback) {
 
+	Dispatcher.registerCall("deleteSecTags", function(result, msg) {
+	    callback(result, msg);
+	    Dispatcher.removeCall("deleteSecTags");
+	});
+	  
     Modules.SocketClient.serverCall('deleteSecTags', {
         'mainTag': mainTag,
         'secTag': secTag
