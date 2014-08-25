@@ -187,57 +187,40 @@ FavouritesContainer.drawContent = function(rep){
                 		'<button id= "searchButton_for_'+that.id+'" type="submit" height="30"><img src="/guis.common/images/icon-lupe.png" alt="Suchen" width="22" height="22"></button>'
             ); 
 
-
-		    /* Click event for search button in popover */
+			/* Click event for search button in popover */
 			$('#searchButton_for_'+that.id).on("click",function(){
 
 				/* Get value from textfield and selected checkboxes */
 				var textfieldValue = $('#textName_for'+that.id).val();
-				var checkboxName = $('#checkName_for'+that.id).prop('checked');
-				var checkboxTag = $('#checkTag_for'+that.id).prop('checked');
-				var checkboxPDF = $('#checkPDF_for'+that.id).prop('checked');
-				var checkboxHTML = $('#checkHTML_for'+that.id).prop('checked');
-				var checkboxAudio = $('#checkAudio_for'+that.id).prop('checked');
-				var checkboxVideo = $('#checkVideo_for'+that.id).prop('checked');
-				var checkboxText = $('#checkText_for'+that.id).prop('checked');
-				var checkboxImage = $('#checkImage_for'+that.id).prop('checked');
-			
-
-				if(textfieldValue != "" && !checkboxName && !checkboxTag){
+				// test if anything is selected
+				var anythingSelected = false;
+				for(var searchoption in that.options) {
+					var m = searchoption.match(/^searchFor(\w+)$/);
+					if(m) {
+						anythingSelected = anythingSelected || $('#check' + m[1] + '_for'+that.id).prop('checked');
+					}
+				}
+				var searchBySelected = $('#checkName_for'+that.id).prop('checked') || $('#checkTag_for'+that.id).prop('checked');
+				if(textfieldValue != "" && !searchBySelected){
 					alert('Please specify what you are looking for (name and/or tag)');		
 				}
-				else{
-					if(!checkboxPDF && !checkboxHTML && !checkboxImage && !checkboxAudio && !checkboxVideo && !checkboxText){
-							alert('Please specify what files you are looking for');
+				else if(!anythingSelected) {
+					alert('Please specify what files you are looking for');
+				}
+				else {
+					// save the values
+					that.options.searchString = textfieldValue;
+					for(var searchoption in that.options) {
+						var m = searchoption.match(/^search(For|By)(\w+)$/);
+						if(m) {
+							that.options[searchoption] = $('#check' + m[2] + '_for'+that.id).prop('checked');
+						}
 					}
-					else{
-				
-						that.options.searchString = textfieldValue;
-						that.options.searchByName = checkboxName;
-						that.options.searchByTag = checkboxTag;
-						that.options.searchForPDF = checkboxPDF;
-						that.options.searchForHTML = checkboxHTML;
-						that.options.searchForImage = checkboxImage;
-						that.options.searchForAudio = checkboxAudio;
-						that.options.searchForVideo = checkboxVideo;
-						that.options.searchForText = checkboxText;
-				
-						//that.setAttribute('searchString', textfieldValue);
-						//that.setAttribute('searchByName', checkboxName);
-						//that.setAttribute('searchByTag', checkboxTag);
-						//that.setAttribute('searchForPDF', checkboxPDF);
-						//that.setAttribute('searchForHTML', checkboxHTML);
-						//that.setAttribute('searchForImage', checkboxImage);
-						//that.setAttribute('searchForAudio', checkboxAudio);
-						//that.setAttribute('searchForVideo', checkboxVideo);
-						//that.setAttribute('searchForText', checkboxText);
-				
-						that.searchAndFilter(that.Files);
-				
-						/* Close popover */
-						popover.hide();
+					
+					that.searchAndFilter(that.Files);
 
-					}
+					/* Close popover */
+					popover.hide();
 					
 				}
 			});
