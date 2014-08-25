@@ -134,13 +134,17 @@ GUI.tagAssigner = new function() {
 				  				  
 				// remove all assigned tags
 				that.assignedSecTags = [];
-				that.drawAssignedTags();				
+				that.drawAssignedTags();
 			
 				  
 			} 
 				
 				// set the main tag
 				that.mainTag = newMainTag;
+
+				//save the new main tag in the database
+				that.webarenaObject.setAttribute('mainTag',that.mainTag);
+				
 				$("#mainTag :button").removeClass('assigned-main-tag');
 				$(this).addClass('assigned-main-tag');
 				
@@ -571,7 +575,7 @@ GUI.tagAssigner = new function() {
 	this.saveChanges = function (){
 		var that = GUI.tagAssigner;
 
-		that.webarenaObject.setAttribute('mainTag',that.mainTag);
+		//that.webarenaObject.setAttribute('mainTag',that.mainTag);
 		
 		// done in this way cause it doesn't accept the 'assignedSecTags' 
 		// directly as a parameter in the setAttribute function

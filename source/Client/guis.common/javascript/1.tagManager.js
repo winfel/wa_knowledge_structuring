@@ -52,43 +52,40 @@ GUI.tagManager = new function() {
 			};	
 
 	this.createMainTag = function(mainTag, newId) {
-		var that = GUI.tagManager;
-		// console.log("createMainTag");
-		// save the newly created tag in the database  
+		// saves the newly created main tag "mainTag" in the database  
 		Modules.TagManager.updMainTags(mainTag, newId);
 	}
 	
-	this.updMainTagName = function(oldName, newName, tagID){
-		var that = GUI.tagManager;
-		//console.log("createMainTag");
-		//save the newly created tag in the database  
+	this.updMainTagName = function(oldName, newName, tagID){		
+		// updates the name of the main tag with ID "tagID" in the database  
 		Modules.TagManager.updMainTagName(oldName, newName, tagID);
 	}
 
-	this.deleteMainTag = function(mainTag, tagID){
-		//console.log("deleteMainTag");
-		Modules.TagManager.deleteMainTag(mainTag, tagID);
+	this.deleteMainTag = function(mainTag, tagID, callback){
+		// deletes the main tag with ID "tagID" from the database
+		Modules.TagManager.deleteMainTag(mainTag, tagID, function(obj){
+			callback(obj);
+		});
 	}
 	
 	this.createSecondaryTag = function(mainTag, secondaryTag){
-		//console.log("createSecondaryTag");		
+		// saves the newly created secondary tag "secondaryTag" in the database		
 		Modules.TagManager.updSecTags(mainTag, secondaryTag);		
 	}
 	
 	this.updSecTagName = function(mainTag, oldName, newName){
-		var that = GUI.tagManager;
-		//save the newly created tag in the database  
+		// updates the name of the secondary tag "oldName" to "newName"  
 		Modules.TagManager.updSecTagName(mainTag, oldName, newName);
 	}
 	
 	this.moveSecTag = function(oldMainTag, newMainTag, secTag){
 		var that = GUI.tagManager;
-		//save the newly created tag in the database  
+		// moves the secondary tag "secTag" from main tag "oldMainTag" to "newMainTag"
 		Modules.TagManager.moveSecTag(oldMainTag, newMainTag, secTag);
 	}
 	
 	this.deleteSecondaryTag = function(mainTag, secondaryTag, callback){
-		console.log("deleteSecondaryTag");
+		// deletes the secondary tag "secondaryTag" from the database
 		Modules.TagManager.deleteSecTags(mainTag, secondaryTag, function(obj){
 			callback(obj);
 		});
@@ -107,7 +104,7 @@ GUI.tagManager = new function() {
 			function(value, settings) {
 			        var oldName = this.revert;
 			    
-			         if (oldName != value) {
+			        if (oldName != value) {
         			     // if a MainTag with this name already exists, discard the new entry
                          for (var index = 0; index < that.mainTags.length; ++index) {
                             if (that.mainTags[index].name == value) {
@@ -115,9 +112,10 @@ GUI.tagManager = new function() {
                                 alert("A main tag with the specified name already exists");
                                 
                                 return this.revert;
+                                
                             }
                          }
-			         }
+			        }
 			    
 					 // console.log(value);					
 					 if (that.mainTagOperation == "create") {
@@ -189,6 +187,8 @@ GUI.tagManager = new function() {
 		});
 		
 		$( "#main-tag-container" ).delegate(".portlet-delete", "click", function() {
+			var self = this;
+			var that = GUI.tagManager;
 		    var mainTagToBeDeleted = $(this).parent().find('.editable').html();
 		    
 		    var tagID = $(this).parent().find('#main-tag-id').html();
@@ -196,11 +196,17 @@ GUI.tagManager = new function() {
 		        tagID = $(this).parent().find('#main-tag-id').data("tag-id");
 		    }
 		    
-		    var icon = $( this );
-		    icon.closest( ".portlet" ).remove();
-		    GUI.tagManager.deleteMainTag(mainTagToBeDeleted, tagID);		  
+		    that.deleteMainTag(mainTagToBeDeleted, tagID, function(obj){
+		    	if(obj.error && obj.error == true){
+		    		alert(obj.msg);		    		
+		    	} else {
+				    var icon = $( self );
+				    icon.closest( ".portlet" ).remove();
+		    	}
+		    		  
+		    });
+		    
 		});
-		
 		
 		$( "#main-tag-container" ).delegate(".sec-tag-delete","click", function() {
 			var self = this;
@@ -211,13 +217,12 @@ GUI.tagManager = new function() {
 			
 		    
 		    that.deleteSecondaryTag(mainTag, secondaryTagToBeDeleted, function(obj){
-		    	if(obj.result && obj.result == true){
+		    	if(obj.error && obj.error == true){
+		    		alert(obj.msg);		    		
+		    	} else {
 		    		var icon = $( self )
 				    icon.closest( "li" ).remove();
-		    	} else {
-		    		alert(obj.msg);
-		    	}
-		    	
+		    	}		    	
 		    });			  
 		});
 		
@@ -303,6 +308,7 @@ GUI.tagManager = new function() {
 			
 		};		
 		
+		passThrough = { "position": ['middle',50] };
 		GUI.dialog("Tag Manager", this.dialogDom, buttons, width, passThrough);
 		
 		//$("#main-tag-container").find( "h2" ).css("font-size", "12.5px");
