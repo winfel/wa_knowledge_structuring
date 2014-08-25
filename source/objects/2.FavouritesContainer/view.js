@@ -154,51 +154,17 @@ FavouritesContainer.drawContent = function(rep){
 				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox"> Tag <br><br>';  
 			}
             
-		   
-		    var searchForPDF;
-			var searchForHTML;
-			var searchForImage;
-			var searchForAudio;
-			var searchForVideo;
-			var searchForText;
-			
-			
-            if(that.options.searchForPDF){
-             	searchForPDF = '<input id = "checkPDF_for'+that.id+'" type="checkbox" checked> PDF<br>';
-			}
-			else{
-				searchForPDF = '<input id = "checkPDF_for'+that.id+'" type="checkbox"> PDF<br>';
-			}
-			if(that.options.searchForHTML){
-             	searchForHTML = '<input id = "checkHTML_for'+that.id+'" type="checkbox" checked> HTML<br>';
-			}
-			else{
-				searchForHTML = '<input id = "checkHTML_for'+that.id+'" type="checkbox"> HTML<br>';
-			}
-			if(that.options.searchForAudio){
-             	searchForAudio = '<input id = "checkAudio_for'+that.id+'" type="checkbox" checked> Audio<br>';
-			}
-			else{
-				searchForAudio = '<input id = "checkAudio_for'+that.id+'" type="checkbox"> Audio<br>';
-			}
-			if(that.options.searchForVideo){
-             	searchForVideo = '<input id = "checkVideo_for'+that.id+'" type="checkbox" checked> Video<br>';
-			}
-			else{
-				searchForVideo = '<input id = "checkVideo_for'+that.id+'" type="checkbox"> Video<br>';
-			}
-			if(that.options.searchForText){
-             	searchForText = '<input id = "checkText_for'+that.id+'" type="checkbox" checked> Text<br>';
-			}
-			else{
-				searchForText = '<input id = "checkText_for'+that.id+'" type="checkbox"> Text<br>';
-			}
-			if(that.options.searchForImage){
-				searchForImage = '<input id = "checkImage_for'+that.id+'" type="checkbox" checked> Image';
-			}
-            else{
-				searchForImage = '<input id = "checkImage_for'+that.id+'" type="checkbox"> Image';
-			}
+		    // add a checkbox and label for every searchFor-option
+			var searchFor = [];
+			for(var searchoption in that.options) {
+			var m = searchoption.match(/^searchFor(\w+)$/);
+				if(m) {
+					searchFor.push('<input id="check' + m[1] + '_for'+that.id+'" type="checkbox" ' + 
+					(that.options[searchoption]?'checked="checked"':'') + 
+						' style="float:left; margin-right:0.5em;" />' +
+						'<label for="check' + m[1] + '_for'+that.id+'">' + m[1] + '</label>');
+				}
+ 			}
 			
 			var s = that.options.searchString;
 			if(s == 0 || s == ""){
@@ -208,17 +174,12 @@ FavouritesContainer.drawContent = function(rep){
 				s = "value='"+that.options.searchString+"'";
 			}
 			
-		     var element = section.addElement('<input id = "textName_for'+that.id+'" type="text"'+s+'><p>Search by:</p>'+
+		     var element = section.addElement('<input id= "textName_for'+that.id+'" type="text"'+s+'><p>Search by:</p>'+
                 		'<p>'+
                 		searchByName +
 						searchByTag+
                 		'<p>Search for:</p>'+
-                		searchForPDF +
-						searchForHTML +
-						searchForAudio +
-						searchForVideo +
-						searchForText +
-						searchForImage +
+						searchFor.join( ' ' ) +
                 		'</p>'+
                 		'<button id= "selectAll_'+that.id+'" type="submit" height="30">Select all</button>'+
                 		'<button id= "deselectAll_'+that.id+'" type="submit" height="30">Deselect all</button>'+
