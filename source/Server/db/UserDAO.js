@@ -25,7 +25,7 @@ UserDAO.init = function(theModules) {
 
 UserDAO.usersByUserName = function(username, callback) {
     var users = db.get('users');
-    users.find({username: username}, {}, callback);
+    users.find({username: username.toLowerCase()}, {}, callback);
 }
 
 UserDAO.usersById = function(id, callback) {
@@ -35,7 +35,7 @@ UserDAO.usersById = function(id, callback) {
 
 UserDAO.createUsers = function(newUserAttr, callback) {
     var users = db.get('users');
-    users.insert({username: newUserAttr.login, password: newUserAttr.password, e_mail: newUserAttr.e_mail }, callback);
+    users.insert({username: newUserAttr.login.toLowerCase(), password: newUserAttr.password, e_mail: newUserAttr.e_mail }, callback);
 }
 
 UserDAO.updateUsersById = function(id, newUserAttr) {

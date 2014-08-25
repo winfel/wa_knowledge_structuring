@@ -195,11 +195,7 @@ UserManager.socketDisconnect = function(socket) {
  * @param {Object} data The credentials of the user.
  */
 UserManager.login = function(socketOrUser, data) {
-  if (typeof socketOrUser.id == 'string')
-    var userID = socketOrUser.id;
-  else
-    var userID = socketOrUser;
-  // var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
+  var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
 
   var connection = UserManager.connections[userID];
   if (!connection) {

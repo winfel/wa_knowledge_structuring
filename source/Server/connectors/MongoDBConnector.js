@@ -81,10 +81,9 @@ mongoConnector.login = function(username, password, externalSession, context, rp
 	data.home = "public";
 
 	Modules.UserDAO.usersByUserName(data.username, function(err, users) {
-		if(!users || users.length==0) {
+		if (!users || users.length == 0) {
 			rp(false);
-		}
-		else {
+		} else {
 			data = users[0];
 			data.home = "public";
 			rp(data);
