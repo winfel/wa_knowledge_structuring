@@ -436,28 +436,9 @@ FavouritesContainer.addFiles = function(files){
 			img = "text.png";
 		}
 		
-		$(rep).find("#sortablefiles").append('<li id=representation_for_'+id+' class="ui-widget-content" tabindex="-1">'+n+'</li>');
+		$(rep).find("#sortablefiles").append('<li id="representation_for_'+id+'" class="ui-widget-content containerFileRepresentation" tabindex="-1" title="' + name + '"><div class="filename">'+name+'</div></li>');
 		
-		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" src="../../guis.common/images/fileicons/'+img+'">');
-		
-		$(rep).find("#sortablefiles li").css("margin", "3px 3px 3px 0");
-		$(rep).find("#sortablefiles li").css("padding", "1px");
-		$(rep).find("#sortablefiles li").css("float", "left");
-		$(rep).find("#sortablefiles li").css("width", "75px");
-		$(rep).find("#sortablefiles li").css("height", "75px");
-		$(rep).find("#sortablefiles li").css("line-height", "10px");
-		$(rep).find("#sortablefiles li").css("font-size", "1em");
-		$(rep).find("#sortablefiles li").css("text-align", "center");
-		$(rep).find("#sortablefiles li").css("vertical-align", "middle");	
-		$(rep).find("#sortablefiles li").css("background", "#d3d3d3");	
-			
-		$(rep).find("#representation_for_"+id).hover(
-			function() {
-				$(this).css("background", "#f5f5f5");
-			}, function() {
-				$(this).css("background", "#d3d3d3");	
-			}
-		);
+		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" src="/guis.common/images/fileicons/'+img+'">');
 		
 		$(rep).find("#representation_for_"+id).dblclick(function(event) {
 		
