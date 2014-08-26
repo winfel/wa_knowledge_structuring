@@ -1,6 +1,6 @@
 
 PaperSelector.setTranslations('de',{
-	'paper.selector':'Papier-Wähler'
+	'paper.selector':'Dokument-Auswähler'
 }
 );
 

@@ -1,4 +1,8 @@
 Room.setTranslations('de',{
-	'Room':'Raum'
-}
-);
+	'Room':'Raum',
+	'showUserPaintings': 'Freihandzeichnungen anzeigen',
+});
+
+Room.setTranslations('en',{
+	'showUserPaintings': 'show user paintings',
+});
