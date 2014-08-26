@@ -262,16 +262,16 @@ function buildObjectFromDBObject (roomID, attr, callback) {
     data.attributes.hasContent = false;
     
     try {
-    GridStore.exist(mongoConnector.db, attributes.id, function(err, result) {
-    	if (err) { throw err; }
-    	if (result) {
-    		//console.log ("File " + attributes.id + "  exist");
-    		data.attributes.hasContent = true;
-            data.attributes.contentAge = new Date().getTime();	
-    	}
-    	
-    	callback(data);
-    });
+        GridStore.exist(mongoConnector.db, attributes.id, function(err, result) {
+        	if (err) { throw err; }
+        	if (result) {
+        		//console.log ("File " + attributes.id + "  exist");
+        		data.attributes.hasContent = true;
+                data.attributes.contentAge = new Date().getTime();	
+        	}
+        	
+        	callback(data);
+        });
     } catch(ex) {
 		Modules.Log.warn(ex);
 		console.log('... this happens then and when and can be ignored.\nIvan or Alejandro will fix it... hopefully... ;-)');
