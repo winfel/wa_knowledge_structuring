@@ -61,9 +61,9 @@ GUI.tagManager = new function() {
 		Modules.TagManager.updMainTagName(oldName, newName, tagID);
 	}
 
-	this.deleteMainTag = function(mainTag, tagID, callback){
+	this.deleteMainTag = function(mainTag, tagID, callback) {
 		// deletes the main tag with ID "tagID" from the database
-		Modules.TagManager.deleteMainTag(mainTag, tagID, function(obj){
+		Modules.TagManager.deleteMainTag(mainTag, tagID, function(obj) {
 			callback(obj);
 		});
 	}
@@ -196,15 +196,15 @@ GUI.tagManager = new function() {
 		        tagID = $(this).parent().find('#main-tag-id').data("tag-id");
 		    }
 		    
-		    that.deleteMainTag(mainTagToBeDeleted, tagID, function(obj){
-		    	if(obj.error && obj.error == true){
-		    		alert(obj.msg);		    		
-		    	} else {
-				    var icon = $( self );
-				    icon.closest( ".portlet" ).remove();
-		    	}
-		    		  
-		    });
+            that.deleteMainTag(mainTagToBeDeleted, tagID, function(obj) {
+                if (obj.error && obj.error == true) {
+                    alert(obj.msg);
+                } else {
+                    var icon = $(self);
+                    icon.closest(".portlet").remove();
+                }
+
+            });
 		    
 		});
 		
