@@ -30,6 +30,7 @@ theObject.onEnter=function(object,oldData,newData){
     Modules.ObjectManager.getObject(currentRoom,object.getAttribute('writer'),object.context, function(o){
         if(o != false){
             o.setAttribute('paper',id);
+            o.setAttribute('initFinished',true);
         }
     });
 }

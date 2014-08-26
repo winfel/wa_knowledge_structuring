@@ -87,15 +87,31 @@ var TagManager = function() {
 	                // let's modify the container associated with this main Tag
 	                Modules.ObjectManager.getObject('public', containerID, context, function (object) {
 	                    object.setAttribute('name', data.newName);
-	                    //object.persist();
 	                });
 	            }
 			}); 
 		});
 		
-		
-		Dispatcher.registerCall('deleteMainTag', function(socket, data, responseID) {
-	        that.deleteMainTag(socket, data.tagID, function(error, msg) {            
+		Dispatcher.registerCall('deleteMainTag', function(socket, data) {
+	        that.deleteMainTag(socket, data.tagID, function(error, msg, containerID) {
+	            if (!error) {
+	                var context = Modules.UserManager.getConnectionBySocket(socket);
+	                
+	                // let's delete the container associated with this main Tag
+	                that.deleteGlobalContainer(containerID, context, function(coordinates) {
+	                    var index = _.sortedIndex(freePlaces, coordinates, 'y');
+	                    
+	                    if (index == freePlaces.length) freePlaces.push(coordinates);
+	                    else {
+	                        var temp = freePlaces.slice(0, index);
+	                        temp.push(coordinates); 
+	                        freePlaces = _.union(temp, freePlaces.slice(index)); 
+	                    }
+	                    
+	                    //console.log("++ freePlaces: " + JSON.stringify(freePlaces));
+	                });
+	            } 
+	            
 	            Modules.SocketServer.sendToSocket(socket, 'deleteMainTag', {"error": error, "msg": msg});
 	        }); 
 	    });
@@ -112,7 +128,6 @@ var TagManager = function() {
 			that.deleteSecTags(socket, data.mainTag, data.secTag, function(error, msg){
 				
 				Modules.SocketServer.sendToSocket(socket, 'deleteSecTags', {"error": error, "msg": msg});
-				
 			}); 
 		});
 		
@@ -336,56 +351,39 @@ var TagManager = function() {
 		var dbMainTags = db.get('MainTags');
 		var dbObjects = db.get('objects');
 		
-		
 		var promise = dbMainTags.findOne( {id: mainTag });
 		promise.on('complete', function(err, obj) {
+		    
             if (err || obj == null) {
-                console.log("deleteMainTag::ERROR " + err);
-                callback(true, "The secondary tag cannot be deleted: " + err);
+                //console.log("deleteMainTag::ERROR " + err);
+                callback(true, "The main tag cannot be deleted: " + err);
             } else {	
-		
 				var promise1 = dbObjects.find( {type: FILE_TYPE_NAME, mainTag : obj.name });
 				
 				promise1.on('complete', function(err, obj) {
 		            if (err || obj == null) {
-		                console.log("deleteMainTag::ERROR " + err);
-		                callback(true, "The secondary tag cannot be deleted: " + err);
+		                //console.log("deleteMainTag::ERROR " + err);
+		                callback(true, "The main tag cannot be deleted: " + err);
 		            } else {
-		                if(obj.length == 0){
+		                if (obj.length == 0) {
 		                	var promise2 = dbMainTags.findOne({id: mainTag.toString()});
 		            		promise2.on('complete', function(err, obj) {
-		                        if (err) callback(true, "The secondary tag cannot be deleted: " + err);
+		                        if (err) callback(true, "The main tag cannot be deleted: " + err);
 		                        else {
 		                            var containerID = obj.containerID;
 		                            
 		                            var promise3 = dbMainTags.remove({id: mainTag.toString()});
 		                            promise3.on('complete', function(err, obj) {
 		                                if (err) { 
-		                                	callback(true, "The secondary tag cannot be deleted: " + err);
-		                                } else {
-		                                	var context = Modules.UserManager.getConnectionBySocket(socket);
-		                                        
-		                                    // let's delete the container associated with this main Tag
-		                                    that.deleteGlobalContainer(containerID, context, function(coordinates) {
-		                                        
-		                                        if (freePlaces.length == 0) freePlaces.push(coordinates);
-		                                        else {
-		                                            var index = _.sortedIndex(freePlaces, coordinates, 'y');
-		                                            var temp = freePlaces.slice(0, index);
-		                                            temp.push(coordinates); 
-		                                            freePlaces = _.union(temp, freePlaces.slice(index)); 
-		                                        }
-		                                        
-		                                        freePlaces.reverse();
-		                                        // console.log("++ freePlaces: " + JSON.stringify(freePlaces));
-		                                    });                                    
-		                                	callback(false, null);
+		                                	callback(true, "The main tag cannot be deleted: " + err);
+		                                } else {                  
+		                                	callback(false, undefined, containerID);
 		                                } 
 		                            });
 		                        }
 		                    });
 		                } else {                	
-		                	console.log("The main tag cannot be deleted since there are files tagged with this tag");
+		                	// console.log("The main tag cannot be deleted since there are files tagged with this tag");
 		                	callback(true, "The main tag cannot be deleted since there are files tagged with this tag");
 		                } 
 		            }        
@@ -393,20 +391,6 @@ var TagManager = function() {
 		
             }        
         });
-		
-		/*var promise = dbMainTags.findOne({id: mainTag.toString()});
-		promise.on('complete', function(err, obj) {
-            if (err) callback(true, null);
-            else {
-                var containerID = obj.containerID;
-                
-                var promise2 = dbMainTags.remove({id: mainTag.toString()});
-                promise2.on('complete', function(err, obj) {
-                    if (err) callback(true, null);
-                    else callback(false, containerID);
-                });
-            }
-        });*/
 	};
 	
 	/**
@@ -443,10 +427,10 @@ var TagManager = function() {
                         attr.x = INITIAL_X + (rest * (HORIZONTAL_GAP + CONTAINER_WIDTH));
                     }
                     
-                    //console.log("*Data totalT= " + totalTags + ", div=" + div + ", rest=" + rest);
                 } else if (freePlaces.length > 0) {
-                    // TODO: Take the most upper 
-                    var coordinates = freePlaces.pop(); 
+                    var coordinates = freePlaces[0]; 
+                    freePlaces = freePlaces.slice(1);
+                    // console.log("++ coordinates: " + JSON.stringify(coordinates));
                     
                     attr.x = coordinates.x;
                     attr.y = coordinates.y;
@@ -494,7 +478,7 @@ var TagManager = function() {
 	                            dbMainTags.update( {id: tag.id.toString()}, { 
 	                                $set: { containerID:  obj.id } 
 	                            }, function(err, o) {
-	                                console.log("Updated tag: " + tag.name + " with container ID: " + obj.id );
+	                                // console.log("Updated tag: " + tag.name + " with container ID: " + obj.id );
 	                                newContainersCounter++;
 	                                recursive(i + 1);
 	                            });  
@@ -517,6 +501,8 @@ var TagManager = function() {
 	 */
 	this.OrderContainers = function(context) {
 	    var dbMainTags = db.get('MainTags');
+	    
+	    // console.log("sorting containers...");
         
         dbMainTags.find({}, [CONTAINER_ID], function(e, mainTags) {
             if (e) console.log("OrderContainers::ERROR " + e);

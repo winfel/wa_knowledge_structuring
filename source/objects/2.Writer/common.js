@@ -20,6 +20,10 @@ Writer.register=function(type){
 		Modules.ObjectManager.loadRoom(object.getAttribute("inRoom"));
     }});
 	
+	this.registerAttribute('initFinished', {type:'boolean', standard:false, hidden:true, changedFunction: function(object, value) {
+
+    }});
+
 	this.standardData.width=210*3;
 	this.standardData.height=297*3;
 	

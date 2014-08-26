@@ -87,7 +87,11 @@ GlobalContainer.register=function(type){
  * @see objects/2.GlobalContainer/view.js
  */
 GlobalContainer.execute=function(){
+	    var destFromURL = document.URL.substring(document.URL.lastIndexOf("/") + 1, document.URL.length);
 
+		this.options.searchByName 	= false;
+		this.options.searchByTag 	= true;
+		this.options.searchString 	= destFromURL;
 }
 
 /**

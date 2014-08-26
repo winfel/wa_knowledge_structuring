@@ -5,7 +5,11 @@
  *
  */
 
-
+/**
+ * 
+ * @param {type} external
+ * @returns {Viewer.draw@call;getRepresentation}
+ */
 Viewer.draw = function(external) {
 
   var rep = this.getRepresentation();
@@ -398,98 +402,93 @@ Viewer.initGUI = function(rep) {
       return commentContainer;
     };
 
-    self.linkCommentToHighlights = function() {
+    var linkCommentWithHighlight = function(commentContainer, data, cssClass, dataAttributeName) {
+            commentContainer = $(commentContainer);
+            commentContainer.off("hover");
+      var commentHighlight = $(".highlighted." + cssClass + "[" + dataAttributeName + "='" + data.hash + "']", frameDocument)[0];
+
+            if (commentHighlight) {
+              commentHighlight = $(commentHighlight);
+              commentHighlight.off("hover");
+
+              // Highlight the highlighting
+              commentContainer.hover(function() {
+                commentHighlight.addClass('remotehover');
+              }, function() {
+                commentHighlight.removeClass('remotehover');
+              });
+
+              // Highlight the comment
+              commentHighlight.hover(function() {
+                commentContainer.addClass('remotehover');
+              }, function() {
+                commentContainer.removeClass('remotehover');
+              });
+            } else {
+              // 
+              commentContainer.addClass("noreference");
+            }
+    };
+
+    self.loadTextComments = function() {
       DBManager.getDocuments(self, "comments", function(docs) {
 
         for (var i in docs) {
           (function(doc) {
             // Javascript has no block scope... Let's use the function scope instead!
             var commentContainer = createCommentOnViewer(doc.user, doc.data);
-            commentContainer = $(commentContainer);
-            commentContainer.off("hover");
-
-            var commentHighlight = $(".highlighted.commented[data-comment='" + doc.data.hash + "']", frameDocument)[0];
-
-            if (commentHighlight) {
-              commentHighlight = $(commentHighlight);
-              commentHighlight.off("hover");
-
-              // Highlight the highlighting
-              commentContainer.hover(function() {
-                commentHighlight.addClass('remotehover');
-              }, function() {
-                commentHighlight.removeClass('remotehover');
-              });
-
-              // Highlight the comment
-              commentHighlight.hover(function() {
-                commentContainer.addClass('remotehover');
-              }, function() {
-                commentContainer.removeClass('remotehover');
-              });
-            } else {
-              // 
-              commentContainer.addClass("noreference");
-            }
+            linkCommentWithHighlight(commentContainer, doc.data, "commented", "data-comment");
           })(docs[i]);
         }
       });
     };
 
-    self.linkAudioCommentToHighlights = function() {
-      
-      console.log("linkAudioCommentToHighlights called");
+    self.loadAudioComments = function() {
       
       DBManager.getDocuments(self, "comments_audio", function(docs) {
-        
-        console.log("documents received!");
         
         for (var i in docs) {
           (function(doc) {
             // Javascript has no block scope... Let's use the function scope instead!
             var commentContainer = createCommentOnViewer(doc.user, doc.data);
-            commentContainer = $(commentContainer);
-            commentContainer.off("hover");
-
-            var commentHighlight = $(".highlighted.audio[data-audioobject='" + doc.data.hash + "']", frameDocument)[0];
-
-            if (commentHighlight) {
-              commentHighlight = $(commentHighlight);
-              commentHighlight.off("hover");
-
-              // Highlight the highlighting
-              commentContainer.hover(function() {
-                commentHighlight.addClass('remotehover');
-              }, function() {
-                commentHighlight.removeClass('remotehover');
-              });
-
-              // Highlight the comment
-              commentHighlight.hover(function() {
-                commentContainer.addClass('remotehover');
-              }, function() {
-                commentContainer.removeClass('remotehover');
-              });
-            } else {
-              // 
-              commentContainer.addClass("noreference");
-            }
+            linkCommentWithHighlight(commentContainer, doc.data, "audio", "data-audioobject");
           })(docs[i]);
         }
       });
     };
+
+    Viewer.addComment = function(data) {
+
+      var cssClass = "commented";
+      var dataAttribute = "data-comment";
+
+      if (data.type.indexOf("audio") >= 0) {
+        cssClass = "audio";
+        dataAttribute = "data-audioobject";
+      }
+
+      var commentContainer = createCommentOnViewer(data.user, data);
+      linkCommentWithHighlight(commentContainer, data, cssClass, dataAttribute);
+    };
+
     /**
      * 
      * @returns {undefined}
      */
+    var loadedInitially = false;
+
     self.loadHighlights = function() {
       var jsonStr = self.getAttribute('highlights');
       if (jsonStr != undefined && jsonStr != '') {
         highlighter.removeHighlights();
         highlighter.deserializeHighlights(jsonStr);
         //window.setTimeout(self.addAudioToHighlights, 50);
-        window.setTimeout(self.linkCommentToHighlights, 50);
-        window.setTimeout(self.linkAudioCommentToHighlights, 50);
+
+        if (!loadedInitially) {
+          window.setTimeout(self.loadTextComments, 100);
+          window.setTimeout(self.loadAudioComments, 100);
+          loadedInitially = true;
+      }
       }
     };
 
@@ -556,6 +555,7 @@ Viewer.initGUI = function(rep) {
                 var date = new Date();
                 var data = {
                   'type': "text/plain",
+                'user': GUI.username,
                   'message': text,
                   'page': pageid,
                   'position': position,
@@ -566,7 +566,6 @@ Viewer.initGUI = function(rep) {
                 DBManager.addDocument(self, "comments", data);
 
                 callback(data);
-
                 theDialog.dialog("close");
               }
             }
@@ -758,6 +757,7 @@ Viewer.initGUI = function(rep) {
                 var date = new Date();
                 var data = {
                   'type': waveMimeType,
+                'user': GUI.username,
                   'message': waveBase64,
                   'page': pageid,
                   'position': position,
@@ -768,7 +768,6 @@ Viewer.initGUI = function(rep) {
                 DBManager.addDocument(self, "comments_audio", data);
 
                 callback(data);
-
                 theDialog.dialog("close");
               } else {
                 alert(t.haventrecorded);
