@@ -7,41 +7,19 @@
 
 "use strict";
 
+var _ = require('underscore');
+
 var theObject = Object.create(require('./common.js'));
 var Modules = require('../../server.js');
 
 var TRASH_ROOM = 'trash';
 
 theObject.getAllFileObjects = function(cb) {
-    var that = this;
     var fileObjects = new Array();
-    var containerTag = that.getAttribute('name');
-
-    Modules.Connector.listRooms(function(n, rooms) {
-        
-        function recursive(i) {
-            if (i < rooms.length) {
-                var room = rooms[i];
-                
-                if (room.id == TRASH_ROOM) {
-                    recursive(i + 1);
-                } else {
-                    Modules.Connector.getInventory(room.id, true, function(inventory) {
-                        for (var k in inventory) {
-                            if (inventory[k].type == "File" && containerTag == inventory[k].attributes.mainTag) {
-                                fileObjects.push(inventory[k]);
-                            }
-                        }
-                        
-                        recursive(i + 1);
-                    });
-                }
-            } else {
-                cb(fileObjects);
-            }
-        }
-        
-        recursive(0);
+    var containerTag = this.getAttribute('name');
+    
+    Modules.Connector.getObjectDataByQuery({mainTag: containerTag}, function(objects) {
+        cb(_.filter(objects, function(obj){ return obj.inRoom != TRASH_ROOM; }));
     });
 }
 

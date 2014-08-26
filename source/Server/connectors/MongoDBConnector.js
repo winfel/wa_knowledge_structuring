@@ -719,6 +719,37 @@ function getObjectsByRoom (roomID) {
 }
 
 /**
+*   Returns objects of the DB that match the query
+*   i.e. query = {mainTag: 'xx' } 
+*   @function getObjectDataByQuery
+*   @param query a json object containing the query
+*   @param callback callback to call
+*   @return a list of objects
+*/
+mongoConnector.getObjectDataByQuery = function(query, callback) {
+    objects.find(query, function (err, objects) {
+        var objectsList = [];
+        
+        function pushToObjects(i) {
+            if (i < objects.length) {
+                buildObjectFromDBObject(objects[i].inRoom, objects[i], function(data) {
+                    objectsList.push(data);
+                    pushToObjects(i+1);
+                });
+            } else {
+                callback(objectsList);
+            }
+        }
+        
+        if (!err && objects !== undefined && objects.length > 0) { 
+            pushToObjects(0);
+        } else {
+            callback(objectsList);
+        }
+    });
+}
+
+/**
 * returns the room hierarchy starting by given roomID as root
 *   @function getRoomHierarchy
 *   @param roomID
