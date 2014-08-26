@@ -23,7 +23,7 @@ DBManager.getDocuments = function(object, collection, callback, column) {
 
   Dispatcher.registerCall("dbDocuments" + object.id, function(documents) {
     // call the callback
-    if(callback)
+    if (callback)
       callback(documents);
     // deregister
     Dispatcher.removeCall("dbDocuments" + object.id);
@@ -47,17 +47,18 @@ DBManager.getDocuments = function(object, collection, callback, column) {
  * @returns {undefined}
  */
 DBManager.addDocument = function(object, collection, data, callback) {
-  
-  Dispatcher.registerCall("dbDocumentAdded" + object.id, function(result) {
-    // call the callback
-    if(callback)
+  if (callback) {
+    Dispatcher.registerCall("dbDocumentAdded" + object.id, function(result) {
+      // call the callback
       callback(result);
-    // deregister
-    Dispatcher.removeCall("dbDocumentAdded" + object.id);
-  });
+      // deregister
+      Dispatcher.removeCall("dbDocumentAdded" + object.id);
+    });
+  }
 
   // The responce should be some sort of broadcast to users with a manager role...
   Modules.SocketClient.serverCall('dbAddDocument', {
+    'singleResponse': (callback ? true : false),
     'collection': collection,
     'object': {id: object.id, type: object.type},
     'data': data
