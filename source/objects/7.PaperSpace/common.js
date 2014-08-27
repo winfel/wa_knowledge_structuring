@@ -60,7 +60,9 @@ PaperSpace.register = function(type) {
 
   }, true);
 
-  this.registerAttribute('Project name', {type: 'text',standard:'Type your name here' ,hidden: false});
+  this.registerAttribute('Project name', {type: 'text',standard:'Type your name here' ,hidden: false, changedFunction: function(object, value) {
+      UserManager.setDataOfSpaceWithDest("ProjectNames","name",value);
+  }});
 
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
   this.registerAttribute('bigIcon', {hidden: true});
