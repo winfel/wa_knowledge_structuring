@@ -62,9 +62,12 @@ PaperSpace.register = function(type) {
 
   this.registerAttribute('Project name', {type: 'text',standard:'Type your name here' ,hidden: false, changedFunction: function(object, value) {
       UserManager.setDataOfSpaceWithDest("ProjectNames","name",value);
+<<<<<<< HEAD
 
       // store id of the corresponding project
       UserManager.setDataOfSpaceWithDest("ProjectNames","ID#Name",object.id+"#"+value);
+=======
+>>>>>>> c35f131a76899118a71bd05a185079f36bb51688
   }});
 
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
