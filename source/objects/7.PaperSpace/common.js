@@ -61,6 +61,62 @@ PaperSpace.register = function(type) {
   }, true);
 
   this.registerAttribute('Project name', {type: 'text',standard:'Type your name here' ,hidden: false, changedFunction: function(object, value) {
+    var dbCleanUpForNames = function(o){
+
+        // function is not supported at the moment
+        return;
+
+        var deleteNames = [];
+        var arr = new Array();
+
+        if(d != "error"){
+          var key;
+          for(key in d[0].value){
+
+            // store old names of this paperspace (via id)
+            if(true /* object.id is not in the system anymore */){
+              deleteNames.push(d[0].value[key].split("#")[1]);
+            }else{
+              arr.push(d[0].value[key]);
+            }
+          }
+          UserManager.removeDataOfSpaceWithDest("ProjectNames","ID#Name");
+        }
+        
+        if(arr.indexOf(object.id+"#"+value) == -1){
+          arr.push(object.id+"#"+value);
+        }
+
+        // store data
+        setTimeout(function(){UserManager.setDataOfSpaceWithDest("ProjectNames","ID#Name",arr) }, 500);
+
+        // store name
+        UserManager.getDataOfSpaceWithDest("ProjectNames", "name" , function(d){
+
+          var arr = new Array();
+
+          if(d != "error"){
+            var key;
+            for(key in d[0].value){
+
+              // if name is not an old name of this paperpspace -> store it
+              if(deleteNames.indexOf(d[0].value[key]) == -1){
+                arr.push(d[0].value[key]);
+              }
+            }
+            UserManager.removeDataOfSpaceWithDest("ProjectNames","name");
+          }
+
+          if(arr.indexOf(value) == -1){
+            arr.push(value);
+          }
+
+          setTimeout(function(){ UserManager.setDataOfSpaceWithDest("ProjectNames", "name", arr) }, 500);
+
+        });
+
+      };
+
     var oldNames = [];
 
       // store id of the corresponding project
