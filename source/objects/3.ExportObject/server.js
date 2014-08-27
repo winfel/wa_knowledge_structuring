@@ -11,7 +11,16 @@ var theObject=Object.create(require('./common.js'));
 var Modules=require('../../server.js');
 var exportableTypes = ['PaperSpace', 'PaperChapter', 'PaperObject']; // , 'File'
 
-theObject.exportAsFile = function(type, position) {
+var calls = {};
+theObject.calls = calls;
+
+/**
+ * Exports the associated files of the ExportObject
+ * @param type	one of html, txt, pdf or image_*
+ * @param position	position in form {x:47, y:11} where the created file should be dropped; optional
+ * @param createFile	callback of type function(filename, data, mimeType); optional
+ */
+theObject.exportAsFile = function(type, position, createFile) {
 	var that = this;
 	if(!type) {
 		type = this.getAttribute('exportFormat');
@@ -27,20 +36,23 @@ theObject.exportAsFile = function(type, position) {
 		outputContent = [],
 		outputCount = 0;
 
-	var createFile = function(filename, data, mimeType) {
-		Modules.ObjectManager.createObject(that.getRoomID(), "File", {
-			x: position.x,
-			y: position.y,
-			hasContent : true,	// prevent calling justCreated() after object
-								// creation (would display file upload dialog)
-			name: filename,
-			visible: false,
-		}, data, that.context, function(dummy, newObject) {
-			newObject.set('mimeType',mimeType);
-			newObject.set('visible', true);
-			newObject.persist();
-		});
-	};
+	// createFile performs as a callback here
+	if(!createFile) {
+		createFile = function(filename, data, mimeType) {
+			Modules.ObjectManager.createObject(that.getRoomID(), "File", {
+				x: position.x,
+				y: position.y,
+				hasContent : true,	// prevent calling justCreated() after object
+									// creation (would display file upload dialog)
+				name: filename,
+				visible: false,
+			}, data, that.context, function(dummy, newObject) {
+				newObject.set('mimeType',mimeType);
+				newObject.set('visible', true);
+				newObject.persist();
+			});
+		};
+	}
 
 	var addContent = function(object, content) {
 		outputContent[inputPaperIds.indexOf(object.getId())] = content;
@@ -168,6 +180,22 @@ theObject.exportAsFile = function(type, position) {
 	});
 };
 theObject.exportAsFile.public = true;
+
+/**
+ * registers an export job in the global EportObject.calls and returns a url, under which the job is executed
+ */
+theObject.exportAsUrl = function(type, callback) {
+	var that = this;
+	// generate a random id for that call
+	var callid = '' + (new Date()).getTime() + '-' + (Math.random()*10000000);
+	calls[callid] = function(cb) {
+		that.exportAsFile(type, false, cb);
+		// if delete is enabled, every url works exactly once; on the other hand, without delete the environment could be polluted
+		//delete calls[callid];
+	};
+	callback('/getExport/' + callid);
+}
+theObject.exportAsUrl.public = true;
 
 /**
  * gives the connected inputPapers as ordered object array to the callback

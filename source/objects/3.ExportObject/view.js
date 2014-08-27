@@ -229,11 +229,7 @@ ExportObject.createExportIcons = function(rep) {
 		.dblclick(function(event) {
 			event.preventDefault();
 			event.stopPropagation();
-			var paperstring = '';
-			that.getAttribute('inputPapers').forEach(function(paper) {
-				paperstring += paper + '\n';
-			});
-			window.alert('Export\n' + paperstring + 'to ' + $(this).data('exportFormat'));
+			that.exportAsUrl($(this).data('exportFormat'));
 		});
 
 	}

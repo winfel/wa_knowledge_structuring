@@ -317,6 +317,24 @@ app.get('/getContent/:roomID/:objectID/:p3/:hash', function(req, res, next) {
 });
 });
 
+/**
+ * returns the contents of the files associated with an export object, converted
+ * calls a predefined prepared call in ExportObject
+ */
+app.get('/getExport/:requestId', function(req, res, next) {
+	var ExportObject = Modules.ObjectManager.getPrototype('ExportObject');
+	if(!ExportObject.calls[req.params.requestId]) {
+		res.send(404, 'Not found');
+	}
+
+	// call deferred export
+	ExportObject.calls[req.params.requestId](function(filename, data, mimetype) {
+		res.set('Content-Type', mimetype);
+		res.set('Content-Disposition', 'inline; filename="' + filename + '"');
+		res.send(200, new Buffer(data));
+	});
+});
+
 app.get('/getPreviewContent/:roomID/:objectID/:p3/:hash', function(req, res, next) {
   Modules.ObjectManager.getObject(req.params.roomID, req.params.objectID, req.context, function(object) {
 
