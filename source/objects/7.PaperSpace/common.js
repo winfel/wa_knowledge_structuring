@@ -61,10 +61,48 @@ PaperSpace.register = function(type) {
   }, true);
 
   this.registerAttribute('Project name', {type: 'text',standard:'Type your name here' ,hidden: false, changedFunction: function(object, value) {
-      UserManager.setDataOfSpaceWithDest("ProjectNames","name",value);
+
+      UserManager.getDataOfSpaceWithDest("ProjectNames", "name" , function(d){
       
+        var arr = new Array();
+                
+        if(d != "error"){
+          var key;
+          for(key in d[0].value){
+            arr.push(d[0].value[key]);
+          }
+          UserManager.removeDataOfSpaceWithDest("ProjectNames","name");
+        }
+        
+        if(arr.indexOf(value) == -1){
+          arr.push(value);
+        }
+            
+        setTimeout(function(){ UserManager.setDataOfSpaceWithDest("ProjectNames", "name", arr) }, 500);
+      
+      });
+
+
       // store id of the corresponding project
-      UserManager.setDataOfSpaceWithDest("ProjectNames","ID#Name",object.id+"#"+value);
+    UserManager.getDataOfSpaceWithDest("ProjectNames", "name" , function(d){
+      
+        var arr = new Array();
+                
+        if(d != "error"){
+          var key;
+          for(key in d[0].value){
+            arr.push(d[0].value[key]);
+          }
+          UserManager.removeDataOfSpaceWithDest("ProjectNames","name");
+        }
+        
+        if(arr.indexOf(object.id+"#"+value) == -1){
+          arr.push(object.id+"#"+value);
+        }
+            
+        setTimeout(function(){UserManager.setDataOfSpaceWithDest("ProjectNames","ID#Name",arr) }, 500);
+      
+      });
   }});
 
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
