@@ -13,7 +13,7 @@ var Modules=require('../../server.js');
  * @classdesc Common elements for view and server
  */
 
-var ExportObject=Object.create(Modules.ObjectManager.getPrototype('IconObject'));
+var ExportObject=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
 /**
  * Registers the object (attributes and actions).
@@ -30,26 +30,40 @@ ExportObject.register = function(type) {
 
     // Registering the object
 
-    IconObject = Modules.ObjectManager.getPrototype('IconObject');
-    IconObject.register.call(this, type);
+    //IconObject = Modules.ObjectManager.getPrototype('IconObject');
+    GeneralObject = Modules.ObjectManager.getPrototype('GeneralObject');
+    GeneralObject.register.call(this, type);
 
     this.makeSensitive();
 
-    this.registerAttribute('bigIcon', {
-        type: 'boolean',
-        standard: true,
-        
-        changedFunction: function(object) {
-            object.updateIcon();
-        },
-        checkFunction: function(object, value) {
-            if (object.getAttribute("preview")) return "icon size not changeable when preview is shown";
-        }
-    });
-
+	this.registerAttribute('width',{hidden:true});
+	this.registerAttribute('height',{hidden:true});
     this.registerAttribute('exportFormat', {type: 'selection', standard: 'text', 
         options: [ 'text', 'pdf', 'html', 'image_png', 'image_jpg', 'image_svg' ], category: 'Basic'});
+	this.registerAttribute('inputPapers', {type: 'list', standard: [], category: 'Basic'});
 };
+
+
+/**
+ * Exports connected input files
+ *
+ * @this {File}
+ * @see objects/1.GeneralObject/client.js
+ * @see objects/1.GeneralObject/common.js
+ * @see objects/3.File/client.js
+ */
+ExportObject.execute=function(event){
+	this.exportAsFile();
+}
+
+/**
+ * Returns always false.
+ *
+ * @return {boolean} false
+ */
+ExportObject.isResizable=function(){
+	return false;
+}
 
 ExportObject.register('ExportObject');
 ExportObject.isCreatable=true;
