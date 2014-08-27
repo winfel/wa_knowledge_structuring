@@ -473,10 +473,30 @@ GlobalContainer.addFiles = function(files){
 				
 				$("div.addremove-menu").remove();
 			});
+			
+			var padding = 25;
+			
+			for(var i = 0; i < that.PaperSpaces.length; i++){
+			
+				$("<div id=menu_for_"+id+" class='addremove-menu'>Add to "+that.PaperSpaces[i]+"</div>")
+				.appendTo("body")
+				.css({top: (parseInt(event.pageY)+padding) + "px", left: event.pageX + "px"})
+				.on("click", function(event){	
+						
+					that.sendNewReference(this.id.split("_")[2], event.target.innerHTML.split(' ')[2]);
+					
+					$("div.addremove-menu").remove();
+				});
+					
+				padding = padding + 25;
+				
+			}
 		});
 		
 	}	
-		
+	
+	this.getAllPaperSpaces();
+	
 }
 
 GlobalContainer.upd = function(){

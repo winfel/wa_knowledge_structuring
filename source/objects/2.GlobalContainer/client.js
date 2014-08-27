@@ -22,6 +22,7 @@ GlobalContainer.options = {
 }
 
 GlobalContainer.Files = new Array();
+GlobalContainer.PaperSpaces = new Array();
 
 GlobalContainer.afterServerCall = function(files){
 	var con = this;
@@ -75,6 +76,31 @@ GlobalContainer.sendNewFavourite = function(fav){
 }
 
 
+GlobalContainer.sendNewReference = function(ref, paperspace){
+		
+	UserManager.getDataOfSpaceWithDest(paperspace, "references" , function(d){
+	
+		var arr = new Array();
+						
+		if(d != "error"){
+			var key;
+			for(key in d[0].value){
+				arr.push(d[0].value[key]);
+			}
+			UserManager.removeDataOfSpaceWithDest(paperspace, "references" );
+		}
+		
+		if(arr.indexOf(ref) == -1){
+			arr.push(ref);
+		}
+				
+		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(paperspace, "references", arr) }, 500);
+	
+	});
+		
+}
+
+
 GlobalContainer.changeMainTag = function(objectId, newTag, roomId){
 
 	var d = {
@@ -85,6 +111,25 @@ GlobalContainer.changeMainTag = function(objectId, newTag, roomId){
 
 	this.serverCall("changeMainTag", d);
 
+}
+
+
+GlobalContainer.getAllPaperSpaces = function(){
+
+	var that = this;
+	this.PaperSpaces = new Array();
+
+	UserManager.getDataOfSpaceWithDest("ProjectNames", "name" , function(d){
+	
+		if(d != "error"){
+			var key;
+			for(key in d[0].value){
+				that.PaperSpaces.push(d[0].value[key]);
+			}
+		}
+	
+	});
+	
 }
 
 

@@ -37,9 +37,10 @@ ReferenceContainer.afterServerCall = function(files){
 	
 }
 
+
 ReferenceContainer.removeReference = function(ref){
 		
-	UserManager.getDataOfSpaceWithDest(ObjectManager.getCurrentRoom(), "references" , function(d){
+	UserManager.getDataOfSpaceWithDest(ObjectManager.getCurrentRoom().name, "references" , function(d){
 	
 		var arr = new Array();
 			
@@ -50,10 +51,10 @@ ReferenceContainer.removeReference = function(ref){
 					arr.push(d[0].value[key]);
 				}
 			}
-			UserManager.removeDataOfSpaceWithDest(ObjectManager.getCurrentRoom(), "references");
+			UserManager.removeDataOfSpaceWithDest(ObjectManager.getCurrentRoom().name, "references");
 		}
 				
-		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(ObjectManager.getCurrentRoom(), "references", arr) }, 500);
+		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(ObjectManager.getCurrentRoom().name, "references", arr) }, 500);
 	
 	});
 	
@@ -61,8 +62,8 @@ ReferenceContainer.removeReference = function(ref){
 
 
 ReferenceContainer.getFiles = function(){
-		
-	this.serverCall("getAllReferenceFileObjects", this.id, ObjectManager.getCurrentRoom(), ReferenceContainer.afterServerCall);
+			
+	this.serverCall("getAllReferenceFileObjects", this.id, ObjectManager.getCurrentRoom().name, ReferenceContainer.afterServerCall);
 		
 }
 
