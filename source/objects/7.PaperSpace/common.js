@@ -131,6 +131,16 @@ PaperSpace.register = function(type) {
             // store old names of this paperspace (via id)
             if(d[0].value[key].indexOf(object.id) > -1){
               oldNames.push(d[0].value[key].split("#")[1]);
+
+              // copy reference array which is needed for the reference container
+              UserManager.getDataOfSpaceWithDest(d[0].value[key].split("#")[1], "references" , function(d2){
+                setTimeout(function(){UserManager.setDataOfSpaceWithDest(value, "references" , d2[0].value) }, 750);
+
+                // remove old reference
+                UserManager.removeDataOfSpaceWithDest(d[0].value[key].split("#")[1], "references");
+
+                // => Done with copying the reference array
+              });
             }else{
               arr.push(d[0].value[key]);
             }
@@ -144,6 +154,10 @@ PaperSpace.register = function(type) {
 
         // store data
         setTimeout(function(){UserManager.setDataOfSpaceWithDest("ProjectNames","ID#Name",arr) }, 500);
+
+        // -------
+        // done with part 1
+        // -------
 
         // store name
         UserManager.getDataOfSpaceWithDest("ProjectNames", "name" , function(d){
