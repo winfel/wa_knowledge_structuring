@@ -59,5 +59,6 @@ PaperCombinator.register('PaperCombinator');
 PaperCombinator.isCreatable = true;
 
 PaperCombinator.category = 'Files';
+PaperCombinator.menuItemLabel = 'paper.combinator';
 
 module.exports = PaperCombinator;

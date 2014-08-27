@@ -39,6 +39,7 @@ var paintings;
 */
 mongoConnector.init = function(theModules) {
 	var that = this;
+	Modules = theModules;
     that.Modules = theModules;
     monk = require('monk'); 
     console.log();
@@ -75,11 +76,19 @@ mongoConnector.login = function(username, password, externalSession, context, rp
     this.Modules.Log.debug("Login request for user '" + username + "'");
     
     var data = {};
-    data.username = username.toLowerCase();
-    data.password = password;
-    data.home = "public";
-    
-    rp(data);
+	data.username = username.toLowerCase();
+	data.password = password;
+	data.home = "public";
+
+	Modules.UserDAO.usersByUserName(data.username, function(err, users) {
+		if (!users || users.length == 0) {
+			rp(false);
+		} else {
+			data = users[0];
+			data.home = "public";
+			rp(data);
+		}
+	});
 }
 
 /**
@@ -252,16 +261,22 @@ function buildObjectFromDBObject (roomID, attr, callback) {
     data.attributes.inRoom = roomID;
     data.attributes.hasContent = false;
     
-    GridStore.exist(mongoConnector.db, attributes.id, function(err, result) {
-    	if (err) { throw err; }
-    	if (result) {
-    		//console.log ("File " + attributes.id + "  exist");
-    		data.attributes.hasContent = true;
-            data.attributes.contentAge = new Date().getTime();	
-    	}
-    	
-    	callback(data);
-    });
+    try {
+        GridStore.exist(mongoConnector.db, attributes.id, function(err, result) {
+        	if (err) { throw err; }
+        	if (result) {
+        		//console.log ("File " + attributes.id + "  exist");
+        		data.attributes.hasContent = true;
+                data.attributes.contentAge = new Date().getTime();	
+        	}
+        	
+        	callback(data);
+        });
+    } catch(ex) {
+		Modules.Log.warn(ex);
+		console.log('... this happens then and when and can be ignored.\nIvan or Alejandro will fix it... hopefully... ;-)');
+		console.dir(arguments);
+    }
 }
 /**
  *  Get room data or create room, if doesn't exist yet.
@@ -701,6 +716,37 @@ function getRoomFromDB(roomID) {
 */
 function getObjectsByRoom (roomID) {
     return objects.find({inRoom: roomID});
+}
+
+/**
+*   Returns objects of the DB that match the query
+*   i.e. query = {mainTag: 'xx' } 
+*   @function getObjectDataByQuery
+*   @param query a json object containing the query
+*   @param callback callback to call
+*   @return a list of objects
+*/
+mongoConnector.getObjectDataByQuery = function(query, callback) {
+    objects.find(query, function (err, objects) {
+        var objectsList = [];
+        
+        function pushToObjects(i) {
+            if (i < objects.length) {
+                buildObjectFromDBObject(objects[i].inRoom, objects[i], function(data) {
+                    objectsList.push(data);
+                    pushToObjects(i+1);
+                });
+            } else {
+                callback(objectsList);
+            }
+        }
+        
+        if (!err && objects !== undefined && objects.length > 0) { 
+            pushToObjects(0);
+        } else {
+            callback(objectsList);
+        }
+    });
 }
 
 /**

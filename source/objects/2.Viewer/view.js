@@ -5,7 +5,11 @@
  *
  */
 
-
+/**
+ * 
+ * @param {type} external
+ * @returns {Viewer.draw@call;getRepresentation}
+ */
 Viewer.draw = function(external) {
 
   var rep = this.getRepresentation();
@@ -370,7 +374,7 @@ Viewer.initGUI = function(rep) {
           });
 
         } else {
-          commentContainer.html('<p class="commentHeader" title="' + data.date.toLocaleString() + '">' + user + ' wrote</p>' +
+          commentContainer.html('<p class="commentHeader" title="' + data.date.toLocaleString() + '">' + user + self.translate(GUI.currentLanguage, ' wrote') + '</p>' +
                   '<p>' + data.message + '</p>');
 
           // Show/Hide the comment on a click.
@@ -398,98 +402,93 @@ Viewer.initGUI = function(rep) {
       return commentContainer;
     };
 
-    self.linkCommentToHighlights = function() {
+    var linkCommentWithHighlight = function(commentContainer, data, cssClass, dataAttributeName) {
+            commentContainer = $(commentContainer);
+            commentContainer.off("hover");
+      var commentHighlight = $(".highlighted." + cssClass + "[" + dataAttributeName + "='" + data.hash + "']", frameDocument)[0];
+
+            if (commentHighlight) {
+              commentHighlight = $(commentHighlight);
+              commentHighlight.off("hover");
+
+              // Highlight the highlighting
+              commentContainer.hover(function() {
+                commentHighlight.addClass('remotehover');
+              }, function() {
+                commentHighlight.removeClass('remotehover');
+              });
+
+              // Highlight the comment
+              commentHighlight.hover(function() {
+                commentContainer.addClass('remotehover');
+              }, function() {
+                commentContainer.removeClass('remotehover');
+              });
+            } else {
+              // 
+              commentContainer.addClass("noreference");
+            }
+    };
+
+    self.loadTextComments = function() {
       DBManager.getDocuments(self, "comments", function(docs) {
 
         for (var i in docs) {
           (function(doc) {
             // Javascript has no block scope... Let's use the function scope instead!
             var commentContainer = createCommentOnViewer(doc.user, doc.data);
-            commentContainer = $(commentContainer);
-            commentContainer.off("hover");
-
-            var commentHighlight = $(".highlighted.commented[data-comment='" + doc.data.hash + "']", frameDocument)[0];
-
-            if (commentHighlight) {
-              commentHighlight = $(commentHighlight);
-              commentHighlight.off("hover");
-
-              // Highlight the highlighting
-              commentContainer.hover(function() {
-                commentHighlight.addClass('remotehover');
-              }, function() {
-                commentHighlight.removeClass('remotehover');
-              });
-
-              // Highlight the comment
-              commentHighlight.hover(function() {
-                commentContainer.addClass('remotehover');
-              }, function() {
-                commentContainer.removeClass('remotehover');
-              });
-            } else {
-              // 
-              commentContainer.addClass("noreference");
-            }
+            linkCommentWithHighlight(commentContainer, doc.data, "commented", "data-comment");
           })(docs[i]);
         }
       });
     };
 
-    self.linkAudioCommentToHighlights = function() {
-      
-      console.log("linkAudioCommentToHighlights called");
+    self.loadAudioComments = function() {
       
       DBManager.getDocuments(self, "comments_audio", function(docs) {
-        
-        console.log("documents received!");
         
         for (var i in docs) {
           (function(doc) {
             // Javascript has no block scope... Let's use the function scope instead!
             var commentContainer = createCommentOnViewer(doc.user, doc.data);
-            commentContainer = $(commentContainer);
-            commentContainer.off("hover");
-
-            var commentHighlight = $(".highlighted.audio[data-audioobject='" + doc.data.hash + "']", frameDocument)[0];
-
-            if (commentHighlight) {
-              commentHighlight = $(commentHighlight);
-              commentHighlight.off("hover");
-
-              // Highlight the highlighting
-              commentContainer.hover(function() {
-                commentHighlight.addClass('remotehover');
-              }, function() {
-                commentHighlight.removeClass('remotehover');
-              });
-
-              // Highlight the comment
-              commentHighlight.hover(function() {
-                commentContainer.addClass('remotehover');
-              }, function() {
-                commentContainer.removeClass('remotehover');
-              });
-            } else {
-              // 
-              commentContainer.addClass("noreference");
-            }
+            linkCommentWithHighlight(commentContainer, doc.data, "audio", "data-audioobject");
           })(docs[i]);
         }
       });
     };
+
+    Viewer.addComment = function(data) {
+
+      var cssClass = "commented";
+      var dataAttribute = "data-comment";
+
+      if (data.type.indexOf("audio") >= 0) {
+        cssClass = "audio";
+        dataAttribute = "data-audioobject";
+      }
+
+      var commentContainer = createCommentOnViewer(data.user, data);
+      linkCommentWithHighlight(commentContainer, data, cssClass, dataAttribute);
+    };
+
     /**
      * 
      * @returns {undefined}
      */
+    var loadedInitially = false;
+
     self.loadHighlights = function() {
       var jsonStr = self.getAttribute('highlights');
       if (jsonStr != undefined && jsonStr != '') {
         highlighter.removeHighlights();
         highlighter.deserializeHighlights(jsonStr);
         //window.setTimeout(self.addAudioToHighlights, 50);
-        window.setTimeout(self.linkCommentToHighlights, 50);
-        window.setTimeout(self.linkAudioCommentToHighlights, 50);
+
+        if (!loadedInitially) {
+          window.setTimeout(self.loadTextComments, 100);
+          window.setTimeout(self.loadAudioComments, 100);
+          loadedInitially = true;
+      }
       }
     };
 
@@ -537,41 +536,47 @@ Viewer.initGUI = function(rep) {
       theDialogContainer.html('<textarea class="addCommentText" style="width: 96%; height: 98%;"></textarea>');
 
       var theDialog = theDialogContainer.dialog({
-        title: "Type your comment...",
+        title: self.translate(GUI.currentLanguage, "Type your comment..."),
         height: 300,
         width: 350,
         modal: true,
-        buttons: {
-          "Submit": function() {
-            var text = $(".addCommentText", theDialogContainer).val().trim();
+        buttons: [
+          {
+            text: GUI.translate("Submit"),
+            click: function() {
+              var text = $(".addCommentText", theDialogContainer).val().trim();
 
-            if (text == "") {
-              alert("Your comment is empty. Try again with some letters!");
-            } else {
-              var pageid = element.parents(".pf").attr("id");
-              var position = getGridPosition(element);
+              if (text == "") {
+                alert(self.translate(GUI.currentLanguage, "Your comment is empty. Try again with some letters!"));
+              } else {
+                var pageid = element.parents(".pf").attr("id");
+                var position = getGridPosition(element);
 
-              var date = new Date();
-              var data = {
-                'type': "text/plain",
-                'message': text,
-                'page': pageid,
-                'position': position,
-                'date': date,
-                'hash': MD5(text + "_" + date.getTime())
-              };
+                var date = new Date();
+                var data = {
+                  'type': "text/plain",
+                'user': GUI.username,
+                  'message': text,
+                  'page': pageid,
+                  'position': position,
+                  'date': date,
+                  'hash': MD5(text + "_" + date.getTime())
+                };
 
-              DBManager.addDocument(self, "comments", data);
+                DBManager.addDocument(self, "comments", data);
 
-              callback(data);
-
-              theDialog.dialog("close");
+                callback(data);
+                theDialog.dialog("close");
+              }
             }
           },
-          "Cancel": function() {
-            theDialog.dialog("close");
+          {
+            text: GUI.translate("Cancel"),
+            click: function() {
+              theDialog.dialog("close");
+            }
           }
-        },
+        ],
         close: function() {
           // Do something after closing...
         }
@@ -608,19 +613,31 @@ Viewer.initGUI = function(rep) {
      * @returns {undefined}
      */
     var addAudioDialog = function(element, callback) {
+      var t = { // get translations
+		clicktostart :		self.translate(GUI.currentLanguage, 'Click to start recording.'),
+		clicktostop :		self.translate(GUI.currentLanguage, 'Recording... Click to stop recording.'),
+		clicktoplay :		self.translate(GUI.currentLanguage, 'Click to play the audio file.'),
+		clicktopause :		self.translate(GUI.currentLanguage, 'Click to pause the audio file.'),
+		clicktostopaudio :	self.translate(GUI.currentLanguage, 'Click to stop the audio file.'),
+		askforaccessagain :	self.translate(GUI.currentLanguage, 'If you want to use the audio comment funtionality, you have to grant me access to your microphone. '
+                  + 'Do you want me to ask for access again?'),
+		noaccesstomic : 	self.translate(GUI.currentLanguage, 'No access to your microphone'),
+		createaudio : 		self.translate(GUI.currentLanguage, "Create an audio comment..."),
+		haventrecorded:		self.translate(GUI.currentLanguage, "Your haven't recorded anything yet!"),
+      };
       var theDialogContainer = $('<div>');
       theDialogContainer.html(
               '<p></p>' +
               '<ul>' +
               '</ul>' +
               '<div class="btn-group">' +
-              '<input type="image" class="btn btnStartRecording lastChild" title="Click to start recording." src="/guis.common/images/oxygen/32x32/actions/media-recording-stopped.png" />' +
-              '<input type="image" class="btn btnStopRecording firstChild" title="Recording... Click to stop recording." src="/guis.common/images/oxygen/32x32/actions/media-recording.png" />' +
+              '<input type="image" class="btn btnStartRecording lastChild" title="' + t.clicktostart + '" src="/guis.common/images/oxygen/32x32/actions/media-recording-stopped.png" />' +
+              '<input type="image" class="btn btnStopRecording firstChild" title="' + t.clicktostop + '" src="/guis.common/images/oxygen/32x32/actions/media-recording.png" />' +
               '</div>' +
               '<div class="btn-group">' +
-              '<input disabled="disabled" type="image" class="btn btnPlayback btnPlaybackStart" title="Click to play the audio file." src="/guis.common/images/oxygen/32x32/actions/media-playback-start.png" />' +
-              '<input disabled="disabled" type="image" class="btn btnPlayback btnPlaybackPause firstChild" title="Click to pause the audio file." src="/guis.common/images/oxygen/32x32/actions/media-playback-pause.png" />' +
-              '<input disabled="disabled" type="image" class="btn btnPlayback btnPlaybackStop" title="Click to stop the audio file." src="/guis.common/images/oxygen/32x32/actions/media-playback-stop.png" />' +
+              '<input disabled="disabled" type="image" class="btn btnPlayback btnPlaybackStart" title="' + t.clicktoplay + '" src="/guis.common/images/oxygen/32x32/actions/media-playback-start.png" />' +
+              '<input disabled="disabled" type="image" class="btn btnPlayback btnPlaybackPause firstChild" title="' + t.clicktopause + '" src="/guis.common/images/oxygen/32x32/actions/media-playback-pause.png" />' +
+              '<input disabled="disabled" type="image" class="btn btnPlayback btnPlaybackStop" title="' + t.clicktostopaudio + '" src="/guis.common/images/oxygen/32x32/actions/media-playback-stop.png" />' +
               '</div>' +
               ''
               );
@@ -656,21 +673,26 @@ Viewer.initGUI = function(rep) {
           btnStopRecording.toggle();
         } else {
           var html = '<div><p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 100px 0;"></span>'
-                  + 'If you want to use the audio comment funtionality, you have to grant me access to your microphone. '
-                  + 'Do you want me to ask for access again?'
+                  + t.askforaccessagain
                   + '</p></div>';
 
-          $(html).dialog({title: 'No access to your microphone',
+          $(html).dialog({title: t.noaccesstomic,
             resizable: false, width: 400, height: 200, modal: true,
-            buttons: {
-              "Yes": function() {
-                initAudio();
-                $(this).dialog("close");
+            buttons: [
+              {
+                text:GUI.translate("Yes"),
+                click: function() {
+                  initAudio();
+                  $(this).dialog("close");
+                }
               },
-              "No": function() {
-                $(this).dialog("close");
+              {
+                text:GUI.translate("No"),
+                click: function() {
+                  $(this).dialog("close");
+                }
               }
-            }
+            ]
           });
         }
       });
@@ -720,39 +742,45 @@ Viewer.initGUI = function(rep) {
       });
 
       var theDialog = theDialogContainer.dialog({
-        title: "Create an audio comment...",
+        title: t.createaudio,
         height: 300,
         width: 350,
         modal: true,
-        buttons: {
-          "Submit": function() {
-            if (waveBase64) {
-              var pageid = element.parents(".pf").attr("id");
-              var position = getGridPosition(element);
+        buttons: [
+          {
+            text:GUI.translate("Submit"),
+            click: function() {
+              if (waveBase64) {
+                var pageid = element.parents(".pf").attr("id");
+                var position = getGridPosition(element);
 
-              var date = new Date();
-              var data = {
-                'type': waveMimeType,
-                'message': waveBase64,
-                'page': pageid,
-                'position': position,
-                'date': date,
-                'hash': MD5(GUI.username + "_audioobject_" + date.getTime())
-              };
+                var date = new Date();
+                var data = {
+                  'type': waveMimeType,
+                'user': GUI.username,
+                  'message': waveBase64,
+                  'page': pageid,
+                  'position': position,
+                  'date': date,
+                  'hash': MD5(GUI.username + "_audioobject_" + date.getTime())
+                };
 
-              DBManager.addDocument(self, "comments_audio", data);
+                DBManager.addDocument(self, "comments_audio", data);
 
-              callback(data);
-
-              theDialog.dialog("close");
-            } else {
-              alert("Your haven't recorded anything yet!");
+                callback(data);
+                theDialog.dialog("close");
+              } else {
+                alert(t.haventrecorded);
+              }
             }
           },
-          "Cancel": function() {
-            theDialog.dialog("close");
+          {
+            text:GUI.translate("Cancel"),
+            click: function() {
+              theDialog.dialog("close");
+            }
           }
-        },
+        ],
         close: function() {
           // Do something after closing...
         }
@@ -767,7 +795,8 @@ Viewer.initGUI = function(rep) {
       }
 
       theDialog.dialog("open");
-    };
+    }; // end addAudioDialog
+
 
     $(".btnRecord", viewerContainer).on("click", function() {
       initAudio();
@@ -789,6 +818,7 @@ Viewer.initGUI = function(rep) {
 };
 
 Viewer.createRepresentation = function(parent) {
+  var self = this;
   var rep = GUI.svg.other(parent, "foreignObject");
   rep.dataObject = this;
   var $rep = $(rep);
@@ -810,27 +840,41 @@ Viewer.createRepresentation = function(parent) {
 
   $body.append(header);
 
+  var t = {
+		highlight : 	self.translate(GUI.currentLanguage, 'Highlight the current selection (background color).'),
+		strike : 		self.translate(GUI.currentLanguage, 'Strike through the current selection.'),
+		scratch : 		self.translate(GUI.currentLanguage, 'Scratch out the current selection.'),
+		glow : 			self.translate(GUI.currentLanguage, 'Add a glow effect to this selection.'),
+		remove : 		self.translate(GUI.currentLanguage, 'Remove this highlighting.'),
+		comment : 		self.translate(GUI.currentLanguage, 'Add a comment for this selection.'),
+		record : 		self.translate(GUI.currentLanguage, 'Click to start recording.'),
+		twopage : 		self.translate(GUI.currentLanguage, 'Two page mode'),
+		singlepage : 	self.translate(GUI.currentLanguage, 'Single page mode'),
+		fullscreen : 	self.translate(GUI.currentLanguage, 'Fullscreen'),
+		restore : 		self.translate(GUI.currentLanguage, 'Restore Screen'),
+  };
+
   $(".buttonAreaLeft", header).html(
           '<div class="btn-group">' +
-          '<input disabled="disabled" type="image" class="btn btnFill btnHighlight" title="Highlight the current selection (background color)." src="/guis.common/images/oxygen/16x16/actions/format-fill-color.png" />' +
-          '<input disabled="disabled" type="image" class="btn btnStrike btnHighlight" title="Strike through the current selection." src="/guis.common/images/oxygen/16x16/actions/format-text-strikethrough.png" />' +
-          '<input disabled="disabled" type="image" class="btn btnScratchout btnHighlight" title="Scratch out the current selection." src="/guis.common/images/oxygen/16x16/actions/format-text-scratch-out.png" />' +
-          '<input disabled="disabled" type="image" class="btn btnGlow btnHighlight" title="Add a glow effect to this selection." src="/guis.common/images/oxygen/16x16/actions/format-text-glow.png" />' +
-          //'<input disabled="disabled" type="image" class="btn btnRemove" title="Remove this highlighting." src="/guis.common/images/oxygen/16x16/actions/media-record.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnFill btnHighlight" title="' + t.highlight + '" src="/guis.common/images/oxygen/16x16/actions/format-fill-color.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnStrike btnHighlight" title="' + t.strike + '" src="/guis.common/images/oxygen/16x16/actions/format-text-strikethrough.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnScratchout btnHighlight" title="' + t.scratch + '" src="/guis.common/images/oxygen/16x16/actions/format-text-scratch-out.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnGlow btnHighlight" title="' + t.glow + '" src="/guis.common/images/oxygen/16x16/actions/format-text-glow.png" />' +
+          //'<input disabled="disabled" type="image" class="btn btnRemove" title="' + t.remove + '" src="/guis.common/images/oxygen/16x16/actions/media-record.png" />' +
           '</div>' +
           '<div class="btn-group">' +
-          '<input disabled="disabled" type="image" class="btn btnAddComment btnHighlight" title="Add a comment for this selection." src="/guis.common/images/oxygen/16x16/actions/view-pim-notes-add.png" />' +
-          '<input disabled="disabled" type="image" class="btn btnRecord btnHighlight" title="Click to start recording." src="/guis.common/images/oxygen/16x16/actions/media-record.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnAddComment btnHighlight" title="' + t.comment + '" src="/guis.common/images/oxygen/16x16/actions/view-pim-notes-add.png" />' +
+          '<input disabled="disabled" type="image" class="btn btnRecord btnHighlight" title="' + t.record + '" src="/guis.common/images/oxygen/16x16/actions/media-record.png" />' +
           '</div>' +
           ''
           );
 
   $(".buttonAreaRight", header).html(
           '<div class="btn-group">' +
-          '<input type="image" class="btn btnTwopage" title="Two page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-new.png" />' +
-          '<input type="image" class="btn btnSinglepage firstChild" title="Single page mode" src="/guis.common/images/oxygen/16x16/actions/view-right-close.png" style="display: none;" />' +
-          '<input type="image" class="btn btnFullscreen lastChild" title="Fullscreen" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
-          '<input type="image" class="btn btnRestore" title="Restore Screen" src="/guis.common/images/oxygen/16x16/actions/view-restore.png" style="display: none;" />' +
+          '<input type="image" class="btn btnTwopage" title="' + t.twopage + '" src="/guis.common/images/oxygen/16x16/actions/view-right-new.png" />' +
+          '<input type="image" class="btn btnSinglepage firstChild" title="' + t.singlepage + '" src="/guis.common/images/oxygen/16x16/actions/view-right-close.png" style="display: none;" />' +
+          '<input type="image" class="btn btnFullscreen lastChild" title="' + t.fullscreen + '" src="/guis.common/images/oxygen/16x16/actions/view-fullscreen.png" />' +
+          '<input type="image" class="btn btnRestore" title="' + t.restore + '" src="/guis.common/images/oxygen/16x16/actions/view-restore.png" style="display: none;" />' +
           '</div>' +
           '');
 
@@ -920,7 +964,7 @@ Viewer.drawTitle = function(title) {
   if (rep.title) {
     $(".titleArea", rep).html('<span class="paperViewerTitle">' + rep.title + '</span><div title="' + rep.title + '" class="moveArea"></div>');
   } else {
-    $(".titleArea", rep).html('<span class="paperViewerTitle">No document...</span><div class="moveArea"></div>');
+    $(".titleArea", rep).html('<span class="paperViewerTitle">' + this.translate(GUI.currentLanguage, 'No document...') + '</span><div class="moveArea"></div>');
   }
 };
 

@@ -145,6 +145,7 @@ PaperChapter.execute = function(openInNewWindow) {
 PaperChapter.register('PaperChapter');
 PaperChapter.isCreatable = true;
 
+PaperChapter.menuItemLabel = 'paper.chapter';
 PaperChapter.category = 'Files';
 
 module.exports = PaperChapter;

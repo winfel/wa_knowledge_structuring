@@ -1,4 +1,4 @@
-Writer.setTranslations('de',{
-
-}
-);
+Writer.setTranslations('de', {
+	'Writer': 'Schreibumgebung',
+	'paper': 'ausgewähltes Dokument',
+});

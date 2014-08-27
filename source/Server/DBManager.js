@@ -48,6 +48,18 @@ DBManager.addDocument = function(socket, data) {
     user: connection.user.username,
     data: data.data
   });
+
+  if (data.singleResponse) {
+    // Send a message to the user who created this document.
+    Modules.SocketServer.sendToSocket(connection.socket, "dbDocumentAdded_" + data.collection + "_" + data.object.id, data.data);
+  } else {
+    // Send it to all other users within the room.
+    var connectionOfOthers;
+    for (var socketId in Modules.UserManager.getConnectionsForRoom(connection.rooms.left.id)) {
+      connectionOfOthers = Modules.UserManager.getConnectionBySocketID(socketId);
+      Modules.SocketServer.sendToSocket(connectionOfOthers.socket, "dbDocumentAdded_" + data.collection, data.data);
+    }
+  }
 };
 
 /**

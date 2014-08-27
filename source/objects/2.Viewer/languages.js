@@ -1,4 +1,37 @@
 Viewer.setTranslations('de',{
-
-}
-);
+	'Viewer': 'PDF-Betrachter',
+	'file': 'ausgewählte Datei',
+	'highlights': 'Markierungen',
+	'twopage': 'zweiseitig',
+	' wrote': ' schrieb',
+	'No document...': 'Kein Dokument...',
+	"Type your comment...":"Kommentar eingeben...",
+	"Your comment is empty. Try again with some letters!":"Der Kommentar ist noch leer.",
+	'Click to start recording.': 'Klicken, um Aufnahme zu starten.',
+	'Recording... Click to stop recording.': 'Aufnahme... Klicken, um zu stoppen.',
+	'Click to play the audio file.': 'Klicken, um den Kommentar abzuspielen.',
+	'Click to pause the audio file.': 'Klicken, um zu pausieren.',
+	'Click to stop the audio file.': 'Klicken, um zu stoppen.',
+	'If you want to use the audio comment funtionality, you have to grant me access to your microphone. Do you want me to ask for access again?':
+		'Um Audio-Kommentare erstellen zu können, muss der Zugriff auf das Mikofon gewährt werden. Zugriff erneut versuchen?',
+	'No access to your microphone': 'Kein Zugriff auf das Mikrofon',
+	"Create an audio comment...": "Audio-Kommentar erstellen...",
+	"Your haven't recorded anything yet!": "Es wurde noch nichts aufgenommen!",
+	'Highlight the current selection (background color).': 'Aktuelle Auswahl hervorheben (Hintergrundfarbe).',
+	'Strike through the current selection.': 'Aktuelle Auswahl durchstreichen.',
+	'Scratch out the current selection.': 'Aktuelle Auswahl durchkritzeln.',
+	'Add a glow effect to this selection.': 'Aktuelle Auswahl durch Leuchteffekt hervorheben.',
+	'Remove this highlighting.': 'Hervorhebung entfernen.',
+	'Add a comment for this selection.': 'Kommentar für die Auswahl hinzufügen.',
+	//'Click to start recording.': 'Audiokommentar für die Auswahl hinzufügen.',
+	'Two page mode': 'auf zweiseitig umschalten',
+	'Single page mode': 'auf einseitig umschalten',
+	'Fullscreen': 'auf Vollbild wechseln',
+	'Restore Screen': 'Vollbild beenden',
+});
+Viewer.setTranslations('en',{
+    'Viewer': 'PDF Viewer',
+    'file': 'chosen File',
+    'highlights': 'highlights',
+    'twopage': 'twopage mode',
+});

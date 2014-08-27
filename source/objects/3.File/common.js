@@ -72,7 +72,7 @@ File.register=function(type){
 		if (object.isPreviewable()) {
 			return true;
 		} else {
-			return "this file is not previewable";
+			return object.translate(GUI.currentLanguage, "this file is not previewable");
 		}
 		
 	}});
@@ -109,7 +109,7 @@ File.register=function(type){
 		
 	}, false);
 
-	this.registerAction(this.translate(this.currentLanguage, "Upload file"),function(){
+	this.registerAction("Upload file",function(){
 		
 		var selected = ObjectManager.getSelected();
 		
@@ -124,7 +124,7 @@ File.register=function(type){
 		return (ObjectManager.getSelected()[0].hasContent() === false);
 	});
 	
-	this.registerAction(this.translate(this.currentLanguage, "Change content"),function(){
+	this.registerAction("Change content",function(){
 		
 		var selected = ObjectManager.getSelected();
 		
@@ -139,14 +139,14 @@ File.register=function(type){
 		return (ObjectManager.getSelected()[0].hasContent() === true);
 	});
 	
-	this.registerAction(this.translate(this.currentLanguage, "Edit"), function(){
+	this.registerAction("EditTags", function(){
 		$.each(ObjectManager.getSelected(), function(key, object) {
 			object.setTag();
 		});
 	}, true);
 	
 	
-	this.registerAction(this.translate(this.currentLanguage, "Download"),function(){
+	this.registerAction("Download",function(){
 		
 		var selected = ObjectManager.getSelected();
 		
@@ -236,6 +236,7 @@ File.isCreatable=true;
 File.moveByTransform = function(){return true;};
 
 File.category='Files';
+File.menuItemLabel = 'upload.file';
 
 /**
  * Checks if the object is shown always on top.

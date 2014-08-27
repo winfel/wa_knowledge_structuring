@@ -27,6 +27,10 @@ GeneralObject.selected = false;
 GeneralObject.category = 'Graphical Elements';
 GeneralObject.ObjectManager = Modules.ObjectManager;
 
+// The label that will appear in the menuItem of the toolbar
+// If left blank then the label will be the type of the Object
+GeneralObject.menuItemLabel = '';
+
 /**
  * Returns always false.
  *

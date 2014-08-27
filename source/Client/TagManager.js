@@ -21,9 +21,11 @@ var TagManager = new function() {
 
   
   /**
+   * Returns all existing main tags in format ["id", "name"]
+   * (without corresponding secondary tags)
    * 
    * @param {type} callback
-   * @returns {undefined}
+   * @return {undefined}
    */
   this.getMainTags = function(callback) {
 
@@ -36,9 +38,11 @@ var TagManager = new function() {
   };
   
   /**
+   * Returns all existing main tags
+   * with corresponding secondary tags
    * 
    * @param {type} callback
-   * @returns {undefined}
+   * @return {type} data All main tags
    */
   this.getMainTagsAndSecTags = function(callback) {
 
@@ -50,10 +54,12 @@ var TagManager = new function() {
     Modules.SocketClient.serverCall('getMainTagsAndSecTags');
   };
   
-    /**
+  /**
+   * Creates a new Main Tag with the specified name and id
    * 
-   * @param {type} callback
-   * @returns {undefined}
+   * @param {type} mainTag The name of the new main tag.
+   * @param {type} newId The ID of the new main tag.
+   * @return {undefined}
    */
   this.updMainTags = function(mainTag, newId) {
 
@@ -63,11 +69,14 @@ var TagManager = new function() {
 	});
   }
   
-      /**
+  /**
+   * Updates the name of the specified main tag
    * 
-   * @param {type} callback
-   * @returns {undefined}
-   */
+   * @param {type} oldName The old name of the main tag.
+   * @param {type} newName The new name of the main tag.
+   * @param {type} tagID The ID of the main tag.
+   * @return {undefined}
+   */  
   this.updMainTagName = function(oldName, newName, tagID) {
 
     Modules.SocketClient.serverCall('updMainTagName', {
@@ -78,12 +87,20 @@ var TagManager = new function() {
   };
   
   /**
+   * Deletes the specified main tag
    * 
-   * @param {type} callback
-   * @returns {undefined}
+   * @param {type} mainTag The name of the main tag.
+   * @param {type} id The id of the main tag.
+   * @param {type} callback callback function
+   * @return {type} result Result which says whether action was successful or not
    */
-  this.deleteMainTag = function(mainTag, id) {
+  this.deleteMainTag = function(mainTag, id, callback) {
 
+	Dispatcher.registerCall("deleteMainTag", function(result) {
+	    callback(result);
+	    Dispatcher.removeCall("deleteMainTag");
+	});
+	  
     Modules.SocketClient.serverCall('deleteMainTag', {
         'mainTag': mainTag,
         'tagID': id
@@ -91,9 +108,12 @@ var TagManager = new function() {
   };
   
   /**
+   * Updates name of the specified secondary tag
    * 
-   * @param {type} callback
-   * @returns {undefined}
+   * @param {type} mainTag The name of the main tag.
+   * @param {type} oldName The old name of the secondary tag.
+   * @param {type} newName The new name of the secondary tag.
+   * @return {undefined}
    */
   this.updSecTagName = function(mainTag, oldName, newName) {
 
@@ -106,9 +126,12 @@ var TagManager = new function() {
   
   
   /**
+   * Moves the specified secondary tag from one main tag to another one
    * 
-   * @param {type} callback
-   * @returns {undefined}
+   * @param {type} oldMainTag The name of old main tag.
+   * @param {type} newMainTag The name of new main tag.
+   * @param {type} secTag The name of the secondary tag.
+   * @return {undefined}
    */
   this.moveSecTag = function(oldMainTag, newMainTag, secTag) {
 
@@ -120,9 +143,12 @@ var TagManager = new function() {
   };
   
   /**
+   * Add new secondary tag in the list of secondary tags 
+   * of the specified main tag
    * 
-   * @param {type} callback
-   * @returns {undefined}
+   * @param {type} mainTag The main tag.
+   * @param {type} secTag The name of the newly added secondary tag.
+   * @return {undefined}
    */
   this.updSecTags = function(mainTag, secTag) {
 
@@ -132,13 +158,24 @@ var TagManager = new function() {
     });
   };
   
-   /**
+  /**
+   * Deletes the specified secondary tag from the list of 
+   * secondary tags of the specified main tag 
+   * In case that some files tagged with this file exist,
+   * deletion is not performed
    * 
-   * @param {type} callback
-   * @returns {undefined}
+   * @param {type} mainTag The main tag.
+   * @param {type} secTag The secondary tag to be deleted.
+   * @param {type} callback callback function
+   * @return {type} result Result which says whether action was successful or not
    */
-  this.deleteSecTags = function(mainTag, secTag) {
+  this.deleteSecTags = function(mainTag, secTag, callback) {
 
+	Dispatcher.registerCall("deleteSecTags", function(result) {
+	    callback(result);
+	    Dispatcher.removeCall("deleteSecTags");
+	});
+	  
     Modules.SocketClient.serverCall('deleteSecTags', {
         'mainTag': mainTag,
         'secTag': secTag
@@ -146,11 +183,13 @@ var TagManager = new function() {
   };
   
 
-   /**
-    * 
-    * @param {type} callback
-    * @returns {undefined}
-    */
+  /**
+   * Returns all secondary tags for a specified main tag 
+   * 
+   * @param {type} mainTag The main tag for which secondary tags are returned.
+   * @param {type} callback callback function 
+   * @return {type} data All secondary tags
+   */
     this.getSecTags = function(mainTag, callback) {
 
         Dispatcher.registerCall("getSecTags", function(data) {

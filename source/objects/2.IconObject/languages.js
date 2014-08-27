@@ -1,4 +1,5 @@
 IconObject.setTranslations('de',{
-	'bigIcon':'Großes Icon'
+	'bigIcon':'Großes Icon',
+	'verybigIcon': 'Extragroßes Icon',
 }
 );

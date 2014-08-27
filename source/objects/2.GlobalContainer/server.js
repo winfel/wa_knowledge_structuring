@@ -1,55 +1,38 @@
 /**
-*    Webarena - A web application for responsive graphical knowledge work
-*
-*    University of Paderborn, 2014
-*
-*/
+ * Webarena - A web application for responsive graphical knowledge work
+ * 
+ * University of Paderborn, 2014
+ * 
+ */
 
 "use strict";
 
-var theObject=Object.create(require('./common.js'));
-var Modules=require('../../server.js');
-module.exports=theObject;
+var _ = require('underscore');
 
-theObject.getAllFileObjects = function(cb){
-	var that = this;
-	var fileObjects = new Array();
-	var containerTag = that.getAttribute('name');
+var theObject = Object.create(require('./common.js'));
+var Modules = require('../../server.js');
 
-	Modules.Connector.listRooms(function(n, rooms){
-		var l = rooms.length-1;
-		var counter = 0;
-		for(var key in rooms){
-			if(rooms[key].id == 'trash') {
-				continue;
-			}
-			Modules.Connector.getInventory(rooms[key].id, true, function(inventory){
-				for(var k in inventory){
-					if(inventory[k].type == "File" && containerTag == inventory[k].attributes.mainTag){
-						fileObjects.push(inventory[k]);
-					}
-				}
+var TRASH_ROOM = 'trash';
 
-				counter++;
+theObject.getAllFileObjects = function(cb) {
+    var fileObjects = new Array();
+    var containerTag = this.getAttribute('name');
+    
+    Modules.Connector.getObjectDataByQuery({mainTag: containerTag}, function(objects) {
+        cb(_.filter(objects, function(obj){ return obj.inRoom != TRASH_ROOM; }));
+    });
+}
 
-				if(counter == l){
-					cb(fileObjects);
-				}
-			
-			});
-		}
-	});
+theObject.changeMainTag = function(d) {
+
+    Modules.ObjectManager.getObject(d.room, d.id, true, function(o) {
+        o.setAttribute('mainTag', d.tag);
+        o.setAttribute('secondaryTags', []);
+    });
+
 }
 
 theObject.getAllFileObjects.public = true;
-
-theObject.changeMainTag = function(d){
-
-	Modules.ObjectManager.getObject(d.room, d.id, true, function(o){
-		o.setAttribute('mainTag', d.tag);
-		o.setAttribute('secondaryTags', []);
-	});
-
-}
-
 theObject.changeMainTag.public = true;
+
+module.exports = theObject;

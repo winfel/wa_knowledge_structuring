@@ -109,5 +109,6 @@ PaperSpace.register('PaperSpace');
 PaperSpace.isCreatable = true;
 
 PaperSpace.category = 'Files';
+PaperSpace.menuItemLabel = 'paper.space';
 
 module.exports = PaperSpace;

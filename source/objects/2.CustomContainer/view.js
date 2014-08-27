@@ -154,51 +154,17 @@ CustomContainer.drawContent = function(rep){
 				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox"> Tag <br><br>';  
 			}
             
-		   
-		    var searchForPDF;
-			var searchForHTML;
-			var searchForImage;
-			var searchForAudio;
-			var searchForVideo;
-			var searchForText;
-			
-			
-            if(that.options.searchForPDF){
-             	searchForPDF = '<input id = "checkPDF_for'+that.id+'" type="checkbox" checked> PDF<br>';
-			}
-			else{
-				searchForPDF = '<input id = "checkPDF_for'+that.id+'" type="checkbox"> PDF<br>';
-			}
-			if(that.options.searchForHTML){
-             	searchForHTML = '<input id = "checkHTML_for'+that.id+'" type="checkbox" checked> HTML<br>';
-			}
-			else{
-				searchForHTML = '<input id = "checkHTML_for'+that.id+'" type="checkbox"> HTML<br>';
-			}
-			if(that.options.searchForAudio){
-             	searchForAudio = '<input id = "checkAudio_for'+that.id+'" type="checkbox" checked> Audio<br>';
-			}
-			else{
-				searchForAudio = '<input id = "checkAudio_for'+that.id+'" type="checkbox"> Audio<br>';
-			}
-			if(that.options.searchForVideo){
-             	searchForVideo = '<input id = "checkVideo_for'+that.id+'" type="checkbox" checked> Video<br>';
-			}
-			else{
-				searchForVideo = '<input id = "checkVideo_for'+that.id+'" type="checkbox"> Video<br>';
-			}
-			if(that.options.searchForText){
-             	searchForText = '<input id = "checkText_for'+that.id+'" type="checkbox" checked> Text<br>';
-			}
-			else{
-				searchForText = '<input id = "checkText_for'+that.id+'" type="checkbox"> Text<br>';
-			}
-			if(that.options.searchForImage){
-				searchForImage = '<input id = "checkImage_for'+that.id+'" type="checkbox" checked> Image';
-			}
-            else{
-				searchForImage = '<input id = "checkImage_for'+that.id+'" type="checkbox"> Image';
-			}
+		   	// add a checkbox and label for every searchFor-option
+			var searchFor = [];
+			for(var searchoption in that.options) {
+			var m = searchoption.match(/^searchFor(\w+)$/);
+				if(m) {
+					searchFor.push('<input id="check' + m[1] + '_for'+that.id+'" type="checkbox" ' + 
+					(that.options[searchoption]?'checked="checked"':'') + 
+						' style="float:left; margin-right:0.5em;" />' +
+						'<label for="check' + m[1] + '_for'+that.id+'">' + m[1] + '</label>');
+				}
+ 			}
 			
 			var s = that.options.searchString;
 			if(s == 0 || s == ""){
@@ -208,17 +174,12 @@ CustomContainer.drawContent = function(rep){
 				s = "value='"+that.options.searchString+"'";
 			}
 			
-		     var element = section.addElement('<input id = "textName_for'+that.id+'" type="text"'+s+'><p>Search by:</p>'+
+		     var element = section.addElement('<input id= "textName_for'+that.id+'" type="text"'+s+'><p>Search by:</p>'+
                 		'<p>'+
                 		searchByName +
 						searchByTag+
                 		'<p>Search for:</p>'+
-                		searchForPDF +
-						searchForHTML +
-						searchForAudio +
-						searchForVideo +
-						searchForText +
-						searchForImage +
+                		searchFor.join( ' ' ) +
                 		'</p>'+
                 		'<button id= "selectAll_'+that.id+'" type="submit" height="30">Select all</button>'+
                 		'<button id= "deselectAll_'+that.id+'" type="submit" height="30">Deselect all</button>'+
@@ -232,52 +193,35 @@ CustomContainer.drawContent = function(rep){
 
 				/* Get value from textfield and selected checkboxes */
 				var textfieldValue = $('#textName_for'+that.id).val();
-				var checkboxName = $('#checkName_for'+that.id).prop('checked');
-				var checkboxTag = $('#checkTag_for'+that.id).prop('checked');
-				var checkboxPDF = $('#checkPDF_for'+that.id).prop('checked');
-				var checkboxHTML = $('#checkHTML_for'+that.id).prop('checked');
-				var checkboxAudio = $('#checkAudio_for'+that.id).prop('checked');
-				var checkboxVideo = $('#checkVideo_for'+that.id).prop('checked');
-				var checkboxText = $('#checkText_for'+that.id).prop('checked');
-				var checkboxImage = $('#checkImage_for'+that.id).prop('checked');
-			
-
-				if(textfieldValue != "" && !checkboxName && !checkboxTag){
+				// test if anything is selected
+				var anythingSelected = false;
+				for(var searchoption in that.options) {
+					var m = searchoption.match(/^searchFor(\w+)$/);
+					if(m) {
+						anythingSelected = anythingSelected || $('#check' + m[1] + '_for'+that.id).prop('checked');
+					}
+				}
+				var searchBySelected = $('#checkName_for'+that.id).prop('checked') || $('#checkTag_for'+that.id).prop('checked');
+				if(textfieldValue != "" && !searchBySelected){
 					alert('Please specify what you are looking for (name and/or tag)');		
 				}
-				else{
-					if(!checkboxPDF && !checkboxHTML && !checkboxImage && !checkboxAudio && !checkboxVideo && !checkboxText){
-							alert('Please specify what files you are looking for');
+				else if(!anythingSelected) {
+					alert('Please specify what files you are looking for');
+				}
+				else {
+					// save the values
+					that.options.searchString = textfieldValue;
+					for(var searchoption in that.options) {
+						var m = searchoption.match(/^search(For|By)(\w+)$/);
+						if(m) {
+							that.options[searchoption] = $('#check' + m[2] + '_for'+that.id).prop('checked');
+						}
 					}
-					else{
-						
-						that.options.searchString = textfieldValue;
-						that.options.searchByName = checkboxName;
-						that.options.searchByTag = checkboxTag;
-						that.options.searchForPDF = checkboxPDF;
-						that.options.searchForHTML = checkboxHTML;
-						that.options.searchForImage = checkboxImage;
-						that.options.searchForAudio = checkboxAudio;
-						that.options.searchForVideo = checkboxVideo;
-						that.options.searchForText = checkboxText;
-						
-						
-						//that.setAttribute('searchString', textfieldValue);
-						//that.setAttribute('searchByName', checkboxName);
-						//that.setAttribute('searchByTag', checkboxTag);
-						//that.setAttribute('searchForPDF', checkboxPDF);
-						//that.setAttribute('searchForHTML', checkboxHTML);
-						//that.setAttribute('searchForImage', checkboxImage);
-						//that.setAttribute('searchForAudio', checkboxAudio);
-						//that.setAttribute('searchForVideo', checkboxVideo);
-						//that.setAttribute('searchForText', checkboxText);
-				
-						that.getFiles();
-				
-						/* Close popover */
-						popover.hide();
+					
+					that.getFiles();
 
-					}
+					/* Close popover */
+					popover.hide();
 					
 				}
 			});
@@ -433,29 +377,10 @@ CustomContainer.addFiles = function(files){
 			img = "text.png";
 		}
 		
-		$(rep).find("#sortablefiles").append('<li id=representation_for_'+id+' class="ui-widget-content" tabindex="-1">'+n+'</li>');
+		$(rep).find("#sortablefiles").append('<li id="representation_for_'+id+'" class="ui-widget-content containerFileRepresentation" tabindex="-1" title="' + name + '"><div class="filename">'+name+'</div></li>');
 		
-		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" src="../../guis.common/images/fileicons/'+img+'">');
-		
-		$(rep).find("#sortablefiles li").css("margin", "3px 3px 3px 0");
-		$(rep).find("#sortablefiles li").css("padding", "1px");
-		$(rep).find("#sortablefiles li").css("float", "left");
-		$(rep).find("#sortablefiles li").css("width", "75px");
-		$(rep).find("#sortablefiles li").css("height", "75px");
-		$(rep).find("#sortablefiles li").css("line-height", "10px");
-		$(rep).find("#sortablefiles li").css("font-size", "1em");
-		$(rep).find("#sortablefiles li").css("text-align", "center");
-		$(rep).find("#sortablefiles li").css("vertical-align", "middle");	
-		$(rep).find("#sortablefiles li").css("background", "#d3d3d3");	
-		
-		$(rep).find("#representation_for_"+id).hover(
-			function() {
-				$(this).css("background", "#f5f5f5");
-			}, function() {
-				$(this).css("background", "#d3d3d3");	
-			}
-		);
-		
+		$(rep).find("#representation_for_"+id).prepend('<img id="image_for_'+id+'" src="/guis.common/images/fileicons/'+img+'">');
+			
 		$(rep).find("#representation_for_"+id).dblclick(function(event) {
 		
 			var objectId = event.currentTarget.id.split("_")[2];

@@ -39,6 +39,8 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('enter', UserManager.enterRoom);
   Dispatcher.registerCall('leave', UserManager.leaveRoom);
 
+  Dispatcher.registerCall('setUserPreferredLanguage', UserManager.setUserPreferredLanguage);
+
   Dispatcher.registerCall("umClearRoles", UserManager.clearRoles);
   Dispatcher.registerCall("umLoadDefaultRoles", UserManager.loadDefaulRoles);
   Dispatcher.registerCall('umGetRoles', UserManager.getRoles);
@@ -193,11 +195,7 @@ UserManager.socketDisconnect = function(socket) {
  * @param {Object} data The credentials of the user.
  */
 UserManager.login = function(socketOrUser, data) {
-  if (typeof socketOrUser.id == 'string')
-    var userID = socketOrUser.id;
-  else
-    var userID = socketOrUser;
-  // var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
+  var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
 
   var connection = UserManager.connections[userID];
   if (!connection) {
@@ -218,28 +216,34 @@ UserManager.login = function(socketOrUser, data) {
 
     if (data) {
 
-      var colors = [
-        "#398da8",
-        "#39a842",
-        "#a84d39",
-        "#a8398e",
-        "#a2a839",
-        "#39a899",
-        "#74a839",
-        "#a87639",
-        "#1d68c4",
-        "#c41d73",
-        "#1dc46e",
-        "#c46b1d"
-      ];
+		// if there is no color yet, create one and store it
+		if(!data.color) {
+			var colors = [
+				"#398da8",
+				"#39a842",
+				"#a84d39",
+				"#a8398e",
+				"#a2a839",
+				"#39a899",
+				"#74a839",
+				"#a87639",
+				"#1d68c4",
+				"#c41d73",
+				"#1dc46e",
+				"#c46b1d"
+			];
 
-      var userColor = colors[Math.floor(Math.random() * colors.length + 1)];
+			var userColor = colors[Math.floor(Math.random() * colors.length + 1)];
+			data.color = userColor;
+			Modules.UserDAO.updateUsersById(data._id, {color:userColor});
+		}
 
       var userObject = require('./User.js');
       connection.user = new userObject(this);
       connection.user.username = data.username;
       connection.user.password = data.password;
-      connection.user.color = userColor;
+      connection.user.preferredLanguage = data.preferredLanguage;
+      connection.user.color = data.color;
       connection.user.externalSession = data.externalSession;
       connection.user.id = socket.id;
 
@@ -262,6 +266,20 @@ UserManager.login = function(socketOrUser, data) {
 
 };
 
+UserManager.setUserPreferredLanguage = function(socketOrUser, lang) {
+	if (typeof socketOrUser.id == 'string')
+		var userID = socketOrUser.id;
+	else
+		var userID = socketOrUser;
+	Modules.UserDAO.usersByUserName(UserManager.connections[userID].user.username, function(err,users) {
+		if(err || users.length == 0) {
+			return;
+		}
+		Modules.UserDAO.updateUsersById(users[0]._id, {preferredLanguage:lang});
+	});
+}
+UserManager.setUserPreferredLanguage.public = true;
+
 UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
   var shouldInclude = [ PAPER_WRITER+"#Writer#20#100#700#2#locked;true#paper;"+data.roomID,
@@ -270,9 +288,7 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
                         "GlobalContainer#References#800#100#500#2#locked;true#height;455",
                         "SimpleText#DefineInfo#800#600#190#2#height;30#content;Sort the PaperChapters from left to right to give them an order",
                         "SimpleText#DefineInfo2#255#600#190#2#height;30#content;Place a chapter inside the selector to load it",
-                        "PaperSelector#Selector#655#700#1#1#locked;false"/*,
-                        "Line#TestLine#690#553#0#1#height;148",
-                        "PaperChapter#Chapter1#880#650#1#1#chapterID;"+data.roomID*/];
+                        "PaperSelector#Selector#655#700#128#0#"];
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 

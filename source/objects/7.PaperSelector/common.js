@@ -60,5 +60,6 @@ PaperSelector.register('PaperSelector');
 PaperSelector.isCreatable = true;
 
 PaperSelector.category = 'Files';
+PaperSelector.menuItemLabel = 'paper.selector';
 
 module.exports = PaperSelector;

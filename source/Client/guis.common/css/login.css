@@ -60,11 +60,17 @@
 #login div.login_title {
 	font-size: 22px;
 	color: #3684DD;
-	margin-left: 20px;
+	margin-left: 45px;
 	margin-top: 20px;
-	margin-bottom: 20px;
 }
-
+#login  div.login_title::before {
+	content: "";
+	width: 64px;
+	height: 64px;
+	background: url(/cow_64x64.png) no-repeat;
+	display: inline-block;
+	vertical-align: middle;
+}
 
 #login div.login_icon, #sign_up div.login_icon {
 	position: relative;
@@ -107,7 +113,7 @@
 	font-weight: bold;
 	padding-left: 10px;
 	padding-right: 10px;
-	margin-left: 298px;
+	margin-left: 282px;
 	margin-top: 10px;
 }
 
@@ -140,9 +146,9 @@
 #sign_up div.sign_up_title {
 	font-size: 22px;
 	color: #3684DD;
-	margin-left: 20px;
-	margin-top: 20px;
-	margin-bottom: 20px;
+	margin-left: 45px;
+	margin-top: 30px;
+	margin-bottom: 10px;
 }
 
 #sign_up input.sign_up_submit {
@@ -158,7 +164,7 @@
 	font-weight: bold;
 	padding-left: 10px;
 	padding-right: 10px;
-	margin-left: 207px;
+	margin-left: 223px;
 	margin-top: 10px;
 }
 

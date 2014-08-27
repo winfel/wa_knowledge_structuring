@@ -119,5 +119,6 @@ CustomContainer.isCreatable=true;
 CustomContainer.contentURLOnly = false; //content is only accessible via URL
 
 CustomContainer.category='Active';
+CustomContainer.menuItemLabel = 'custom.container';
 
 module.exports=CustomContainer;

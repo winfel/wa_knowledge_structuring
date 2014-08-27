@@ -1,8 +1,8 @@
 "use strict";
 
 /* SETTINGS */
-var popover_positionOffsetX = -12;
-var popover_positionOffsetY = 20;
+var popover_positionOffsetX = 8;
+var popover_positionOffsetY = 21;
 
 /**
  * Init. the toolbar
@@ -60,9 +60,9 @@ GUI.initToolbar = function() {
 
           $.each(object, function(key, object) {
 			
-			var name = object.translate(GUI.currentLanguage, object.type);
+			var name = (object.menuItemLabel != '') ? object.translate(GUI.currentLanguage, object.menuItemLabel) : object.translate(GUI.currentLanguage, object.type);
 			
-			if(name == "GlobalContainer"){ //Global Container cannot be created manually (they are created automatically when entering the global space)
+			if (name == "GlobalContainer") { //Global Container cannot be created manually (they are created automatically when entering the global space)
 				return true;
 			}
 
@@ -357,28 +357,55 @@ GUI.initToolbar = function() {
   $(menuButton).jPopover({
     positionOffsetX: popover_positionOffsetX,
     positionOffsetY: popover_positionOffsetY,
-    arrowOffsetRight: 30,
+    arrowOffsetRight: 12,
     onSetup: function(domEl, popover) {
+    
+		Object.defineProperty(popover.options, 'positionOffsetX', {
+			get:function() {
+				return -4 - popover_positionOffsetX + $("#header > .header_right").position().left;
+			}
+		});
+		Object.defineProperty(popover.options, 'arrowOffsetRight', {
+			get:function() {
+				return 30 + $("#header > .header_right").position().left;
+			}
+		});
+
       var page = popover.addPage(GUI.translate("Welcome")+ " " + GUI.username);
       var section = page.addSection();
 
-      var btnSignout = section.addElement('<img src= "../../guis.common/images/lock.png" alt="" width="24" height="24" /> ' + GUI.translate("Sign out"));
+      var btnSignout = section.addElement('<img src= "../../guis.common/images/log_out.png" alt="" width="24" height="24" /> ' + GUI.translate("Sign out"));
       var clickSignout = function() {
         location.pathname = "/logout";
         popover.hide();
       };
 
+		var selLanguage = section.addElement(GUI.translate("Language")).addWidget('selection');
+		selLanguage.setOptions(['de', 'en', 'es', 'cow']);
+		selLanguage.setValue(ObjectManager.getUser().preferredLanguage || GUI.currentLanguage);
+		selLanguage.onChange(function(sel) {
+			GUI.currentLanguage = sel;
+			ObjectManager.getUser().preferredLanguage = sel;
+			if(confirm(GUI.translate('To update the language of all elements of the page it has to be reloaded. Reload now?'))) {
+				location.reload();
+			}
+		});
+
+/*		// the color widget allows colors which shouldn't be allowed :-/
+		var selUserColor = section.addElement(GUI.translate("Your color")).addWidget('color');
+		selUserColor.setColor(ObjectManager.getUser().color);
+		selUserColor.onChange(function(sel) {
+			ObjectManager.getUser().color = sel;
+			if(confirm(GUI.translate('To update your color at all elements of the page it has to be reloaded. Reload now?'))) {
+				location.reload();
+			}
+		});
+*/
+
       var btnPaste = section.addElement('<img src= "../../guis.common/images/paste-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Paste"));
       var clickPaste = function() {
         alert("Paste");
         Modules.ObjectManager.pasteObjects();
-        popover.hide();
-      };
-
-      var btnHome = section.addElement('<img src= "../../guis.common/images/level-up.png" alt="" width="24" height="24" /> ' + GUI.translate("Home"));
-      var clickHome = function() {
-        Modules.ObjectManager.goParent();
-        alert("Go parent");
         popover.hide();
       };
 
@@ -388,24 +415,22 @@ GUI.initToolbar = function() {
         popover.hide();
       };
 	  
-	  var btnTagManager = section.addElement('<img src= "../../guis.common/images/Tag-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Tag Manager"));
+	  var btnTagManager = section.addElement('<img src= "../../guis.common/images/tag.png" alt="" width="24" height="24" /> ' + GUI.translate("Tag Manager"));
       var clickTagManager = function() {
-        GUI.tagManager.open(800, 800,false);
+        GUI.tagManager.open(700, 800,false);
         popover.hide();
       };
 
       if (GUI.isTouchDevice) {
         $(btnSignout.getDOM()).bind("touchstart", clickSignout);
         $(btnPaste.getDOM()).bind("touchstart", clickPaste);
-        $(btnHome.getDOM()).bind("touchstart", clickHome);
         $(btnCoupling.getDOM()).bind("touchstart", clickCoupling);
-		 $(btnTagManager.getDOM()).bind("touchstart", clickTagManager);
+		$(btnTagManager.getDOM()).bind("touchstart", clickTagManager);
       } else {
         $(btnSignout.getDOM()).bind("click", clickSignout);
         $(btnPaste.getDOM()).bind("click", clickPaste);
-        $(btnHome.getDOM()).bind("click", clickHome);
         $(btnCoupling.getDOM()).bind("click", clickCoupling);
-		 $(btnTagManager.getDOM()).bind("click", clickTagManager);
+		$(btnTagManager.getDOM()).bind("click", clickTagManager);
       }
     }
   });

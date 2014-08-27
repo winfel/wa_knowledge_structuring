@@ -7,7 +7,33 @@ var Modules = false;
 /**
  * Object providing functions for object management
  */
-var ObjectManager = {};
+var ObjectManager = {
+	get user(){
+		return this._user || {};
+	},
+	set user(val){
+		this._user = val;
+		try {
+			if(val.preferredLanguage && val.preferredLanguage != 'undefined') {
+				GUI.currentLanguage = val.preferredLanguage;
+			}
+		}
+		catch(ex){} // Pokemon exception handling
+		Object.defineProperty(this._user, 'preferredLanguage', (function(){
+			var _preferredLanguage = val.preferredLanguage;
+			return {
+				set: function(val2) {
+					_preferredLanguage = val2;
+					GUI.currentLanguage = val2;
+					Modules.Dispatcher.query('setUserPreferredLanguage', val2);
+				},
+				get: function() {
+					return _preferredLanguage || GUI.currentLanguage;
+				},
+			};
+		})());
+	},
+};
 
 ObjectManager.isServer = false;
 ObjectManager.objects = {'left': {}, 'right': {}};
@@ -16,7 +42,7 @@ ObjectManager.currentRoomID = {'left': false, 'right': false};
 ObjectManager.currentRoom = {'left': false, 'right': false};
 ObjectManager.clientID = new Date().getTime() - 1296055327011;
 ObjectManager.prototypes = {};
-ObjectManager.user = {};
+//ObjectManager.user = {};
 ObjectManager.clipBoard = {};
 
 /**
