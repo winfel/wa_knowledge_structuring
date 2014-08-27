@@ -285,7 +285,7 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
   var shouldInclude = [ PAPER_WRITER+"#Writer#20#100#700#2#locked;true#paper;"+data.roomID,
                         "SimpleText#WritingAreaInfo#20#45#100#2#height;30#content;Writing Area:",
                         "SimpleText#ReferenceInfo#800#45#100#2#height;30#content;References:",
-                        "GlobalContainer#References#800#100#500#2#locked;true#height;455",
+                        "ReferenceContainer#References#800#100#500#2#locked;true#height;455",
                         "SimpleText#DefineInfo#800#600#190#2#height;30#content;Sort the PaperChapters from left to right to give them an order",
                         "SimpleText#DefineInfo2#255#600#190#2#height;30#content;Place a chapter inside the selector to load it",
                         "PaperSelector#Selector#655#700#128#0#"];
