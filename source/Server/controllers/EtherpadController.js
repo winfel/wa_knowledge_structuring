@@ -33,7 +33,7 @@ EtherpadController.convertToPdf = function(html, callback) {
 	child,
 	ostmpdir = require('os').tmpdir(),
 	fs = require('fs'),
-	tmpFilename = 'webArena_' + (Math.random()*100000);
+	tmpFilename = 'CoW_' + (Math.random()*100000);
 
 	// we first have to save the html to a temporary file
 	fs.writeFile(ostmpdir + '/' + tmpFilename + '.html', html, function(err) {
@@ -79,7 +79,7 @@ EtherpadController.convertToImage = function(html, imgtype, callback) {
 	child,
 	ostmpdir = require('os').tmpdir(),
 	fs = require('fs'),
-	tmpFilename = 'webArena_' + (Math.random()*100000);
+	tmpFilename = 'CoW_' + (Math.random()*100000);
 
 	// we first have to save the html to a temporary file
 	fs.writeFile(ostmpdir + '/' + tmpFilename + '.html', html, function(err) {
