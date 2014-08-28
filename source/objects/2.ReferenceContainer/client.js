@@ -74,7 +74,6 @@ ReferenceContainer.getFiles = function(){
 			
 	var that = this;		
 	
-	var that = this;
 	this.serverCall("getAllFileObjects", function(data){
 		
 		var f = new Array();

@@ -22,22 +22,11 @@ FavouritesContainer.options = {
 }
 
 FavouritesContainer.Files = new Array();
-
-FavouritesContainer.afterServerCall = function(files){
-
-	files = JSON.parse(files);
-	
-	var id = files.pop();
-	var con = ObjectManager.getObject(id);
-	
-	if(typeof con != "undefined"){
-		con.Files = files;
-		con.searchAndFilter(files);
-	}
-	
-}
+FavouritesContainer.Favourites = new Array();
 
 FavouritesContainer.removeFavourite = function(fav){
+		
+	this.Favourites.splice(this.Favourites.indexOf(fav), 1);	
 		
 	UserManager.getDataOfSpaceWithDest(ObjectManager.user.username, "favourites" , function(d){
 	
@@ -60,9 +49,45 @@ FavouritesContainer.removeFavourite = function(fav){
 }
 
 
-FavouritesContainer.getFiles = function(){
+FavouritesContainer.getFavourites = function(){
 		
-	this.serverCall("getAllFavouriteFileObjects", this.id, ObjectManager.user.username, FavouritesContainer.afterServerCall);
+	this.Favourites = new Array();	
+	var that = this;
+		
+	UserManager.getDataOfSpaceWithDest(ObjectManager.user.username, "favourites" , function(d){
+	
+		if(d != "error"){
+			var key;
+			for(key in d[0].value){
+				that.Favourites.push(d[0].value[key]);
+			}
+		}
+		
+	});
+}
+
+
+FavouritesContainer.getFiles = function(){
+			
+	var that = this;		
+	
+	this.serverCall("getAllFileObjects", function(data){
+		
+		var f = new Array();
+		
+		for(var i = 0; i < data.length; i++){
+		
+			if(that.Favourites.indexOf(data[i].attributes.id) != -1){
+
+				f.push(data[i]);
+			
+			}			
+		
+		}
+		
+		that.Files = f;
+		that.searchAndFilter(f);
+	});
 		
 }
 
