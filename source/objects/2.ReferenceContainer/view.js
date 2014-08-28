@@ -333,7 +333,7 @@ ReferenceContainer.addFiles = function(files){
 	$(rep).find(".spinner").remove();
 	
 	if(files.length == 0){
-		$(rep).find("#sortablefiles").html("Add your reference files by right click on any file in the global space containers!");
+		$(rep).find("#sortablefiles").html("Add your reference files here!");
 		return;
 	}
 	else{

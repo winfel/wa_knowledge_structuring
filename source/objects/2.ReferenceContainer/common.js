@@ -52,7 +52,7 @@ ReferenceContainer.register=function(type){
     }});
 
 
-	this.registerAttribute('name', {type: 'text', standard: 'Favourites', changedFunction: function(object, value) {
+	this.registerAttribute('name', {type: 'text', standard: 'References', changedFunction: function(object, value) {
 		var obj = {id:object.id, name:value}; 
 		object.rename(value);
 		
@@ -103,7 +103,7 @@ ReferenceContainer.intelligentRename=function(newValue){
 		if ( newValue.length > 30 )
 		{ newValue = newValue.substring(0, 30); }
 	
-		if ( objectName == "Favourites" || objectName == oldValue )
+		if ( objectName == "References" || objectName == oldValue )
 		{ that.setAttribute("name", newValue); }
 	});
 }
@@ -115,6 +115,6 @@ ReferenceContainer.isCreatable=true;
 ReferenceContainer.contentURLOnly = false; //content is only accessible via URL
 
 ReferenceContainer.category='Active';
-ReferenceContainer.menuItemLabel = 'favorite.container';
+ReferenceContainer.menuItemLabel = 'Reference container';
 
 module.exports=ReferenceContainer;
