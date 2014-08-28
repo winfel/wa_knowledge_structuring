@@ -37,11 +37,17 @@ GUI.tagAssigner = new function() {
 	// selector for the input field for the custom secondary tag
 	var $customSecTag;
 	
+	// selector for the main tag button
+	var $mainTagBtn;
+	
 	// selector for the input field for the custom main tag
 	var $customMainTag;
 	
 	// selector for the label of the name of the file object
-	var $documentName;
+	var $filename;
+	
+	// selector for the tabs of the current dialog
+	var $dialogTabs;
 	
 	//number of total pages of unassigned tags
 	var totalPages;
@@ -66,9 +72,13 @@ GUI.tagAssigner = new function() {
 		this.$containerUnassignedSecondaryTags = this.dialogDom.find("ul#unassignedTags");
 		this.$containerAssignedSecondaryTags = this.dialogDom.find("#document");
 		this.$containerMainTags = this.dialogDom.find("#mainTag");
+		this.$containerSecondaryTags = this.dialogDom.find("#secondaryTags");
+		
 		this.$customSecTag = this.dialogDom.find("#custom-Sec-tag");
 		this.$customMainTag = this.dialogDom.find("#custom-Main-tag");
-	    this.$documentName = this.dialogDom.find("#document-name"); 
+		this.$mainTagBtn = this.dialogDom.find("#mainTag :button");
+	    this.$filename = this.dialogDom.find(".filename");
+	    this.$dialogTabs = this.dialogDom.first();
 	    
 	    // makes both the container for unassigned and assigned tags droppabale  
 		this.makeContainersDroppable();
@@ -79,6 +89,9 @@ GUI.tagAssigner = new function() {
 		
 		//sets the webArena Object
 		this.webarenaObject = webarenaObject;
+		
+		this.mainTag = [];
+		this.assignedSecTags = [];
 		
 		// sets the main tag of the file object
 		this.mainTag = webarenaObject.getAttribute('mainTag');
@@ -99,7 +112,7 @@ GUI.tagAssigner = new function() {
 	   
 		// sets the name of the file object
 	    var documentName = webarenaObject.getAttribute('name');
-	    this.$documentName.text(documentName);
+	    this.$filename.text(documentName);
 	    
 	    // binds the events for the main tag buttons, paging buttons, 
 	    // and the input field for creation of secondary tags
@@ -109,6 +122,7 @@ GUI.tagAssigner = new function() {
 	}
 	
 	//sets the content of the dialog for tag assignment/unassignment
+	//the content (html) is defined in "index.html" as underscore template 
 	this.setDialogContent = function(){
 		var tagAssignerTemplate = $("#tag-assigner-content-tmpl").html();
 		this.dialogDom = $(tagAssignerTemplate);
@@ -120,7 +134,8 @@ GUI.tagAssigner = new function() {
 		
 		//click event handler for the buttons which represent the main tags
 		//sets the main tag of the file object to the clicked main tag
-		$("#mainTag :button").die().live("click", function(){
+		that.$containerMainTags.delegate(":button", "click", function() {
+		//that.$mainTagBtn.die().live("click", function(){
 			
 			var newMainTag = $(this).text();
 			
@@ -145,14 +160,14 @@ GUI.tagAssigner = new function() {
 				//save the new main tag in the database
 				that.webarenaObject.setAttribute('mainTag',that.mainTag);
 				
-				$("#mainTag :button").removeClass('assigned-main-tag');
+				that.$containerMainTags.find(":button").removeClass('assigned-main-tag');
 				$(this).addClass('assigned-main-tag');
 				
 				//get the appropriate secondary tags for the chosen main tag
 				Modules.TagManager.getSecTags(that.mainTag, that.setSecondaryTags);
 				
 				//enable the page with secondary tags and set the current page to the first one
-				$("#tabs").tabs("enable", 1);
+				that.$dialogTabs.tabs("enable", 1);
 				that.currentPage = 1;
 				
 				// go to secondary tags page
@@ -161,13 +176,17 @@ GUI.tagAssigner = new function() {
 		});	
 		
 		// event handler for the input field for creation of custom main tags
-		// creates new main tag and assigns it to the file object		
-		$("#custom-Main-tag").die().live("keyup", function(event) {
+		// creates new main tag and assigns it to the file object
+		
+		
+		that.$containerMainTags.delegate("#custom-Main-tag", "keyup", function() {
+		//$("#custom-Main-tag").die().live("keyup", function(event) {
 			var that = GUI.tagAssigner;
-			var customMainTagValue = $(this).val();
+			var customMainTagValue;
 			
 			if (event.keyCode == 13 && customMainTagValue != "") {
 				
+				customMainTagValue = $(this).val();
 				//if a MainTag with this name already exists, discard the new entry
 				for (var index = 0; index < that.mainTags.length; ++index) {
 					if (that.mainTags[index].name == customMainTagValue){
@@ -195,20 +214,26 @@ GUI.tagAssigner = new function() {
 				Modules.TagManager.updMainTags(customMainTagValue, newId);
 					
 				//get the complete list from mainTags from the Database and set them
-				Modules.TagManager.getMainTags(that.setMainTags);
+				//Modules.TagManager.getMainTags(that.setMainTags);
 
+				that.mainTag = customMainTagValue;
+				that.mainTags.push({"id": newId, "name": customMainTagValue});
+				that.webarenaObject.setAttribute('mainTag',that.mainTag);
+				
 				//draw the MainTags, including the new Tag
 				that.drawMainTags();
 				
 				// set the main tag
 				that.mainTag = customMainTagValue;
-				$("#mainTag :button").removeClass('assigned-main-tag');
-				$("#mainTag :button").last().addClass('assigned-main-tag');
+				that.$containerMainTags.find(":button").removeClass('assigned-main-tag');
+				//$mainTagBtn.removeClass('assigned-main-tag');
+				that.$containerMainTags.find(":button").last().addClass('assigned-main-tag');
+				//$mainTagBtn.last().addClass('assigned-main-tag');
 				that.unassignedSecTags = [];
 				that.updatePagingParameters();
 				
 				//enable the page with secondary tags and set the current page to the first one
-				$("#tabs").tabs("enable", 1);
+				that.$dialogTabs.tabs("enable", 1);
 				that.currentPage = 1;
 				
 				
@@ -221,8 +246,11 @@ GUI.tagAssigner = new function() {
 		});
 		
 		// event handler for the input field for creation of custom secondary tags
-		// creates new secondary tag and assigns it to the file object		
-		$("#custom-Sec-tag").die().live("keyup", function(event) {
+		// creates new secondary tag and assigns it to the file object
+		
+		
+		that.$containerSecondaryTags.delegate("#custom-Sec-tag", "keyup", function() {
+		//$("#custom-Sec-tag").die().live("keyup", function(event) {
 			var that = GUI.tagAssigner;
 			var customSecTagValue = $(this).val();
 			
@@ -249,7 +277,9 @@ GUI.tagAssigner = new function() {
 		
 		//click event handler for the "next" button
 	    //switches to the next page
-	    $( "#btn-next" ).die().live("click", function(){
+		
+		that.$containerSecondaryTags.delegate("#btn-next", "click", function() {
+	    //$( "#btn-next" ).die().live("click", function(){
 	    	var that = GUI.tagAssigner;
 	    	
 	    	//restriction in the case the current page is set the end page
@@ -263,7 +293,9 @@ GUI.tagAssigner = new function() {
 
 	    //click event handler for the "previous" button
 	    //switches to the previous page
-		$( "#btn-previous" ).die().live("click", function(){
+		
+		that.$containerSecondaryTags.delegate("#btn-previous", "click", function() {
+		//$( "#btn-previous" ).die().live("click", function(){
 			var that = GUI.tagAssigner;
 			
 			//restriction in the case the current page is set to first page
@@ -471,7 +503,7 @@ GUI.tagAssigner = new function() {
 			
 		that.$containerMainTags.find( "button" ).remove();
 		
-		$.each(this.mainTags, function( index, value ) {
+		$.each(that.mainTags, function( index, value ) {
 			
 			if(that.mainTag == value.name) {
 				
@@ -595,7 +627,7 @@ GUI.tagAssigner = new function() {
 	 * @param {int} [height] Height of the dialog
 	 * @param {bool} [passThrough] Additional options for the dialog
 	 */
-	this.open = function(webarenaObject, width, height, passThrough) {
+	this.open = function(webarenaObject, width, height, passThrough, callback) {
 
 		var that = GUI.tagAssigner;
 		
@@ -607,9 +639,12 @@ GUI.tagAssigner = new function() {
 						
 			if (that.mainTag != "") {
 				that.saveChanges();
+				if(callback != undefined){
+					callback();
+				}
 				return true;
 			} else {
-				alert("You must set at least the main tag ");
+				alert("You must set at least the main tag!!");
 				return false;
 			}
 			
@@ -624,12 +659,12 @@ GUI.tagAssigner = new function() {
 
 		
 		// Initialize tabs
-		$( "#tabs" ).tabs();
+		that.$dialogTabs.tabs();
 
 		// Disable the page with secondary tags in the case the main tag is not assigned yet
 		if (that.mainTag == ""){
 			
-			$("#tabs").tabs({disabled: [1]});
+			that.$dialogTabs.tabs({disabled: [1]});
 			
 		}
 	}		
