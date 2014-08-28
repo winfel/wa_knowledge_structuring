@@ -7,20 +7,13 @@
 
 "use strict";
 
-var _ = require('underscore');
-
 var theObject = Object.create(require('./common.js'));
 var Modules = require('../../server.js');
 
 var TRASH_ROOM = 'trash';
 
 theObject.getAllFileObjects = function(cb) {
-    var fileObjects = new Array();
-    var containerTag = this.getAttribute('name');
-    
-    Modules.Connector.getObjectDataByQuery({mainTag: containerTag}, function(objects) {
-        cb(_.filter(objects, function(obj){ return obj.inRoom != TRASH_ROOM; }));
-    });
+    Modules.Connector.getObjectDataByQuery({mainTag: this.getAttribute('name'), inRoom: {$nin:[TRASH_ROOM] } }, cb);
 }
 
 theObject.changeMainTag = function(d) {

@@ -719,8 +719,11 @@ function getObjectsByRoom (roomID) {
 }
 
 /**
-*   Returns objects of the DB that match the query
+*   Returns objects of the DB that match the query object
 *   i.e. query = {mainTag: 'xx' } 
+*   
+*   http://mongodb.github.io/node-mongodb-native/markdown-docs/queries.html#query-object
+*   
 *   @function getObjectDataByQuery
 *   @param query a json object containing the query
 *   @param callback callback to call

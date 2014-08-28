@@ -21,12 +21,12 @@ var DBManager = {};
  */
 DBManager.getDocuments = function(object, collection, callback, column) {
 
-  Dispatcher.registerCall("dbDocuments" + object.id, function(documents) {
+  Dispatcher.registerCall("dbDocuments_" + collection + "_" + object.id, function(documents) {
     // call the callback
     if (callback)
       callback(documents);
     // deregister
-    Dispatcher.removeCall("dbDocuments" + object.id);
+    Dispatcher.removeCall("dbDocuments_" + collection + "_" + object.id);
   });
 
   // The responce should be some sort of broadcast to users with a manager role...
@@ -46,13 +46,13 @@ DBManager.getDocuments = function(object, collection, callback, column) {
  * @param {type} callback
  * @returns {undefined}
  */
-DBManager.addDocument = function(object, collection, data, callback) {
+DBManager.addDocument = function(object, collection, docId, data, callback) {
   if (callback) {
-    Dispatcher.registerCall("dbDocumentAdded" + object.id, function(result) {
+    Dispatcher.registerCall("dbDocumentAdded_" + collection + "_" + object.id, function(result) {
       // call the callback
       callback(result);
       // deregister
-      Dispatcher.removeCall("dbDocumentAdded" + object.id);
+      Dispatcher.removeCall("dbDocumentAdded_" + collection + "_" + object.id);
     });
   }
 
@@ -61,6 +61,35 @@ DBManager.addDocument = function(object, collection, data, callback) {
     'singleResponse': (callback ? true : false),
     'collection': collection,
     'object': {id: object.id, type: object.type},
+    'docId': docId,
     'data': data
+  });
+};
+
+/**
+ * Removes the given data object from the collection, given by its name.
+ * 
+ * @param {type} object
+ * @param {type} collection
+ * @param {type} data
+ * @param {type} callback
+ * @returns {undefined}
+ */
+DBManager.removeDocument = function(object, collection, docId, callback) {
+  if (callback) {
+    Dispatcher.registerCall("dbDocumentRemoved_" + collection + "_" + object.id, function(result) {
+      // call the callback
+      callback(result);
+      // deregister
+      Dispatcher.removeCall("dbDocumentRemoved_" + collection + "_" + object.id);
+    });
+  }
+
+  // The responce should be some sort of broadcast to users with a manager role...
+  Modules.SocketClient.serverCall('dbRemoveDocument', {
+    'singleResponse': (callback ? true : false),
+    'collection': collection,
+    'object': {id: object.id, type: object.type},
+    'docId': docId
   });
 };

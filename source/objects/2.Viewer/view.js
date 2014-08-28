@@ -334,13 +334,13 @@ Viewer.initGUI = function(rep) {
      * @param {type} data
      * @returns 
      */
-    var createCommentOnViewer = function(user, data) {
+    var createCommentOnViewer = function(user, id, data) {
 
       var isAudio = (data.type.indexOf("audio") >= 0);
       var commentClass = (isAudio ? "audioobject" : "comment");
-      var commentIdPrefix = (isAudio ? "audioobject_" : "comment_");
+      var commentIdPrefix = commentClass + "_";
 
-      var commentId = commentIdPrefix + data.hash;
+      var commentId = commentIdPrefix + id;
       var commentContainer = $("#" + commentId, frameDocument)[0];
 
       if (!commentContainer) {
@@ -348,7 +348,8 @@ Viewer.initGUI = function(rep) {
 
         // Create a new one...
         commentContainer = $("<div>")
-                .attr("id", commentIdPrefix + data.hash)
+                .attr("id", commentId)
+                .attr("data-id", id)
                 .attr("data-top-initial", data.position.top)
                 .addClass(commentClass);
 
@@ -402,97 +403,96 @@ Viewer.initGUI = function(rep) {
       return commentContainer;
     };
 
-    var linkCommentWithHighlight = function(commentContainer, data, cssClass, dataAttributeName) {
-            commentContainer = $(commentContainer);
-            commentContainer.off("hover");
-      var commentHighlight = $(".highlighted." + cssClass + "[" + dataAttributeName + "='" + data.hash + "']", frameDocument)[0];
+    var linkCommentWithHighlight = function(commentContainer, commentId, cssClass, dataAttributeName) {
+      commentContainer = $(commentContainer);
+      commentContainer.off("hover");
+      var commentHighlight = $(".highlighted." + cssClass + "[" + dataAttributeName + "='" + commentId + "']", frameDocument)[0];
 
-            if (commentHighlight) {
-              commentHighlight = $(commentHighlight);
-              commentHighlight.off("hover");
+      if (commentHighlight) {
+        commentHighlight = $(commentHighlight);
+        commentHighlight.off("hover");
 
-              // Highlight the highlighting
-              commentContainer.hover(function() {
-                commentHighlight.addClass('remotehover');
-              }, function() {
-                commentHighlight.removeClass('remotehover');
-              });
+        // Highlight the highlighting
+        commentContainer.hover(function() {
+          commentHighlight.addClass('remotehover');
+        }, function() {
+          commentHighlight.removeClass('remotehover');
+        });
 
-              // Highlight the comment
-              commentHighlight.hover(function() {
-                commentContainer.addClass('remotehover');
-              }, function() {
-                commentContainer.removeClass('remotehover');
-              });
-            } else {
-              // 
-              commentContainer.addClass("noreference");
-            }
+        // Highlight the comment
+        commentHighlight.hover(function() {
+          commentContainer.addClass('remotehover');
+        }, function() {
+          commentContainer.removeClass('remotehover');
+        });
+
+        commentContainer.removeClass("noreference");
+      } else {
+        // 
+        commentContainer.addClass("noreference");
+      }
+    };
+
+    self.relinkCommentsWithHighlights = function() {
+      $(".comment", frameDocument).each(function() {
+        linkCommentWithHighlight(this, $(this).attr("data-id"), "commented", "data-comment");
+      });
+
+      $(".audioobject", frameDocument).each(function() {
+        linkCommentWithHighlight(this, $(this).attr("data-id"), "audio", "data-audioobject");
+      });
     };
 
     self.loadTextComments = function() {
       DBManager.getDocuments(self, "comments", function(docs) {
-
         for (var i in docs) {
           (function(doc) {
             // Javascript has no block scope... Let's use the function scope instead!
-            var commentContainer = createCommentOnViewer(doc.user, doc.data);
-            linkCommentWithHighlight(commentContainer, doc.data, "commented", "data-comment");
+            createCommentOnViewer(doc.user, doc.id, doc.data);
           })(docs[i]);
         }
+
+        self.relinkCommentsWithHighlights();
       });
     };
 
     self.loadAudioComments = function() {
-      
+
       DBManager.getDocuments(self, "comments_audio", function(docs) {
-        
         for (var i in docs) {
           (function(doc) {
             // Javascript has no block scope... Let's use the function scope instead!
-            var commentContainer = createCommentOnViewer(doc.user, doc.data);
-            linkCommentWithHighlight(commentContainer, doc.data, "audio", "data-audioobject");
+            createCommentOnViewer(doc.user, doc.id, doc.data);
           })(docs[i]);
         }
+
+        self.relinkCommentsWithHighlights();
       });
     };
 
-    Viewer.addComment = function(data) {
-
-      var cssClass = "commented";
-      var dataAttribute = "data-comment";
-
-      if (data.type.indexOf("audio") >= 0) {
-        cssClass = "audio";
-        dataAttribute = "data-audioobject";
-      }
-
-      var commentContainer = createCommentOnViewer(data.user, data);
-      linkCommentWithHighlight(commentContainer, data, cssClass, dataAttribute);
+    Viewer.addComment = function(user, id, data) {
+      createCommentOnViewer(user, id, data);
+      self.relinkCommentsWithHighlights();
     };
 
     /**
      * 
      * @returns {undefined}
      */
-    var loadedInitially = false;
-
     self.loadHighlights = function() {
       var jsonStr = self.getAttribute('highlights');
       if (jsonStr != undefined && jsonStr != '') {
         highlighter.removeHighlights();
         highlighter.deserializeHighlights(jsonStr);
-        //window.setTimeout(self.addAudioToHighlights, 50);
 
-        if (!loadedInitially) {
-          window.setTimeout(self.loadTextComments, 100);
-          window.setTimeout(self.loadAudioComments, 100);
-          loadedInitially = true;
-      }
+        self.relinkCommentsWithHighlights();
       }
     };
 
     // Load the highlights initially.
+    self.loadTextComments();
+    self.loadAudioComments();
+
     self.loadHighlights();
 
     self.saveHighlights = function() {
@@ -555,17 +555,17 @@ Viewer.initGUI = function(rep) {
                 var date = new Date();
                 var data = {
                   'type': "text/plain",
-                'user': GUI.username,
                   'message': text,
                   'page': pageid,
                   'position': position,
-                  'date': date,
-                  'hash': MD5(text + "_" + date.getTime())
+                  'date': date
                 };
 
-                DBManager.addDocument(self, "comments", data);
+                var commentId = MD5(text + "_" + date.getTime());
 
-                callback(data);
+                callback(commentId);
+                DBManager.addDocument(self, "comments", commentId, data);
+
                 theDialog.dialog("close");
               }
             }
@@ -597,10 +597,10 @@ Viewer.initGUI = function(rep) {
 
       var selected = $(".highlighted.selected", frameDocument);
 
-      addCommentDialog(selected, function(data) {
+      addCommentDialog(selected, function(commentId) {
         selected.removeClass("selected")
                 .addClass("commented")
-                .attr('data-comment', data.hash);
+                .attr('data-comment', commentId);
 
         self.saveHighlights();
       });
@@ -613,17 +613,17 @@ Viewer.initGUI = function(rep) {
      * @returns {undefined}
      */
     var addAudioDialog = function(element, callback) {
-      var t = { // get translations
-		clicktostart :		self.translate(GUI.currentLanguage, 'Click to start recording.'),
-		clicktostop :		self.translate(GUI.currentLanguage, 'Recording... Click to stop recording.'),
-		clicktoplay :		self.translate(GUI.currentLanguage, 'Click to play the audio file.'),
-		clicktopause :		self.translate(GUI.currentLanguage, 'Click to pause the audio file.'),
-		clicktostopaudio :	self.translate(GUI.currentLanguage, 'Click to stop the audio file.'),
-		askforaccessagain :	self.translate(GUI.currentLanguage, 'If you want to use the audio comment funtionality, you have to grant me access to your microphone. '
-                  + 'Do you want me to ask for access again?'),
-		noaccesstomic : 	self.translate(GUI.currentLanguage, 'No access to your microphone'),
-		createaudio : 		self.translate(GUI.currentLanguage, "Create an audio comment..."),
-		haventrecorded:		self.translate(GUI.currentLanguage, "Your haven't recorded anything yet!"),
+      var t = {// get translations
+        clicktostart: self.translate(GUI.currentLanguage, 'Click to start recording.'),
+        clicktostop: self.translate(GUI.currentLanguage, 'Recording... Click to stop recording.'),
+        clicktoplay: self.translate(GUI.currentLanguage, 'Click to play the audio file.'),
+        clicktopause: self.translate(GUI.currentLanguage, 'Click to pause the audio file.'),
+        clicktostopaudio: self.translate(GUI.currentLanguage, 'Click to stop the audio file.'),
+        askforaccessagain: self.translate(GUI.currentLanguage, 'If you want to use the audio comment funtionality, you have to grant me access to your microphone. '
+                + 'Do you want me to ask for access again?'),
+        noaccesstomic: self.translate(GUI.currentLanguage, 'No access to your microphone'),
+        createaudio: self.translate(GUI.currentLanguage, "Create an audio comment..."),
+        haventrecorded: self.translate(GUI.currentLanguage, "Your haven't recorded anything yet!"),
       };
       var theDialogContainer = $('<div>');
       theDialogContainer.html(
@@ -680,14 +680,14 @@ Viewer.initGUI = function(rep) {
             resizable: false, width: 400, height: 200, modal: true,
             buttons: [
               {
-                text:GUI.translate("Yes"),
+                text: GUI.translate("Yes"),
                 click: function() {
                   initAudio();
                   $(this).dialog("close");
                 }
               },
               {
-                text:GUI.translate("No"),
+                text: GUI.translate("No"),
                 click: function() {
                   $(this).dialog("close");
                 }
@@ -748,7 +748,7 @@ Viewer.initGUI = function(rep) {
         modal: true,
         buttons: [
           {
-            text:GUI.translate("Submit"),
+            text: GUI.translate("Submit"),
             click: function() {
               if (waveBase64) {
                 var pageid = element.parents(".pf").attr("id");
@@ -757,17 +757,18 @@ Viewer.initGUI = function(rep) {
                 var date = new Date();
                 var data = {
                   'type': waveMimeType,
-                'user': GUI.username,
                   'message': waveBase64,
                   'page': pageid,
                   'position': position,
-                  'date': date,
-                  'hash': MD5(GUI.username + "_audioobject_" + date.getTime())
+                  'date': date
                 };
 
-                DBManager.addDocument(self, "comments_audio", data);
+                var commentId = MD5(GUI.username + "_audioobject_" + date.getTime());
 
-                callback(data);
+                // Update the highlight first
+                callback(commentId);
+                DBManager.addDocument(self, "comments_audio", commentId, data);
+
                 theDialog.dialog("close");
               } else {
                 alert(t.haventrecorded);
@@ -775,7 +776,7 @@ Viewer.initGUI = function(rep) {
             }
           },
           {
-            text:GUI.translate("Cancel"),
+            text: GUI.translate("Cancel"),
             click: function() {
               theDialog.dialog("close");
             }
@@ -802,11 +803,11 @@ Viewer.initGUI = function(rep) {
       initAudio();
       var selected = $(".highlighted.selected", frameDocument);
 
-      addAudioDialog(selected, function(data) {
+      addAudioDialog(selected, function(commentId) {
         $(".highlighted.selected", frameDocument)
                 .removeClass("selected")
                 .addClass('audio')
-                .attr('data-audioobject', data.hash);
+                .attr('data-audioobject', commentId);
         self.saveHighlights();
       });
     });
@@ -841,17 +842,17 @@ Viewer.createRepresentation = function(parent) {
   $body.append(header);
 
   var t = {
-		highlight : 	self.translate(GUI.currentLanguage, 'Highlight the current selection (background color).'),
-		strike : 		self.translate(GUI.currentLanguage, 'Strike through the current selection.'),
-		scratch : 		self.translate(GUI.currentLanguage, 'Scratch out the current selection.'),
-		glow : 			self.translate(GUI.currentLanguage, 'Add a glow effect to this selection.'),
-		remove : 		self.translate(GUI.currentLanguage, 'Remove this highlighting.'),
-		comment : 		self.translate(GUI.currentLanguage, 'Add a comment for this selection.'),
-		record : 		self.translate(GUI.currentLanguage, 'Click to start recording.'),
-		twopage : 		self.translate(GUI.currentLanguage, 'Two page mode'),
-		singlepage : 	self.translate(GUI.currentLanguage, 'Single page mode'),
-		fullscreen : 	self.translate(GUI.currentLanguage, 'Fullscreen'),
-		restore : 		self.translate(GUI.currentLanguage, 'Restore Screen'),
+    highlight: self.translate(GUI.currentLanguage, 'Highlight the current selection (background color).'),
+    strike: self.translate(GUI.currentLanguage, 'Strike through the current selection.'),
+    scratch: self.translate(GUI.currentLanguage, 'Scratch out the current selection.'),
+    glow: self.translate(GUI.currentLanguage, 'Add a glow effect to this selection.'),
+    remove: self.translate(GUI.currentLanguage, 'Remove this highlighting.'),
+    comment: self.translate(GUI.currentLanguage, 'Add a comment for this selection.'),
+    record: self.translate(GUI.currentLanguage, 'Click to start recording.'),
+    twopage: self.translate(GUI.currentLanguage, 'Two page mode'),
+    singlepage: self.translate(GUI.currentLanguage, 'Single page mode'),
+    fullscreen: self.translate(GUI.currentLanguage, 'Fullscreen'),
+    restore: self.translate(GUI.currentLanguage, 'Restore Screen'),
   };
 
   $(".buttonAreaLeft", header).html(
