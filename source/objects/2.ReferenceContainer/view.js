@@ -59,6 +59,8 @@ ReferenceContainer.createRepresentation = function(parent) {
 	
 	$(rep).attr("id", this.getAttribute('id'));
 	
+	this.getReferences();
+	
 	this.drawContent(rep);
 	
 	this.upd();
@@ -333,7 +335,7 @@ ReferenceContainer.addFiles = function(files){
 	$(rep).find(".spinner").remove();
 	
 	if(files.length == 0){
-		$(rep).find("#sortablefiles").html("Add your reference files here!");
+		$(rep).find("#sortablefiles").html("Add your reference files by right click on any file in the global space containers!");
 		return;
 	}
 	else{

@@ -478,12 +478,12 @@ GlobalContainer.addFiles = function(files){
 			
 			for(var i = 0; i < that.PaperSpaces.length; i++){
 			
-				$("<div id=menu_for_"+id+" class='addremove-menu'>Add to "+that.PaperSpaces[i]+"</div>")
+				$("<div id=menu_for_"+id+" class='addremove-menu'>Add to paperspace "+that.PaperSpaces[i]+"</div>")
 				.appendTo("body")
 				.css({top: (parseInt(event.pageY)+padding) + "px", left: event.pageX + "px"})
 				.on("click", function(event){	
 						
-					that.sendNewReference(this.id.split("_")[2], event.target.innerHTML.split(' ')[2]);
+					that.sendNewReference(this.id.split("_")[2], event.target.innerHTML.split(' ')[3]);
 					
 					$("div.addremove-menu").remove();
 				});
