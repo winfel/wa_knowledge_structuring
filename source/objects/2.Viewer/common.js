@@ -27,11 +27,11 @@ Viewer.register = function(type) {
     }});
   
   Modules.Dispatcher.registerCall("dbDocumentAdded_comments", function(data) {
-    that.addComment(data);
+    that.addComment(data.user, data.id, data.data);
   });
   
   Modules.Dispatcher.registerCall("dbDocumentAdded_comments_audio", function(data) {
-    that.addComment(data);
+    that.addComment(data.user, data.id, data.data);
   });
 
   this.standardData.width = 210 * 3;
