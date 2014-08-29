@@ -432,6 +432,12 @@ GUI.tagAssigner = new function() {
 		
 		that.totalPages = Math.ceil( this.unassignedSecTags.length / this.tagsPerPage);
 		
+		if (that.totalPages < 2){
+			$("#btn-previous, #btn-next").hide();
+		} else {
+			$("#btn-previous, #btn-next").show();
+		}
+		
 		if (that.currentPage > 1 && that.currentPage > that.totalPages) {
 			that.currentPage = that.totalPages;			
 		}

@@ -864,7 +864,7 @@ svg text.font-icon{
 
 #mainTag {min-height: 232px;}
 
-#mainTag button { min-height:40px;}
+#mainTag button { min-height:40px; margin: 2px;}
 
 button.assigned-main-tag { background: #A4B5FF; }
 
@@ -886,15 +886,15 @@ button.assigned-main-tag { background: #A4B5FF; }
 
 ul#unassignedTags {min-height: 135px; padding: 1%;}
 
-ul#assignedTags {height: 100%; list-style: none;}
+ul#assignedTags {height: 100%; list-style: none; margin-left: 33px;}
 
 .tags.custom-state-active { background: #eee; }
 
 .tags li { float: left; width: 96px; height: 50px; padding: 0.4em; margin: 0 0.4em 0.4em 0; text-align: center;}
 
-/*.tags li h5 { margin: 0; cursor: move; float: left; width: 80%; height: 47px;} */
+/*.tags li h5 { margin: 0; cursor: move; float: left; width: 80%; height: 47px; font-size: 12px;} */
 
-.tags li h5 { margin: 0; cursor: move; height: 47px;}
+.tags li h5 { margin: 0; cursor: move; height: 47px; font-size: 12px; line-height: normal; font-weight: 700;}
 
 .tags li a { float: right; }
 
@@ -904,7 +904,7 @@ ul#assignedTags {height: 100%; list-style: none;}
 
 #document h4 { line-height: 30px; margin: 0 0 0.4em; }
 
-#document h4 span { padding: 5px; }
+#document h4 span { padding: 5px; font-size: 14px;}
 
 .assigned-main-tag { background: lightskyblue; }
 

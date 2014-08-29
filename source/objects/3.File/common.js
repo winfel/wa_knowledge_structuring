@@ -50,9 +50,9 @@ File.register=function(type){
 	this.registerAttribute('fillcolor',{hidden: true});
 	this.registerAttribute('width',{hidden: true});
 	this.registerAttribute('height',{hidden: true});
-	this.registerAttribute('progress',{hiddhen: true, standard:0.0});
-	this.registerAttribute('mainTag',{type:'text', standard:""});
-	this.registerAttribute('secondaryTags',{type: 'list', multiple: true});
+	this.registerAttribute('progress',{hidden: true, standard:0.0});
+	this.registerAttribute('mainTag',{type:'text', standard:"", hidden: true});
+	this.registerAttribute('secondaryTags',{type: 'list', multiple: true, hidden: true});
   
   // Stores the previous position of this object, while it is moved outside a viewer object.
   this.registerAttribute("xPrev", {type: 'number', hidden: true, standard: 0, category: "Dimensions"});

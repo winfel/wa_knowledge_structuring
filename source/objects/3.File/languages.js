@@ -18,10 +18,10 @@ File.setTranslations('en',{
 	'progress': 'progress of converting',
 	'mainTag': 'main tag',
 	'secondaryTags': 'secondary tags',
-	'EditTags':'edit tags',
+	'EditTags':'Edit Tags',
 });
 
 File.setTranslations('es',{
 	'upload.file' : 'Subir archivo',
-	'EditTags':'edit tags',
+	'EditTags':'Edit Tags',
 });
