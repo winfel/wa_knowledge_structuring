@@ -378,14 +378,14 @@
 
     <!-- BEGIN: GUI add user dialog -->
     <div id="manageUserDialog" class="rightmanager-user-dialog" style="display: none;">
-      <h3>Friend list</h3>
+      <!-- <h3>Friend list</h3>-->
       <div id="manageUserDialogFriendList" class="rightmanager-user-dialog-section"></div>
-      <h3>Suggested</h3>
+      <!-- <h3>Suggested</h3>
       <div id="manageUserDialogSuggested" class="rightmanager-user-dialog-section"></div>
       <h3>Searched Users</h3>
       <input id="manageUserDialogNewTextfield" type="text" value="Type in the username" />
       <div id="manageUserDialogSearched" class="rightmanager-user-dialog-section">
-      </div>
+      </div>-->
     </div>
     <!-- END: GUI add user dialog -->
 
@@ -509,6 +509,7 @@
 		<li><a href="#secondaryTags">Secondary Tag</a></li>
 	</ul>
 	<div id="mainTag">
+		<div class="filename-wrapper">Name of the file: <span class="filename"></span></div>
 		<div class="custom-main-tag-holder">
 			<label for="custom-Main-tag"><b>Custom tag:</b> </label>
 			<input id="custom-Main-tag">
@@ -531,7 +532,7 @@
 				</div>	
 			</div>
 			<div id="document" class="ui-widget-content ui-state-default">
-				<h4 class="ui-widget-header"><span id="document-name"></span></h4>
+				<h4 class="ui-widget-header"><span class="filename"></span></h4>
 				<ul class="tags ui-helper-reset" id="assignedTags">
 				<ul class="tags" id="assignedTags"></ul>
 			</div>

@@ -27,7 +27,7 @@ $(function() {
 			/* get dropped files */
 			var files = event.dataTransfer.files;
 			
-			var upload=function(file){
+			var upload = function(file, x, y, callback){
 					
 				var progressBarId = GUI.progressBarManager.addProgress(GUI.translate("Create file object"));
 				
@@ -36,11 +36,14 @@ $(function() {
 
 				/* create new File object and set position */
 				ObjectManager.createObject("File",{
-					"x":x,
-					"y":y,
+					"x": x,
+					"y": y,
+					"name": filename,
 					"hasContent":true //prevent calling justCreated() after object creation (would display file upload dialog)
 				},false,function(newObject) {
 					/* object created --> upload content */
+					
+					//GUI.tagAssigner.open(newObject, 600, 600, false);
 					
 					var fd=new FormData();
 					fd.append("file", file); // Append the file
@@ -75,23 +78,38 @@ $(function() {
 				
 					GUI.progressBarManager.updateProgress(progressBarId, 0, GUI.translate("Upload file"));
 					
-					newObject.setAttribute('mimeType',mimeType);
-					newObject.setAttribute('name',filename);
+					newObject.setAttribute('mimeType', mimeType);
+					newObject.setAttribute('name', filename);
 					
-					GUI.tagAssigner.open(newObject, 600, 600,false);
+					GUI.tagAssigner.open(newObject, 600, 600, false, function(){
+						callback();
+					});
 					
 				});
 					
 			}
 			
+			
+			var doRecursion = function(i){
+				if (i < files.length) {
+					if(i != 0){
+						x += 70;
+						y += 30;
+					}
+					upload(files[i], x, y, function(){
+						doRecursion(i + 1);
+					});
+					
+				}
+			}
+			
 			if (files != undefined && files != null && files.length > 0) {
 				/* files dropped */
 
-				for (var i=0; i < files.length; i++) {
-
-					upload(files[i]);
-					
-				}
+				//for (var i=0; i < files.length; i++) {
+					//upload(files[i]);					
+				//}
+				doRecursion(0, x, y);
 			}
 		}
 	}

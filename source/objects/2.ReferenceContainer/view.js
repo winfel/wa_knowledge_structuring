@@ -59,6 +59,8 @@ ReferenceContainer.createRepresentation = function(parent) {
 	
 	$(rep).attr("id", this.getAttribute('id'));
 	
+	this.getReferences();
+	
 	this.drawContent(rep);
 	
 	this.upd();

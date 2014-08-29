@@ -1185,7 +1185,8 @@ mongoConnector.moveObjectToTrashRoom = function(roomID, objectID, context, callb
 	        	// find the corresponding Room object and set the 'parent' attribute to 'trash'
 	        	
 	        	var objectType = objectData.attributes.type;	        	
-	        	if (roomID == PUBLIC_ROOM && objectType == SUBROOM_TYPE) {
+	        	//if (roomID == PUBLIC_ROOM && objectType == SUBROOM_TYPE) {
+	        	if(objectType == SUBROOM_TYPE) {
 	        		if(objectData.attributes.destination != null){
 		        		var roomObjectID = objectData.attributes.destination.toString(); 
 		        		objects.update({id: roomObjectID},{ $set: { parent : TRASH_ROOM }}, function(err, doc){

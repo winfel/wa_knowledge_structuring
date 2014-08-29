@@ -1,14 +1,14 @@
 ReferenceContainer.setTranslations('de',{
-    'favorite.container':'Favoriten-Behälter'
+    'reference.container':'Referenz-Behälter'
 }
 );
 
 ReferenceContainer.setTranslations('en',{
-    'favorite.container':'Favorite container'
+    'reference.container':'Reference container'
 }
 );
 
 ReferenceContainer.setTranslations('es',{
-    'favorite.container':'Contenedor de mis favoritos'
+    'reference.container':'Contenedor de mis referencias'
 }
 );

@@ -22,25 +22,16 @@ ReferenceContainer.options = {
 }
 
 ReferenceContainer.Files = new Array();
-
-ReferenceContainer.afterServerCall = function(files){
-
-	files = JSON.parse(files);
-	
-	var id = files.pop();
-	var con = ObjectManager.getObject(id);
-	
-	if(typeof con != "undefined"){
-		con.Files = files;
-		con.searchAndFilter(files);
-	}
-	
-}
+ReferenceContainer.References = new Array();
 
 
 ReferenceContainer.removeReference = function(ref){
 		
-	UserManager.getDataOfSpaceWithDest(ObjectManager.getCurrentRoom().name, "references" , function(d){
+	var that = this;	
+	
+	this.References.splice(this.References.indexOf(ref), 1);
+		
+	UserManager.getDataOfSpaceWithDest(this.getRoom().getAttribute('name'), "references" , function(d){
 	
 		var arr = new Array();
 			
@@ -51,19 +42,55 @@ ReferenceContainer.removeReference = function(ref){
 					arr.push(d[0].value[key]);
 				}
 			}
-			UserManager.removeDataOfSpaceWithDest(ObjectManager.getCurrentRoom().name, "references");
+			UserManager.removeDataOfSpaceWithDest(that.getRoom().getAttribute('name'), "references");
 		}
 				
-		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(ObjectManager.getCurrentRoom().name, "references", arr) }, 500);
+		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(that.getRoom().getAttribute('name'), "references", arr) }, 500);
 	
 	});
 	
 }
 
 
+ReferenceContainer.getReferences = function(){
+		
+	this.References = new Array();	
+	var that = this;
+		
+	UserManager.getDataOfSpaceWithDest(this.getRoom().getAttribute('name'), "references" , function(d){
+	
+		if(d != "error"){
+			var key;
+			for(key in d[0].value){
+				that.References.push(d[0].value[key]);
+			}
+		}
+		
+	});
+}
+
+
 ReferenceContainer.getFiles = function(){
 			
-	this.serverCall("getAllReferenceFileObjects", this.id, ObjectManager.getCurrentRoom().name, ReferenceContainer.afterServerCall);
+	var that = this;		
+	
+	this.serverCall("getAllFileObjects", function(data){
+		
+		var f = new Array();
+		
+		for(var i = 0; i < data.length; i++){
+		
+			if(that.References.indexOf(data[i].attributes.id) != -1){
+
+				f.push(data[i]);
+			
+			}			
+		
+		}
+		
+		that.Files = f;
+		that.searchAndFilter(f);
+	});
 		
 }
 

@@ -304,9 +304,6 @@ CustomContainer.drawContent = function(rep){
 				that.options.sortingCriterion = select1Value;
 				that.options.sortingOrder = select2Value;	
 				
-				//that.setAttribute('sortingCriterion', select1Value);
-				//that.setAttribute('sortingOrder', select2Value);
-				
 				that.getFiles();
 							
 				/* Close popover */

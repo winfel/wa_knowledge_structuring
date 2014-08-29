@@ -59,6 +59,8 @@ FavouritesContainer.createRepresentation = function(parent) {
 	
 	$(rep).attr("id", this.getAttribute('id'));
 	
+	this.getFavourites();
+	
 	this.drawContent(rep);
 	
 	this.upd();
@@ -302,9 +304,6 @@ FavouritesContainer.drawContent = function(rep){
 						
 				that.options.sortingCriterion = select1Value;
 				that.options.sortingOrder = select2Value;	
-						
-				//that.setAttribute('sortingCriterion', select1Value);
-				//that.setAttribute('sortingOrder', select2Value);
 				
 				that.searchAndFilter(that.Files);
 							
