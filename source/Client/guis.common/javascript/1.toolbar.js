@@ -7,7 +7,7 @@ var popover_positionOffsetY = 21;
 /**
  * Init. the toolbar
  */
-GUI.initToolbar = function() {
+ GUI.initToolbar = function() {
 
   /* insert icons for creating new objects: */
 
@@ -37,7 +37,7 @@ GUI.initToolbar = function() {
 
   /* build categories for each type */
   $.each(types, function(key, object) {
-  
+
     var newCategoryIcon = document.createElement("img");
     $(newCategoryIcon).attr("src", "../../guis.common/images/categories/" + object[0].category + ".png").attr("alt", "");
     $(newCategoryIcon).attr("width", "24").attr("height", "24");
@@ -59,9 +59,9 @@ GUI.initToolbar = function() {
           var section = page.addSection();
 
           $.each(object, function(key, object) {
-			
-			var name = (object.menuItemLabel != '') ? object.translate(GUI.currentLanguage, object.menuItemLabel) : object.translate(GUI.currentLanguage, object.type);
-			
+
+           var name = (object.menuItemLabel != '') ? object.translate(GUI.currentLanguage, object.menuItemLabel) : object.translate(GUI.currentLanguage, object.type);
+
 			if (name == "GlobalContainer") { //Global Container cannot be created manually (they are created automatically when entering the global space)
 				return true;
 			}
@@ -69,84 +69,84 @@ GUI.initToolbar = function() {
 			var element = section.addElement('<img src="/objectIcons/' + object.type + '" alt="" width="24" height="24" /> ' + name);
 
 			var click = function(attributes) {
-		  
+
 				popover.hide();
-		  
+
 				if($(".ui-tabs-active").children().first().attr('title') != "Global Space" || object.type != "File"){ //do not allow Files in the Global Space
 
-				  var proto = ObjectManager.getPrototype(object.type);
+          var proto = ObjectManager.getPrototype(object.type);
 
-				  if (!Modules.Config.presentationMode) {
+          if (!Modules.Config.presentationMode) {
 
-					proto.create(attributes);
+           proto.create(attributes);
 
-				  } else {
-					alert(GUI.translate("You cannot create objects in presentation mode"));
-				  }
-				}
-				else{
-					alert("Sorry, it's not allowed to upload Files in the Global Space. Please upload them in your private Space or in the Paper Spaces");
-				}
-			};
+         } else {
+           alert(GUI.translate("You cannot create objects in presentation mode"));
+         }
+       }
+       else{
+         alert("Sorry, it's not allowed to upload Files in the Global Space. Please upload them in your private Space or in the Paper Spaces");
+       }
+     };
 
-			if (GUI.isTouchDevice) {
-			  $(element.getDOM()).bind("touchstart", function() {
-				click({
-				  "x": window.pageXOffset + 40,
-				  "y": window.pageYOffset + 40
-				});
-			  });
-			} else {
-			  $(element.getDOM()).bind("click", function() {
-				click({
-				  "x": window.pageXOffset + 40,
-				  "y": window.pageYOffset + 40
-				});
-			  });
-			}
+     if (GUI.isTouchDevice) {
+       $(element.getDOM()).bind("touchstart", function() {
+        click({
+          "x": window.pageXOffset + 40,
+          "y": window.pageYOffset + 40
+        });
+      });
+     } else {
+       $(element.getDOM()).bind("click", function() {
+        click({
+          "x": window.pageXOffset + 40,
+          "y": window.pageYOffset + 40
+        });
+      });
+     }
 
 
-			/* make draggable */
-			var helper = $('<img src="/objectIcons/' + object.type + '" alt="" width="24" height="24" />');
-			helper.get(0).callback = function(offsetX, offsetY) {
+     /* make draggable */
+     var helper = $('<img src="/objectIcons/' + object.type + '" alt="" width="24" height="24" />');
+     helper.get(0).callback = function(offsetX, offsetY) {
 
-			  var svgpos = $("#content").offset();
+       var svgpos = $("#content").offset();
 
-			  var top = offsetY - svgpos.top;
-			  var left = offsetX;
+       var top = offsetY - svgpos.top;
+       var left = offsetX;
 
-			  click({
-				"x": left,
-				"y": top
-			  });
-
-			};
-
-			$(element.getDOM()).addClass("toolbar_draggable");
-			$(element.getDOM()).draggable({
-			  revert: true,
-			  distance: 20,
-			  cursor: "move",
-			  helper: function(event) {
-				return helper;
-			  }
-			});
-			
-
-          });
-
-        }
+       click({
+        "x": left,
+        "y": top
       });
 
-    } else {
+     };
 
-      /* add link to icon (no Popover) */
+     $(element.getDOM()).addClass("toolbar_draggable");
+     $(element.getDOM()).draggable({
+       revert: true,
+       distance: 20,
+       cursor: "move",
+       helper: function(event) {
+        return helper;
+      }
+    });
 
-      $(newCategoryIcon).attr("title", object[0].translate(GUI.currentLanguage, object[0].type));
 
-      var click = function(attributes) {
+   });
 
-        if (toolbar_locked_elements[object[0].type] === true)
+}
+});
+
+} else {
+
+  /* add link to icon (no Popover) */
+
+  $(newCategoryIcon).attr("title", object[0].translate(GUI.currentLanguage, object[0].type));
+
+  var click = function(attributes) {
+
+    if (toolbar_locked_elements[object[0].type] === true)
           return; //element is locked
 
         if (object[0].type == "Paint" || object[0].type == "Highlighter") {
@@ -359,17 +359,17 @@ GUI.initToolbar = function() {
     positionOffsetY: popover_positionOffsetY,
     arrowOffsetRight: 12,
     onSetup: function(domEl, popover) {
-    
-		Object.defineProperty(popover.options, 'positionOffsetX', {
-			get:function() {
-				return -4 - popover_positionOffsetX + $("#header > .header_right").position().left;
-			}
-		});
-		Object.defineProperty(popover.options, 'arrowOffsetRight', {
-			get:function() {
-				return 30 + $("#header > .header_right").position().left;
-			}
-		});
+
+      Object.defineProperty(popover.options, 'positionOffsetX', {
+       get:function() {
+        return -4 - popover_positionOffsetX + $("#header > .header_right").position().left;
+      }
+    });
+      Object.defineProperty(popover.options, 'arrowOffsetRight', {
+       get:function() {
+        return 30 + $("#header > .header_right").position().left;
+      }
+    });
 
       var page = popover.addPage(GUI.translate("Welcome") + " " + Modules.Helper.capitalize(GUI.username));
       var section = page.addSection();
@@ -380,16 +380,16 @@ GUI.initToolbar = function() {
         popover.hide();
       };
 
-		var selLanguage = section.addElement(GUI.translate("Language")).addWidget('selection');
-		selLanguage.setOptions(['de', 'en', 'es', 'cow']);
-		selLanguage.setValue(ObjectManager.getUser().preferredLanguage || GUI.currentLanguage);
-		selLanguage.onChange(function(sel) {
-			GUI.currentLanguage = sel;
-			ObjectManager.getUser().preferredLanguage = sel;
-			if(confirm(GUI.translate('To update the language of all elements of the page it has to be reloaded. Reload now?'))) {
-				location.reload();
-			}
-		});
+      var selLanguage = section.addElement(GUI.translate("Language")).addWidget('selection');
+      selLanguage.setOptions(['de', 'en', 'es', 'cow']);
+      selLanguage.setValue(ObjectManager.getUser().preferredLanguage || GUI.currentLanguage);
+      selLanguage.onChange(function(sel) {
+       GUI.currentLanguage = sel;
+       ObjectManager.getUser().preferredLanguage = sel;
+       if(confirm(GUI.translate('To update the language of all elements of the page it has to be reloaded. Reload now?'))) {
+        location.reload();
+      }
+    });
 
 /*		// the color widget allows colors which shouldn't be allowed :-/
 		var selUserColor = section.addElement(GUI.translate("Your color")).addWidget('color');
@@ -402,222 +402,221 @@ GUI.initToolbar = function() {
 		});
 */
 
-      var btnPaste = section.addElement('<img src= "../../guis.common/images/paste-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Paste"));
-      var clickPaste = function() {
-        alert("Paste");
-        Modules.ObjectManager.pasteObjects();
-        popover.hide();
-      };
+var btnPaste = section.addElement('<img src= "../../guis.common/images/paste-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Paste"));
+var clickPaste = function() {
+  alert("Paste");
+  Modules.ObjectManager.pasteObjects();
+  popover.hide();
+};
 
-      var btnCoupling = section.addElement('<img src= "../../guis.common/images/coupling-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Coupling"));
-      var clickCoupling = function() {
-        GUI.enterCouplingMode();
-        popover.hide();
-      };
-	  
-	  var btnTagManager = section.addElement('<img src= "../../guis.common/images/tag.png" alt="" width="24" height="24" /> ' + GUI.translate("Manage Tags"));
-      var clickTagManager = function() {
-        GUI.tagManager.open(700, 800,false);
-        popover.hide();
-      };
+var btnCoupling = section.addElement('<img src= "../../guis.common/images/coupling-black.png" alt="" width="24" height="24" /> ' + GUI.translate("Coupling"));
+var clickCoupling = function() {
+  GUI.enterCouplingMode();
+  popover.hide();
+};
 
-      if (GUI.isTouchDevice) {
-        $(btnSignout.getDOM()).bind("touchstart", clickSignout);
-        $(btnPaste.getDOM()).bind("touchstart", clickPaste);
-        $(btnCoupling.getDOM()).bind("touchstart", clickCoupling);
-		$(btnTagManager.getDOM()).bind("touchstart", clickTagManager);
-      } else {
-        $(btnSignout.getDOM()).bind("click", clickSignout);
-        $(btnPaste.getDOM()).bind("click", clickPaste);
-        $(btnCoupling.getDOM()).bind("click", clickCoupling);
-		$(btnTagManager.getDOM()).bind("click", clickTagManager);
-      }
-    }
-  });
+var btnTagManager = section.addElement('<img src= "../../guis.common/images/tag.png" alt="" width="24" height="24" /> ' + GUI.translate("Manage Tags"));
+var clickTagManager = function() {
+  GUI.tagManager.open(700, 800,false);
+  popover.hide();
+};
 
-  /* add bug report toggle */
-  if (!Modules.Config.presentationMode) {
-
-    var bugButton = document.createElement("img");
-    $(bugButton).attr("src", "../../guis.common/images/bugreport.png").attr("alt", "");
-    $(bugButton).attr("width", "24").attr("height", "24");
-
-    $(bugButton).attr("id", "bug_button");
-    $(bugButton).addClass("sidebar_button header_tab");
-
-    $(bugButton).attr("title", GUI.translate("Bugreport"));
-
-    $("#header > .header_tabs_sidebar").append(bugButton);
-
-    var click = function() {
-      GUI.sidebar.openPage("bug", bugButton);
-    };
-
-    if (GUI.isTouchDevice) {
-      $(bugButton).bind("touchstart", click);
-    } else {
-      $(bugButton).bind("mousedown", click);
-    }
-
-  }
+if (GUI.isTouchDevice) {
+  $(btnSignout.getDOM()).bind("touchstart", clickSignout);
+  $(btnPaste.getDOM()).bind("touchstart", clickPaste);
+  $(btnCoupling.getDOM()).bind("touchstart", clickCoupling);
+  $(btnTagManager.getDOM()).bind("touchstart", clickTagManager);
+} else {
+  $(btnSignout.getDOM()).bind("click", clickSignout);
+  $(btnPaste.getDOM()).bind("click", clickPaste);
+  $(btnCoupling.getDOM()).bind("click", clickCoupling);
+  $(btnTagManager.getDOM()).bind("click", clickTagManager);
+}
+}
+});
 
 
-  /* add chat toggle */
+/* add inspector toggle */
 
-  if (!Modules.Config.presentationMode) {
+if (!Modules.Config.presentationMode) {
 
-    var chatButton = document.createElement("img");
-    $(chatButton).attr("src", "../../guis.common/images/chat.png").attr("alt", "");
-    $(chatButton).attr("width", "24").attr("height", "24");
+  var inspectorButton = document.createElement("img");
+  $(inspectorButton).attr("src", "../../guis.common/images/inspector.png").attr("alt", "");
+  $(inspectorButton).attr("width", "24").attr("height", "24");
 
-    $(chatButton).attr("id", "chat_button");
-    $(chatButton).addClass("sidebar_button header_tab");
+  $(inspectorButton).attr("id", "inspector_button");
+  $(inspectorButton).addClass("sidebar_button header_tab");
 
-    $(chatButton).attr("title", GUI.translate("Chat"));
+  $(inspectorButton).attr("title", GUI.translate("Object inspector"));
 
-    $("#header > .header_tabs_sidebar").append(chatButton);
-
-
-    var chatNotifier = document.createElement("span");
-    $(chatNotifier).attr("id", "chat_notifier");
-    $(chatNotifier).html("");
-
-    $(chatNotifier).css("opacity", 0);
-
-    var buttonPos = $(chatButton).position();
-
-    $(chatNotifier).css("left", buttonPos.left).css("top", buttonPos.top);
-
-    $("#header > .header_tabs_sidebar").append(chatNotifier);
-
-
-    var click = function() {
-      GUI.sidebar.openPage("chat", chatButton);
-    };
-
-    if (GUI.isTouchDevice) {
-      $(chatButton).bind("touchstart", click);
-      $(chatNotifier).bind("touchstart", click);
-    } else {
-      $(chatButton).bind("mousedown", click);
-      $(chatNotifier).bind("mousedown", click);
-    }
-
-  }
-  /* add search toggle */
-
-  if (!Modules.Config.presentationMode) {
-
-    var searchButton = document.createElement("img");
-    $(searchButton).attr("src", "../../guis.common/images/fileicons/selectBidFile.png").attr("alt", "");
-    $(searchButton).attr("width", "24").attr("height", "24");
-
-    $(searchButton).attr("id", "search_Button");
-    $(searchButton).addClass("sidebar_button header_tab");
-
-    $(searchButton).attr("title", GUI.translate("Search"));
-
-    var click = function() {
-		$("#primButton").empty();
-
-		Modules.TagManager.getMainTagsAndSecTags(function(mainTagList){
-			var option = $("<option>");
-			            option.attr({
-			                value: " ",
-							selected:true
-			            });
-			 option.html("Select");
-
-			 $("#primButton").append(option);
-				for(var i=0;i<mainTagList.length;i++){
-			var option = $("<option>");
-            option.attr({
-                value: mainTagList[i].name,
-            });
-			
-            option.html(mainTagList[i].name);
-			$("#primButton").append(option);          
-
-			}	
-
-		});
-      GUI.sidebar.openPage("search", searchButton);
-    };
-
-    if (GUI.isTouchDevice) {
-      $(searchButton).bind("touchstart", click);
-    } else {
-      $(searchButton).bind("mousedown", click);
-    }
-
-    $("#header > .header_tabs_sidebar").append(searchButton);
-
-    GUI.sidebar.openPage("search", searchButton);
-
-  }
-
-
-  /* add Right Manager toggle */
-
-  if (!Modules.Config.presentationMode) {
-
-    var rmButton = document.createElement("img");
-    $(rmButton).attr("src", "../../guis.common/images/rightManagment.png").attr("alt", "");
-    $(rmButton).attr("width", "24").attr("height", "24");
-
-    $(rmButton).attr("id", "rightmanager_button");
-    $(rmButton).addClass("sidebar_button header_tab");
-
-    $(rmButton).attr("title", GUI.translate("Right Manager"));
-
-    var click = function() {
-      GUI.sidebar.openPage("rightmanager", rmButton);
-    };
-
-    if (GUI.isTouchDevice) {
-      $(rmButton).bind("touchstart", click);
-    } else {
-      $(rmButton).bind("mousedown", click);
-    }
-
-    $("#header > .header_tabs_sidebar").append(rmButton);
-
-  }
-
-  /* add inspector toggle */
-
-  if (!Modules.Config.presentationMode) {
-
-    var inspectorButton = document.createElement("img");
-    $(inspectorButton).attr("src", "../../guis.common/images/inspector.png").attr("alt", "");
-    $(inspectorButton).attr("width", "24").attr("height", "24");
-
-    $(inspectorButton).attr("id", "inspector_button");
-    $(inspectorButton).addClass("sidebar_button header_tab");
-
-    $(inspectorButton).attr("title", GUI.translate("Object inspector"));
-
-    var click = function() {
-      GUI.sidebar.openPage("inspector", inspectorButton);
-    };
-
-    if (GUI.isTouchDevice) {
-      $(inspectorButton).bind("touchstart", click);
-    } else {
-      $(inspectorButton).bind("mousedown", click);
-    }
-
-    $("#header > .header_tabs_sidebar").append(inspectorButton);
-
+  var click = function() {
     GUI.sidebar.openPage("inspector", inspectorButton);
+  };
 
+  if (GUI.isTouchDevice) {
+    $(inspectorButton).bind("touchstart", click);
+  } else {
+    $(inspectorButton).bind("mousedown", click);
   }
 
-  $("#header_toggle_sidebar_hide").on("click", function() {
-    GUI.sidebar.closeSidebar();
-  });
+  $("#header > .header_tabs_sidebar").append(inspectorButton);
 
-  $("#header_toggle_sidebar_show").on("click", function() {
-    GUI.sidebar.openSidebar();
-  });
+  GUI.sidebar.openPage("inspector", inspectorButton);
+
+}
+
+/* add Right Manager toggle */
+
+if (!Modules.Config.presentationMode) {
+
+  var rmButton = document.createElement("img");
+  $(rmButton).attr("src", "../../guis.common/images/rightManagment.png").attr("alt", "");
+  $(rmButton).attr("width", "24").attr("height", "24");
+
+  $(rmButton).attr("id", "rightmanager_button");
+  $(rmButton).addClass("sidebar_button header_tab");
+
+  $(rmButton).attr("title", GUI.translate("Right Manager"));
+
+  var click = function() {
+    GUI.sidebar.openPage("rightmanager", rmButton);
+  };
+
+  if (GUI.isTouchDevice) {
+    $(rmButton).bind("touchstart", click);
+  } else {
+    $(rmButton).bind("mousedown", click);
+  }
+
+  $("#header > .header_tabs_sidebar").append(rmButton);
+
+}
+/* add search toggle */
+
+if (!Modules.Config.presentationMode) {
+
+  var searchButton = document.createElement("img");
+  $(searchButton).attr("src", "../../guis.common/images/fileicons/selectBidFile.png").attr("alt", "");
+  $(searchButton).attr("width", "24").attr("height", "24");
+
+  $(searchButton).attr("id", "search_Button");
+  $(searchButton).addClass("sidebar_button header_tab");
+
+  $(searchButton).attr("title", GUI.translate("Search"));
+
+  var click = function() {
+    $("#primButton").empty();
+
+    Modules.TagManager.getMainTagsAndSecTags(function(mainTagList){
+     var option = $("<option>");
+     option.attr({
+       value: " ",
+       selected:true
+     });
+     option.html("Select");
+
+     $("#primButton").append(option);
+     for(var i=0;i<mainTagList.length;i++){
+       var option = $("<option>");
+       option.attr({
+        value: mainTagList[i].name,
+      });
+
+       option.html(mainTagList[i].name);
+       $("#primButton").append(option);          
+
+     }  
+
+   });
+    GUI.sidebar.openPage("search", searchButton);
+  };
+
+  if (GUI.isTouchDevice) {
+    $(searchButton).bind("touchstart", click);
+  } else {
+    $(searchButton).bind("mousedown", click);
+  }
+
+  $("#header > .header_tabs_sidebar").append(searchButton);
+  
+}
+
+/* add chat toggle */
+
+if (!Modules.Config.presentationMode) {
+
+  var chatButton = document.createElement("img");
+  $(chatButton).attr("src", "../../guis.common/images/chat.png").attr("alt", "");
+  $(chatButton).attr("width", "24").attr("height", "24");
+
+  $(chatButton).attr("id", "chat_button");
+  $(chatButton).addClass("sidebar_button header_tab");
+
+  $(chatButton).attr("title", GUI.translate("Chat"));
+
+  $("#header > .header_tabs_sidebar").append(chatButton);
+
+
+  var chatNotifier = document.createElement("span");
+  $(chatNotifier).attr("id", "chat_notifier");
+  $(chatNotifier).html("");
+
+  $(chatNotifier).css("opacity", 0);
+
+  var buttonPos = $(chatButton).position();
+
+  $(chatNotifier).css("left", buttonPos.left).css("top", buttonPos.top);
+
+  $("#header > .header_tabs_sidebar").append(chatNotifier);
+
+
+  var click = function() {
+    GUI.sidebar.openPage("chat", chatButton);
+  };
+
+  if (GUI.isTouchDevice) {
+    $(chatButton).bind("touchstart", click);
+    $(chatNotifier).bind("touchstart", click);
+  } else {
+    $(chatButton).bind("mousedown", click);
+    $(chatNotifier).bind("mousedown", click);
+  }
+
+}
+
+/* add bug report toggle */
+if (!Modules.Config.presentationMode) {
+
+  var bugButton = document.createElement("img");
+  $(bugButton).attr("src", "../../guis.common/images/bugreport.png").attr("alt", "");
+  $(bugButton).attr("width", "24").attr("height", "24");
+
+  $(bugButton).attr("id", "bug_button");
+  $(bugButton).addClass("sidebar_button header_tab");
+
+  $(bugButton).attr("title", GUI.translate("Bugreport"));
+
+  $("#header > .header_tabs_sidebar").append(bugButton);
+
+  var click = function() {
+    GUI.sidebar.openPage("bug", bugButton);
+  };
+
+  if (GUI.isTouchDevice) {
+    $(bugButton).bind("touchstart", click);
+  } else {
+    $(bugButton).bind("mousedown", click);
+  }
+
+}
+
+
+
+$("#header_toggle_sidebar_hide").on("click", function() {
+  GUI.sidebar.closeSidebar();
+});
+
+$("#header_toggle_sidebar_show").on("click", function() {
+  GUI.sidebar.openSidebar();
+});
 };
