@@ -52,11 +52,7 @@ GlobalContainer.register=function(type){
     }});
 
 
-	this.registerAttribute('name', {type: 'text', standard: 'GlobalContainer', changedFunction: function(object, value) {
-		var obj = {id:object.id, name:value}; 
-		object.rename(value);
-		
-    }});
+	this.registerAttribute('name', {type: 'text', standard: 'GlobalContainer', readonly: true});
 	
 	
 	this.registerAction('Edit',function(){
