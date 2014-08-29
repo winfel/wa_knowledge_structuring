@@ -30,8 +30,16 @@ Viewer.register = function(type) {
     that.addComment(data.user, data.id, data.data);
   });
   
+  Modules.Dispatcher.registerCall("dbDocumentRemoved_comments", function(data) {
+    that.removeComment(data.id, "comment", "commented");
+  });
+  
   Modules.Dispatcher.registerCall("dbDocumentAdded_comments_audio", function(data) {
     that.addComment(data.user, data.id, data.data);
+  });
+  
+  Modules.Dispatcher.registerCall("dbDocumentRemoved_comments_audio", function(data) {
+    that.removeComment(data.id, "audioobject", "audio");
   });
 
   this.standardData.width = 210 * 3;

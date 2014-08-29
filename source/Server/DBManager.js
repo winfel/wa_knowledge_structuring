@@ -13,9 +13,11 @@ var db = false;
 var DBManager = {};
 
 /**
+ * Receives all documents from a given collection, which are stored in the
+ * context of a given object id.
  * 
- * @param {type} socket
- * @param {type} data
+ * @param {type} socket   Socket of the client, which called this function
+ * @param {type} data     Data object containing the required information
  * @returns {undefined}
  */
 DBManager.getDocuments = function(socket, data) {
@@ -34,9 +36,11 @@ DBManager.getDocuments = function(socket, data) {
 };
 
 /**
+ * Adds a document to the given collection. It will also notify all members within the same of room of the requester
+ * or - if requested - only to the client of requester.
  * 
- * @param {type} socket
- * @param {type} data
+ * @param {type} socket   Socket of the client, which called this function
+ * @param {type} data     Data object containing the required information
  * @returns {undefined}
  */
 DBManager.addDocument = function(socket, data) {
@@ -45,7 +49,7 @@ DBManager.addDocument = function(socket, data) {
 
   dbCollection.insert({
     objectid: String(data.object.id),
-    id: String(data.docId),
+    id: String(data.id),
     user: connection.user.username,
     data: data.data
   });
@@ -53,7 +57,7 @@ DBManager.addDocument = function(socket, data) {
   if (data.singleResponse) {
     // Send a message to the user who created this document.
     Modules.SocketServer.sendToSocket(connection.socket, "dbDocumentAdded_" + data.collection + "_" + data.object.id,
-            {user: connection.user.username, id: data.docId, data: data.data});
+            {user: connection.user.username, id: data.id, data: data.data});
   } else {
     // Send it to all other users within the room.
     var connectionOfOthers;
@@ -61,15 +65,17 @@ DBManager.addDocument = function(socket, data) {
       connectionOfOthers = Modules.UserManager.getConnectionBySocketID(socketId);
 
       Modules.SocketServer.sendToSocket(connectionOfOthers.socket, "dbDocumentAdded_" + data.collection,
-              {user: connection.user.username, id: data.docId, data: data.data});
+              {user: connection.user.username, id: data.id, data: data.data});
     }
   }
 };
 
 /**
+ * Removes a document from the given collection. It will also notify all members within the same of room of the requester
+ * or - if requested - only to the client of requester.
  * 
- * @param {type} socket
- * @param {type} data
+ * @param {type} socket   Socket of the client, which called this function
+ * @param {type} data     Data object containing the required information
  * @returns {undefined}
  */
 DBManager.removeDocument = function(socket, data) {
@@ -84,7 +90,7 @@ DBManager.removeDocument = function(socket, data) {
   if (data.singleResponse) {
     // Send a message to the user who created this document.
     Modules.SocketServer.sendToSocket(connection.socket, "dbDocumentRemoved_" + data.collection + "_" + data.object.id,
-            {user: connection.user.username, id: data.id, data: data.data});
+            {user: connection.user.username, id: data.id});
   } else {
     // Send it to all other users within the room.
     var connectionOfOthers;
@@ -92,14 +98,15 @@ DBManager.removeDocument = function(socket, data) {
       connectionOfOthers = Modules.UserManager.getConnectionBySocketID(socketId);
 
       Modules.SocketServer.sendToSocket(connectionOfOthers.socket, "dbDocumentRemoved_" + data.collection,
-              {user: connection.user.username, id: data.id, data: data.data});
+              {user: connection.user.username, id: data.id});
     }
   }
 };
 
 /**
+ * Initializes the DBManager.
  * 
- * @param {type} theModules
+ * @param {type} theModules   The modules object
  * @returns {undefined}
  */
 DBManager.init = function(theModules) {

@@ -76,6 +76,11 @@ Viewer.initGUI = function(rep) {
     }
   });
 
+  /**
+   * 
+   * @param {type} event
+   * @returns {undefined}
+   */
   var toggleFullscreen = function(event) {
     if (toggled) {
       // Normal...
@@ -119,15 +124,57 @@ Viewer.initGUI = function(rep) {
     btnSinglepage.toggle();
   });
 
+  var showHighlightMenu = function(event, frameDocument, showRemoveButton) {
+    var left = event.pageX - highlightMenu.width() / 2;
+    var top = event.pageY - 10 - $(frameDocument).scrollTop();
+
+    if (left < 0)
+      left -= left;
+
+    var right = left + highlightMenu.width() + 20;
+    var docWidth = $(frameDocument).width();
+
+    if (right > docWidth)
+      left -= (right - docWidth);
+
+    highlightMenu.css("left", left);
+    highlightMenu.css("top", top);
+
+    if (showRemoveButton)
+      $(".btnRemove", highlightMenu).show();
+    else
+      $(".btnRemove", highlightMenu).hide();
+
+    highlightMenu.show();
+  };
+
+  var hideHighlightMenu = function(delayed) {
+    if (delayed) {
+      clearTimeout(highlightMenuTimer);
+      highlightMenuTimer = setTimeout(function() {
+        highlightMenu.hide();
+      }, 250);
+    }
+    else {
+      highlightMenu.hide();
+    }
+  };
+
+  var disableHeaderButtons = function() {
+    $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", true);
+  };
+
+  var enableHeaderButtons = function(withRemoveButton) {
+    $(".buttonAreaLeft .btn" + (!withRemoveButton ? ":not(.btnRemove)" : ""), viewerContainer).prop("disabled", false);
+  };
+
   var initializeTextHighlighter = function() {
     // Remove all previous event handlers.
     $(".buttonAreaLeft .btn", viewerContainer).off();
     $(".btn", highlightMenu).off();
 
     //get the iframe contents and apply the textHighlighter
-
     var frameDocument = iframe.contents();
-
 
     // do not load highlighter for about:blank, but if error happens, ignore
     try {
@@ -156,22 +203,13 @@ Viewer.initGUI = function(rep) {
                 .addClass('at_time_' + (new Date()).getTime())
                 .attr('title', 'by ' + GUI.username);
 
-        // Enable the highlight buttons
-        $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", false);
+        // Enable the highlight buttons in the header of the viewer
+        enableHeaderButtons();
 
         $(".highlighted.selected", frameDocument).hover(function(event) {
-          // Hover in
-          var scrollTop = $(frameDocument).scrollTop();
-
-          highlightMenu.css("left", event.pageX - highlightMenu.width() / 2);
-          highlightMenu.css("top", event.pageY - 10 - scrollTop);
-          highlightMenu.show();
-        }, function(event) {
-          // Hover out      
-          clearTimeout(highlightMenuTimer);
-          highlightMenuTimer = setTimeout(function() {
-            highlightMenu.hide();
-          }, 250);
+          showHighlightMenu(event, frameDocument);
+        }, function() {
+          hideHighlightMenu(true);
         });
       }
     });
@@ -180,34 +218,37 @@ Viewer.initGUI = function(rep) {
     highlighter = frameDocument.getHighlighter();
 
     // Remove old selected text...
-    $(".highlighted.selected", frameDocument).each(function(index, element) {
-      highlighter.removeHighlights(element);
+    $(".highlighted.selected", frameDocument).each(function() {
+      highlighter.removeHighlights(this);
     });
 
-    // Show the highlight menu
+    // Disable the hide timer and keep it visible.
     highlightMenu.hover(function(event) {
       clearTimeout(highlightMenuTimer);
     }, function() {
-      highlightMenu.hide();
+      hideHighlightMenu();
     });
 
     highlightMenu.on("click", function(event) {
-      highlightMenu.hide();
-      $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", true);
+      hideHighlightMenu();
+      disableHeaderButtons();
     });
 
     // Remove selected highlightings...
     frameDocument.on("mousedown", function(event) {
       if (selection && event.target != selection) {
         // Remove the selected (not highlighted) text.
-        $(".highlighted.selected", frameDocument).each(function(index, element) {
-          highlighter.removeHighlights(element);
+        $(".highlighted.selected:not(.modify)", frameDocument).each(function() {
+          highlighter.removeHighlights(this);
         });
+        // Remove the selected for modification text...
+        $(".selected.modify", frameDocument).removeClass("modify");
+
         selection = null;
 
         // Disable the highlight buttons
-        $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", true);
-        highlightMenu.hide();
+        disableHeaderButtons();
+        hideHighlightMenu();
 
         // Reset the highlightings
         self.loadHighlights();
@@ -331,6 +372,7 @@ Viewer.initGUI = function(rep) {
     /**
      * 
      * @param {type} user
+     * @param {type} id
      * @param {type} data
      * @returns 
      */
@@ -375,8 +417,18 @@ Viewer.initGUI = function(rep) {
           });
 
         } else {
-          commentContainer.html('<p class="commentHeader" title="' + data.date.toLocaleString() + '">' + user + self.translate(GUI.currentLanguage, ' wrote') + '</p>' +
+          commentContainer.html('<p class="commentHeader" title="' + data.date.toLocaleString() + '">'
+                  + user + self.translate(GUI.currentLanguage, ' wrote') + '</p>' +
                   '<p>' + data.message + '</p>');
+
+          var deleteImg = $("<img>");
+          deleteImg.attr("alt", "Delete");
+          deleteImg.attr("src", "/guis.common/images/oxygen/16x16/actions/edit-delete.png");
+          deleteImg.on("click", function(event) {
+            DBManager.removeDocument(self, "comments", id);
+            event.stopPropagation();
+          });
+          $("p.commentHeader", commentContainer).append(deleteImg);
 
           // Show/Hide the comment on a click.
           commentContainer.on("click", function(event) {
@@ -441,6 +493,22 @@ Viewer.initGUI = function(rep) {
       $(".audioobject", frameDocument).each(function() {
         linkCommentWithHighlight(this, $(this).attr("data-id"), "audio", "data-audioobject");
       });
+
+      // Do also a litte bit more...
+      $(".highlighted:not(.selected)", frameDocument).each(function() {
+        $(this).off("click").on("click", function(event) {
+          selection = this;
+          $(this).addClass("selected modify");
+          showHighlightMenu(event, frameDocument, true);
+          enableHeaderButtons(true);
+
+          $(this).off("hover").hover(function() {
+            showHighlightMenu(event, frameDocument, true);
+          }, function() {
+            hideHighlightMenu(true);
+          });
+        });
+      });
     };
 
     self.loadTextComments = function() {
@@ -473,6 +541,30 @@ Viewer.initGUI = function(rep) {
     Viewer.addComment = function(user, id, data) {
       createCommentOnViewer(user, id, data);
       self.relinkCommentsWithHighlights();
+    };
+
+    Viewer.removeComment = function(id, dataPrefix, cssClassHighlight) {
+      // Remove the comment
+      $("#" + dataPrefix + "_" + id, frameDocument).remove();
+
+      // Remove the highlights
+      $("." + cssClassHighlight + "[data-" + dataPrefix + "=\"" + id + "\"]", frameDocument).each(function() {
+        highlighter.removeHighlights(this);
+      });
+      self.saveHighlights();
+    };
+
+    var removeHighlight = function(elem) {
+      var element = $(elem);
+
+      highlighter.removeHighlights(element);
+      self.saveHighlights();
+
+      if (element.hasClass("commented")) {
+        DBManager.removeDocument(self, "comments", element.attr("data-comment"));
+      } else if (element.hasClass("audio")) {
+        DBManager.removeDocument(self, "comments_audio", element.attr("data-audioobject"));
+      }
     };
 
     /**
@@ -567,6 +659,8 @@ Viewer.initGUI = function(rep) {
                 DBManager.addDocument(self, "comments", commentId, data);
 
                 theDialog.dialog("close");
+
+                $(frameDocument).trigger("mousedown");
               }
             }
           },
@@ -770,6 +864,9 @@ Viewer.initGUI = function(rep) {
                 DBManager.addDocument(self, "comments_audio", commentId, data);
 
                 theDialog.dialog("close");
+
+                $(frameDocument).trigger("mousedown");
+
               } else {
                 alert(t.haventrecorded);
               }
@@ -810,6 +907,24 @@ Viewer.initGUI = function(rep) {
                 .attr('data-audioobject', commentId);
         self.saveHighlights();
       });
+    });
+
+    $(".btnRemove", viewerContainer).on("click", function() {
+      $(".highlighted.selected", frameDocument).each(function() {
+        removeHighlight(this);
+      });
+    });
+
+    $(".btn", viewerContainer).on("click", function() {
+      var element = $(this);
+
+      if (!element.hasClass("btnAddComment")
+              && !element.hasClass("btnRecord")) {
+        // On mousedown on the framedocument we will reset selection and other things.
+        // Which is why we trigger the mousedown event here...
+        // AddComment and Record trigger this event on it's own!
+        $(frameDocument).trigger("mousedown");
+      }
     });
   };
 
@@ -852,7 +967,7 @@ Viewer.createRepresentation = function(parent) {
     twopage: self.translate(GUI.currentLanguage, 'Two page mode'),
     singlepage: self.translate(GUI.currentLanguage, 'Single page mode'),
     fullscreen: self.translate(GUI.currentLanguage, 'Fullscreen'),
-    restore: self.translate(GUI.currentLanguage, 'Restore Screen'),
+    restore: self.translate(GUI.currentLanguage, 'Restore Screen')
   };
 
   $(".buttonAreaLeft", header).html(
@@ -866,6 +981,9 @@ Viewer.createRepresentation = function(parent) {
           '<div class="btn-group">' +
           '<input disabled="disabled" type="image" class="btn btnAddComment btnHighlight" title="' + t.comment + '" src="/guis.common/images/oxygen/16x16/actions/view-pim-notes-add.png" />' +
           '<input disabled="disabled" type="image" class="btn btnRecord btnHighlight" title="' + t.record + '" src="/guis.common/images/oxygen/16x16/actions/media-record.png" />' +
+          '</div>' +
+          '<div class="btn-group">' +
+          '<input disabled="disabled" type="image" class="btn btnRemove btnHighlight" title="' + t.remove + '" src="/guis.common/images/oxygen/16x16/actions/edit-delete.png" />' +
           '</div>' +
           ''
           );
@@ -883,6 +1001,7 @@ Viewer.createRepresentation = function(parent) {
   highlightMenu.addClass("highlightMenu jPopover");
   highlightMenu.append($(".buttonAreaLeft > div", header).clone());
   $(".btn", highlightMenu).prop("disabled", false);
+  $(".btnRemove", highlightMenu).hide();
 
   $body.append(highlightMenu);
 

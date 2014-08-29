@@ -53,16 +53,22 @@ Author     : Patrick
   margin-left:0;
 }
 
-.audio:first-of-type::before {
+.audio:first-of-type::before,
+.commented:first-of-type::before {
   content: "";
   position: absolute;
   left: -10px;
   top: -10px;
   width: 20px;
   height: 20px;
+}
+
+.audio:first-of-type::before {
   background-image: url("/guis.common/images/oxygen/16x16/actions/text-speak.png");
-  /*background: blue;
-  border-radius: 20px;*/
+}
+
+.commented:first-of-type::before {
+  background-image: url("/guis.common/images/oxygen/16x16/actions/view-pim-notes.png");
 }
 
 .remotehover {
