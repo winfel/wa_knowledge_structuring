@@ -33,7 +33,6 @@ GlobalContainer.getFiles = function(){
 	});
 };
 
-
 GlobalContainer.sendNewFavourite = function(fav){
 		
 	UserManager.getDataOfSpaceWithDest(ObjectManager.user.username, "favourites" , function(d){
@@ -57,7 +56,6 @@ GlobalContainer.sendNewFavourite = function(fav){
 	});
 		
 }
-
 
 GlobalContainer.sendNewReference = function(ref, paperspace){
 		
@@ -83,6 +81,9 @@ GlobalContainer.sendNewReference = function(ref, paperspace){
 		
 }
 
+GlobalContainer.deleteIt = function() {
+    alert(this.translate(GUI.currentLanguage, "globalContainer.delte.msg"));
+}
 
 GlobalContainer.changeMainTag = function(objectId, newTag, roomId){
 
