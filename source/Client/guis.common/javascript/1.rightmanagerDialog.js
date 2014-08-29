@@ -37,12 +37,12 @@ GUI.rightmanagerDialog = new function() {
       modal: true,
       width: 500,
       buttons: [
-        {
+        /*{
           text: "Load default",
           click: function() {
             setDefaultRoles();
           }
-        },
+        },*/
         {
           text: "Add users",
           click: function() {
@@ -201,7 +201,7 @@ GUI.rightmanagerDialog = new function() {
         } else {
           // No rights found
           var span = $("<span>");
-          span.html("Ups! That's wired, I was not able to find any right for this role.");
+          span.html("Ups! That's weird, I was not able to find any right for this role.");
           sectionRights.append(span);
         }
       });

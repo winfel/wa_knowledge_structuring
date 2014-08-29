@@ -24,27 +24,10 @@ GlobalContainer.options = {
 GlobalContainer.Files = new Array();
 GlobalContainer.PaperSpaces = new Array();
 
-GlobalContainer.afterServerCall = function(files){
-	var con = this;
-	//search through all files and check if the mainTag matches to the name of the container
-	var f = new Array();
-	var n = con.getAttribute('name');
-	for (var key in files) { 
-		var mainTag = files[key].attributes.mainTag;
-		if(mainTag == n){
-			f.push(files[key]);
-		}
-	}
-
-	con.Files = f;
-	con.searchAndFilter(f);
-};
-
 
 GlobalContainer.getFiles = function(){
 	var that = this;
 	this.serverCall("getAllFileObjects", function(data){
-		//that.afterServerCall(data);
 		that.Files = data;
 		that.searchAndFilter(data);
 	});

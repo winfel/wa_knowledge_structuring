@@ -52,23 +52,12 @@ ReferenceContainer.register=function(type){
     }});
 
 
-	this.registerAttribute('name', {type: 'text', standard: 'Favourites', changedFunction: function(object, value) {
+	this.registerAttribute('name', {type: 'text', standard: 'References', changedFunction: function(object, value) {
 		var obj = {id:object.id, name:value}; 
 		object.rename(value);
 		
     }});
 	
-	//this.registerAttribute('sortingCriterion', {type: 'text', standard: 'By Name', hidden: true});
-	//this.registerAttribute('sortingOrder', {type: 'text', standard: 'From A to Z', hidden: true});
-	//this.registerAttribute('searchString', {type: 'text', hidden: true});
-	//this.registerAttribute('searchByName', {type: 'boolean', hidden: true, standard: true});
-	//this.registerAttribute('searchByTag', {type: 'boolean', hidden: true, standard: false});
-	//this.registerAttribute('searchForPDF', {type: 'boolean', hidden: true, standard: true});
-	//this.registerAttribute('searchForHTML', {type: 'boolean', hidden: true, standard: true});
-	//this.registerAttribute('searchForImage', {type: 'boolean', hidden: true, standard: true});
-	//this.registerAttribute('searchForAudio', {type: 'boolean', hidden: true, standard: true});
-	//this.registerAttribute('searchForVideo', {type: 'boolean', hidden: true, standard: true});
-	//this.registerAttribute('searchForText', {type: 'boolean', hidden: true, standard: true});
 	
 	this.registerAction('Edit',function(){
 		$.each(ObjectManager.getSelected(), function(key, object) {
@@ -103,7 +92,7 @@ ReferenceContainer.intelligentRename=function(newValue){
 		if ( newValue.length > 30 )
 		{ newValue = newValue.substring(0, 30); }
 	
-		if ( objectName == "Favourites" || objectName == oldValue )
+		if ( objectName == "References" || objectName == oldValue )
 		{ that.setAttribute("name", newValue); }
 	});
 }
@@ -115,6 +104,6 @@ ReferenceContainer.isCreatable=true;
 ReferenceContainer.contentURLOnly = false; //content is only accessible via URL
 
 ReferenceContainer.category='Active';
-ReferenceContainer.menuItemLabel = 'favorite.container';
+ReferenceContainer.menuItemLabel = 'Reference container';
 
 module.exports=ReferenceContainer;

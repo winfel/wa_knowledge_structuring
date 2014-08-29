@@ -1,8 +1,13 @@
 /* 
  * Sidebar: File Search
  */
+
+var NON_MATCHING_FILE_OPACITY = 0.3;
+var FILE_TYPE_NAME = 'File';
+
 GUI.search = new function () {
 
+	
     this.init = function () {
         var that = GUI.search;
 
@@ -16,16 +21,18 @@ GUI.search = new function () {
             for (var i in inventory) {
                 var candidate = inventory[i];
 
-                if (candidate.getAttribute('type') == 'File') {
+                if (candidate.getAttribute('type') == FILE_TYPE_NAME) {
 
-                   // candidate.setAttribute('visible', false);
-					var rep=document.getElementById(candidate.getAttribute('id'));
-$(rep).css("opacity", 0.1);
-                    if (candidate.getAttribute('name').indexOf($("#searchFileId").val()) >= 0) {
-
-                       // candidate.setAttribute('visible', true);
-$(rep).css("opacity", 1);
-
+                    // candidate.setAttribute('visible', false);
+					var rep = document.getElementById(candidate.getAttribute('id'));
+					
+					var searchString = $("#searchFileId").val();					
+                    if (candidate.getAttribute('name').search(new RegExp(searchString, "i")) >= 0) {
+                        // matching case
+                    	$(rep).css("opacity", 1);
+                    } else {
+                    	//non-matching case
+                    	$(rep).css("opacity", NON_MATCHING_FILE_OPACITY);
                     }
                 }
             }
@@ -39,7 +46,7 @@ $(rep).css("opacity", 1);
 
             for (var i in inventory) {
                 var candidate = inventory[i];
-                if (candidate.getAttribute('type') == 'File') {
+                if (candidate.getAttribute('type') == FILE_TYPE_NAME) {
                    // candidate.setAttribute('visible', false);
 				   	var rep=document.getElementById(candidate.getAttribute('id'));
                     if (candidate.getAttribute('name').indexOf($("#searchFileId").val()) >= 0) {
@@ -65,10 +72,10 @@ $(rep).css("opacity", 1);
             for (var i in inventory) {
                 var candidate = inventory[i];
 
-                if (candidate.getAttribute('type') == 'File') {
-					   	var rep=document.getElementById(candidate.getAttribute('id'));
+                if (candidate.getAttribute('type') == FILE_TYPE_NAME) {
+					var rep=document.getElementById(candidate.getAttribute('id'));
 
-                    $(rep).css("opacity", 0.1);
+                    $(rep).css("opacity", NON_MATCHING_FILE_OPACITY);
                     if (candidate.getAttribute('mainTag').indexOf($("#primButton").val()) >= 0) {
 					
                         array.push(candidate.getAttribute('secondaryTags'));
@@ -163,27 +170,19 @@ $(rep).css("opacity", 1);
 
             for (var i in inventory) {
                 var candidate = inventory[i];
-                if (candidate.getAttribute('type') == 'File') {
-				var rep=document.getElementById(candidate.getAttribute('id'));
+                if (candidate.getAttribute('type') == FILE_TYPE_NAME) {
+				var rep = document.getElementById(candidate.getAttribute('id'));
                     if (candidate.getAttribute('mainTag').indexOf($("#primButton").val()) >= 0) {
                         visible = candidate.getAttribute('visible');
                         matchVisible = matchArrays(candidate.getAttribute('secondaryTags'), filterArray);
-
-
-                        if ( matchVisible == true) {
-
+                        if( matchVisible == true){
                             $(rep).css("opacity", 1);
-                        }else{
-						    $(rep).css("opacity", 0.1);
-
+                        } else {
+						    $(rep).css("opacity", NON_MATCHING_FILE_OPACITY);
 						}
                     }
                 }
             }
-
-
-
-
         });
 
 

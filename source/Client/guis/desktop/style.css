@@ -860,7 +860,7 @@ svg text.font-icon{
 }
 
 
-/* tag dialog */
+/* Tag Assigner dialog */
 
 #mainTag {min-height: 232px;}
 
@@ -869,6 +869,14 @@ svg text.font-icon{
 button.assigned-main-tag { background: #A4B5FF; }
 
 .custom-main-tag-holder{margin: 10px 0px;}
+
+#mainTag .filename-wrapper {
+	font-size: 15px;
+}
+#mainTag span.filename {
+	font-weight: bold;
+	font-size: 15px;
+}
 
 #secondaryTags {padding: 0.3em !important;}
 
@@ -908,10 +916,10 @@ button#btn-previous {margin-left: 133px;}
 
 .custom-sec-tag-holder {margin-top: 40px;}
 
-/* end tag dialog */
+/* end Tag Assigner dialog */
 
 
-/ * tag manager */
+/ * Tag Manager dialog*/
 
 .portlet {
 	width: 200px !important;
@@ -1035,7 +1043,7 @@ span.portlet-toggle, span.portlet-delete, span.sec-tag-delete {
 	min-height: 64px;
 }
 
-/* end tag manager */
+/* end Tag Manager dialog*/
 
 /* Container Objects */
 .containerFileRepresentation {
