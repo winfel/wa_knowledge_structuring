@@ -460,3 +460,35 @@ ReferenceContainer.upd = function(){
 	this.getFiles();
 
 }
+
+
+/**
+ * Called when a click was performed and the object is selected
+ * @param {DomEvent} event DOM click event
+ */
+ReferenceContainer.selectedClickHandler = function(event) {
+
+  if (GUI.shiftKeyDown) {
+    this.deselect();
+  } else {
+
+    var x = this.getViewBoundingBoxX() + this.getViewBoundingBoxWidth();
+    var y = this.getViewBoundingBoxY();
+
+    if (GUI.couplingModeActive) {
+      var index = ObjectManager.getIndexOfObject(this.getId());
+      if (index === 'right') {
+        x += parseInt($('#room_right_wrapper').attr('x')) + GUI.getPanX(index);
+      } else {
+        x += GUI.getPanX(index);
+      }
+      y += GUI.getPanY(index);
+    }
+	
+	if((event.target.id.indexOf("image") == -1) && (event.target.id.indexOf("representation") == -1) && (event.target.className.indexOf("filename") == -1)){
+		GUI.showActionsheet(x, y, this);
+	}
+
+  }
+
+}

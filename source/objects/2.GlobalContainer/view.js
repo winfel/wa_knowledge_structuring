@@ -436,8 +436,6 @@ GlobalContainer.addFiles = function(files){
 		
 		$(rep).find("#representation_for_"+id).dblclick(function(event) {
 		
-			event.stopImmediatePropagation()
-		
 			var objectId = event.currentTarget.id.split("_")[2];
 
 			var n;
@@ -461,8 +459,6 @@ GlobalContainer.addFiles = function(files){
 			.css({top: event.pageY + "px", left: event.pageX + "px"})
 			.on("click", function(event){
 					
-				event.stopImmediatePropagation()	
-					
 				that.sendNewFavourite(this.id.split("_")[2]);
 				
 				$("div.addremove-menu").remove();
@@ -476,8 +472,6 @@ GlobalContainer.addFiles = function(files){
 				.appendTo("body")
 				.css({top: (parseInt(event.pageY)+padding) + "px", left: event.pageX + "px"})
 				.on("click", function(event){	
-				
-					event.stopImmediatePropagation()
 						
 					that.sendNewReference(this.id.split("_")[2], event.target.innerHTML.split(' ')[3]);
 					
@@ -525,5 +519,37 @@ GlobalContainer.upd = function(){
 		'</div>');
 	
 	this.getFiles();
+
+}
+
+
+/**
+ * Called when a click was performed and the object is selected
+ * @param {DomEvent} event DOM click event
+ */
+GlobalContainer.selectedClickHandler = function(event) {
+
+  if (GUI.shiftKeyDown) {
+    this.deselect();
+  } else {
+
+    var x = this.getViewBoundingBoxX() + this.getViewBoundingBoxWidth();
+    var y = this.getViewBoundingBoxY();
+
+    if (GUI.couplingModeActive) {
+      var index = ObjectManager.getIndexOfObject(this.getId());
+      if (index === 'right') {
+        x += parseInt($('#room_right_wrapper').attr('x')) + GUI.getPanX(index);
+      } else {
+        x += GUI.getPanX(index);
+      }
+      y += GUI.getPanY(index);
+    }
+	
+	if((event.target.id.indexOf("image") == -1) && (event.target.id.indexOf("representation") == -1) && (event.target.className.indexOf("filename") == -1)){
+		GUI.showActionsheet(x, y, this);
+	}
+
+  }
 
 }
