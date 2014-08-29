@@ -238,7 +238,7 @@ GlobalContainer.drawContent = function(rep){
                 		'<button id= "selectAll_'+that.id+'" type="submit" height="30">Select all</button>'+
                 		'<button id= "deselectAll_'+that.id+'" type="submit" height="30">Deselect all</button>'+
                 		'<br><br>'+
-                		'<button id= "searchButton_for_'+that.id+'" type="submit" height="30"><img src="/guis.common/images/icon-lupe.png" alt="Suchen" width="22" height="22"></button>'
+                		'<button id= "searchButton_for_'+that.id+'" type="submit" height="30">Search</button>'
             ); 
 
 
