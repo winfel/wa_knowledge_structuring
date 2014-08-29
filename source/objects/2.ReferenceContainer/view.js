@@ -406,7 +406,7 @@ ReferenceContainer.addFiles = function(files){
 			event.preventDefault();
 			$("div.addremove-menu").remove();
 			var id = this.id.split("_")[2];
-			$("<div id=menu_for_"+id+" class='addremove-menu'>Remove from reference</div>")
+			$("<div id=menu_for_"+id+" class='addremove-menu'>Remove from references</div>")
 			.appendTo("body")
 			.css({top: event.pageY + "px", left: event.pageX + "px"})
 			.on("click", function(event){

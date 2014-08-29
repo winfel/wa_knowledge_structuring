@@ -422,6 +422,7 @@ GUI.initMouseHandler = function() {
       jPopoverManager.hideAll();
 	  
 	  $("div.addremove-menu").remove();
+	  $("div.global-menu").remove();
 
       var contentPosition = $("#content").offset();
 
