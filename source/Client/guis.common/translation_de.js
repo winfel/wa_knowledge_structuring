@@ -64,12 +64,13 @@ GUI.setTranslations('de',{
 	'Sign out': 'Ausloggen',
 	'Language': 'Sprache',
 	'Coupling': 'Zwei-Raum-Ansicht',
-	'Tag Manager': 'Tags verwalten',
+	'Manage Tags': 'Tags verwalten',
 	'changing room': 'Raum wechseln',
 	'close': 'schließen',
 	'Submit': 'Abschicken',
 	'Cancel': 'Abbrechen',
 	'Yes': 'Ja',
 	'No': 'Nein',
+	'Create New Main Tag': 'Erzeuge neuen Haupt-Tag',
 }
 );

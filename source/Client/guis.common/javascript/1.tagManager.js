@@ -238,7 +238,7 @@ GUI.tagManager = new function() {
 			
 			
 			var secTagTemplate = $("#secondary-tag-tmpl").html();
-		    $listToInsertInto.prepend(_.template( secTagTemplate, { secTag : "Type name" } ));
+		    $listToInsertInto.prepend(_.template( secTagTemplate, { secTag : "" } ));
 			
 				   
 			that.enableEditable();
@@ -267,7 +267,7 @@ GUI.tagManager = new function() {
 			var mainTagToBeCreated = "";
 					
 			var mainTagTemplate = $("#main-tag-tmpl").html();
-			$(this).after(_.template( mainTagTemplate, { items : [{ id: "", name: "Type name", secTags: []}]} ));	
+			$(this).after(_.template( mainTagTemplate, { items : [{ id: "", name: "", secTags: []}]} ));	
 						
 			that.enableEditable();
 		
@@ -309,7 +309,7 @@ GUI.tagManager = new function() {
 		};		
 		
 		passThrough = { "position": ['middle',50] };
-		GUI.dialog("Tag Manager", this.dialogDom, buttons, width, passThrough);
+		GUI.dialog("Manage Tags", this.dialogDom, buttons, width, passThrough);
 		
 		//$("#main-tag-container").find( "h2" ).css("font-size", "12.5px");
 				

@@ -415,7 +415,7 @@ GUI.initToolbar = function() {
         popover.hide();
       };
 	  
-	  var btnTagManager = section.addElement('<img src= "../../guis.common/images/tag.png" alt="" width="24" height="24" /> ' + GUI.translate("Tag Manager"));
+	  var btnTagManager = section.addElement('<img src= "../../guis.common/images/tag.png" alt="" width="24" height="24" /> ' + GUI.translate("Manage Tags"));
       var clickTagManager = function() {
         GUI.tagManager.open(700, 800,false);
         popover.hide();
