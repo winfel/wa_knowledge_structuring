@@ -463,7 +463,7 @@ FavouritesContainer.upd = function(){
  * Called when a click was performed and the object is selected
  * @param {DomEvent} event DOM click event
  */
-FavouriteContainer.selectedClickHandler = function(event) {
+FavouritesContainer.selectedClickHandler = function(event) {
 
   if (GUI.shiftKeyDown) {
     this.deselect();
