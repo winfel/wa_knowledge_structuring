@@ -371,7 +371,7 @@ GUI.initToolbar = function() {
 			}
 		});
 
-      var page = popover.addPage(GUI.translate("Welcome")+ " " + GUI.username);
+      var page = popover.addPage(GUI.translate("Welcome")+ " " + GUI.username.replace(/\w\S*/g, function(txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()}));
       var section = page.addSection();
 
       var btnSignout = section.addElement('<img src= "../../guis.common/images/log_out.png" alt="" width="24" height="24" /> ' + GUI.translate("Sign out"));
