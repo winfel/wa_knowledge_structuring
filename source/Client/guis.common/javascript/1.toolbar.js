@@ -518,6 +518,29 @@ GUI.initToolbar = function() {
     $(searchButton).attr("title", GUI.translate("Search"));
 
     var click = function() {
+		$("#primButton").empty();
+
+		Modules.TagManager.getMainTagsAndSecTags(function(mainTagList){
+			var option = $("<option>");
+			            option.attr({
+			                value: " ",
+							selected:true
+			            });
+			 option.html("Select");
+
+			 $("#primButton").append(option);
+				for(var i=0;i<mainTagList.length;i++){
+			var option = $("<option>");
+            option.attr({
+                value: mainTagList[i].name,
+            });
+			
+            option.html(mainTagList[i].name);
+			$("#primButton").append(option);          
+
+			}	
+
+		});
       GUI.sidebar.openPage("search", searchButton);
     };
 
