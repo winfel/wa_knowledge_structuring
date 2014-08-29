@@ -134,6 +134,10 @@ CustomContainer.searchAndFilter = function(files){
 	for (k in filteredFiles1) { //filter files with the given types
 		var type = filteredFiles1[k].attributes.mimeType;
 	
+		if(typeof type === 'undefined'){
+			continue;
+		}
+	
 		if(pdf){
 			if(type == "application/pdf"){ //type of object is pdf
 				filteredFiles2.push(filteredFiles1[k]);
