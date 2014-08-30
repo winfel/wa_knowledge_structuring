@@ -20,7 +20,7 @@
 
 #login {
 	width: 400px;
-	height: 285px;
+	height: 265px;
 	background-color: #FFFFFF;
 	border: 1px solid #C7C7C7;
 	position: absolute;
@@ -39,7 +39,7 @@
 	color: #888888;
 	border-radius: 3px;
 	width: 260px;
-	margin-top: 20px;
+	margin-top: 13px;
 	padding-left: 40px;
 	margin-left: 20px;
 }
@@ -75,7 +75,7 @@
 #login div.login_icon, #sign_up div.login_icon {
 	position: relative;
 	left: 54px;
-	top: 21px;
+	top: 14px;
 	border-right: 1px solid #DFDFE1;
 	width: 24px;
 	height: 25px;
@@ -113,7 +113,7 @@
 	font-weight: bold;
 	padding-left: 10px;
 	padding-right: 10px;
-	margin-left: 282px;
+	margin-left: 285px;
 	margin-top: 10px;
 }
 
@@ -164,7 +164,7 @@
 	font-weight: bold;
 	padding-left: 10px;
 	padding-right: 10px;
-	margin-left: 223px;
+	margin-left: 228px;
 	margin-top: 10px;
 }
 
