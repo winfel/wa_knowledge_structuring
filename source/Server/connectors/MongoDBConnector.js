@@ -42,7 +42,6 @@ mongoConnector.init = function(theModules) {
 	Modules = theModules;
     that.Modules = theModules;
     monk = require('monk'); 
-    console.log();
     dbmonk = monk(theModules.MongoDBConfig.getURI());
        
     mongo.MongoClient.connect(theModules.MongoDBConfig.getURI(), function (err, db) {
@@ -54,7 +53,7 @@ mongoConnector.init = function(theModules) {
     rooms   = dbmonk.get('rooms');
     objects = dbmonk.get('objects');
     paintings = dbmonk.get('paintings');
-}
+};
 
 /**
 *   logs the user in on the backend. The main purpose of this function is not
@@ -89,7 +88,7 @@ mongoConnector.login = function(username, password, externalSession, context, rp
 			rp(data);
 		}
 	});
-}
+};
 
 /**
  * @function isLoggedIn
@@ -97,7 +96,7 @@ mongoConnector.login = function(username, password, externalSession, context, rp
  */
 mongoConnector.isLoggedIn = function(context) {
     return true;
-}
+};
 
 //-------------------------RIGHTS ----------------------------------------------
 // TODO: discuss this with the rightmanager group
@@ -113,7 +112,8 @@ mongoConnector.isLoggedIn = function(context) {
  */
 mongoConnector.mayWrite = function(roomID, objectID, connection, callback) {
     callback(null, true);
-}
+};
+
 /**
  * About rights
  * 
@@ -125,7 +125,8 @@ mongoConnector.mayWrite = function(roomID, objectID, connection, callback) {
  */
 mongoConnector.mayRead = function(roomID, objectID, connection, callback) {
     callback(null, true);
-}
+};
+
 /**
  * About rights
  * 
@@ -137,7 +138,7 @@ mongoConnector.mayRead = function(roomID, objectID, connection, callback) {
  */
 mongoConnector.mayDelete = function(roomID, objectID, connection, callback) {
     callback(null, true);
-}
+};
 
 /**
  * About rights
@@ -149,7 +150,7 @@ mongoConnector.mayDelete = function(roomID, objectID, connection, callback) {
  */
 mongoConnector.mayEnter = function(roomID, connection, callback) {
     callback(null, true);
-}
+};
 
 /**
  * @function mayInsert
@@ -159,7 +160,7 @@ mongoConnector.mayEnter = function(roomID, connection, callback) {
  */
 mongoConnector.mayInsert = function(roomID, connection, callback) {
     callback(null, true);
-}
+};
 
 //-----------------------------------------------------------------
 
@@ -177,7 +178,7 @@ mongoConnector.listRooms = function(callback) {
         	callback(null, rooms);
         }    	
     });
-}
+};
 
 /**
 * returns all objects in a room (no actual objects, just their attribute set)
@@ -236,7 +237,7 @@ mongoConnector.getInventory = function(roomID, context, callback) {
             callback(false);
         }
     });
-}
+};
 
 /**
 *   internal
@@ -278,6 +279,7 @@ function buildObjectFromDBObject (roomID, attr, callback) {
 		console.dir(arguments);
     }
 }
+
 /**
  *  Get room data or create room, if doesn't exist yet.
  *  @function getRoomData
@@ -325,7 +327,7 @@ mongoConnector.getRoomData = function(roomID, context, callback, oldRoomId) {
             });
         } 
     });
-}
+};
 
 /**
  * save the object (by given data) 
@@ -354,7 +356,7 @@ mongoConnector.saveObjectData = function(roomID, objectID, data, callback, conte
         	if (!_.isUndefined(callback) && callback != false) callback();
         }
     });
-}
+};
 
 /**
 *   create a new object on the persistence layer
@@ -396,7 +398,7 @@ mongoConnector.createObject = function(roomID, type, data, context, callback) {
             callback(objectID);
         }
     });
-}
+};
  
 /**
  * Duplicate a list of objects
@@ -418,7 +420,7 @@ mongoConnector.duplicateObjects = function(roomID, toRoom, objectIDs, context, c
     }
     
     dObject(0);
-}
+};
 
 /**
  * duplicate an object on the persistence layer to directly work on the new
@@ -517,7 +519,7 @@ mongoConnector.duplicateObject = function(roomID, toRoom, objectID, context, cal
             });
         }
     });
-}
+};
 
 /**
 *   move object/objects from one room to another
@@ -567,7 +569,7 @@ mongoConnector.moveObjects = function(roomID, toRoom, objectIDs, objectAttribute
     }
     
     updateObject(0);
-}
+};
 
 /**
 *   Returns the attribute set of an object
@@ -596,7 +598,7 @@ mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
             });
         }
     });
-}
+};
 
 /**
  * Save the object (by given data) if an "callback" function is specified, it is
@@ -615,7 +617,7 @@ mongoConnector.saveRoom = function(roomID, data, context) {
     if (!data)    this.Modules.Log.error("Missing data");
     
     return rooms.insert(data);
-}
+};
 
 /**
 *   internal
@@ -750,7 +752,7 @@ mongoConnector.getObjectDataByQuery = function(query, callback) {
             callback(objectsList);
         }
     });
-}
+};
 
 /**
 * returns the room hierarchy starting by given roomID as root
@@ -804,7 +806,7 @@ mongoConnector.getRoomHierarchy = function(roomID, context, callback) {
 	async.waterfall([self.listRooms, filter, buildTree], function(err, res) {
 		callback(res);
 	});
-}
+};
 
 /**
  * save the object's content if an "after" function is specified, it is called
@@ -849,7 +851,7 @@ mongoConnector.saveContent = function(roomID, objectID, content, callback, conte
     } else {
     	writeFileInDB(filename, content, callback, objectID);		
     }
-}
+};
 
 function writeFileInDB(filename, content, callback, callbackParam, metaData) {
 	var that = this;
@@ -923,7 +925,7 @@ mongoConnector.savePainting = function(roomID, content, callback, context) {
 	paintingMetaData.name = filename;
 	
 	writeFileInDB(filename, content, callback, null, paintingMetaData);	
-}
+};
 
 /**
  * Saves the painting (given by data), if an "callback" function is specified, it is
@@ -940,7 +942,7 @@ mongoConnector.savePaintingInDB = function(roomID, painting, context) {
     if (!painting) this.Modules.Log.error("Missing data");
     
     return paintings.insert(painting);
-}
+};
 
 /**
  * deletePainting delete a users Painting
@@ -965,7 +967,7 @@ mongoConnector.deletePainting = function(roomID, callback, context) {
 			callback();
 		}
     });
-}
+};
 
 /**
 *   getPaintings
@@ -998,7 +1000,7 @@ mongoConnector.getPaintings = function(roomID, context, callback) {
             callback(paintings);
         }    	
     });	
-}
+};
 
 /**
 *	get the the object's content from a file and save it
@@ -1024,7 +1026,7 @@ mongoConnector.copyContentFromFile = function(roomID, objectID, sourceFilename, 
     });
 
 	this.saveContent(roomID, objectID, rds, callback ,context, true);
-}
+};
 
 /**
  * get an object's content as an array of bytes
@@ -1076,7 +1078,7 @@ mongoConnector.getContent = function(roomID, objectID, context, callback) {
 			}
 		}
 	});
-}
+};
 
 /**
 *   @function getContentStream
@@ -1100,7 +1102,7 @@ mongoConnector.getContentStream = function(roomID, objectID, context) {
     });
 
     return readStream;
-}
+};
 
 /**
 *   @function getPaintingStream
@@ -1131,9 +1133,8 @@ mongoConnector.getPaintingStream = function(roomID, user, context) {
     	that.Modules.Log.error("Error reading file: " + filename + " error type: " + err);
     });
 
-    return readStream;
-    
-}
+    return readStream;  
+};
 
 /**
  * @function getTrashRoom
@@ -1143,7 +1144,7 @@ mongoConnector.getPaintingStream = function(roomID, user, context) {
  */
 mongoConnector.getTrashRoom = function(context, callback) {
     this.getRoomData(TRASH_ROOM, context, callback);
-}
+};
 
 /**
  * remove an object from the persistence layer
@@ -1168,7 +1169,7 @@ mongoConnector.removeObject = function(roomID, objectID, context, callback) {
     	// just move to the trash room
     	this.moveObjectToTrashRoom(roomID, objectID, context, callback);    	
     }	 
-}
+};
 
 mongoConnector.moveObjectToTrashRoom = function(roomID, objectID, context, callback) {
     roomID = roomID.toString();
@@ -1205,7 +1206,7 @@ mongoConnector.moveObjectToTrashRoom = function(roomID, objectID, context, callb
 	        }			
 	    });	
 	});
-}
+};
 
 mongoConnector.removeObjectFromDB = function(roomID, objectID, context, callback) {
     roomID = roomID.toString();
@@ -1321,7 +1322,7 @@ mongoConnector.removeObjectFromDB = function(roomID, objectID, context, callback
 			}
 		}
 	});	
-}
+};
 
 /**
 *	@function trimImage
@@ -1395,7 +1396,7 @@ mongoConnector.trimImage = function(roomID, objectID, context, callback) {
             });
         });
     });
-}
+};
 
 /**
 *	@function isInlineDisplayable
@@ -1403,7 +1404,7 @@ mongoConnector.trimImage = function(roomID, objectID, context, callback) {
 */
 mongoConnector.isInlineDisplayable = function(mimeType) {
     return !(this.getInlinePreviewProviderName(mimeType) == false); 
-}
+};
 
 /**
 *	@function getMimeTyp
@@ -1419,7 +1420,8 @@ mongoConnector.getMimeType = function(roomID, objectID, context, callback) {
         var mimeType = objectData.attributes.mimeType;
         callback(mimeType);
     });
-}
+};
+
 /**
 * SYNC
 *	@function getInlinePreviewProviderName
@@ -1431,7 +1433,7 @@ mongoConnector.getInlinePreviewProviderName = function(mimeType) {
     var inlinePreProv = this.getInlinePreviewProviders()[mimeType];
 
     return (inlinePreProv != undefined) ? inlinePreProv : false;
-}
+};
 
 /**
 * SYNC
@@ -1446,7 +1448,7 @@ mongoConnector.getInlinePreviewMimeTypes = function() {
     }
     
     return list;
-}
+};
 
 /**
 * SYNC
@@ -1464,7 +1466,7 @@ mongoConnector.getInlinePreviewProviders = function() {
 		"image/x-bmp" : "image",
 		"image/x-ms-bmp" : "image"
 	}
-}
+};
 
 /**
 *	@function getInlinePreviewDimensions
@@ -1503,7 +1505,7 @@ mongoConnector.getInlinePreviewDimensions = function(roomID, objectID, mimeType,
     } else {
         mimeTypeDetected(mimeType);
     }
-}
+};
 
 /**
 *	@function getInlinePreview
@@ -1545,7 +1547,7 @@ mongoConnector.getInlinePreview = function(roomID, objectID, mimeType, context, 
     } else {
         mimeTypeDetected(mimeType);
     }
-}
+};
 
 /**
 *	@function getInlinePreviewMimeType
@@ -1577,7 +1579,7 @@ mongoConnector.getInlinePreviewMimeType = function(roomID, objectID, context, ca
         }
         
     });
-}
+};
 
 /**
 *   Head function and some subfunctions included, TODO JSDoc

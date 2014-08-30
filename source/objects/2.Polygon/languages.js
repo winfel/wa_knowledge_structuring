@@ -4,3 +4,10 @@ Polygon.setTranslations('de',{
 	'rotation':'Drehung'
 }
 );
+
+Polygon.setTranslations('es',{
+    'Polygon':'Polígono',
+    'edges':'Bordes',
+    'rotation':'Rotación'
+}
+);

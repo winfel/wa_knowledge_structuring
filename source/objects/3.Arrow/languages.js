@@ -4,3 +4,11 @@ Arrow.setTranslations('de',{
 	'markerEnd':'Pfeil am Ende',
 }
 );
+
+Arrow.setTranslations('es',{
+        'Arrow':'Flecha',
+        'markerStart':'Marcador inicial',
+        'markerEnd':'Marcador final',
+    }
+);
+
