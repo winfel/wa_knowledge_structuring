@@ -11,10 +11,9 @@ $(function() {
 	 */
 	var drop = function(event) {
 		
-		if($(".ui-tabs-active").children().first().attr('title') == "Global Space"){
-			alert("Sorry, it's not allowed to upload Files in the Global Space. Please upload them in your private Space or in the Paper Spaces");
-		}
-		else{
+		if ($(".ui-tabs-active").children().first().attr('title') == "Global Space") {
+			alert(GUI.translate("upload.globalspace.error"));
+		} else {
 		
 			/* get position of drop */
 			var x = event.clientX+parseInt($("body").scrollLeft());

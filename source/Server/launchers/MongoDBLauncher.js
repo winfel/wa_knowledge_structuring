@@ -1,8 +1,8 @@
 
 /**
-*    Webarena - A web application for responsive graphical knowledge work
+* CoW - A web application for responsive graphical knowledge work
 *
-*    @author Felix Winkelnkemper, University of Paderborn, 2012
+* @author University of Paderborn, 2014
 *
 * @class MongoDBLauncher
 * @classdesc This checks if MongoDB is running if not then MongoDB is launched

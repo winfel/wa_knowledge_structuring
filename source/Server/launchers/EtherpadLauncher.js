@@ -1,7 +1,7 @@
 /**
-*    Webarena - A web application for responsive graphical knowledge work
+* CoW - A web application for responsive graphical knowledge work
 *
-*    @author Felix Winkelnkemper, University of Paderborn, 2012
+* @author University of Paderborn, 2014
 *
 * @class EtherpadLauncher
 * @classdesc This checks if Etherpad is running if not then etherpad is launched

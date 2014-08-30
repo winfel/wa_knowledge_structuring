@@ -31,7 +31,12 @@ GUI.userdialog = new function() {
         if (newUser) {
             Modules.UserManager.isValidUser(newUser, function(valid) {
                 if (valid) addUserToSection(that, newUser, that.searched, false, false, true, true);
-                else alert("The User " + newUser + " was not found");
+                else {
+                    $("#container-notifier").notify("create", "withIcon", {
+                        text: GUI.translate("The User " + newUser + " was not found"),
+                        icon: '/guis.common/images/toast/error.png'
+                    }, {expires:false});
+                }
             });
         }
         

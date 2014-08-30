@@ -1,10 +1,10 @@
 /**
-*    Webarena - A web application for responsive graphical knowledge work
+*    CoW - A web application for responsive graphical knowledge work
 *    
 *    @class FileConnector
 *    @classdesc Connects to the database
 *    
-*    @author Felix Winkelnkemper, University of Paderborn, 2012
+*    @author University of Paderborn, 2014
 */
 "use strict";
 

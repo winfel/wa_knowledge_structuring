@@ -159,7 +159,9 @@ GUI.enterCouplingMode = function() {
 	        	$('#couplingGreyRectangle').remove();
 	        	GUI.addZoomPanControl('right', $(window).width()-105, $('#couplingBar').attr('y2')-138);
 	        } else {
-	        	alert(GUI.translate("Room already displayed"));
+	        	$("#container-notifier").notify("create", "basic-notification", {
+	                text: GUI.translate(GUI.currentLanguage, "Room already displayed")
+	            });
 	        }
 		});
 		$('#couplingNavigation').append(navigationDiv);

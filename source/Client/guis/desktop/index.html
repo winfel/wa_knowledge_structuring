@@ -35,6 +35,7 @@
     <script type="text/javascript" src="/guis.common/libraries/recorder.js"></script>
     <script type="text/javascript" src="/guis.common/libraries/setupRecorder.js"></script>
     <script type="text/javascript" src="/guis.common/libraries/md5.js"></script>
+    <script type="text/javascript" src="/guis.common/libraries/jquery.notify.js"></script>
 
 
 <script src="/guis.common/javascript/0.loadTab.js"></script>
@@ -90,15 +91,15 @@
         }
 
         document.title = Modules.Config.projectTitle || 'WebArena';
-
+        
+        $("#container-notifier").notify();
       });
     </script>
 
     <!-- /objects is generated in BuildTool.js on the server side. -->
     <script src="/objects"></script>
     <script type="text/javascript" src="/defaultJavascripts"></script>
-    <script type="text/javascript" src="/guis.common/translation_de.js"></script>
-    <script type="text/javascript" src="/guis.common/translation_es.js"></script>
+    <script type="text/javascript" src="/guis.common/translation.js"></script>
 
     <link type="text/css" href="/guis/desktop/style.css" rel="Stylesheet">
     <link type="text/css" href="/guis.common/css/actionsheet.css" rel="Stylesheet">
@@ -111,11 +112,12 @@
     <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jDesktopInspector.js"></script>
     <link type="text/css" href="/guis.common/libraries/jquery/plugins/css/jquery.jDesktopInspector.css" rel="Stylesheet">
     <link type="text/css" href="/guis.common/libraries/jquery/plugins/css/jquery.jPopover.desktop.css" rel="Stylesheet">
+    <link type="text/css" href="/guis.common/css/ui.notify.css" rel="Stylesheet">
 
     <link type="text/css" href="/guis/desktop/rightmanager.css" rel="Stylesheet">
     <link type="text/css" href="/guis/desktop/objects/paperViewer.css" rel="Stylesheet">
     <link type="text/css" href="/guis/desktop/objects/paperWriter.css" rel="Stylesheet">
-<link type="text/css" href="/guis.common/css/verTabs.css" rel="Stylesheet">
+    <link type="text/css" href="/guis.common/css/verTabs.css" rel="Stylesheet">
 
     <script type="text/javascript" src="/guis/desktop/main.js"></script>
     <script>
@@ -412,7 +414,36 @@
     </div>
 
     <div id="progressBar"><div class="progressBar_container"></div></div>
-
+    
+    <!-- set the container hidden to avoid a flash of unstyled content
+         when the page first loads -->
+	<div id="container-notifier" style="display:none">
+	  <!-- 
+	  http://www.erichynds.com/blog/a-jquery-ui-growl-ubuntu-notification-widget
+	  -->
+	  <div id="basic-notification">
+	      <a class="ui-notify-cross ui-notify-close" href="#">x</a>
+	      <h1>#{title}</h1>
+	      <p>#{text}</p>
+	  </div>
+	  
+	  <div id="withIcon">
+			<a class="ui-notify-close ui-notify-cross" href="#">x</a>
+			<div style="float:left;margin:0 10px 0 0"><img src="#{icon}" alt="warning" /></div>
+			<h1>#{title}</h1>
+			<p>#{text}</p>
+		</div>
+		
+		<div id="confrim-notification">
+			<h1>#{title}</h1>
+			<p>#{text}</p>
+			<p style="margin-top:10px;text-align:center">
+				<input type="button" class="confirm" value="#{Yes}" name="yes" />
+				<input type="button" class="confirm" value="#{No}" name="no" />
+			</p>
+		</div>
+	</div>
+    
     <!-- BEGIN: Underscore Template Definition. -->
     <script type="text/template" id="proceeding-statusdialog">
       <div>

@@ -193,7 +193,11 @@ GUI.tagAssigner = new function() {
 					
 						//reset the value of the input field
 						$(this).val("");
-						alert("A main tag with the specified name already exists");
+						$("#container-notifier").notify("create", "withIcon", {
+                             title :  GUI.translate("error"),
+                             text: GUI.translate("tagManager.duplicateTag.error"),
+                             icon: '/guis.common/images/toast/warning.png'
+                        });
 						
 						return
 					}

@@ -1,12 +1,11 @@
 /**
-*    Webarena - A web application for responsive graphical knowledge work
+*    CoW - A web application for responsive graphical knowledge work
 *
 *    University of Paderborn, 2014
 *
 */
 
 GlobalContainer.options = {
-
 	searchString : "",
 	searchByName : true,
 	searchByTag : false,
@@ -18,14 +17,13 @@ GlobalContainer.options = {
 	searchForText : true,
 	sortingCriterion : "By Name",
 	sortingOrder : "From A to Z"
-
 }
 
 GlobalContainer.Files = new Array();
 GlobalContainer.PaperSpaces = new Array();
 
 
-GlobalContainer.getFiles = function(){
+GlobalContainer.getFiles = function() {
 	var that = this;
 	this.serverCall("getAllFileObjects", function(data){
 		that.Files = data;
@@ -33,60 +31,59 @@ GlobalContainer.getFiles = function(){
 	});
 };
 
-GlobalContainer.sendNewFavourite = function(fav){
+GlobalContainer.sendNewFavourite = function(fav) {
 		
-	UserManager.getDataOfSpaceWithDest(ObjectManager.user.username, "favourites" , function(d){
+	UserManager.getDataOfSpaceWithDest(ObjectManager.user.username, "favourites" , function(d) {
 	
 		var arr = new Array();
 						
-		if(d != "error"){
+		if (d != "error") {
 			var key;
-			for(key in d[0].value){
+			for(key in d[0].value) {
 				arr.push(d[0].value[key]);
 			}
 			UserManager.removeDataOfSpaceWithDest(ObjectManager.user.username, "favourites");
 		}
 		
-		if(arr.indexOf(fav) == -1){
+		if (arr.indexOf(fav) == -1) {
 			arr.push(fav);
 		}
 				
 		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(ObjectManager.user.username, "favourites", arr) }, 500);
-	
 	});
-		
 }
 
-GlobalContainer.sendNewReference = function(ref, paperspace){
+GlobalContainer.sendNewReference = function(ref, paperspace) {
 		
-	UserManager.getDataOfSpaceWithDest(paperspace, "references" , function(d){
+	UserManager.getDataOfSpaceWithDest(paperspace, "references" , function(d) {
 	
 		var arr = new Array();
 						
-		if(d != "error"){
+		if (d != "error") {
 			var key;
-			for(key in d[0].value){
+			for (key in d[0].value) {
 				arr.push(d[0].value[key]);
 			}
 			UserManager.removeDataOfSpaceWithDest(paperspace, "references" );
 		}
 		
-		if(arr.indexOf(ref) == -1){
+		if (arr.indexOf(ref) == -1) {
 			arr.push(ref);
 		}
 				
 		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(paperspace, "references", arr) }, 500);
-	
-	});
-		
+	});	
 }
 
 GlobalContainer.deleteIt = function() {
-    alert(this.translate(GUI.currentLanguage, "globalContainer.delte.msg"));
+    $("#container-notifier").notify("create", "withIcon", {
+        title: this.translate(GUI.currentLanguage, "globalContainer.delte.titel"), 
+        text: this.translate(GUI.currentLanguage, "globalContainer.delte.msg"),
+        icon: '/guis.common/images/toast/notice.png'
+    });
 }
 
-GlobalContainer.changeMainTag = function(objectId, newTag, roomId){
-
+GlobalContainer.changeMainTag = function(objectId, newTag, roomId) {
 	var d = {
 		id : objectId,
 		tag : newTag,
@@ -94,31 +91,24 @@ GlobalContainer.changeMainTag = function(objectId, newTag, roomId){
 	};
 
 	this.serverCall("changeMainTag", d);
-
 }
 
-
-GlobalContainer.getAllPaperSpaces = function(){
-
+GlobalContainer.getAllPaperSpaces = function() {
 	var that = this;
 	this.PaperSpaces = new Array();
 
-	UserManager.getDataOfSpaceWithDest("ProjectNames", "name" , function(d){
+	UserManager.getDataOfSpaceWithDest("ProjectNames", "name" , function(d) {
 	
-		if(d != "error"){
+		if (d != "error") {
 			var key;
-			for(key in d[0].value){
+			for (key in d[0].value) {
 				that.PaperSpaces.push(d[0].value[key]);
 			}
 		}
-	
 	});
-	
 }
 
-
-GlobalContainer.searchAndFilter = function(files){
-	
+GlobalContainer.searchAndFilter = function(files) {
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
 	
@@ -132,30 +122,29 @@ GlobalContainer.searchAndFilter = function(files){
 	var video = this.options.searchForVideo;
 	var text = this.options.searchForText;
 	
-	if(typeof s === "undefined" || s == "" || s == 0){
+	if (typeof s === "undefined" || s == "" || s == 0) {
 		filteredFiles1 = files;
-	}
-	else{ //the user has entered a search string, search through all files and check if name and/or tag matches to the search string
-	
+	} else { 
+	    // the user has entered a search string, search through all files and check if name and/or tag matches to the search string
 		var key;
 		for (key in files) { 
 		
 			var n = files[key].attributes.name;
 			var secTags = files[key].attributes.secondaryTags;
 			
-			if(secTags == 0 || typeof secTags == "undefined"){
+			if (secTags == 0 || typeof secTags == "undefined") {
 				secTags = new Array();
 			}
 					
-			if(name){
-				if(n.indexOf(s) > -1){ //searchString part of the name of the object
+			if (name) {
+				if (n.indexOf(s) > -1) { //searchString part of the name of the object
 					filteredFiles1.push(files[key]);
 					continue;
 				}
 			}
-			if(tag){
-				for(var i = 0; i<secTags.length; i++){ 
-					if(secTags[i].indexOf(s) > -1){ //searchString part of a tag of the object
+			if (tag) {
+				for (var i = 0; i<secTags.length; i++) { 
+					if (secTags[i].indexOf(s) > -1) { //searchString part of a tag of the object
 						filteredFiles1.push(files[key]);
 						break;
 					}
@@ -221,7 +210,6 @@ GlobalContainer.searchAndFilter = function(files){
 
 
 GlobalContainer.sortFiles = function(files){ //bubble sort
-
 	var sortingCriterion = this.options.sortingCriterion;
 	var sortingOrder = this.options.sortingOrder;
 	

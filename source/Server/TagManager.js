@@ -384,7 +384,7 @@ var TagManager = function() {
 		                    });
 		                } else {                	
 		                	// console.log("The main tag cannot be deleted since there are files tagged with this tag");
-		                	callback(true, "The main tag cannot be deleted since there are files tagged with this tag");
+		                	callback(true, "tagManager.maintagdeletion.error");
 		                } 
 		            }        
 		        });

@@ -54,6 +54,7 @@ GUI.tagManager = new function() {
 	this.createMainTag = function(mainTag, newId) {
 		// saves the newly created main tag "mainTag" in the database  
 		Modules.TagManager.updMainTags(mainTag, newId);
+		// TODO: add tag to the mainTags array
 	}
 	
 	this.updMainTagName = function(oldName, newName, tagID){		
@@ -109,7 +110,11 @@ GUI.tagManager = new function() {
                          for (var index = 0; index < that.mainTags.length; ++index) {
                             if (that.mainTags[index].name == value) {
                             
-                                alert("A main tag with the specified name already exists");
+                                $("#container-notifier").notify("create", "withIcon", {
+                                    title :  GUI.translate("error"),
+                                    text: GUI.translate("tagManager.duplicateTag.error"),
+                                    icon: '/guis.common/images/toast/warning.png'
+                                });
                                 
                                 return this.revert;
                                 
@@ -198,7 +203,11 @@ GUI.tagManager = new function() {
 		    
             that.deleteMainTag(mainTagToBeDeleted, tagID, function(obj) {
                 if (obj.error && obj.error == true) {
-                    alert(obj.msg);
+                    $("#container-notifier").notify("create", "withIcon", {
+                        title :  GUI.translate("error"),
+                        text: GUI.translate(obj.msg),
+                        icon: '/guis.common/images/toast/warning.png'
+                    }, { expires: 7000});
                 } else {
                     var icon = $(self);
                     icon.closest(".portlet").remove();
@@ -217,8 +226,12 @@ GUI.tagManager = new function() {
 			
 		    
 		    that.deleteSecondaryTag(mainTag, secondaryTagToBeDeleted, function(obj){
-		    	if(obj.error && obj.error == true){
-		    		alert(obj.msg);		    		
+		    	if(obj.error && obj.error == true) {
+		    		$("#container-notifier").notify("create", "withIcon", {
+	                        title : GUI.translate("error"),
+	                        text: GUI.translate(obj.msg),
+	                        icon: '/guis.common/images/toast/warning.png'
+	                    }, { expires: 7000});
 		    	} else {
 		    		var icon = $( self )
 				    icon.closest( "li" ).remove();

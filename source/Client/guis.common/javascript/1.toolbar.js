@@ -384,11 +384,22 @@ var popover_positionOffsetY = 21;
       selLanguage.setOptions(['de', 'en', 'es', 'cow']);
       selLanguage.setValue(ObjectManager.getUser().preferredLanguage || GUI.currentLanguage);
       selLanguage.onChange(function(sel) {
-       GUI.currentLanguage = sel;
-       ObjectManager.getUser().preferredLanguage = sel;
-       if(confirm(GUI.translate('To update the language of all elements of the page it has to be reloaded. Reload now?'))) {
-        location.reload();
-      }
+          
+           var response = $("#container-notifier").notify("create", "confrim-notification", { 
+               text: GUI.translate('trasnlate'),
+               Yes: GUI.translate('Yes'),
+               No: GUI.translate('No')
+           }, { expires:false });
+           
+           response.widget().delegate("input", "click", function(event) {
+               if (event.currentTarget.name == "yes") {
+                   GUI.currentLanguage = sel;
+                   ObjectManager.getUser().preferredLanguage = sel;
+                   location.reload();
+               }  else {
+                   response.close();
+               }
+           });
     });
 
 /*		// the color widget allows colors which shouldn't be allowed :-/

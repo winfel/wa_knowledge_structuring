@@ -1040,7 +1040,10 @@ GeneralObject.moveStart = function(event) {
 
               $(object.getRepresentation()).appendTo('#room_left');
             });
-            alert(GUI.translate('No room loaded.'));
+            $("#container-notifier").notify("create", "basic-notification", {
+                title: GUI.translate(GUI.currentLanguage, "Message"), 
+                text: GUI.translate(GUI.currentLanguage, 'No room loaded.')
+            });
           }
         } else {
           $.each(ObjectManager.getSelected(), function(index, object) {
