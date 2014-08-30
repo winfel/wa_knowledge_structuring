@@ -282,13 +282,14 @@ UserManager.setUserPreferredLanguage.public = true;
 
 UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
-  var shouldInclude = [ PAPER_WRITER+"#Writer#20#100#700#2#locked;true#paper;"+data.roomID,
-                        "SimpleText#WritingAreaInfo#20#45#100#2#height;30#content;Writing Area:",
-                        "SimpleText#ReferenceInfo#800#45#100#2#height;30#content;References:",
-                        "ReferenceContainer#References#800#100#500#2#locked;true#height;455",
-                        "SimpleText#DefineInfo#800#600#190#2#height;30#content;Sort the PaperChapters from left to right to give them an order",
-                        "SimpleText#DefineInfo2#255#600#190#2#height;30#content;Place a chapter inside the selector to load it",
-                        "PaperSelector#Selector#655#700#128#0#"];
+  var shouldInclude = [ PAPER_WRITER+"#Writer#20#200#700#2#locked;true#paper;"+data.roomID,
+                        "SimpleText#WritingAreaInfo#20#145#100#2#height;30#content;Writing Area:",
+                        "SimpleText#ViewerInfo#800#145#100#2#height;30#content;Viewing Area:",
+                        "Viewer#Viewer#800#200#600#0#",
+                        "ReferenceContainer#References#800#800#600#2#locked;true#height;455",
+                        "Textarea#InfoBox#20#800#700#2#height;100#content;For your information: \nYou can use the magnifier to choose a chapter that is shown within the"+
+                          "writing area. Sort the chapters from left to right to create a order.",
+                        "PaperSelector#Selector#220#45#128#0#"];
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 
