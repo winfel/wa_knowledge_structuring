@@ -354,12 +354,13 @@ GUI.tagAssigner = new function() {
 
 	// sets the list of unassigned secondary tags to the secondary tags 
 	//which are retrieved from the database, filters them and draws them
-	this.setSecondaryTags = function(list){
+	this.setSecondaryTags = function(data){
 		var that = GUI.tagAssigner;
 		
-		if(list != undefined && list.length > 0){
+		//if(data != undefined && data.secTags > 0){
+		if(data != undefined){
 			
-			that.unassignedSecTags = list[0].secTags;	
+			that.unassignedSecTags = data.secTags;	
 			that.filterSecondaryTags(that.assignedSecTags);
 			
 			that.updatePagingParameters();	

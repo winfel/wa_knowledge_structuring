@@ -1212,3 +1212,23 @@ span.portlet-toggle, span.portlet-delete, span.sec-tag-delete {
     -webkit-transform: scale(1.0);
   }
 } 
+
+
+/* Search Sidebar*/
+
+#search input[type="text"] {
+	width: 175px;
+}
+
+#search select {
+	width: 195px;
+}
+
+#search img {
+	vertical-align: top;
+	cursor: pointer;
+}
+
+
+/* end Search Sidebar*/
+

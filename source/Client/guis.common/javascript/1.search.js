@@ -10,206 +10,179 @@ GUI.search = new function () {
 	
     this.init = function () {
         var that = GUI.search;
+        
+        var filterByFilename = "";
+        var filterByMainTag = "";
+        var filterBySecondaryTag = [];
 
-        var span = $("<span>");
-        this.content = $("#span");
+        //$("#searchButton").click(function () {
+        $("#searchFilenameTxt").keyup(function () {
 
-        $("#searchButton").click(function () {
-
-            var inventory = Modules.ObjectManager.getInventory();
-
-            for (var i in inventory) {
-                var candidate = inventory[i];
-
-                if (candidate.getAttribute('type') == FILE_TYPE_NAME) {
-
-                    // candidate.setAttribute('visible', false);
-					var rep = document.getElementById(candidate.getAttribute('id'));
-					
-					var searchString = $("#searchFileId").val();					
-                    if (candidate.getAttribute('name').search(new RegExp(searchString, "i")) >= 0) {
-                        // matching case
-                    	$(rep).css("opacity", 1);
-                    } else {
-                    	//non-matching case
-                    	$(rep).css("opacity", NON_MATCHING_FILE_OPACITY);
-                    }
-                }
-            }
+        	filterByFilename = $("#searchFilenameTxt").val();      	
+        	
+        	doFiltering();
+        	
         });
 
-        $("#resetButton").click(function () {
-
-            var inventory = Modules.ObjectManager.getInventory();
-            $("#searchFileId").val('');
-				
-
-            for (var i in inventory) {
-                var candidate = inventory[i];
-                if (candidate.getAttribute('type') == FILE_TYPE_NAME) {
-                   // candidate.setAttribute('visible', false);
-				   	var rep=document.getElementById(candidate.getAttribute('id'));
-                    if (candidate.getAttribute('name').indexOf($("#searchFileId").val()) >= 0) {
-                       $(rep).css("opacity", 1);
-                    }
-                }
-            }
+        $("#resetButton").click(function () {        	
+        	
+        	var fileObjects = getFileObjectsFromInventory();        	
+        	
+        	$.each( fileObjects, function( key, file ) {
+        		var rep = document.getElementById(file.getAttribute('id'));        		                    
+                $(rep).css("opacity", 1);
+        	});
+        	
+        	resetFilterByFilename();
+        	resetFilterByMainTag();
+        	resetFilterBySecondaryTag();
+        	$("#secondaryTagSel").empty();
+        	
         });
-
-        $("#primButton").click(function () {
-            var array = [];
-            var array2 = [];
-
-            var uniqueArray = [];
-            $("#Sec_tag").empty();
-            $("#filterButton").empty();
-
-            $("#Sec_tag span").empty();
-            $("#title_Sec_tag").empty();
-            var setTitle = true;
-            var inventory = Modules.ObjectManager.getInventory();
-
-            for (var i in inventory) {
-                var candidate = inventory[i];
-
-                if (candidate.getAttribute('type') == FILE_TYPE_NAME) {
-					var rep=document.getElementById(candidate.getAttribute('id'));
-
-                    $(rep).css("opacity", NON_MATCHING_FILE_OPACITY);
-                    if (candidate.getAttribute('mainTag').indexOf($("#primButton").val()) >= 0) {
-					
-                        array.push(candidate.getAttribute('secondaryTags'));
-                        if ($("#primButton").val() != " " && setTitle == true) {
-						
-                            var spanTitle = $("<span >");
-                            spanTitle.html("Filter By Secondary Tag - " + candidate.getAttribute('mainTag') + "");
-                            spanTitle.addClass("jDesktopInspector_pageHead");
-                            $("#title_Sec_tag").append(spanTitle);
-                            $("#title_Sec_tag").append("<br>");
-
-                            var filterButton = $("<input >");
-                            filterButton.attr({
-
-                                type: "Button",
-                                value: "Filter"
-                            });
-
-                            $("#filterButton").append(filterButton);
-                            setTitle = false;
-                        }
-
-
-                       $(rep).css("opacity", 1);
-                    }
-                }
-            }
-
-            $.each(array, function (j) {
-                array2 = array[j]
-                $.each(array2, function (k) {
-                    uniqueArray.push(array2[k]);
-
-                });
+        
+        
+        $("#resetFilterByFilenameBtn").click(function(){
+        	resetFilterByFilename();
+        });
+        
+        $("#resetFilterByMainTagBtn").click(function(){
+        	resetFilterByMainTag();
+        	resetFilterBySecondaryTag();
+        	$("#secondaryTagSel").empty(); 
+        });
+        
+        $("#resetFilterBySecondaryTagBtn").click(function(){
+        	resetFilterBySecondaryTag();
+        });
+        
+       
+                
+        $("#mainTagSel").change(function () {
+        	
+        	filterByMainTag = $(this).val();       	
+        	filterBySecondaryTag = [];
+        	        	
+        	Modules.TagManager.getSecTags(filterByMainTag, function(data){        		 
+        		
+        		var select = $("#secondaryTagSel");
+        		select.empty();
+        		
+        		$.each( data.secTags, function( key, secTag ) {
+        			var option = $("<option>");
+	                option.attr({
+	                    value: secTag,
+	                    id: secTag,
+	                });
+	                option.html(secTag);
+	                select.append(option);
+        		});
+        		
+        		doFiltering();
+        	});
+        });
+        
+        $("#secondaryTagSel").change(function () {
+        	
+        	filterBySecondaryTag = [];
+        	$("#secondaryTagSel > option:selected").each(function() {
+            	filterBySecondaryTag.push($(this).val());
             });
-            uniqueArray = GetUnique(uniqueArray);
-            if ($("#primButton").val() != " ") {
-                var select = $("<select>");
-
-                select.attr({
-                    size: 5,
-                    name: "select-secondary-tag",
-                    multiple: "multiple",
-                    title: "Select",
-                    id: "select"
-
-                });
-                $.each(uniqueArray, function (m) {
-
-                    addSecTags(select, uniqueArray[m]);
-
-                });
-            }
-
-
+        	
+        	doFiltering();
         });
-
-        function GetUnique(inputArray) {
-            var outputArray = [];
-            for (var i = 0; i < inputArray.length; i++) {
-                if ((jQuery.inArray(inputArray[i], outputArray)) == -1) {
-                    outputArray.push(inputArray[i]);
-                }
-            }
-            return outputArray;
+                
+        
+        function resetFilterByFilename(){
+        	$("#searchFilenameTxt").val('');
+        	filterByFilename = "";
+        	doFiltering();
         }
-
-        function addSecTags(select, secTags) {
-
-
-            var option = $("<option>");
-            option.attr({
-                value: secTags,
-                id: secTags,
-            });
-            option.html(secTags);
-            select.append(option);
-
-            $("#Sec_tag").append(select);
+        
+        function resetFilterByMainTag(){
+        	$("#mainTagSel").prop('selectedIndex', 0);
+        	filterByMainTag = "";
+        	doFiltering();
         }
-        $("#filterButton").click(function () {
-            var size = $("#select")[0].selectedOptions.length;
-            var filterArray = [];
-
-            for (var z = 0; z < size; z++) {
-                filterArray.push($("#select")[0].selectedOptions[z].text);
-            }
-            var visible = true;
-            var matchVisible = true;
-
-            var inventory = Modules.ObjectManager.getInventory();
-
-            for (var i in inventory) {
-                var candidate = inventory[i];
-                if (candidate.getAttribute('type') == FILE_TYPE_NAME) {
-				var rep = document.getElementById(candidate.getAttribute('id'));
-                    if (candidate.getAttribute('mainTag').indexOf($("#primButton").val()) >= 0) {
-                        visible = candidate.getAttribute('visible');
-                        matchVisible = matchArrays(candidate.getAttribute('secondaryTags'), filterArray);
-                        if( matchVisible == true){
-                            $(rep).css("opacity", 1);
-                        } else {
-						    $(rep).css("opacity", NON_MATCHING_FILE_OPACITY);
-						}
-                    }
-                }
-            }
-        });
-
-
-
-
+        
+        function resetFilterBySecondaryTag(){
+        	$("#secondaryTagSel option:selected").prop("selected", false);
+        	filterBySecondaryTag = [];
+        	doFiltering();
+        }
+        
         function matchArrays(arrayA, arrayB) {
 
-            var matchedValues = 0;
-            for (var i = 0; i < arrayA.length; i++) {
-                for (var j = 0; j < arrayB.length; j++) {
+            var matches = 0;
+            for (var i = 0; i < arrayB.length; i++) {
+                for (var j = 0; j < arrayA.length; j++) {
                     // we can now compare each value in arrayA to each value in arrayB
 
-                    if (arrayA[i] == arrayB[j]) {
-                        matchedValues++;
+                    if (arrayA[j] == arrayB[i]) {
+                    	matches++;
                         // no point continuing once we've confirmed there's a match...
                         break;
                     }
                 }
             }
             // check if the arrays are 'equal'
-            if (matchedValues == arrayA.length) {
-                return false;
-            } else {
+            if (matches == arrayB.length) {
                 return true;
+            } else {
+                return false;
             }
         }
-
+        
+        function getFileObjectsFromInventory(){
+        	var inventory = Modules.ObjectManager.getInventory();
+        	var fileObjects = [];
+        	
+        	$.each( inventory, function( key, object ) {
+        		if (object.getAttribute('type') == FILE_TYPE_NAME) {
+                	fileObjects.push(object);
+                } 
+        	});
+        	
+            return fileObjects
+        }
+        
+		function doFiltering(){
+			var fileObjects = getFileObjectsFromInventory();
+			var matchByFilename = true;
+			var matchByMainTag = true;
+			var matchBySecondaryTag = true;
+			
+			$.each( fileObjects, function( key, file ) {    
+				var rep = document.getElementById(file.getAttribute('id'));              
+			      
+				if(filterByFilename != ""){
+					if (file.getAttribute('name').search(new RegExp(filterByFilename, "i")) >= 0) {// matching case                    
+						matchByFilename = true;
+	                } else { //non-matching case                	
+	                	matchByFilename = false;
+	                }
+				}
+				
+				if(filterByMainTag != ""){
+					if (file.getAttribute('mainTag').indexOf(filterByMainTag) >= 0) {
+						matchByMainTag = true;
+	        		} else {
+	        			matchByMainTag = false;
+	        		}
+				}
+				
+				if(filterBySecondaryTag.length > 0){
+					matchBySecondaryTag = matchArrays(file.getAttribute('secondaryTags'), filterBySecondaryTag);
+				}
+				
+				if(matchByFilename && matchByMainTag && matchBySecondaryTag){					
+	            	$(rep).css("opacity", 1);
+	            } else {
+					$(rep).css("opacity", NON_MATCHING_FILE_OPACITY);					
+				}
+			});   
+		}
+      
     };
 
+    
 }

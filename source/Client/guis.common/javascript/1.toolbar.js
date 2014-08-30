@@ -505,17 +505,18 @@ if (!Modules.Config.presentationMode) {
   $(searchButton).attr("title", GUI.translate("Search"));
 
   var click = function() {
-    $("#primButton").empty();
+    $("#mainTagSel").empty();
 
     Modules.TagManager.getMainTagsAndSecTags(function(mainTagList){
      var option = $("<option>");
      option.attr({
        value: " ",
-       selected:true
+       disabled: true,
+       selected: true
      });
-     option.html("Select");
+     option.html("Select Main Tag");
 
-     $("#primButton").append(option);
+     $("#mainTagSel").append(option);
      for(var i=0;i<mainTagList.length;i++){
        var option = $("<option>");
        option.attr({
@@ -523,7 +524,7 @@ if (!Modules.Config.presentationMode) {
       });
 
        option.html(mainTagList[i].name);
-       $("#primButton").append(option);          
+       $("#mainTagSel").append(option);          
 
      }  
 

@@ -172,7 +172,7 @@ var TagManager = function() {
 	this.getSecTags = function(socket, mainTag) {
 		var dbMainTags = db.get('MainTags');
 		
-		dbMainTags.find( {name: mainTag}, ["secTags"] , function(e, secTags) {
+		dbMainTags.findOne( {name: mainTag}, ["secTags"] , function(e, secTags) {
 			Modules.SocketServer.sendToSocket(socket, "getSecTags", secTags);
 		} );
 	};
