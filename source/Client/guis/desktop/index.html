@@ -269,34 +269,44 @@
           </div>
           
 		<div id="search" class="jDesktopInspector">
-		    <div class="jDesktopInspector_main content">
-		        <div class="jDesktopInspector_pageHead" id="search_title">Filter By Filename</div>
-				<div class="jDesktopInspector_page jDesktopInspector_page_1" id="rm_rolesPage">			
+			<div class="jDesktopInspector_main content">
+				<div class="jDesktopInspector_pageHead">Filter By Filename</div>
+				<div class="jDesktopInspector_page jDesktopInspector_page_0">					
 					<div class="jDesktopInspector_section">                                                             							
 						<div class="jDesktopInspector_element">
-							<input id="searchFilenameTxt" name="searchFileName" type="text" size="13" value="" placeholder="Type name of a file">
+							<input id="searchFilenameTxt" type="text" size="13" value="" placeholder="Type name of a file">
 							<img id="resetFilterByFilenameBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete.png">														
 						</div>
 					</div>
-				</div>
-				<div class="rightmanager-role-separator"></div>
-				<div class="jDesktopInspector_pageHead" id="prim_search_title">Filter By Primary Tag</div>            
-				<div class="jDesktopInspector_button_right" >
-					<select id="mainTagSel"></select>
-					<img id="resetFilterByMainTagBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete.png">
-					<div class="rightmanager-role-separator"></div>
-					<div class="jDesktopInspector_section" id="title_Sec_tag">
-						<span class="jDesktopInspector_pageHead">Filter By Secondary Tag</span>
+				</div>				
+				<div class="jDesktopInspector_pageHead">Filter By Primary Tag</div>
+				<div class="jDesktopInspector_page jDesktopInspector_page_1">	           
+					<div class="jDesktopInspector_section">
+						<div class="jDesktopInspector_element">
+							<select id="mainTagSel" title="Select Main Tag"></select>					
+							<img id="resetFilterByMainTagBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete.png">
+						</div>
 					</div>
-					<div class="jDesktopInspector_section" id="Sec_tag">
-						<select size="5" name="select-secondary-tag" multiple="multiple" title="Select" id="secondaryTagSel"></select>
-						<img id="resetFilterBySecondaryTagBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete.png">
-					</div>  
-					<div class="jDesktopInspector_button_right" id="filterButton">						
-						<input id="resetButton" type="button" value="Reset" style="float: right">
-					</div>		
+				</div>				
+				<div class="jDesktopInspector_pageHead">Filter By Secondary Tag</div>
+				<div class="jDesktopInspector_page jDesktopInspector_page_2">				
+					<div class="jDesktopInspector_section">
+						<div class="jDesktopInspector_element">
+							<select id="secondaryTagSel" size="5" multiple="multiple" title="Select one/multiple Secondary Tags"></select>
+							<img id="resetFilterBySecondaryTagBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete.png">
+						</div>
+					</div>					
+				</div>
+				<div class="jDesktopInspector_page jDesktopInspector_page_3">
+					<div class="jDesktopInspector_section">
+						<div class="jDesktopInspector_element">
+							<div class="jDesktopInspector_button_right">						
+								<input id="resetBtn" type="button" value="Reset All Filters">
+							</div>
+						</div>
+					</div>
 				</div>           
-		    </div>
+			</div>
 		</div>
           
           <div id="chat"></div>

@@ -15,7 +15,7 @@ GUI.search = new function () {
         var filterByMainTag = "";
         var filterBySecondaryTag = [];
 
-        //$("#searchButton").click(function () {
+        // Events
         $("#searchFilenameTxt").keyup(function () {
 
         	filterByFilename = $("#searchFilenameTxt").val();      	
@@ -24,7 +24,7 @@ GUI.search = new function () {
         	
         });
 
-        $("#resetButton").click(function () {        	
+        $("#resetBtn").click(function () {        	
         	
         	var fileObjects = getFileObjectsFromInventory();        	
         	
@@ -81,8 +81,17 @@ GUI.search = new function () {
         	});
         });
         
+        $("#secondaryTagSel").click(function (){
+        	if( $(this).find("option").length == 0){
+	        	$("#container-notifier").notify("create", "withIcon", {
+	        		title :  "Info",
+	                text: "You need firstly to select a Main Tag.",
+	                icon: '/guis.common/images/toast/notice.png'
+	            }, {expires:false});
+        	}
+        });
+        
         $("#secondaryTagSel").change(function () {
-        	
         	filterBySecondaryTag = [];
         	$("#secondaryTagSel > option:selected").each(function() {
             	filterBySecondaryTag.push($(this).val());
