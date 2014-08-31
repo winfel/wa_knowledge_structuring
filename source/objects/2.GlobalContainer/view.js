@@ -192,120 +192,121 @@ GlobalContainer.drawContent = function(rep){
 
              var page = popover.addPage(GUI.translate('Search/Filter'));
              var section = page.addSection();
-
-             var searchByName;
-			 var searchByTag;
-			 if(that.options.searchByName){
-             	searchByName = '<input id = "checkName_for'+that.id+'" type="checkbox" checked> Name &nbsp &nbsp ';
-			}
-			else{
-				searchByName = '<input id = "checkName_for'+that.id+'" type="checkbox"> Name &nbsp &nbsp ';
-			}
-			if(that.options.searchByTag){
-				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox" checked> sec. Tag <br><br>';    
-			}
-			else{
-				searchByTag = '<input id = "checkTag_for'+that.id+'" type="checkbox"> sec. Tag <br><br>';  
-			}
-
-			// add a checkbox and label for every searchFor-option
-			var searchFor = [];
-			for(var searchoption in that.options) {
-				var m = searchoption.match(/^searchFor(\w+)$/);
-				if(m) {
-					searchFor.push('<input id="check' + m[1] + '_for'+that.id+'" type="checkbox" ' + 
-						(that.options[searchoption]?'checked="checked"':'') + 
-						' style="float:left; margin-right:0.5em;" />' +
-						'<label for="check' + m[1] + '_for'+that.id+'">' + m[1] + '</label>');
-				}
-			}
-
-			var s = that.options.searchString;
+			 
+			 var s = that.searchString;
 			if(s == 0 || s == ""){
-				s = "placeholder='search'";
+				s = 'value="""" placeholder = "search by name"';
 			}
 			else{
-				s = "value='"+that.options.searchString+"'";
+				s = "value='"+that.searchString+"'";
 			}
-			
-		     var element = section.addElement('<input id="textName_for'+that.id+'" type="text"'+s+'><p>Search by:</p>'+
-                		'<p>'+
-                		searchByName +
-						searchByTag+
-                		'<p>Search for:</p>'+
-                		searchFor.join('') +
-                		'</p>'+
-                		'<button id= "selectAll_'+that.id+'" type="submit" height="30">Select all</button>'+
-                		'<button id= "deselectAll_'+that.id+'" type="submit" height="30">Deselect all</button>'+
-                		'<br><br>'+
-                		'<button id= "searchButton_for_'+that.id+'" type="submit" height="30">Search</button>'
-            ); 
-
-
-		    /* Click event for search button in popover */
-			$('#searchButton_for_'+that.id).on("click",function(){
-
-				/* Get value from textfield and selected checkboxes */
-				var textfieldValue = $('#textName_for'+that.id).val();
-
-				// test if anything is selected
-				var anythingSelected = false;
-				for(var searchoption in that.options) {
-					var m = searchoption.match(/^searchFor(\w+)$/);
-					if(m) {
-						anythingSelected = anythingSelected || $('#check' + m[1] + '_for'+that.id).prop('checked');
+			 
+			 var selectSecTags;
+			 if(that.secTag != ""){
+				selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="" disabled>Select a secondary tag</option>';
+			}
+			else{
+				selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="" disabled selected>Select a secondary tag</option>';
+			}
+			 
+			TagManager.getSecTags(that.getAttribute('name'), function(o){ 
+			 
+				for(var i = 0; i < o.secTags.length; i++){
+					if(o.secTags[i] != that.secTag){
+						selectSecTags = selectSecTags + '<option value="'+o.secTags[i]+'">'+o.secTags[i]+'</option>';
+					}
+					else{
+						selectSecTags = selectSecTags + '<option value="'+o.secTags[i]+'" selected>'+o.secTags[i]+'</option>';
 					}
 				}
-				var searchBySelected = $('#checkName_for'+that.id).prop('checked') ||
-					$('#checkTag_for'+that.id).prop('checked');
-
-				if(textfieldValue != "" && !searchBySelected){
-					alert('Please specify what you are looking for (name and/or tag)');		
+				
+				selectSecTags = selectSecTags + '</select>';
+				
+				// add a checkbox and label for every searchFor-option
+				var searchFor = [];
+				for(var searchoption in that) {
+					var m = searchoption.match(/^searchFor(\w+)$/);
+					if(m) {
+						searchFor.push('<input id="check' + m[1] + '_for'+that.id+'" type="checkbox" ' + 
+							(that[searchoption]?'checked="checked"':'') + 
+							' style="float:left; margin-right:0.5em;" />' +
+							'<label for="check' + m[1] + '_for'+that.id+'">' + m[1] + '</label>');
+					}
 				}
-				else if(!anythingSelected) {
-					alert('Please specify what files you are looking for');
+				
+				section.addElement('<input id="textName_for'+that.id+'" type="text"'+s+'>');
+				section.addElement(selectSecTags);
+				section.addElement(searchFor.join(''));
+				var selectAll = section.addElement('<button id= "selectAll_'+that.id+'" type="submit" height="30">Select all</button>');
+				var clickSelectAll = function(){
+					$('#checkPDF_for'+that.id).prop('checked',true);
+					$('#checkHTML_for'+that.id).prop('checked',true);
+					$('#checkAudio_for'+that.id).prop('checked',true);
+					$('#checkVideo_for'+that.id).prop('checked',true);
+					$('#checkText_for'+that.id).prop('checked',true);
+					$('#checkImage_for'+that.id).prop('checked',true);
 				}
-				else {
-					// save the values
-					that.options.searchString = textfieldValue;
-					for(var searchoption in that.options) {
-						var m = searchoption.match(/^search(For|By)(\w+)$/);
+				var deselectAll = section.addElement('<button id= "deselectAll_'+that.id+'" type="submit" height="30">Deselect all</button>');
+				var clickDeselectAll = function(){
+					$('#checkPDF_for'+that.id).prop('checked',false);
+					$('#checkHTML_for'+that.id).prop('checked',false);
+					$('#checkAudio_for'+that.id).prop('checked',false);
+					$('#checkVideo_for'+that.id).prop('checked',false);
+					$('#checkText_for'+that.id).prop('checked',false);
+					$('#checkImage_for'+that.id).prop('checked',false);
+				}
+				var search = section.addElement('<button id= "searchButton_for_'+that.id+'" type="submit" height="30">Search</button>');
+				var clickSearch = function(){
+				
+					/* Get value from textfield and selected checkboxes */
+					var textfieldValue = $('#textName_for'+that.id).val();
+				
+					var tagValue = $('#selectSecTags_for_'+that.id).val();
+				
+					// test if anything is selected
+					var anythingSelected = false;
+					for(var searchoption in that) {
+						var m = searchoption.match(/^searchFor(\w+)$/);
 						if(m) {
-							that.options[searchoption] = $('#check' + m[2] + '_for'+that.id).prop('checked');
+							anythingSelected = anythingSelected || $('#check' + m[1] + '_for'+that.id).prop('checked');
 						}
 					}
 
-					that.searchAndFilter(that.Files);
+					if(!anythingSelected) {
+						alert('Please specify what files you are looking for');
+					}
+					else {
+						// save the values						
+						that.searchString = textfieldValue;
+						
+						that.secTag = tagValue;
+						
+						for(var searchoption in that) {
+							var m = searchoption.match(/^searchFor(\w+)$/);
+							if(m) {
+								that[searchoption] = $('#check' + m[1] + '_for'+that.id).prop('checked');
+							}
+						}
 
-					/* Close popover */
-					popover.hide();
+						that.searchAndFilter(that.Files);
+
+						/* Close popover */
+						popover.hide()
+					}
 				}
-			});
-
-			/* Click event for select all button in popover */
-			$('#selectAll_'+that.id).on("click",function(){
-				$('#checkPDF_for'+that.id).prop('checked',true);
-				$('#checkHTML_for'+that.id).prop('checked',true);
-				$('#checkAudio_for'+that.id).prop('checked',true);
-				$('#checkVideo_for'+that.id).prop('checked',true);
-				$('#checkText_for'+that.id).prop('checked',true);
-				$('#checkImage_for'+that.id).prop('checked',true);
 				
+				if (GUI.isTouchDevice) {
+					$(selectAll.getDOM()).bind("touchstart", clickSelectAll);
+					$(deselectAll.getDOM()).bind("touchstart", clickDeselectAll);
+					$(search.getDOM()).bind("touchstart", clickSearch);
+				} else {
+					$(selectAll.getDOM()).bind("click", clickSelectAll);
+					$(deselectAll.getDOM()).bind("click", clickDeselectAll);
+					$(search.getDOM()).bind("click", clickSearch);
+				}
+			
 			});
-
-
-			/* Click event for deselect all button in popover */
-			$('#deselectAll_'+that.id).on("click",function(){
-				$('#checkPDF_for'+that.id).prop('checked',false);
-				$('#checkHTML_for'+that.id).prop('checked',false);
-				$('#checkAudio_for'+that.id).prop('checked',false);
-				$('#checkVideo_for'+that.id).prop('checked',false);
-				$('#checkText_for'+that.id).prop('checked',false);
-				$('#checkImage_for'+that.id).prop('checked',false);
-				
-			});
-
-
+			
 		}
 	});	
 	
@@ -317,23 +318,66 @@ GlobalContainer.drawContent = function(rep){
              var page = popover.addPage(GUI.translate('Sort'));
              var section = page.addSection();
 
-		     var element = section.addElement(
-                		'<p>Criterion</p>'+
-						'<select id="criterion_for'+that.id+'">'+
-						'<option value="name">By Name</option>'+
-						'<option value="date">By Date</option>'+
-						'</select>'+
-						'<p>Order</p>'+
-						'<select id="order_for'+that.id+'">'+
-						'<option value="AZ">From A to Z</option>'+
-						'<option value="ZA">From Z to A</option>'+
-						'</select>'+
-						'<button id="submitButton_for_'+that.id+'">Submit</button>'
-            ); 
+			 var sel1 = '<select id="criterion_for'+that.id+'">';
+			 
+			 if(that.sortingCriterion == "By Name"){
+				 sel1 = sel1 + '<option value="name" selected>By Name</option>';
+				 sel1 = sel1 + '<option value="date">By Date</option>';
+			 }
+			 else{
+				 sel1 = sel1 + '<option value="name">By Name</option>';
+				 sel1 = sel1 + '<option value="date" selected>By Date</option>';
+			 }
+			 
+			 sel1 = sel1 + '</select>';
+			 
+			 var s1 = section.addElement(sel1);
+			 
+			 var sel2 = '<select id="order_for'+that.id+'">';
+			
+			 if(that.sortingOrder == "From A to Z"){
+				sel2 = sel2 + '<option value="AZ" selected>From A to Z</option>';
+				sel2 = sel2 + '<option value="ZA">From Z to A</option>';
+			 }
+			 else{
+				sel2 = sel2 + '<option value="AZ">From A to Z</option>';
+				sel2 = sel2 + '<option value="ZA" selected>From Z to A</option>';
+			 }
+			 
+			 sel2 = sel2 + '</select>';
+			 
+			 var s2 = section.addElement(sel2);
+			
+			var submitButton = section.addElement('<button id="submitButton_for_'+that.id+'">Submit</button>'); 
+			
+			/* Click event for search button in popover */
+			var clickSubmitButton = function(){
+
+				/* Get value from the selection boxes */				
+				var select1 = document.getElementById('criterion_for'+that.id);
+				var select1Value = select1[select1.selectedIndex].text;
+					
+				var select2 = document.getElementById('order_for'+that.id);
+				var select2Value = select2[select2.selectedIndex].text;
+							
+				that.sortingCriterion = select1Value;
+				that.sortingOrder = select2Value;	
+				
+				that.searchAndFilter(that.Files);
+							
+				/* Close popover */
+				popover.hide()
+			}
+			
+			if (GUI.isTouchDevice) {
+				$(submitButton.getDOM()).bind("touchstart", clickSubmitButton);
+			} else {
+				$(submitButton.getDOM()).bind("click", clickSubmitButton);
+			}
 			
 			var sel = document.getElementById('criterion_for'+that.id);
 			sel.onchange = function() {
-							
+					
 				var order = document.getElementById('order_for'+that.id);
 				
 				order.innerHTML = '';
@@ -346,25 +390,7 @@ GlobalContainer.drawContent = function(rep){
 					$('<option value="newold">From new to old</option><option value="oldnew">From old to new</option>').appendTo(order);
 				}
 			}
-
-			/* Click event for search button in popover */
-			$('#submitButton_for_'+that.id).on("click",function(){
-
-				/* Get value from the selection boxes */				
-				var select1 = document.getElementById('criterion_for'+that.id);
-				var select1Value = select1.options[select1.selectedIndex].text;
-					
-				var select2 = document.getElementById('order_for'+that.id);
-				var select2Value = select2.options[select2.selectedIndex].text;
-							
-				that.options.sortingCriterion = select1Value;
-				that.options.sortingOrder = select2Value;	
-				
-				that.searchAndFilter(that.Files);
-							
-				/* Close popover */
-				popover.hide();
-			});				
+			
 		}
 	});	
 }

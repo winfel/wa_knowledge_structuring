@@ -5,23 +5,19 @@
 *
 */
 
-GlobalContainer.options = {
-	searchString : "",
-	searchByName : true,
-	searchByTag : false,
-	searchForPDF : true,
-	searchForHTML : true,
-	searchForImage : true,
-	searchForAudio : true,
-	searchForVideo : true,
-	searchForText : true,
-	sortingCriterion : "By Name",
-	sortingOrder : "From A to Z"
-}
+GlobalContainer.searchString = "";
+GlobalContainer.secTag = "";
+GlobalContainer.searchForPDF = true;
+GlobalContainer.searchForHTML = true;
+GlobalContainer.searchForImage = true;
+GlobalContainer.searchForAudio = true;
+GlobalContainer.searchForVideo = true;
+GlobalContainer.searchForText = true;
+GlobalContainer.sortingCriterion = "By Name";
+GlobalContainer.sortingOrder = "From A to Z";
 
 GlobalContainer.Files = new Array();
 GlobalContainer.PaperSpaces = new Array();
-
 
 GlobalContainer.getFiles = function() {
 	var that = this;
@@ -112,45 +108,59 @@ GlobalContainer.searchAndFilter = function(files) {
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
 	
-	var s = this.options.searchString;
-	var name = this.options.searchByName;
-	var tag = this.options.searchByTag;
-	var pdf = this.options.searchForPDF;
-	var html = this.options.searchForHTML;
-	var image = this.options.searchForImage;
-	var audio = this.options.searchForAudio;
-	var video = this.options.searchForVideo;
-	var text = this.options.searchForText;
+	var s = this.searchString;
+	var tag = this.secTag;
+	var pdf = this.searchForPDF;
+	var html = this.searchForHTML;
+	var image = this.searchForImage;
+	var audio = this.searchForAudio;
+	var video = this.searchForVideo;
+	var text = this.searchForText;
 	
-	if (typeof s === "undefined" || s == "" || s == 0) {
+	var stringEntered = (s != "");
+	var tagEntered = (tag != "");
+	
+	if(!stringEntered && !tagEntered){
 		filteredFiles1 = files;
-	} else { 
-	    // the user has entered a search string, search through all files and check if name and/or tag matches to the search string
+	}
+	else{
+		
 		var key;
 		for (key in files) { 
 		
-			var n = files[key].attributes.name;
-			var secTags = files[key].attributes.secondaryTags;
-			
-			if (secTags == 0 || typeof secTags == "undefined") {
-				secTags = new Array();
-			}
-					
-			if (name) {
-				if (n.indexOf(s) > -1) { //searchString part of the name of the object
-					filteredFiles1.push(files[key]);
+			if(stringEntered){  //the user has entered a search string, search through all files and check if name matches to the search string
+				var n = files[key].attributes.name;
+				
+				if(n.indexOf(s) == -1){ //searchString is not part of the name of the object
 					continue;
 				}
 			}
-			if (tag) {
-				for (var i = 0; i<secTags.length; i++) { 
-					if (secTags[i].indexOf(s) > -1) { //searchString part of a tag of the object
-						filteredFiles1.push(files[key]);
-						break;
+			
+			if(tagEntered){ //the user has entered a secondary tag, search through all files and check if a secondary tag of the file matches to the searched one
+			
+				var secTags = files[key].attributes.secondaryTags;
+				
+				if(secTags == 0 || typeof secTags === "undefined"){
+					continue;
+				}
+				else{
+				
+					for(var i = 0; i<secTags.length; i++){ 
+						if(secTags[i] == tag){ //found a secondary tag which matches to the searched one
+							filteredFiles1.push(files[key]);
+							break;
+						}
 					}
+					
+					continue;
+					
 				}
 			}
+		
+			filteredFiles1.push(files[key]);
+		
 		}
+
 	}
 		
 	var k;
@@ -210,8 +220,8 @@ GlobalContainer.searchAndFilter = function(files) {
 
 
 GlobalContainer.sortFiles = function(files){ //bubble sort
-	var sortingCriterion = this.options.sortingCriterion;
-	var sortingOrder = this.options.sortingOrder;
+	var sortingCriterion = this.sortingCriterion;
+	var sortingOrder = this.sortingOrder;
 	
 	var R1;
 	var R2;

@@ -73,10 +73,8 @@ GlobalContainer.register=function(type){
  */
 GlobalContainer.execute=function(){
 	    var destFromURL = document.URL.substring(document.URL.lastIndexOf("/") + 1, document.URL.length);
-
-		this.options.searchByName 	= false;
-		this.options.searchByTag 	= true;
-		this.options.searchString 	= destFromURL;
+		
+		this.searchString = destFromURL;
 }
 
 /**
