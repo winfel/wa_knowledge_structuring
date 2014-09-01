@@ -5,21 +5,17 @@
 *
 */
 
-FavouritesContainer.options = {
-
-	searchString : "",
-	searchByName : true,
-	searchByTag : false,
-	searchForPDF : true,
-	searchForHTML : true,
-	searchForImage : true,
-	searchForAudio : true,
-	searchForVideo : true,
-	searchForText : true,
-	sortingCriterion : "By Name",
-	sortingOrder : "From A to Z"
-
-}
+FavouritesContainer.searchString = "";
+FavouritesContainer.mainTag = "";
+FavouritesContainer.secTag = "";
+FavouritesContainer.searchForPDF = true;
+FavouritesContainer.searchForHTML = true;
+FavouritesContainer.searchForImage = true;
+FavouritesContainer.searchForAudio = true;
+FavouritesContainer.searchForVideo = true;
+FavouritesContainer.searchForText = true;
+FavouritesContainer.sortingCriterion = "By Name";
+FavouritesContainer.sortingOrder = "From A to Z";
 
 FavouritesContainer.Files = new Array();
 FavouritesContainer.Favourites = new Array();
@@ -97,52 +93,73 @@ FavouritesContainer.searchAndFilter = function(files){
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
 	
-	var s = this.options.searchString;
-	var name = this.options.searchByName;
-	var tag = this.options.searchByTag;
-	var pdf = this.options.searchForPDF;
-	var html = this.options.searchForHTML;
-	var image = this.options.searchForImage;
-	var audio = this.options.searchForAudio;
-	var video = this.options.searchForVideo;
-	var text = this.options.searchForText;
-			
-	if(typeof s === "undefined" || s == "" || s == 0){
+	var s = this.searchString;
+	var maintag = this.mainTag;
+	var sectag = this.secTag;
+	var pdf = this.searchForPDF;
+	var html = this.searchForHTML;
+	var image = this.searchForImage;
+	var audio = this.searchForAudio;
+	var video = this.searchForVideo;
+	var text = this.searchForText;
+	
+	var stringEntered = (s != "");
+	var maintagEntered = (maintag != "");
+	var sectagEntered = (sectag != "");
+	
+	if(!stringEntered && !sectagEntered && !maintagEntered){
 		filteredFiles1 = files;
 	}
 	else{
-	
+		
 		var key;
-		for (key in files) { //filter name/tag with the given searchstring
+		for (key in files) { 
+		
+			if(stringEntered){  //the user has entered a search string, search through all files and check if name matches to the search string
+				var n = files[key].attributes.name;
 				
-			var n = files[key].attributes.name;
-			var mainTag = files[key].attributes.mainTag;
-			var secTags = files[key].attributes.secondaryTags;
-			
-			if(secTags == 0 || typeof secTags == "undefined"){
-				secTags = new Array();
-			}
-			
-			if(mainTag != "" && typeof mainTag != "undefined"){
-				secTags.push(mainTag);
-			}
-
-					
-			if(name){
-				if(n.indexOf(s) > -1){ //searchString part of the name of the object
-					filteredFiles1.push(files[key]);
+				if(n.indexOf(s) == -1){ //searchString is not part of the name of the object
 					continue;
 				}
 			}
-			if(tag){
-				for(var i = 0; i<secTags.length; i++){ 
-					if(secTags[i].indexOf(s) > -1){ //searchString part of a tag of the object
-						filteredFiles1.push(files[key]);
-						break;
-					}
+			
+			if(maintagEntered){  //the user has entered a main tag, search through all files and check if the main tag matches to the searched one
+				var m = files[key].attributes.mainTag;
+				
+				if(m == 0 || typeof m === "undefined" || m == ""){
+					continue;
+				}
+				
+				if(m != maintag){ 
+					continue;
 				}
 			}
+			
+			if(sectagEntered){ //the user has entered a secondary tag, search through all files and check if a secondary tag of the file matches to the searched one
+			
+				var secTags = files[key].attributes.secondaryTags;
+				
+				if(secTags == 0 || typeof secTags === "undefined"){
+					continue;
+				}
+				else{
+				
+					for(var i = 0; i<secTags.length; i++){ 
+						if(secTags[i] == sectag){ //found a secondary tag which matches to the searched one
+							filteredFiles1.push(files[key]);
+							break;
+						}
+					}
+					
+					continue;
+					
+				}
+			}
+		
+			filteredFiles1.push(files[key]);
+		
 		}
+
 	}
 		
 	var k;
@@ -200,8 +217,8 @@ FavouritesContainer.searchAndFilter = function(files){
 
 FavouritesContainer.sortFiles = function(files){ //bubble sort
 
-	var sortingCriterion = this.options.sortingCriterion;
-	var sortingOrder = this.options.sortingOrder;
+	var sortingCriterion = this.sortingCriterion;
+	var sortingOrder = this.sortingOrder;
 	
 	var R1;
 	var R2;
