@@ -111,17 +111,21 @@ Viewer.initGUI = function(rep) {
   btnRestore.click(toggleFullscreen);
 
   btnTwopage.click(function() {
-    self.setAttribute("twopage", true);
+    viewerContainer.data("twopage", true);
 
     btnTwopage.toggle();
     btnSinglepage.toggle();
+    
+    self.adjustPaper();
   });
 
   btnSinglepage.click(function() {
-    self.setAttribute("twopage", false);
+    viewerContainer.data("twopage", false);
 
     btnTwopage.toggle();
     btnSinglepage.toggle();
+    
+    self.adjustPaper();
   });
 
   var showHighlightMenu = function(event, frameDocument, showRemoveButton) {
@@ -172,6 +176,7 @@ Viewer.initGUI = function(rep) {
     // Remove all previous event handlers.
     $(".buttonAreaLeft .btn", viewerContainer).off();
     $(".btn", highlightMenu).off();
+
 
     //get the iframe contents and apply the textHighlighter
     var frameDocument = iframe.contents();
@@ -256,6 +261,7 @@ Viewer.initGUI = function(rep) {
     });
 
     /**
+     * Calculates the absolute offset of an element to a parent.
      * 
      * @param {type} elem
      * @param {type} parent
@@ -305,76 +311,13 @@ Viewer.initGUI = function(rep) {
       elem.css("top", position.top).css("left", position.left);
     };
 
-    // this function adds a play option for every audio highlighting
-    self.addAudioToHighlights = function() {
-      var matchYClass = /\b(y[0-9a-z]+)\b/; // this finds the y-positioning class within pdf classes
-      frameDocument.find('.highlighted.audio').each(function() {
-        var that = $(this);
-        var aoid = that.attr('data-audioobject');
-        if (aoid == undefined || frameDocument.find('#' + aoid).length > 0) {
-          // there is no connected audio or the audioobject already exists
-          return;
-        }
-
-        // get the object of the wave
-        var wave = ObjectManager.getObject(aoid);
-        if (wave == undefined || !wave) {
-          return;
-        }
-        // create the player for the wave (the object isn't needed anymore)
-        wave = new Audio(wave.getContentURL());
-
-        // guess the position of the highlight
-        var position = getGridPosition(that);
-
-        // create an audio play button
-        var audioobject = $('<div>')
-                .attr('id', aoid)
-                .attr("data-top-initial", position.top)
-                .addClass('audioobject')
-                .append(wave)
-                .click(function() {
-                  wave.paused ? wave.play() : wave.pause();
-                })
-                // highlight the highlight if hovering the button
-                .hover(function() {
-                  that.addClass('remotehover');
-                }, function() {
-                  that.removeClass('remotehover');
-                })
-                .appendTo(that.closest(".pc"));
-
-        setFixedPosition(position, audioobject);
-
-        $(wave)
-                .on('playing', function() {
-                  audioobject.addClass('playing');
-                })
-                .on('pause', function() {
-                  audioobject.removeClass('playing');
-                })
-                .on('ended', function() {
-                  // chrome has a replay bug; load fixes it
-                  if (window.chrome) {
-                    wave.load();
-                  }
-                });
-
-        // last but not least, highlight button if hovering highlight
-        that.hover(function() {
-          audioobject.addClass('remotehover');
-        }, function() {
-          audioobject.removeClass('remotehover');
-        });
-      });
-    };
-
     /**
+     * Creates a div container representing comments and audio objects inside the frame object.
      * 
-     * @param {type} user
-     * @param {type} id
-     * @param {type} data
-     * @returns 
+     * @param {type} user   The user, who created the comment
+     * @param {type} id     The id of the comment
+     * @param {type} data   The comment data
+     * @returns The div container 
      */
     var createCommentOnViewer = function(user, id, data) {
 
@@ -512,30 +455,29 @@ Viewer.initGUI = function(rep) {
     };
 
     self.loadTextComments = function() {
-      DBManager.getDocuments(self, "comments", function(docs) {
-        for (var i in docs) {
-          (function(doc) {
-            // Javascript has no block scope... Let's use the function scope instead!
-            createCommentOnViewer(doc.user, doc.id, doc.data);
-          })(docs[i]);
-        }
-
-        self.relinkCommentsWithHighlights();
-      });
+      Viewer.updateStatus(self.translate(GUI.currentLanguage, 'Loading comments.'));
+      DBManager.getDocuments(self, "comments");
     };
 
     self.loadAudioComments = function() {
+      Viewer.updateStatus(self.translate(GUI.currentLanguage, 'Loading audio comments.'));
+      DBManager.getDocuments(self, "comments_audio");
+    };
 
-      DBManager.getDocuments(self, "comments_audio", function(docs) {
-        for (var i in docs) {
-          (function(doc) {
-            // Javascript has no block scope... Let's use the function scope instead!
-            createCommentOnViewer(doc.user, doc.id, doc.data);
-          })(docs[i]);
-        }
+    var statusTimer;
+    Viewer.updateStatus = function(text) {
 
-        self.relinkCommentsWithHighlights();
-      });
+      var status = $(".paperViewerFooter .status", viewerContainer);
+
+      if (text) {
+        clearTimeout(statusTimer);
+        status.show();
+        status.html(text);
+      } else {
+        statusTimer = setTimeout(function() {
+          status.hide();
+        }, 2500);
+      }
     };
 
     Viewer.addComment = function(user, id, data) {
@@ -1030,6 +972,7 @@ Viewer.createRepresentation = function(parent) {
 
   // Various / helper stuff...
   var borderBottom = $("<div>");
+  borderBottom.html('<div class="status"></div>');
   borderBottom.addClass("paperViewerFooter");
   $body.append(borderBottom);
 
@@ -1171,16 +1114,21 @@ Viewer.resizeHandler = function() {
  * @returns {undefined}
  */
 Viewer.adjustPaper = function() {
+  var viewerContainer = $('[data-id="paperViewer-' + this.getAttribute('id') + '"]');
   var iframe = $('#iframe-' + this.getAttribute('id'));
-  //var frameDocument = iframe.contents();
 
   if (iframe[0].contentWindow.pdf2htmlEX) {
+    if (viewerContainer.hasClass("fullscreen"))
+      iframe.height(viewerContainer.height() - $(".paperViewerHeader", this).height());
+    else
+      iframe.height(this.getViewHeight() - $(".paperViewerHeader", this).height());
+
     var pdfviewer = iframe[0].contentWindow.pdf2htmlEX.defaultViewer;
 
     pdfviewer.rescale(1, false);
     pdfviewer.fit_width();
 
-    if (this.getAttribute('twopage'))
+    if (viewerContainer.data('twopage'))
     {
       pdfviewer.rescale(0.5, true);
     }

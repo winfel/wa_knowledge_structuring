@@ -13,22 +13,25 @@ var DBManager = {};
 /**
  * Gets all documents from the given collection of a specific object.
  * 
- * @param {type} object       The object where the data is related to
- * @param {type} collection   The mongo db collection, where the data is stored
- * @param {type} callback     The callback which will receive the result
- * @param {type} [column]     [Optional]. Default is "objectid"
+ * @param {type} object               The object where the data is related to
+ * @param {type} collection           The mongo db collection, where the data is stored
+ * @param {type} [callback]           The callback which will receive the result (optional)
+ * @param {type} [column]             Default is "objectid" (optional)
  * @returns {undefined}
  */
 DBManager.getDocuments = function(object, collection, callback, column) {
 
-  Dispatcher.registerCall("dbDocuments_" + collection + "_" + object.id, function(documents) {
-    if (callback)
-      callback(documents);
-    Dispatcher.removeCall("dbDocuments_" + collection + "_" + object.id);
-  });
+  if (callback) {
+    Dispatcher.registerCall("dbDocuments_" + collection + "_" + object.id, function(documents) {
+      if (callback)
+        callback(documents);
+      Dispatcher.removeCall("dbDocuments_" + collection + "_" + object.id);
+    });
+  }
 
   // The responce should be some sort of broadcast to users with a manager role...
   Modules.SocketClient.serverCall('dbGetDocuments', {
+    'oneMessage': (callback ? true : false),
     'collection': collection,
     'object': {id: object.id, type: object.type},
     'column': column

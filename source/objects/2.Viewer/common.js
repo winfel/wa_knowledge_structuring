@@ -22,11 +22,20 @@ Viewer.register = function(type) {
   this.registerAttribute('highlights', {type: 'text', standard: '', changedFunction: function(object, value) {
       object.loadHighlights();
     }});
-  this.registerAttribute('twopage', {type: 'boolean', standard: false, changedFunction: function(object, value) {
-      object.adjustPaper();
-    }});
+    
+  Modules.Dispatcher.registerCall("dbDocument_comments", function(data) {
+    that.addComment(data.user, data.id, data.data);
+  });
+  
+  Modules.Dispatcher.registerCall("dbDocument_comments_audio", function(data) {
+    that.addComment(data.user, data.id, data.data);
+  });
   
   Modules.Dispatcher.registerCall("dbDocumentAdded_comments", function(data) {
+    that.addComment(data.user, data.id, data.data);
+  });
+  
+  Modules.Dispatcher.registerCall("dbDocumentAdded_comments_audio", function(data) {
     that.addComment(data.user, data.id, data.data);
   });
   
@@ -34,12 +43,16 @@ Viewer.register = function(type) {
     that.removeComment(data.id, "comment", "commented");
   });
   
-  Modules.Dispatcher.registerCall("dbDocumentAdded_comments_audio", function(data) {
-    that.addComment(data.user, data.id, data.data);
-  });
-  
   Modules.Dispatcher.registerCall("dbDocumentRemoved_comments_audio", function(data) {
     that.removeComment(data.id, "audioobject", "audio");
+  });
+  
+  Modules.Dispatcher.registerCall("dbAllDocumentsSend_comments", function(data) {
+    that.updateStatus();
+  });
+  
+  Modules.Dispatcher.registerCall("dbAllDocumentsSend_comments_audio", function(data) {
+    that.updateStatus();
   });
 
   this.standardData.width = 210 * 3;

@@ -31,7 +31,17 @@ DBManager.getDocuments = function(socket, data) {
     obj["objectid"] = String(data.object.id);
 
   dbCollection.find(obj, {}, function(e, docs) {
-    Modules.SocketServer.sendToSocket(socket, "dbDocuments_" + data.collection + "_" + data.object.id, docs);
+
+    if (data.oneMessage) {
+      // Send one big message with all documents to the client.
+      Modules.SocketServer.sendToSocket(socket, "dbDocuments_" + data.collection + "_" + data.object.id, docs);
+    } else {
+      // Send a message for each document to the client.
+      for (var i in docs) {
+        Modules.SocketServer.sendToSocket(socket, "dbDocument_" + data.collection, docs[i]);
+      }
+      Modules.SocketServer.sendToSocket(socket, "dbAllDocumentsSend_" + data.collection);
+    }
   });
 };
 
