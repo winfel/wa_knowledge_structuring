@@ -52,7 +52,7 @@ GatewayContainer.register=function(type){
     }});
 
 
-	this.registerAttribute('name', {type: 'text', standard: 'Favourites', changedFunction: function(object, value) {
+	this.registerAttribute('name', {type: 'text', standard: 'Gateways', changedFunction: function(object, value) {
 		var obj = {id:object.id, name:value}; 
 		object.rename(value);
 		
