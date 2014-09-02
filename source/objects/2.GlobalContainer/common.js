@@ -99,7 +99,7 @@ GlobalContainer.intelligentRename=function(newValue){
 
 
 GlobalContainer.register('GlobalContainer');
-GlobalContainer.isCreatable=true;
+GlobalContainer.isCreatable=false;
 
 GlobalContainer.contentURLOnly = false; //content is only accessible via URL
 

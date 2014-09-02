@@ -62,10 +62,6 @@ var popover_positionOffsetY = 21;
 
            var name = (object.menuItemLabel != '') ? object.translate(GUI.currentLanguage, object.menuItemLabel) : object.translate(GUI.currentLanguage, object.type);
 
-			if (name == "GlobalContainer") { //Global Container cannot be created manually (they are created automatically when entering the global space)
-				return true;
-			}
-
 			var element = section.addElement('<img src="/objectIcons/' + object.type + '" alt="" width="24" height="24" /> ' + name);
 
 			var click = function(attributes) {
