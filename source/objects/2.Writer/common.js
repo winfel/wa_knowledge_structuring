@@ -27,10 +27,10 @@ Writer.register=function(type){
 	this.standardData.width=210*3;
 	this.standardData.height=297*3;
 	
-	this.registerAction('De/Activate', function()
-	{
-		alert('Just deactive the embedded Etherpad.');
-	}, true);
+//	this.registerAction('De/Activate', function()
+//	{
+//		alert('Just deactive the embedded Etherpad.');
+//	}, true);
 }
 
 //set restrictedMovingArea to true, if you want to enable interface interaction within
@@ -41,6 +41,9 @@ Writer.register=function(type){
 
 //Writer.restrictedMovingArea = true;
 Writer.isCreatable=true;
+Writer.alwaysOnTop = function() {
+  return true;
+};
 Writer.category='Texts';
 
 Writer.register('Writer');
