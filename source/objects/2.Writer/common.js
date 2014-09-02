@@ -39,7 +39,7 @@ Writer.register=function(type){
 //have its class set to "moveArea". Set restrictedMovingArea to false if you use the HTML
 //element for diplaying purposes only.
 
-Writer.restrictedMovingArea = true;
+//Writer.restrictedMovingArea = true;
 Writer.isCreatable=true;
 Writer.category='Texts';
 
