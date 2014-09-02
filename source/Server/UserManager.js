@@ -386,14 +386,20 @@ UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
 };
 
 UserManager.setDataOfSpaceWithDestServerSide = function(data){
-     var ss = db.get('SpaceStorage');
+	var ss = db.get('SpaceStorage');
 
-     // if data is not included: store it
-    ss.find({'destination':data.destination,'key':data.key}, {}, function(e, docs){
-        if(typeof docs == 'undefined' || docs.length == 0){
-            ss.insert({'destination':data.destination, 'key':data.key, 'value':data.value});
-        }
-    });
+	// if data is not included: store it
+	ss.update({ // query
+		'destination':String(data.destination),'key':String(data.key)
+	},
+	{ // update
+		$set: {
+			'value':data.value,
+		}
+	},
+	{ // options
+		upsert: true,
+	});
 };
 
 UserManager.getDataOfSpaceWithDestServerSide = function(data, callback){
@@ -409,14 +415,7 @@ UserManager.getDataOfSpaceWithDestServerSide = function(data, callback){
 };
 
 UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID){
-     var ss = db.get('SpaceStorage');
-
-     // if data is not included: store it
-    ss.find({'destination':String(data.destination),'key':String(data.key)}, {}, function(e, docs){
-        if(typeof docs == 'undefined' || docs.length == 0){
-            ss.insert({'destination':data.destination, 'key':data.key, 'value':data.value});
-        }
-    });
+	UserManager.setDataOfSpaceWithDestServerSide.call(this, data);
 };
 
 UserManager.removeDataOfSpaceWithDest = function(socketOrUser, data, responseID){

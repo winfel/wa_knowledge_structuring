@@ -63,7 +63,7 @@ theObject.exportAsFile = function(type, position, createFile) {
 				// create a html file object
 				createFile(that.getId() + '.html', outputContent.join('\r\n'), 'text/html');
 			}
-			else if(type == 'txt') {
+			else if(type == 'text') {
 				// create plain textfile
 				createFile(that.getId() + '.txt', outputContent.join('\r\n'), 'text/plain');
 			}
@@ -95,20 +95,20 @@ theObject.exportAsFile = function(type, position, createFile) {
 		Modules.UserManager.getDataOfSpaceWithDestServerSide(dbData, function(chapterPadIDs) {
 
 			if(chapterPadIDs == "error") {
-				var errorText = "Error: You don't have created a chapter that could be exported right now. <br> To use"+
-				" the export object, you need to create a chapter, write something into it and, as soon as you wan't to export something, "+
-				"double click a chapter to run the ordering algorithm (this last step will be fixed in the final release of "+
-				" the CoW aka HackArena aka HackATron...)";
+				var errorText = that.translate(that.currentLanguage, "Error: The paper has not any chapters yet.");
 				addContent(object, errorText);
 				return;
 			}
 
-			var token = chapterPadIDs[0].value.split(";"); 
+			chapterPadIDs = chapterPadIDs[0].value;
+			if(typeof chapterPadIDs == 'string') { // fallback for deprecated string notation
+				chapterPadIDs = chapterPadIDs.split(";");
+			}
 			var cPos = 0;
 
 			var summedText = "";
 
-			token.forEach(function(chapterPadID) {
+			chapterPadIDs.forEach(function(chapterPadID) {
 				// read the html from etherpad
 				Modules.EtherpadController.pad.getHTML( {
 					padID : chapterPadID
@@ -118,7 +118,8 @@ theObject.exportAsFile = function(type, position, createFile) {
 						//return;
 					}
 
-					if(cPos < token.length-1) {
+					// due to async access it might happen, that the order of chapters is mixed - we'll find a solution later
+					if(cPos < chapterPadIDs.length-1) {
 						if(data != null) {
 							summedText += data.html;
 						}
@@ -149,7 +150,7 @@ theObject.exportAsFile = function(type, position, createFile) {
 			var text = "";
 			if(error) {
 				console.error("PadID "+ chapterPadID + " >> Error pad.getText: ", error.message);
-				text = ("PadID "+ chapterPadID + " >> Error pad.getText: ", error.message);
+				//text = ("PadID "+ chapterPadID + " >> Error pad.getText: ", error.message); // chapter has no content
 			}else if(data != null) {
 				text = data.html;
 			}
@@ -224,7 +225,6 @@ theObject.onEnter = function(object,oldData,newData) {
 	var inputPapers = this.getAttribute('inputPapers');
 
 	if(exportableTypes.indexOf(object.getType()) == -1) {
-		console.log('no paper');
 		return;
 	}
 

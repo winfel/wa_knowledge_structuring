@@ -125,22 +125,8 @@ PaperChapter.execute = function(openInNewWindow) {
       tempIDs[pos-1] = inv[i].getAttribute('chapterID');
     }
   }
-
-  var tempString = "";
-  /* build String */
-  tempIDs.forEach(function(item){
-    tempString += item+";";
-  });
-  
-
-  tempString = tempString.substr(0,tempString.length-1);
-
-  var destFromURL = document.URL.substring(document.URL.lastIndexOf("/")+1,document.URL.length);
-
-  /* set ids of pads */
-  //UserManager.removeDataOfSpaceWithDest(ObjectManager.getCurrentRoom().id,"paperIDs");
-  UserManager.setDataOfSpaceWithDest(destFromURL,"paperIDs",tempString);   
-}
+  UserManager.setDataOfSpaceWithDest(this.getCurrentRoom(),"paperIDs",tempIDs);   
+};
 
 PaperChapter.register('PaperChapter');
 PaperChapter.isCreatable = true;
