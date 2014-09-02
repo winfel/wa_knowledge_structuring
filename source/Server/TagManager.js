@@ -173,6 +173,13 @@ var TagManager = function() {
 		var dbMainTags = db.get('MainTags');
 		
 		dbMainTags.findOne( {name: mainTag}, ["secTags"] , function(e, secTags) {
+			if(!secTags) {
+				/* it happens that there are requests for maintags, which are not existant (any more).
+					This is not good, but at least throw no error at client side because argument secTags is null.*/
+				secTags = {
+					secTags: [],
+				};
+			}
 			Modules.SocketServer.sendToSocket(socket, "getSecTags", secTags);
 		} );
 	};
