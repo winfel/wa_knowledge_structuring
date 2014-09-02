@@ -135,6 +135,7 @@ CustomContainer.drawContent = function(rep){
 	$(body).find( "button:first" ).next().jPopover({
          //positionOffsetY : $("#containment-wrapper").height()-7,
          onSetup : function(domEl, popover) {
+			$(domEl).addClass('absolute'); // scrolls with the page
 
              var page = popover.addPage(GUI.translate('Search/Filter'));
              var section = page.addSection();
@@ -295,6 +296,7 @@ CustomContainer.drawContent = function(rep){
 	$(body).find( "button:first" ).next().next().jPopover({
          //positionOffsetY : $("#containment-wrapper").height()-7,
          onSetup : function(domEl, popover) {
+			$(domEl).addClass('absolute'); // scrolls with the page
 
              var page = popover.addPage(GUI.translate('Sort'));
              var section = page.addSection();

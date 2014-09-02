@@ -384,3 +384,9 @@
 	top: 14px;
 	border-color: #696d72 transparent transparent transparent;
 }
+
+
+/* sometimes, absolute positioned popups are needed */
+.jPopover.scroll, .jPopover.absolute {
+	position:absolute;
+}
