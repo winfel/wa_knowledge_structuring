@@ -297,15 +297,24 @@
 						</div>
 					</div>					
 				</div>
+				<div class="jDesktopInspector_pageHead">Filtering Results</div>
 				<div class="jDesktopInspector_page jDesktopInspector_page_3">
 					<div class="jDesktopInspector_section">
 						<div class="jDesktopInspector_element">
-							<div class="jDesktopInspector_button_right">						
+							<b><span id="matchesCounterSpan"></span></b><br />
+						</div>
+					</div>
+				</div> 
+				<div class="jDesktopInspector_pageHead"></div>
+				<div class="jDesktopInspector_page jDesktopInspector_page_4">
+					<div class="jDesktopInspector_section">
+						<div class="jDesktopInspector_element">
+							<div class="jDesktopInspector_button_right">												
 								<input id="resetBtn" type="button" value="Reset All Filters">
 							</div>
 						</div>
 					</div>
-				</div>           
+				</div>       
 			</div>
 		</div>
           
@@ -549,7 +558,7 @@
 		<div class="filename-wrapper">Name of the file: <span class="filename"></span></div>
 		<div class="custom-main-tag-holder">
 			<label for="custom-Main-tag"><b>Custom tag:</b> </label>
-			<input id="custom-Main-tag">
+			<input id="custom-Main-tag" placeholder="Type a custom Main Tag" >
 		</div>
 	</div>
 	<div id="secondaryTags">
@@ -565,7 +574,7 @@
 				</div>			
 				<div class="custom-sec-tag-holder">
 					<label for="custom-Sec-tag"><b>Custom tag:</b> </label>
-					<input id="custom-Sec-tag">
+					<input id="custom-Sec-tag" placeholder="Type a custom Secondary Tag" >
 				</div>	
 			</div>
 			<div id="document" class="ui-widget-content ui-state-default">
@@ -585,7 +594,7 @@
 <script type="text/html" id='tag-manager-content-tmpl'>
 	<div id="main-tag-container">
 		<div class="portlet portlet-new-main-tag ui-corner-all">
-			<h2>Create New Main Tag</h2>
+			<h2>Click to create a new Main Tag</h2>
 		</div>	    	
 	</div>	
 </script>
@@ -599,9 +608,17 @@
 	</div>	
 </script>
 
-<script type="text/html" id='secondary-tag-tmpl'>	
+
+<script type="text/html" id='secondary-tag-tmpl1'>	
     <li class='ui-widget-content' data-sectag='<%= secTag %>'>
 		<h5 class='ui-widget-header tagValue editable-sec'><%= secTag %></h5>
+		<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
+	</li>      	
+</script>
+
+<script type="text/html" id='secondary-tag-tmpl'>	
+    <li class='ui-widget-content' data-sectag='<%= secTag %>'>
+		<h5 class='ui-widget-header tagValue'><div class="editable-sec"><%= secTag %></div></h5>
 		<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
 	</li>      	
 </script>
@@ -609,21 +626,20 @@
 
 	<% _.each(items,function(item, key, list){ %>
 		
-		<div class='portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all' data-maintag='<%= item.name %>'>
+		<div class='portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all' data-maintag='<%= item.id %>'>
 			<div class='portlet-header ui-widget-header ui-corner-all'>
 				<span class='ui-icon ui-icon-trash portlet-delete'></span>
 				<span class='ui-icon ui-icon-plusthick portlet-toggle'></span>
 				<div class='editable'><%= item.name %></div>
-                <span id="main-tag-id" style="display: none;"><%= item.id %></span>
 			</div>
 			<div class='portlet-content' style='display: none'>
 				<div class='ui-widget-content portlet-new-sec-tag ui-corner-all'>
-					<h2>Create New Secondary Tag</h2>
+					<h2>Click to create a new Secondary Tag</h2>
 				</div>
 				<ul class='managetags ui-helper-reset ui-helper-clearfix connectedSortable'>
 					<% for(var tag in item.secTags) { %>								
-						 <li class='ui-widget-content' data-sectag='<%= item.secTags[tag] %>'>
-							<h5 class='ui-widget-header tagValue editable-sec'><%= item.secTags[tag] %></h5>
+						 <li class='ui-widget-content' data-sectag='<%= item.secTags[tag] %>'>							
+							<h5 class='ui-widget-header tagValue'><div class="editable-sec"><%= item.secTags[tag] %></div></h5>
 							<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
 						</li>
 				   <% } %>

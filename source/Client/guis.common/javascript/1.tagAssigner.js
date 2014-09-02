@@ -184,18 +184,18 @@ GUI.tagAssigner = new function() {
 			var that = GUI.tagAssigner;
 			var customMainTagValue;
 			
+			customMainTagValue = $(this).val();
 			if (event.keyCode == 13 && customMainTagValue != "") {
-				
-				customMainTagValue = $(this).val();
+							
 				//if a MainTag with this name already exists, discard the new entry
 				for (var index = 0; index < that.mainTags.length; ++index) {
-					if (that.mainTags[index].name == customMainTagValue){
+					if (that.mainTags[index].name.toLowerCase() == customMainTagValue.toLowerCase()){
 					
 						//reset the value of the input field
 						$(this).val("");
 						$("#container-notifier").notify("create", "withIcon", {
                              title :  GUI.translate("error"),
-                             text: GUI.translate("tagManager.duplicateTag.error"),
+                             text: GUI.translate("tagManager.duplicateMainTag.error"),
                              icon: '/guis.common/images/toast/warning.png'
                         });
 						
@@ -250,8 +250,7 @@ GUI.tagAssigner = new function() {
 		});
 		
 		// event handler for the input field for creation of custom secondary tags
-		// creates new secondary tag and assigns it to the file object
-		
+		// creates new secondary tag and assigns it to the file object	
 		
 		that.$containerSecondaryTags.delegate("#custom-Sec-tag", "keyup", function() {
 		//$("#custom-Sec-tag").die().live("keyup", function(event) {
@@ -260,13 +259,31 @@ GUI.tagAssigner = new function() {
 			
 			if (event.keyCode == 13 && customSecTagValue != "") {
 				
+				for (var index = 0; index < that.assignedSecTags.length; ++index) {
+					if (that.assignedSecTags[index].toLowerCase() == customSecTagValue.toLowerCase()){
+					
+						//reset the value of the input field
+						$(this).val("");
+						$("#container-notifier").notify("create", "withIcon", {
+                             title :  GUI.translate("error"),
+                             text: GUI.translate("tagManager.duplicateSecondaryTag.error"),
+                             icon: '/guis.common/images/toast/warning.png'
+                        });
+						
+						return
+					} 
+				}	
 				//remove the newly created tag if it already exists in the list of unassigned secondary tags
+				// the function "removeListItem" removes the item if it exists in the list of unassigned secondary tags
 				// and redraw the unassigned secondary tags
-				that.removeListItem( that.unassignedSecTags, customSecTagValue);
+				var checkedCustomSecTagValue = that.removeListItem( that.unassignedSecTags, customSecTagValue);
 				that.drawUnassignedTags();
 				
 				//insert the newly created secondary tag into the list of assigned secondary tags
 				// and redraw the assigned secondary tags
+				if(checkedCustomSecTagValue != ""){
+					customSecTagValue = checkedCustomSecTagValue;
+				}
 				that.assignedSecTags.push(customSecTagValue);
 				that.drawAssignedTags();
 				
@@ -274,9 +291,8 @@ GUI.tagAssigner = new function() {
 				Modules.TagManager.updSecTags(that.mainTag, customSecTagValue);
 				
 				//reset the value of the input field
-				$(this).val("");
+				$(this).val("");									
 			}
-			
 		});
 		
 		//click event handler for the "next" button
@@ -335,14 +351,17 @@ GUI.tagAssigner = new function() {
 	
 
 
-	//remove specified element from an array
+	//remove specified element from an array and return the deleted element
 	this.removeListItem = function(arr, item) {
+		var removedItem = "";
 	    for (var index = 0; index < arr.length; index++) {
-	        if (arr[index] === item) {
+	        if (arr[index].toLowerCase() === item.toLowerCase()) {
+	        	removedItem = arr[index]; 
 	            arr.splice(index, 1);
-	            index--;
+	            index--;	           
 	        }
 	    }
+	    return removedItem;
 	}
 	
 	// sets the list main tags to the all existing main tags 

@@ -963,10 +963,16 @@ button#btn-previous {margin-left: 133px;}
 	font-size: 12.5px
 }
 
-#main-tag-container div.editable, #main-tag-container div.editable-sec{
+#main-tag-container div.editable {
 	width: 80%;
 	cursor: default !important;
 }
+
+#main-tag-container div.editable-sec {
+	width: 95%;
+	cursor: default !important;
+}
+
 div.tagValue {
 	width:90%;
 }

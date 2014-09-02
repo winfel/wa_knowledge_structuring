@@ -9,7 +9,8 @@ GUI.setTranslations('en',{
     'trasnlate' : 'To update the language of all elements of the page it has to be reloaded. Reload now?',
     'upload.globalspace.error' : "Sorry, it's not allowed to upload Files in the Global Space. Please upload them in your private Space or in the Paper Spaces",
     'error' : 'Error',
-    'tagManager.duplicateTag.error' :'A main tag with the specified name already exists',
+    'tagManager.duplicateMainTag.error' :'A main tag with the specified name already exists',
+    'tagManager.duplicateSecondaryTag.error' :'A secondary tag with the specified name already exists',
     'tagManager.maintagdeletion.error' : 'The main tag cannot be deleted since there are files tagged with this tag'
     }
 );
@@ -89,7 +90,8 @@ GUI.setTranslations('de',{
     'trasnlate' : 'Um die Sprache der alle Elemente der Seite zu whechsel, muss sie nun neugeladen werden. Jetzt neu laden?',
     'upload.globalspace.error' : "Sorry, es ist nicht erlaubt, Dateien im globalen Raum hochzuladen. Bitte laden Sie sie in Ihrem privaten Raum oder in den paper space",
     'error' : 'Fehler',
-    'tagManager.duplicateTag.error' :'Ein Haupt Tag mit dem angegebenen Namen ist bereits vorhanden',
+    'tagManager.duplicateMainTag.error' :'Ein Haupt Tag mit dem angegebenen Namen ist bereits vorhanden',
+    'tagManager.duplicateSecondaryTag.error' :'Ein Sekundär Tag mit dem angegebenen Namen ist bereits vorhanden',
     'tagManager.maintagdeletion.error' : 'Der Haupt Tag kann nicht gelöscht werden, da es Dateien mit diesem Tag vorliegen'
 }
 );
@@ -169,7 +171,8 @@ GUI.setTranslations('es',{
 	'trasnlate' : '¿Para actualizar el idioma de todos los elementos de la página se tiene que volver a cargar la pagina. Actualizar ahora?',
     'upload.globalspace.error' : "Lo sentimos, no se permite cargar archivos en el espacio global. Por favor, suba el archivo en su espacio privado o en el paper space",
     'error' : 'Error',
-    'tagManager.duplicateTag.error' :'Una etiqueta principal con el nombre especificado ya existe',
+    'tagManager.duplicateMainTag.error' :'Una etiqueta principal con el nombre especificado ya existe',
+    'tagManager.duplicateSecondaryTag.error' :'Una etiqueta secundaria con el nombre especificado ya existe',
     'tagManager.maintagdeletion.error' : 'La etiqueta principal no se puede eliminar ya que hay archivos etiquetados con esta etiqueta'
 }
 );

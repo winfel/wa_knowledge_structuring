@@ -89,12 +89,11 @@ var TagManager = new function() {
   /**
    * Deletes the specified main tag
    * 
-   * @param {type} mainTag The name of the main tag.
-   * @param {type} id The id of the main tag.
+   * @param {type} mainTagID The id of the main tag.
    * @param {type} callback callback function
    * @return {type} result Result which says whether action was successful or not
    */
-  this.deleteMainTag = function(mainTag, id, callback) {
+  this.deleteMainTag = function(mainTagID, callback) {
 
 	Dispatcher.registerCall("deleteMainTag", function(result) {
 	    callback(result);
@@ -102,8 +101,7 @@ var TagManager = new function() {
 	});
 	  
     Modules.SocketClient.serverCall('deleteMainTag', {
-        'mainTag': mainTag,
-        'tagID': id
+        'mainTagID': mainTagID,
     });
   };
   

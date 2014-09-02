@@ -22,6 +22,7 @@ GUI.tagManager = new function() {
 	
 	this.oldMainTagName = "";
 	
+	this.currentMainTagID = "";
 	this.currentMainTag = "";
 	
 	this.oldMainTag = "";
@@ -57,14 +58,14 @@ GUI.tagManager = new function() {
 		// TODO: add tag to the mainTags array
 	}
 	
-	this.updMainTagName = function(oldName, newName, tagID){		
+	this.updateMainTagName = function(oldName, newName, tagID){		
 		// updates the name of the main tag with ID "tagID" in the database  
 		Modules.TagManager.updMainTagName(oldName, newName, tagID);
 	}
 
-	this.deleteMainTag = function(mainTag, tagID, callback) {
+	this.deleteMainTag = function(mainTagID, callback) {
 		// deletes the main tag with ID "tagID" from the database
-		Modules.TagManager.deleteMainTag(mainTag, tagID, function(obj) {
+		Modules.TagManager.deleteMainTag(mainTagID, function(obj) {
 			callback(obj);
 		});
 	}
@@ -74,7 +75,7 @@ GUI.tagManager = new function() {
 		Modules.TagManager.updSecTags(mainTag, secondaryTag);		
 	}
 	
-	this.updSecTagName = function(mainTag, oldName, newName){
+	this.updateSecondaryTagName = function(mainTag, oldName, newName){
 		// updates the name of the secondary tag "oldName" to "newName"  
 		Modules.TagManager.updSecTagName(mainTag, oldName, newName);
 	}
@@ -108,14 +109,14 @@ GUI.tagManager = new function() {
 			        if (oldName != value) {
         			     // if a MainTag with this name already exists, discard the new entry
                          for (var index = 0; index < that.mainTags.length; ++index) {
-                            if (that.mainTags[index].name == value) {
+                            if (that.mainTags[index].name.toLowerCase() == value.toLowerCase()) {
                             
                                 $("#container-notifier").notify("create", "withIcon", {
                                     title :  GUI.translate("error"),
-                                    text: GUI.translate("tagManager.duplicateTag.error"),
+                                    text: GUI.translate("tagManager.duplicateMainTag.error"),
                                     icon: '/guis.common/images/toast/warning.png'
                                 });
-                                
+                                $(this).closest(".portlet").remove();
                                 return this.revert;
                                 
                             }
@@ -127,16 +128,11 @@ GUI.tagManager = new function() {
 					     var newId = new Date().getTime() - 1296055327011;
 						 that.createMainTag(value, newId);
 						 that.mainTagOperation = "";
+						 $(this).closest('.portlet').data('maintag', newId);			 
 						 
-						 $(this).parent().find('#main-tag-id').data("tag-id", newId );
 					 } else {
-						 var tagID = $(this).parent().find('#main-tag-id').data("tag-id");
-						 
-						 if (!tagID) {
-						     tagID = $(this).parent().find('#main-tag-id').html();;
-						 }
-						 
-						 that.updMainTagName(oldName, value, tagID);
+						 var tagID = $(this).closest('.portlet').data('maintag');						 						 
+						 that.updateMainTagName(oldName, value, tagID);
 					 }
 					 
 					 return value;
@@ -147,11 +143,40 @@ GUI.tagManager = new function() {
 				function(value, settings) { 
 						 // console.log(value);						 
 						 if(that.secTagOperation == "create"){
-							 that.createSecondaryTag(that.currentMainTag, value);
-							 that.secTagOperation = "";
-						 } else{
+							 var currentMainTagWithSecTags;
+							 var existenceOfSecondaryTag = false;
+							 
+							 $.each(that.mainTags, function( index, mainTag ) {		
+								 if (mainTag.id == that.currentMainTagID){
+									 currentMainTagWithSecTags = mainTag;
+									 return false;
+								 }									
+							 });
+							 
+							 $.each(currentMainTagWithSecTags.secTags, function( index, secTag ) {		
+								 if (secTag.toLowerCase() == value.toLowerCase()){
+									 existenceOfSecondaryTag = true;
+									 return false;
+								 }									
+							 });
+							 
+							 if(!existenceOfSecondaryTag){
+								 that.createSecondaryTag(that.currentMainTag, value);
+								 that.secTagOperation = "";
+							 } else {
+								 $("#container-notifier").notify("create", "withIcon", {
+	                                    title :  GUI.translate("error"),
+	                                    text: GUI.translate("tagManager.duplicateSecondaryTag.error"),
+	                                    icon: '/guis.common/images/toast/warning.png'
+	                                });
+								 that.secTagOperation = "";
+								 $(this).closest("li").remove();
+	                             return this.revert;
+							 }
+							 
+						 } else {
 							 var oldName = this.revert;
-							 that.updSecTagName(that.currentMainTag, oldName, value);
+							 that.updateSecondaryTagName(that.currentMainTag, oldName, value);
 						 }
 						 return value;
 				},  
@@ -194,14 +219,11 @@ GUI.tagManager = new function() {
 		$( "#main-tag-container" ).delegate(".portlet-delete", "click", function() {
 			var self = this;
 			var that = GUI.tagManager;
-		    var mainTagToBeDeleted = $(this).parent().find('.editable').html();
-		    
-		    var tagID = $(this).parent().find('#main-tag-id').html();
-		    if (!tagID) {
-		        tagID = $(this).parent().find('#main-tag-id').data("tag-id");
-		    }
-		    
-            that.deleteMainTag(mainTagToBeDeleted, tagID, function(obj) {
+			
+			// ID of the Main Tag to be deleted
+		    var mainTagID = $(this).closest('.portlet').data('maintag').toString();		    
+		    		    
+            that.deleteMainTag(mainTagID, function(obj) {
                 if (obj.error && obj.error == true) {
                     $("#container-notifier").notify("create", "withIcon", {
                         title :  GUI.translate("error"),
@@ -257,7 +279,7 @@ GUI.tagManager = new function() {
 			that.enableEditable();
 			
 			that.secTagOperation = "create";
-			//that.currentMainTag = $(this).closest('.portlet').data('maintag');
+			that.currentMainTagID = $(this).closest('.portlet').data('maintag');
 			that.currentMainTag = $(this).closest('.portlet').find('.editable').html();
 			
 			$listToInsertInto.find('.editable-sec').first().click();
@@ -268,7 +290,7 @@ GUI.tagManager = new function() {
 		
 		$( "#main-tag-container" ).delegate(".editable-sec","click", function() {
 		 	
-			//that.currentMainTag = $(this).closest('.portlet').data('maintag');
+			that.currentMainTagID = $(this).closest('.portlet').data('maintag');
 			that.currentMainTag = $(this).closest('.portlet').find('editable').html();
 				
 		});

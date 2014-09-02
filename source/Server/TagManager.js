@@ -93,7 +93,7 @@ var TagManager = function() {
 		});
 		
 		Dispatcher.registerCall('deleteMainTag', function(socket, data) {
-	        that.deleteMainTag(socket, data.tagID, function(error, msg, containerID) {
+	        that.deleteMainTag(socket, data.mainTagID, function(error, msg, containerID) {
 	            if (!error) {
 	                var context = Modules.UserManager.getConnectionBySocket(socket);
 	                
@@ -347,11 +347,11 @@ var TagManager = function() {
      * @param {Object} callback callback function
      * @returns {undefined}
      */
-	this.deleteMainTag = function(socket, mainTag, callback) {
+	this.deleteMainTag = function(socket, mainTagID, callback) {
 		var dbMainTags = db.get('MainTags');
 		var dbObjects = db.get('objects');
 		
-		var promise = dbMainTags.findOne( {id: mainTag });
+		var promise = dbMainTags.findOne( {id: mainTagID });
 		promise.on('complete', function(err, obj) {
 		    
             if (err || obj == null) {
@@ -366,13 +366,13 @@ var TagManager = function() {
 		                callback(true, "The main tag cannot be deleted: " + err);
 		            } else {
 		                if (obj.length == 0) {
-		                	var promise2 = dbMainTags.findOne({id: mainTag.toString()});
+		                	var promise2 = dbMainTags.findOne({id: mainTagID.toString()});
 		            		promise2.on('complete', function(err, obj) {
 		                        if (err) callback(true, "The main tag cannot be deleted: " + err);
 		                        else {
 		                            var containerID = obj.containerID;
 		                            
-		                            var promise3 = dbMainTags.remove({id: mainTag.toString()});
+		                            var promise3 = dbMainTags.remove({id: mainTagID.toString()});
 		                            promise3.on('complete', function(err, obj) {
 		                                if (err) { 
 		                                	callback(true, "The main tag cannot be deleted: " + err);

@@ -14,6 +14,8 @@ GUI.search = new function () {
         var filterByFilename = "";
         var filterByMainTag = "";
         var filterBySecondaryTag = [];
+        
+        var matchedFiles = [];
 
         // Events
         $("#searchFilenameTxt").keyup(function () {
@@ -82,7 +84,8 @@ GUI.search = new function () {
         });
         
         $("#secondaryTagSel").click(function (){
-        	if( $(this).find("option").length == 0){
+        	//if( $(this).find("option").length == 0){
+        	if($("#mainTagSel").val() == " "){        		
 	        	$("#container-notifier").notify("create", "withIcon", {
 	        		title :  "Info",
 	                text: "You need firstly to select a Main Tag.",
@@ -159,36 +162,49 @@ GUI.search = new function () {
 			var matchByFilename = true;
 			var matchByMainTag = true;
 			var matchBySecondaryTag = true;
+			matchedFiles = [];
+			if(filterByFilename == "" && filterByMainTag == "" && filterBySecondaryTag.length == 0){
+				$("#matchesCounterSpan").html("");
+				$.each( fileObjects, function( key, file ) {
+					var rep = document.getElementById(file.getAttribute('id')); 
+					$(rep).css("opacity", 1);
+				});  
+			} else {
+				$.each( fileObjects, function( key, file ) {    
+					var rep = document.getElementById(file.getAttribute('id'));              
+				      
+					if(filterByFilename != ""){
+						if (file.getAttribute('name').search(new RegExp(filterByFilename, "i")) >= 0) {// matching case                    
+							matchByFilename = true;
+		                } else { //non-matching case                	
+		                	matchByFilename = false;
+		                }
+					}
+					
+					if(filterByMainTag != ""){
+						if (file.getAttribute('mainTag').indexOf(filterByMainTag) >= 0) {
+							matchByMainTag = true;
+		        		} else {
+		        			matchByMainTag = false;
+		        		}
+					}
+					
+					if(filterBySecondaryTag.length > 0){
+						matchBySecondaryTag = matchArrays(file.getAttribute('secondaryTags'), filterBySecondaryTag);
+					}
+					
+					if(matchByFilename && matchByMainTag && matchBySecondaryTag){					
+		            	$(rep).css("opacity", 1);
+						matchedFiles.push(file.getAttribute('name'));
+		            } else {
+						$(rep).css("opacity", NON_MATCHING_FILE_OPACITY);					
+					}
+					
+				});  
+				var matchStr = matchedFiles.length == 1 ? " matched File." : " matched Files."
+				$("#matchesCounterSpan").html(matchedFiles.length + matchStr)
+			}
 			
-			$.each( fileObjects, function( key, file ) {    
-				var rep = document.getElementById(file.getAttribute('id'));              
-			      
-				if(filterByFilename != ""){
-					if (file.getAttribute('name').search(new RegExp(filterByFilename, "i")) >= 0) {// matching case                    
-						matchByFilename = true;
-	                } else { //non-matching case                	
-	                	matchByFilename = false;
-	                }
-				}
-				
-				if(filterByMainTag != ""){
-					if (file.getAttribute('mainTag').indexOf(filterByMainTag) >= 0) {
-						matchByMainTag = true;
-	        		} else {
-	        			matchByMainTag = false;
-	        		}
-				}
-				
-				if(filterBySecondaryTag.length > 0){
-					matchBySecondaryTag = matchArrays(file.getAttribute('secondaryTags'), filterBySecondaryTag);
-				}
-				
-				if(matchByFilename && matchByMainTag && matchBySecondaryTag){					
-	            	$(rep).css("opacity", 1);
-	            } else {
-					$(rep).css("opacity", NON_MATCHING_FILE_OPACITY);					
-				}
-			});   
 		}
       
     };
