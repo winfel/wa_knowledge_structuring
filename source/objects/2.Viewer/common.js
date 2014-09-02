@@ -24,27 +24,27 @@ Viewer.register = function(type) {
     }});
     
   Modules.Dispatcher.registerCall("dbDocument_comments", function(data) {
-    that.addComment(data.user, data.id, data.data);
+    that.addComment(data.user, data.id || data._id, data.data);
   });
   
   Modules.Dispatcher.registerCall("dbDocument_comments_audio", function(data) {
-    that.addComment(data.user, data.id, data.data);
+    that.addComment(data.user, data.id || data._id, data.data);
   });
   
   Modules.Dispatcher.registerCall("dbDocumentAdded_comments", function(data) {
-    that.addComment(data.user, data.id, data.data);
+    that.addComment(data.user, data.id || data._id, data.data);
   });
   
   Modules.Dispatcher.registerCall("dbDocumentAdded_comments_audio", function(data) {
-    that.addComment(data.user, data.id, data.data);
+    that.addComment(data.user, data.id || data._id, data.data);
   });
   
   Modules.Dispatcher.registerCall("dbDocumentRemoved_comments", function(data) {
-    that.removeComment(data.id, "comment", "commented");
+    that.removeComment(data.id || data._id, "comment", "commented");
   });
   
   Modules.Dispatcher.registerCall("dbDocumentRemoved_comments_audio", function(data) {
-    that.removeComment(data.id, "audioobject", "audio");
+    that.removeComment(data.id || data._id, "audioobject", "audio");
   });
   
   Modules.Dispatcher.registerCall("dbAllDocumentsSend_comments", function(data) {
