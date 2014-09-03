@@ -517,23 +517,58 @@ if (!Modules.Config.presentationMode) {
     Modules.TagManager.getMainTagsAndSecTags(function(mainTagList){
      var option = $("<option>");
      option.attr({
-       value: " ",
-       disabled: true,
-       selected: true
+    	 value: " ",
+    	 disabled: true,
+    	 selected: true
      });
      option.html("Select Main Tag");
 
      $("#mainTagSel").append(option);
      for(var i=0;i<mainTagList.length;i++){
-       var option = $("<option>");
-       option.attr({
-        value: mainTagList[i].name,
-      });
+    	 var option = $("<option>");
+    	 option.attr({
+    		 value: mainTagList[i].name,
+    	 });
 
-       option.html(mainTagList[i].name);
-       $("#mainTagSel").append(option);          
-
-     }  
+    	 option.html(mainTagList[i].name);
+    	 $("#mainTagSel").append(option);
+    }
+     
+     $("#mimeTypesColumn1, #mimeTypesColumn2").html("");
+     
+     var allMimeTypes = [
+                         { "name": "application/pdf", "label": "pdf" },
+                         { "name": "text/html", "label": "html" },
+                    	 { "name": "text/plain", "label": "text" },
+                         { "name": "image/", "label": "image" },
+                    	 { "name": "audio/", "label": "audio" }, 
+                         { "name": "video/", "label": "video" }    	 				 
+                        ];
+     
+     var columnToAppendTo = $("#mimeTypesColumn1");
+     $.each(allMimeTypes, function(key, mimeType){
+     	var checkbox = $("<input />");
+     	checkbox.attr({
+     		type: 'checkbox',
+     		id: "mimeTypeChk_" + mimeType.label,
+     		name: 'mimeTypeChk',
+     		'class': 'mimeTypeChk',
+     		value: mimeType.name
+     	});
+     	
+     	var label = $('<label>');
+     	label.attr({
+     		'for': "mimeTypeChk_" + mimeType.label     		
+     	});
+     	label.text(mimeType.label);
+     	
+     	if(key > 2) {
+     		columnToAppendTo = $("#mimeTypesColumn2");
+     	}
+     	columnToAppendTo.append(checkbox);
+     	columnToAppendTo.append(label);
+     	
+     });
 
    });
     GUI.sidebar.openPage("search", searchButton);

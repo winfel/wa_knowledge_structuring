@@ -1235,6 +1235,26 @@ span.portlet-toggle, span.portlet-delete, span.sec-tag-delete {
 	cursor: pointer;
 }
 
+#search input[type="checkbox"] {
+	float: left;
+	margin-right: 0.5em;
+}
+
+#search input[type="checkbox"] {
+	float: left;
+	margin-right: 0.5em;
+}
+
+#search #mimeTypesColumn1 {
+	width: 45%;
+	float:left;
+}
+
+#search #mimeTypesColumn2 {
+	width: 45%;
+	display: inline-block;
+}
+
 
 /* end Search Sidebar*/
 
