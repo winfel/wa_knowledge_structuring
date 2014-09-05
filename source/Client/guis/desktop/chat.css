@@ -4,14 +4,13 @@
 
 /* chatbox */
 #one2one-container {
-    display: none;
     position: fixed;
-    right: 280px;
-    bottom: 10%;
-    background-color: #3efd44;
+    right: 255px;
+    bottom: 0px;
     z-index: 10;
     width: 400;
     height: 200;
+    background-color: #ffffff!important;
 }
 
 .chatuserhandle:hover {
@@ -20,12 +19,15 @@
 }
 
 .chat-box {
-    background: #8790b3; width:260px; overflow:hidden;
-    position:fixed; bottom:0; right:20%; z-index:9;
+    background: #3a3a3d; width:260px;
+    /*overflow:hidden;*/
+    position:relative; bottom:0; z-index:9;
+    float: right;
+    margin-right: 3px;
 }
 
 .chat-box .chat-header .close_btn {
-    background: url(../../guis.common/images/close_btn.png) no-repeat 0px 0px;
+    background: url(../../guis.common/images/close_btn_grey.png) no-repeat 0px 0px;
     float:right;
     width:25px;
     height: 25px;
@@ -34,12 +36,12 @@
 }
 
 .chat-box .chat-header .close_btn:hover {
-    background: url(../../guis.common/images/close_btn.png) no-repeat 0px 0px;
+    background: url(../../guis.common/images/close_btn_grey.png) no-repeat 0px 0px;
     cursor: pointer;
 }
 
 .chat-box .chat-header .minimize_btn {
-    background: url(../../guis.common/images/minimize.png) no-repeat 0px 0px;
+    background: url(../../guis.common/images/minimize_grey.png) no-repeat 0px 0px;
     float:right;
     width:25px;
     height: 25px;
@@ -49,7 +51,7 @@
 }
 
 .chat-box .chat-header .minimize_btn:hover {
-    background: url(../../guis.common/images/minimize.png) no-repeat 0px 0px;
+    background: url(../../guis.common/images/minimize_grey.png) no-repeat 0px 0px;
     cursor: pointer;
 }
 
@@ -72,7 +74,8 @@
 
 .chat-box .message-box {
     background: #FFFFFF; height: 200px;
-    overflow:auto; border: 1px solid #CCC;
+    overflow:auto;
+    border: 1px solid #8c8c8c;
 }
 .chat-msg{
     margin-bottom: 10px; display: block;
@@ -98,7 +101,7 @@ time{
     width: 97%;
     height: 45px;
     border: 2px;
-    border-color: #b2b2b2;
+    border-color: #8c8c8c;
     border-style: solid;
     /*border-top: none;*/
     padding: 3px 0px 0px 3px;
@@ -119,20 +122,20 @@ time{
     position:fixed; bottom:0; right:20%; z-index:9;
 }
 .shout_box .header .close_btn {
-    background: url(images/close_btn.png) no-repeat 0px 0px;
+    background: url(images/close_btn_grey.png) no-repeat 0px 0px;
     float:right; width:15px;
     height: 15px;
 }
 .shout_box .header .close_btn:hover {
-    background: url(images/close_btn.png) no-repeat 0px 0px;
+    background: url(images/close_btn_grey.png) no-repeat 0px 0px;
 }/*^*/
 .shout_box .header .open_btn {
-    background: url(images/close_btn.png) no-repeat 0px -32px;
+    background: url(images/close_btn_grey.png) no-repeat 0px -32px;
     float:right; width:15px;
     height:15px;
 }
 .shout_box .header .open_btn:hover {
-    background: url(images/close_btn.png) no-repeat 0px -48px;
+    background: url(images/close_btn_grey.png) no-repeat 0px -48px;
 }
 /*>*/
 .shout_box .header{
