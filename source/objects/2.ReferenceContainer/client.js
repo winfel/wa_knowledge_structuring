@@ -21,6 +21,10 @@ ReferenceContainer.Files = new Array();
 ReferenceContainer.References = new Array();
 
 
+/**
+* @function removeReference
+* @param ref
+*/
 ReferenceContainer.removeReference = function(ref){
 		
 	var that = this;	
@@ -90,7 +94,9 @@ ReferenceContainer.getFiles = function(){
 		
 }
 
-
+/**
+* @param files
+*/
 ReferenceContainer.searchAndFilter = function(files){
 	
 	var filteredFiles1 = new Array();
@@ -217,7 +223,9 @@ ReferenceContainer.searchAndFilter = function(files){
 	
 }
 
-
+/**
+* @param files
+*/
 ReferenceContainer.sortFiles = function(files){ //bubble sort
 
 	var sortingCriterion = this.sortingCriterion;

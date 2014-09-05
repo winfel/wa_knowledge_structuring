@@ -5,6 +5,10 @@
 *
 */	
 
+/**
+* @function draw
+* @param external
+*/
 ReferenceContainer.draw=function(external){
 	var rep=this.getRepresentation();
 	
@@ -50,7 +54,10 @@ ReferenceContainer.updateInnerHeight = function() {
 	
 }
 
-
+/**
+* @param parent
+* @return {undefined}
+*/
 ReferenceContainer.createRepresentation = function(parent) { 	
 	
 	var rep = GUI.svg.other(parent,"foreignObject");
@@ -74,6 +81,9 @@ ReferenceContainer.adjustControls = function() {
 	GeneralObject.adjustControls.call(this);
 }
 
+/**
+* @param rep
+*/
 ReferenceContainer.drawContent = function(rep){
 
 	var that = this;
@@ -382,7 +392,9 @@ ReferenceContainer.drawContent = function(rep){
 	});	
 }
 
-
+/**
+* @param newName
+*/
 ReferenceContainer.rename = function(newName){
 
 	var rep=this.getRepresentation();
@@ -391,6 +403,9 @@ ReferenceContainer.rename = function(newName){
 		
 }
 
+/**
+* @param files
+*/
 ReferenceContainer.addFiles = function(files){
 
 	var that = this;

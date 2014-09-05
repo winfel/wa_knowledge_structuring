@@ -5,6 +5,11 @@
 *
 */
 
+/**
+* @function createRepresentation
+* @param parent
+* @return {undefined}
+*/
 Ellipse.createRepresentation = function(parent) {
 	var rep = GUI.svg.group(parent,this.getAttribute('id'));
 	
@@ -23,7 +28,9 @@ Ellipse.createRepresentation = function(parent) {
 	
 }
 
-
+/**
+* @param external
+*/
 Ellipse.draw=function(external){
 	
 	var rep=this.getRepresentation();
@@ -63,12 +70,17 @@ Ellipse.updateInnerObject=function() {
 	
 }
 
-
+/**
+* @param value
+*/
 Ellipse.setViewWidth = function(value) {
 	GeneralObject.setViewWidth.call(this,value);
 	this.updateInnerObject();
 }
 
+/**
+* @param value
+*/
 Ellipse.setViewHeight = function(value) {
 	GeneralObject.setViewHeight.call(this,value);
 	this.updateInnerObject();

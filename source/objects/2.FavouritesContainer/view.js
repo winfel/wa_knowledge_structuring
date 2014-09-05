@@ -5,6 +5,10 @@
 *
 */	
 
+/**
+* @function draw
+* @param external
+*/
 FavouritesContainer.draw=function(external){
 	var rep=this.getRepresentation();
 	
@@ -30,7 +34,9 @@ FavouritesContainer.draw=function(external){
 	this.adjustControls();
 }
 
-
+/**
+* @function updateInnerHeight
+*/
 FavouritesContainer.updateInnerHeight = function() {
 	
 	var rep=this.getRepresentation();
@@ -50,7 +56,10 @@ FavouritesContainer.updateInnerHeight = function() {
 	
 }
 
-
+/**
+* @param parent
+* @return {undefined}
+*/
 FavouritesContainer.createRepresentation = function(parent) { 	
 	
 	var rep = GUI.svg.other(parent,"foreignObject");
@@ -69,11 +78,16 @@ FavouritesContainer.createRepresentation = function(parent) {
 	
 }
 
+
 FavouritesContainer.adjustControls = function() {
 	this.updateInnerHeight();
 	GeneralObject.adjustControls.call(this);
 }
 
+/**
+* @function drawContent
+* @param rep
+*/
 FavouritesContainer.drawContent = function(rep){
 
 	var that = this;
@@ -380,7 +394,10 @@ FavouritesContainer.drawContent = function(rep){
 	});	
 }
 
-
+/**
+* @function rename
+* @param newName
+*/
 FavouritesContainer.rename = function(newName){
 
 	var rep=this.getRepresentation();
@@ -389,6 +406,10 @@ FavouritesContainer.rename = function(newName){
 		
 }
 
+/**
+* @function addFiles
+* @param files
+*/
 FavouritesContainer.addFiles = function(files){
 
 	var that = this;

@@ -1,5 +1,10 @@
 var VERY_BIG_ICON = 128;
 
+/**
+* @function createRepresentation
+* @param parent
+* @return {undefined}
+*/
 IconObject.createRepresentation = function(parent) {
 	
 	var rep = GUI.svg.group(parent,this.getAttribute('id'));
@@ -29,7 +34,10 @@ IconObject.createRepresentation = function(parent) {
 	
 }
 
-
+/**
+* @function draw
+* @param external
+*/
 IconObject.draw=function(external){
 	
 	var rep=this.getRepresentation();
@@ -105,7 +113,9 @@ IconObject.draw=function(external){
 	this.createPixelMap();
 }
 
-
+/**
+* @param value
+*/
 IconObject.setViewWidth = function(value) {
 	
 	$(this.getRepresentation()).find("image").attr("width", parseInt(value));
@@ -115,6 +125,9 @@ IconObject.setViewWidth = function(value) {
 	
 }
 
+/**
+* @param value
+*/
 IconObject.setViewHeight = function(value) {
 
 	$(this.getRepresentation()).find("image").attr("height", parseInt(value));
@@ -127,6 +140,9 @@ IconObject.dblclickHandler = function() {
 	this.execute();
 }
 
+/**
+* @param SVGImage
+*/
 IconObject.createPixelMap=function(SVGImage){
 	
 	if (!SVGImage) SVGImage=$(this.getRepresentation()).find("image")[0];
@@ -194,6 +210,9 @@ IconObject.getIconText = function() {
 	return false;
 }
 
+/**
+* @param text
+*/
 IconObject.renderText = function (text){
 	
 	var rep = this.getRepresentation();

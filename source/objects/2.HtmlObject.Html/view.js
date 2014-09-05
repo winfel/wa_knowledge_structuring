@@ -5,6 +5,10 @@
 *
 */
 
+/**
+* @function draw
+* @param external
+*/
 HtmlObject.draw=function(external){
 
 	var rep=this.getRepresentation();
@@ -39,7 +43,11 @@ HtmlObject.updateContent = function() {
 	
 }
 
-
+/**
+* @function createRepresentation
+* @param parent
+* @return {undefined}
+*/
 HtmlObject.createRepresentation = function(parent) {
 	
 	var rep = GUI.svg.other(parent,"foreignObject");

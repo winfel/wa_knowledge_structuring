@@ -14,6 +14,10 @@ module.exports=theObject;
 var TRASH_ROOM = 'trash';
 var f = 'File';
 
+/**
+* @function getAllFileObjects
+* @param cb
+*/
 theObject.getAllFileObjects = function(cb) {
     
 	Modules.Connector.getObjectDataByQuery({type: f, inRoom: {$nin:[TRASH_ROOM] } }, cb);
