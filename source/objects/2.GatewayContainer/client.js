@@ -17,7 +17,7 @@ GatewayContainer.getGateways = function(){
 	
 	var that = this;		
 	
-	this.serverCall("getAllGatewayObjects", function(data){
+	this.serverCall("getAllGatewayObjects", GUI.username, function(data){
 		
 		var f = new Array();
 		
