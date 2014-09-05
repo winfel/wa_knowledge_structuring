@@ -368,10 +368,13 @@ var RightManager = function() {
     var collection = db.get('roles');
     collection.find({contextID: String(object.id)}, {}, function(e, docs) {
       if (typeof docs == 'undefined' || docs.length === 0) {
-        var parent = that.getParentOfObject(object);
+        // ----------
+        // FALLBACK NOT USED ATM
+        // ----------
+        //var parent = that.getParentOfObject(object);
 
         // call method for parent
-        parent.hasAccess(command, parent, user, callback);
+        //parent.hasAccess(command, parent, user, callback);
       } else {
         /* (1) get the roles that includes the current command within the context of
          the given object */

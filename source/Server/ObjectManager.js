@@ -26,6 +26,7 @@ var tokenChecker = require("./TokenChecker.js");
 var async = require("async");
 var Q = require("q");
 
+var db = false;
 var Modules = false;
 var ObjectManager = {};
 var runtimeData = {};
@@ -47,6 +48,8 @@ var enter = String.fromCharCode(10);
 ObjectManager.init = function (theModules) {
     var that = this;
     Modules = theModules;
+
+    db = require('monk')(Modules.MongoDBConfig.getURI());
 
     //go through all objects, build its client code (the code for the client side)
     //register the object types.
@@ -121,6 +124,37 @@ ObjectManager.getPrototypeFor = ObjectManager.getPrototype;
  *  @param obj the object that should be removed
  */
 ObjectManager.remove = function (obj) {
+	if(obj.type == "PaperSpace"){
+		// Remove project name 
+		var arr = [];
+		var arrNames = [];
+
+		var idNames = db.get('SpaceStorage');
+		idNames.find({destination: "ProjectNames",key: "ID#Name"},{},function(e, rv){
+
+			// test every item of the ID list that contains a poject name
+			rv[0].value.forEach(function(item){
+				if(item.indexOf(obj.id) == -1){
+					// Object that should be deletet is not in the current object list
+					arr.push(item);
+
+					// push name
+					arrNames.push(item.split('#')[1]);
+				}else{
+					console.log("Deleting object "+item);
+				}
+			});
+
+			// remove the old entrys 
+            Modules.UserManager.removeDataOfSpaceWithDestServerSide({destination:"ProjectNames", key:"ID#Name"});
+            Modules.UserManager.removeDataOfSpaceWithDestServerSide({destination:"ProjectNames", key:"name"});
+
+			// push new ones
+            Modules.UserManager.setDataOfSpaceWithDestServerSide({destination:"ProjectNames", key:"ID#Name" , value:arr});
+            Modules.UserManager.setDataOfSpaceWithDestServerSide({destination:"ProjectNames", key:"name" , value:arrNames});
+
+		});
+	}
 
 	// Send remove to connector
 	Modules.Connector.removeObject(obj.inRoom, obj.id, obj.context);
