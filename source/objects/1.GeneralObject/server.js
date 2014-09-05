@@ -29,6 +29,9 @@ module.exports = theObject;
 // * MAKE SENSITIVE ***********************************************
 // ****************************************************************
 
+/**
+* @function makeSensitive
+*/
 theObject.makeSensitive = function() {
   this.isSensitiveFlag = true;
 
@@ -74,7 +77,17 @@ theObject.makeSensitive = function() {
     });
   }
 
-
+  /**
+  * function bBoxIntersects
+  * @param thisX
+  * @param thisY
+  * @param thisWidth
+  * @param thisHeight
+  * @param otherX
+  * @param otherY
+  * @param otherWidth
+  * @param otherHeight
+  */
   theObject.bBoxIntersects = function(thisX, thisY, thisWidth, thisHeight, otherX, otherY, otherWidth, otherHeight) {
 
     if ((otherX + otherWidth) < thisX) {
@@ -100,10 +113,14 @@ theObject.makeSensitive = function() {
   }
 
   /**
-   *	intersects
-   *
-   *	determines, if this Active object intersects another object.
+   *	Determines, if this Active object intersects another object.
    *	In this simple implementation, this is done by bounding box comparison.
+   * @function intersects
+   * @param otherX
+   * @param otherY
+   * @param otherWidth
+   * @param otherHeight
+   * @return {boolean}
    **/
   theObject.intersects = function(otherX, otherY, otherWidth, otherHeight) {
 
@@ -121,9 +138,10 @@ theObject.makeSensitive = function() {
 
   }
   /**
-   *	getOverlappingObjcts
-   *
-   *	get an array of all overlapping objects
+   *  Get an array of all overlapping objects
+   *	@function getOverlappingObjcts
+   *  return {undefined}
+   *	
    **/
   theObject.getOverlappingObjects = function() {
     var result = [];
@@ -146,8 +164,10 @@ theObject.makeSensitive = function() {
   /**
    *	SensitiveObjects evaluate other objects in respect to themselves.
    *
-   *	object the object that shall be evaluated
-   *	changeData old and new values of positioning (e.g. changeData.old.x) 
+   *  @function evaluateObject
+   *	@param object The object that shall be evaluated
+   *	@param changeData Old and new values of positioning (e.g. changeData.old.x) 
+   *  @return {undefined}
    **/
   theObject.evaluateObject = function(object, changeData) {
 
@@ -207,6 +227,10 @@ theObject.makeSensitive = function() {
 // * MAKE STRUCTURING *********************************************
 // ****************************************************************
 
+/**
+* @function makeStructuring
+* @return {undefined}
+*/
 theObject.makeStructuring = function() {
   this.isStructuringFlag = true;
   this.makeSensitive();
@@ -241,20 +265,21 @@ theObject.makeStructuring = function() {
 
 
 /**
- *	getAttributeSet
  *
  *	all of the objects Attributes as key,value pairs.
  *	This may be different from actual object data
  *	as evaluations may be involved
+ * @function getAttributeSet
+ * @return {AttributeSet}
  */
 theObject.getAttributeSet = function() {
   return Modules.AttributeManager.getAttributeSet(this);
 }
 
 /**
- *	updateClient
  *
- *	send a message to a client (identified by its socket)
+ *send a message to a client (identified by its socket)
+ * @function updateClient
  */
 theObject.updateClient = function(socket, mode) {
     
@@ -270,11 +295,12 @@ theObject.updateClient = function(socket, mode) {
 }
 
 /**
- *	persist
+ *	
  *
- *	call this whenever an object has changed. It is saved
+ *	Call this whenever an object has changed. It is saved
  *	through the current connector, the evaluation is called
  *	and a message is sent to the clients
+ * @function persist
  *
  */
 theObject.persist = function() {
@@ -288,8 +314,10 @@ theObject.persist = function() {
 /**
  *	updateClients
  *
- *	send an upadate message to all clients which are subscribed
+ *	Send an upadate message to all clients which are subscribed
  *	to the object's room
+ * @function updateClients
+ * @param mode
  */
 theObject.updateClients = function(mode) {
 
@@ -306,19 +334,21 @@ theObject.updateClients = function(mode) {
 }
 
 /**
- *	hasContent
- *
- *	determines, if the object has content or not
+ *	Determines, if the object has content or not
+ * @function hasContent
+ * @return {Boolean}
  */
 theObject.hasContent = function() {
   return this.getAttribute('hasContent');
 }
 
 /**
- *	setContent
  *
- *	set a new content. If the content is base64 encoded png data,
+ *	Set a new content. If the content is base64 encoded png data,
  *	it is decoded first.
+ * @function setContent
+ * @param content
+ * @param callback
  */
 theObject.setContent = function(content, callback) {	
 	var that = this;
@@ -344,7 +374,11 @@ theObject.setContent.neededRights = {
   write: true
 }
 
-
+/**
+* @function copyContentFromFile
+* @param filename
+* @param callback
+*/
 theObject.copyContentFromFile = function(filename, callback) {
 
   Modules.Connector.copyContentFromFile(this.inRoom, this.id, filename, this.context, callback);
@@ -358,6 +392,10 @@ theObject.copyContentFromFile = function(filename, callback) {
 
 }
 
+/**
+* @function getCurrentUserName
+* @return {undefined}
+*/
 theObject.getCurrentUserName = function() {
   if (!this.context)
     return 'root';
@@ -365,9 +403,9 @@ theObject.getCurrentUserName = function() {
 }
 
 /**
- *	getContent
+ *  Gget the object's content
+ *	@function getContent
  *
- *	get the object's content
  */
 theObject.getContent = function(callback) {
 	if (!this.context)
@@ -386,6 +424,11 @@ theObject.getContent.neededRights = {
   read: true
 }
 
+/**
+* @function getContentAsString
+* @param callback
+* @return {undefined}
+*/
 theObject.getContentAsString = function(callback) {
   if (callback === undefined) {
     return GeneralObject.utf8.parse(this.getContent());
@@ -396,6 +439,11 @@ theObject.getContentAsString = function(callback) {
   }
 }
 
+/**
+* @function getContentFromApplication
+* @param applicationName
+* @param callback
+*/
 theObject.getContentFromApplication = function(applicationName, callback) {
   var eventName = "applicationevent::" + applicationName + "::getContent"
   var event = {
@@ -406,19 +454,32 @@ theObject.getContentFromApplication = function(applicationName, callback) {
 }
 
 /**
- *	getInlinePreview
+ * Get the object's inline preview
+ * @function getInlinePreview
+ * @param callback
+ * @param mimeType
+ *  @return {undefined}
  *
- *	get the object's inline preview
  */
 theObject.getInlinePreview = function(callback, mimeType) {
   return Modules.Connector.getInlinePreview(this.inRoom, this.id, mimeType, this.context, callback);
 }
 
+/**
+* @function getInlinePreviewMimeType
+* @param callback
+*/
 theObject.getInlinePreviewMimeType = function(callback) {
   Modules.Connector.getInlinePreviewMimeType(this.inRoom, this.id, this.context, callback);
 }
 
 
+/**
+* @function evaluatePosition
+* @param key
+* @param value
+* @param oldvalue
+*/
 theObject.evaluatePosition = function(key, value, oldvalue) {
 
   if (this.runtimeData.evaluatePositionData === undefined) {
@@ -458,6 +519,10 @@ theObject.evaluatePosition = function(key, value, oldvalue) {
 
 }
 
+/**
+* @function evaluatePositionInt
+* @param data
+*/
 theObject.evaluatePositionInt = function(data) {
     var self = this;
     this.getRoom(function (room) {
@@ -470,6 +535,10 @@ theObject.evaluatePositionInt = function(data) {
   });
 }
 
+/**
+* @function getRoom
+* @param callback
+*/
 theObject.getRoom = function(callback) {
   if (callback == undefined) return console.warn("GeneralObject/server.js getRoom callback is undefined!!");
     
@@ -482,6 +551,10 @@ theObject.getRoom = function(callback) {
   
 }
 
+/**
+* @function getBoundingBox
+* @return {undefined}
+*/
 theObject.getBoundingBox = function() {
 
   var x = this.getAttribute('x');
@@ -492,6 +565,11 @@ theObject.getBoundingBox = function() {
 
 }
 
+/**
+* @function fireEvent
+* @param name
+* @param data
+*/
 theObject.fireEvent = function(name, data) {
   data.context = this.context;
 
