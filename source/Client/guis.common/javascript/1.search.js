@@ -80,51 +80,62 @@ GUI.search = new function () {
 			var matchByMimeType = true;			
 			matchedFiles = [];
 			
-			$.each( fileObjects, function( key, file ) {    
-				var rep = document.getElementById(file.getAttribute('id'));              
-			      
-				if(filterByFilename != ""){
-					if (file.getAttribute('name').search(new RegExp(filterByFilename, "i")) >= 0) {// matching case                    
-						matchByFilename = true;
-	                } else { //non-matching case                	
-	                	matchByFilename = false;
-	                }
-				}
-				
-				if(filterByMimeType.length > 0){
-					var fileMimeType = file.getAttribute('mimeType');						
-					var tempMatch = false;
-					$.each(filterByMimeType, function(key, mimeType){
-						if(fileMimeType.search(new RegExp(mimeType, "i")) >= 0){
-							tempMatch = true;
-							return true;
-						}
-					});
-					matchByMimeType = tempMatch;
-				}
-				
-				if(filterByMainTag != ""){
-					if (file.getAttribute('mainTag').indexOf(filterByMainTag) >= 0) {
-						matchByMainTag = true;
-	        		} else {
-	        			matchByMainTag = false;
-	        		}
-				}
-				
-				if(filterBySecondaryTag.length > 0){
-					matchBySecondaryTag = matchArrays(file.getAttribute('secondaryTags'), filterBySecondaryTag);
-				}
-				
-				if(matchByFilename && matchByMainTag && matchBySecondaryTag && matchByMimeType){					
-	            	$(rep).css("opacity", 1);
-					matchedFiles.push(file.getAttribute('name'));
-	            } else {
-					$(rep).css("opacity", NON_MATCHING_FILE_OPACITY);					
-				}
-				
-			});  
-			var matchStr = matchedFiles.length == 1 ? " matched File." : " matched Files."
-			$("#matchesCounterSpan").html(matchedFiles.length + matchStr)						
+			if(filterByFilename == "" && filterByMimeType.length == 0 && filterByMainTag == "" && filterBySecondaryTag.length == 0){
+				var fileObjects = getFileObjectsFromInventory();
+	        	$.each( fileObjects, function( key, file ) {
+	        		var rep = document.getElementById(file.getAttribute('id'));        		                    
+	                $(rep).css("opacity", 1);
+	        	});
+	        	$("#matchesCounterSpan").html("");
+			} else {
+				$.each( fileObjects, function( key, file ) {    
+					var rep = document.getElementById(file.getAttribute('id'));              
+				      
+					if(filterByFilename != ""){
+						if (file.getAttribute('name').search(new RegExp(filterByFilename, "i")) >= 0) {// matching case                    
+							matchByFilename = true;
+		                } else { //non-matching case                	
+		                	matchByFilename = false;
+		                }
+					}
+					
+					if(filterByMimeType.length > 0){
+						var fileMimeType = file.getAttribute('mimeType');						
+						var tempMatch = false;
+						$.each(filterByMimeType, function(key, mimeType){
+							if(fileMimeType.search(new RegExp(mimeType, "i")) >= 0){
+								tempMatch = true;
+								return true;
+							}
+						});
+						matchByMimeType = tempMatch;
+					}
+					
+					if(filterByMainTag != ""){
+						if (file.getAttribute('mainTag').indexOf(filterByMainTag) >= 0) {
+							matchByMainTag = true;
+		        		} else {
+		        			matchByMainTag = false;
+		        		}
+					}
+					
+					if(filterBySecondaryTag.length > 0){
+						matchBySecondaryTag = matchArrays(file.getAttribute('secondaryTags'), filterBySecondaryTag);
+					}
+					
+					if(matchByFilename && matchByMainTag && matchBySecondaryTag && matchByMimeType){					
+		            	$(rep).css("opacity", 1);
+						matchedFiles.push(file.getAttribute('name'));
+		            } else {
+						$(rep).css("opacity", NON_MATCHING_FILE_OPACITY);					
+					}
+					
+				});  
+				var matchStr = matchedFiles.length == 1 ? " matched File." : " matched Files."
+				$("#matchesCounterSpan").html(matchedFiles.length + matchStr);	
+			}
+			
+									
 		}
         
         //Reset functions
