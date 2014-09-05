@@ -91,7 +91,8 @@ Subroom.register=function(type){
         window.open(destination);
 
     } else {
-
+        GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
+        GUI.tabs.redrawTabContent();
         Modules.RightManager.hasAccess("read", { id: this.id, type: this.type}, GUI.username, function(result) {
           if(result) {
             ObjectManager.loadRoom(destination, false, ObjectManager.getIndexOfObject(that.getAttribute('id')));
