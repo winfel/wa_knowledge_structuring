@@ -1,11 +1,21 @@
+/**
+* @param obj
+*/
 Subroom.filterObject = function(obj) {
 	
 }
 
+/**
+* @param id
+* @param name
+*/
 Subroom.selectFile = function(id, name) {
 	
 }
 
+/**
+* return boolean
+*/
 Subroom.hasContent=function(){
 	return true;
 }
