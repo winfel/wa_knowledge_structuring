@@ -152,15 +152,19 @@ var TagManager = new function() {
    * 
    * @param {type} mainTag The main tag.
    * @param {type} secTag The name of the newly added secondary tag.
-   * @return {undefined}
+   * @param {type} callback callback function
    */
-  this.updSecTags = function(mainTag, secTag) {
+    this.updSecTags = function(mainTag, secTag, callback) {
+        Dispatcher.registerCall("updSecTags", function(result) {
+            callback(result);
+            Dispatcher.removeCall("updSecTags");
+        });
 
-    Modules.SocketClient.serverCall('updSecTags', {
-        'mainTag': mainTag,
-        'secTag': secTag
-    });
-  };
+        Modules.SocketClient.serverCall('updSecTags', {
+            'mainTag' : mainTag,
+            'secTag' : secTag
+        });
+    };
   
   /**
    * Deletes the specified secondary tag from the list of 

@@ -69,9 +69,9 @@ GUI.tagManager = new function() {
 		});
 	}
 	
-	this.createSecondaryTag = function(mainTag, secondaryTag){
+	this.createSecondaryTag = function(mainTag, secondaryTag, callback) {
 		// saves the newly created secondary tag "secondaryTag" in the database		
-		Modules.TagManager.updSecTags(mainTag, secondaryTag);		
+		Modules.TagManager.updSecTags(mainTag, secondaryTag, callback);		
 	}
 	
 	this.updateSecondaryTagName = function(mainTag, oldName, newName){
@@ -167,9 +167,19 @@ GUI.tagManager = new function() {
 								 }									
 							 });
 							 
-							 if(!existenceOfSecondaryTag){
-								 that.createSecondaryTag(that.currentMainTag, value);
-								 that.secTagOperation = "";
+							 if (!existenceOfSecondaryTag) {
+								 that.createSecondaryTag(that.currentMainTag, value, function (result) {
+								     if (!result.error) {
+								         that.secTagOperation = "";
+		                             } else {
+		                                 $(this).closest( "li" ).remove();
+		                                 $("#container-notifier").notify("create", "withIcon", {
+		                                     title : GUI.translate("error"),
+		                                     text: GUI.translate(result.msg),
+		                                     icon: '/guis.common/images/toast/warning.png'
+		                                 });
+		                             }
+								 });
 							 } else {
 								 $("#container-notifier").notify("create", "withIcon", {
 	                                    title :  GUI.translate("error"),

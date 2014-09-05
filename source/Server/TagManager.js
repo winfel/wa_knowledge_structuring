@@ -64,10 +64,6 @@ var TagManager = function() {
 			that.getMainTagsAndSecTags(socket);
 		});
 	   
-	    Dispatcher.registerCall('updSecTags', function(socket, data, responseID) {
-			that.updSecTags(socket, data.mainTag, data.secTag); 
-		});
-		
 		Dispatcher.registerCall('updMainTags', function(socket, data) {
 			// for every Main Tag a GlobalContainer object is created
 			var context = Modules.UserManager.getConnectionBySocket(socket);
@@ -147,6 +143,12 @@ var TagManager = function() {
 			}); 
 		});
 		
+		Dispatcher.registerCall('updSecTags', function(socket, data) {
+            that.updSecTags(socket, data.mainTag, data.secTag, function (error, message) {
+                Modules.SocketServer.sendToSocket(socket, 'updSecTags', {"error": error, "msg": message});
+            }); 
+        });
+        
 		// we create our context
 		var context = {
 	            user: { username : "root"}
@@ -222,12 +224,21 @@ var TagManager = function() {
      * @param {Object} socket The socket of the client.
      * @param {Object} mainTag The main tag.
      * @param {Object} newSecTag The newly added secondary tag.
+     * @param {Object} callback the function to call back.
      */
-	this.updSecTags = function(socket, mainTag, newSecTag) {
+	this.updSecTags = function(socket, mainTag, newSecTag, callback) {
 		var dbMainTags = db.get('MainTags');
-		dbMainTags.update( {name: mainTag}, { 
-		    $addToSet: { secTags:  newSecTag } 
-	    });
+		
+		dbMainTags.findOne( { name: mainTag, secTags: {$in:[newSecTag]}}, function(error, secTag) {
+		    if (!secTag) {
+		        dbMainTags.update( {name: mainTag}, { 
+                    $addToSet: { secTags:  newSecTag } 
+                });
+		    } 
+		    
+		    var message = (secTag != null) ? "tagManager.duplicateSecondaryTag.error" : "success";
+		    callback((secTag != null), message);
+		});
 	};
 	
 	/**

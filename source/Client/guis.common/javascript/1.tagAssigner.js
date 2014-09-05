@@ -281,9 +281,10 @@ GUI.tagAssigner = new function() {
 				
 				//insert the newly created secondary tag into the list of assigned secondary tags
 				// and redraw the assigned secondary tags
-				if(checkedCustomSecTagValue != ""){
+				if (checkedCustomSecTagValue != "") {
 					customSecTagValue = checkedCustomSecTagValue;
 				}
+				
 				that.assignedSecTags.push(customSecTagValue);
 				that.drawAssignedTags();
 				
