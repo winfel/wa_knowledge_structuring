@@ -7,22 +7,45 @@
 *
 */
 
+/**
+* @class ActionManager
+* @classdesc This is the Actionmanager
+*
+*/
+
+
 var ActionManager=Object.create(Object);
 
 ActionManager.proto=false;
 ActionManager.actions=false;
 
+/**
+* @function init
+* @param proto
+*/
 ActionManager.init=function(proto){
 	
 	this.proto=proto;
 	this.actions={};
 }
 
+/**
+* @function toString
+* @return {String}
+*/
 ActionManager.toString=function(){
 	return 'ActionManager for '+this.proto;
 }
 
 
+/**
+* @function toString
+* @param name
+* @param func
+* @param single
+* @param visibilityFunc
+* @return {ActionManager}
+*/
 ActionManager.registerAction=function(name,func,single,visibilityFunc){
 	
 	this.actions[name] = {
@@ -35,12 +58,22 @@ ActionManager.registerAction=function(name,func,single,visibilityFunc){
 	
 }
 
+/**
+* @function unregisterAction
+* @param name
+* @return {ActionManager}
+*/
 ActionManager.unregisterAction=function(name){
 	delete(this.actions[name]);
 	return this;
 }
 
-
+/**
+* @function performAction
+* @param name
+* param clickedObject
+* @return {ActionManager}
+*/
 ActionManager.performAction=function(name, clickedObject){
 	
 	if (!this.actions[name]) {
@@ -54,6 +87,10 @@ ActionManager.performAction=function(name, clickedObject){
 
 }
 
+/**
+* @function getActions
+* @return {ActionManager}
+*/
 ActionManager.getActions=function(){
 	return this.actions;
 }

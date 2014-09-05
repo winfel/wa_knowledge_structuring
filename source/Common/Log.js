@@ -5,6 +5,12 @@
 *
 */
 
+/**
+* @class Log
+* @classdesc This is the Log
+*
+*/
+
 
 "use strict";
 
@@ -22,20 +28,37 @@ Log.colors = {
 
 Log.linebreak = '\n';
 
-
+/**
+* @function init
+* @param theModules
+*/
 Log.init=function(theModules){
 	Modules=theModules;
 }
 
+/**
+* @function getTime
+* @return proto
+*/
 Log.getTime=function() {
 	var date = new Date();
 	return date.toLocaleString();
 }
 
+/**
+* @function getLogString
+* @param message
+* @param color
+* @return {String}
+*/
 Log.getLogString=function(message,color) {
 	return color+""+Log.getTime()+"   "+message+""+Log.colors.reset+"\n";
 }
 
+/**
+* @function info
+* @param message
+*/
 Log.info=function(message) {
 	if (!Modules.Config.logLevels.info) return;
 	
@@ -47,6 +70,10 @@ Log.info=function(message) {
 	
 }
 
+/**
+* @function error
+* @param message
+*/
 Log.error=function(message) {
 
 	if (message.stack === undefined) {
@@ -64,6 +91,10 @@ Log.error=function(message) {
 
 }
 
+/**
+* @function warn
+* @param message
+*/
 Log.warn=function(message) {
 	if (!Modules.Config.logLevels.warn) return;
 	
@@ -75,6 +106,10 @@ Log.warn=function(message) {
 	
 }
 
+/**
+* @function debug
+* @param message
+*/
 Log.debug=function(message) {
 	if (!Modules.Config.logLevels.debug) return;
 	
@@ -86,6 +121,11 @@ Log.debug=function(message) {
 	
 }
 
+/**
+* @function getUserFromContext
+* @param context
+* @return {String} username
+*/
 Log.getUserFromContext=function(context) {
 	if (context === true) {
  		return "root";

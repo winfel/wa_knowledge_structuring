@@ -6,6 +6,13 @@
  * @author Felix Winkelnkemper, University of Paderborn, 2011
  * 
  */
+
+/**
+* @class DataSet
+* @classdesc This is the DataSet
+*
+*/
+
 var DataSet = function() {
     this.name = 'unnamed';
     this.type = 'Object';

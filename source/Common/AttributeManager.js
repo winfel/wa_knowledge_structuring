@@ -17,7 +17,11 @@
 *   Note: Data is stored in the static attributeData member. This assures that
 *   even when several instances of the same object exist (which is common on
 *   the server side), they all have the same attribute set they operate on.
+* @class AttributeManager
+* @classdesc This is the AttributeManager
+*
 */
+
 var AttributeManager=new function(){
 	
 	//actual attribute data is kept private, so it can only be maniplulated
@@ -83,13 +87,13 @@ var AttributeManager=new function(){
 
 
 /**
-*	init
-*	
-*	called when an object type is registred (see GeneralObject). During this
+*	Called when an object type is registred (see GeneralObject). During this
 *	project, each object type derives an Attributemanager whicht is herein
 *	bound to its prototype and gets an empty attribute array which is then
 *	again filled in the registration procress.
-**/
+* @function init
+* @param proto
+*/
 AttributeManager.init=function(proto){
 
 	this.proto=proto;
@@ -112,7 +116,10 @@ AttributeManager.init=function(proto){
 *			readonly - true, false
 *			hidden - true, false
 *			category - a block or tab this attribute should be displayed in
-*
+* @function registerAttribute
+* @param attribute
+* @param data
+* @return {data}
 */
 AttributeManager.registerAttribute=function(attribute,data){
 	
@@ -139,7 +146,12 @@ AttributeManager.registerAttribute=function(attribute,data){
 	if (data.standard==undefined) data.standard=0;
 	if (data.category==undefined) data.category='Basic';
 	
-	
+	/**
+	* Setter
+	* @function setter
+	* @param object
+	* @param value
+	*/
 	data.setter=function(object,value){	
 		
 		if (value===undefined) value=data.standard;
@@ -157,7 +169,12 @@ AttributeManager.registerAttribute=function(attribute,data){
 		}
 	}
 	
-
+	/**
+	* Getter
+	* @function getter
+	* @param object
+	* @return {number}
+	*/
 	data.getter=function(object){
 		if (!data.getFunction) {
 			var result=object.get(attribute);
@@ -195,6 +212,13 @@ var saveDelays={};
 
 /**
 *	set an attribute to a value on a specified object
+* @function setAttribute
+* @param object
+* @param attribute
+* @param value
+* @param forced
+* @param noevaluation
+* @return {boolean}
 */
 AttributeManager.setAttribute = function(object, attribute, value, forced, noevaluation) {
     
@@ -323,6 +347,11 @@ AttributeManager.setAttribute = function(object, attribute, value, forced, noeva
 
 /**
 *	get an attribute of a specified object
+* @function getAttribute
+* @param object
+* @param attribute
+* @param noevaluation
+* @return {Attribute}
 */
 AttributeManager.getAttribute=function(object,attribute,noevaluation){
 	
@@ -341,6 +370,9 @@ AttributeManager.getAttribute=function(object,attribute,noevaluation){
 /**
 *	get a full attribute set of an object
 *	with getter functions and evaluations
+* @function getAttributeSet
+* @param object
+* @return {AttributeSet}
 */
 AttributeManager.getAttributeSet=function(object){
 	
@@ -353,7 +385,12 @@ AttributeManager.getAttributeSet=function(object){
 	return result;
 }
 
-
+/**
+* @function hasAttribute
+* param object
+* param attribute
+* @return {boolean}
+*/
 AttributeManager.hasAttribute=function(object,attribute) {
 	return (this.attributes[attribute]!=undefined);
 }
@@ -362,6 +399,8 @@ AttributeManager.hasAttribute=function(object,attribute) {
 *	get the attributes (e.g. for GUI)
 *
 *	returns only registred attribute data, not their contents or unregistred attributes
+* @function getAttributes
+* @return {Attributes}
 */
 AttributeManager.getAttributes=function(){
 	return this.attributes;
