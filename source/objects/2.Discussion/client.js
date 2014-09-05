@@ -1,7 +1,13 @@
+/**
+* @param time
+*/
 Discussion.formatTimestamp = function(time){
     return moment(time).format('DD.MM.YYYY HH:mm');
 }
 
+/**
+* @param timestamp
+*/
 Discussion.deleteStatement = function(timestamp){
     var newArr = _.filter(this.messageArray,
         function(message){return message.timestamp !== timestamp});
@@ -9,6 +15,9 @@ Discussion.deleteStatement = function(timestamp){
     this.setContent(JSON.stringify(newArr));
 }
 
+/**
+* @param rep
+*/
 Discussion.fetchDiscussion = function(rep){
     if(!rep)rep = this.getRepresentation();
     var that = this;
