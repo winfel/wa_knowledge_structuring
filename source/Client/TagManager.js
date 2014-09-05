@@ -59,14 +59,20 @@ var TagManager = new function() {
    * 
    * @param {type} mainTag The name of the new main tag.
    * @param {type} newId The ID of the new main tag.
+   * @param {type} callback callback function
    * @return {undefined}
    */
-  this.updMainTags = function(mainTag, newId) {
+  this.updMainTags = function(mainTag, newId, callback) {
 
-    Modules.SocketClient.serverCall('updMainTags', {
-		'mainTag': mainTag,
-		'newId': newId,
-	});
+        Dispatcher.registerCall("updMainTags", function(result) {
+            callback(result);
+            Dispatcher.removeCall("updMainTags");
+        });
+
+        Modules.SocketClient.serverCall('updMainTags', {
+            'mainTag' : mainTag,
+            'newId' : newId,
+        });
   }
   
   /**

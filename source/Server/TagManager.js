@@ -35,7 +35,6 @@ var fillCurrentDbWithTestData = function() {
 			    secTags: ["Cryptography", "Algorithms", "Complexity", "Theory of Distributed Systems", "Swarm Intelligence"] }
 		   ]	
 	);	
-	
 };
 
 var TagManager = function() {
@@ -69,12 +68,29 @@ var TagManager = function() {
 			that.updSecTags(socket, data.mainTag, data.secTag); 
 		});
 		
-		Dispatcher.registerCall('updMainTags', function(socket, data, responseID) {
+		Dispatcher.registerCall('updMainTags', function(socket, data) {
 			// for every Main Tag a GlobalContainer object is created
 			var context = Modules.UserManager.getConnectionBySocket(socket);
-			that.createGlobalContainer(context, data, function (error, object) {
-			    if (!error) {
-			        that.updMainTags(data.mainTag, data.newId, object.id); 
+			
+			db.get("MainTags").findOne({name: data.mainTag }, function(error, tags) {
+			    if (error) {
+			        console.log("updMainTags::ERROR " + error);
+			    } else {
+			        if (tags != null) {
+			            var msg = "tagManager.duplicateMainTag.error";
+			            Modules.SocketServer.sendToSocket(socket, "updMainTags", {"error": true, "msg": msg});
+			        } else {
+			            that.createGlobalContainer(context, data, function (error, object) {
+	                        if (!error) {
+	                            that.updMainTags(data.mainTag, data.newId, object.id); 
+	                        } else {
+	                            that.deleteGlobalContainer(object.id, context, null);
+	                        }
+	                        
+	                        var msg = (error) ? "tagManager.maintagcreation.error" : "success";
+	                        Modules.SocketServer.sendToSocket(socket, 'updMainTags', {"error": error, "msg": msg});
+	                    });   
+			        }
 			    }
 			});
 		});
@@ -461,7 +477,7 @@ var TagManager = function() {
 	            y : obj.get('y')
 	        }; 
 	        Modules.ObjectManager.remove(obj);
-	        callback(coordinates);
+	        if (callback != null && callback != undefined) callback(coordinates);
 	    });
 	}
 	
