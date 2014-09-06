@@ -1,9 +1,12 @@
 "use strict";
 
-/* rubberband */
+/**
+ * @file 1.rubberband.js
+ */
 
 /**
  * Called when a user clicks on the rooms background to start the rubberband (called by DOM event)
+ * @function rubberbandStart
  * @param {event} event Mouse/Touch down DOM event
  */
 GUI.rubberbandStart = function(event) {
@@ -62,6 +65,10 @@ GUI.rubberbandStart = function(event) {
 	GUI.rubberbandX = GUI.rubberbandStartX;
 	GUI.rubberbandY = GUI.rubberbandStartY;
 	
+	/**
+	* @function move
+	* @param {event} event Mouse/Touch down DOM event
+	*/
 	var move = function(event) {
 		
 		event.preventDefault();
@@ -134,7 +141,10 @@ GUI.rubberbandStart = function(event) {
 		}
 					
 	}
-	
+	/**
+	* @function end
+	* @param event
+	**/
 	var end = function(event) {
 
 		if (GUI.rubberbandWidth || GUI.rubberbandHeight){
