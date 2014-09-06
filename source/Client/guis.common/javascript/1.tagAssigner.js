@@ -252,7 +252,7 @@ GUI.tagAssigner = new function() {
 		// event handler for the input field for creation of custom secondary tags
 		// creates new secondary tag and assigns it to the file object	
 		
-		that.$containerSecondaryTags.delegate("#custom-Sec-tag", "keyup", function() {
+		that.$containerSecondaryTags.delegate("#custom-Sec-tag", "keyup", function(event) {
 		//$("#custom-Sec-tag").die().live("keyup", function(event) {
 			var that = GUI.tagAssigner;
 			var customSecTagValue = $(this).val();
@@ -506,23 +506,19 @@ GUI.tagAssigner = new function() {
 	
 		var that = GUI.tagAssigner;
 		
-		if(s=="assigned"){
-		
+		if(s == "assigned"){		
 			$(
 			  '<li class="ui-widget-content" data-sectag="'+value+'">'+
 				  '<h5 class="ui-widget-header tagValue">'+value+'</h5>'+
 			  '</li>'
 			 ).appendTo(container);
-		}
-		else{
+		} else {
 			$(
 			  '<li class="ui-widget-content" data-sectag="'+value+'">'+
 				  '<h5 class="ui-widget-header tagValue">'+value+'</h5>'+			
 			  '</li>'
-			 ).appendTo(container);
-		
-		}
-		
+			 ).appendTo(container);		
+		}		
 		that.makeTagItemsDraggable(container);
 		
 	};

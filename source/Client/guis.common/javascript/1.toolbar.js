@@ -542,10 +542,12 @@ if (!Modules.Config.presentationMode) {
                     	 { "name": "text/plain", "label": "text" },
                          { "name": "image/", "label": "image" },
                     	 { "name": "audio/", "label": "audio" }, 
-                         { "name": "video/", "label": "video" }    	 				 
+                         { "name": "video/", "label": "video" },
                         ];
-     
+
+     //organize into two columns
      var columnToAppendTo = $("#mimeTypesColumn1");
+     var middleOfArray = Math.round(allMimeTypes.length / 2) - 1; 
      $.each(allMimeTypes, function(key, mimeType){
      	var checkbox = $("<input />");
      	checkbox.attr({
@@ -562,7 +564,7 @@ if (!Modules.Config.presentationMode) {
      	});
      	label.text(mimeType.label);
      	
-     	if(key > 2) {
+     	if(key > middleOfArray) {
      		columnToAppendTo = $("#mimeTypesColumn2");
      	}
      	columnToAppendTo.append(checkbox);

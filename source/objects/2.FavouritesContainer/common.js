@@ -65,6 +65,8 @@ FavouritesContainer.register=function(type){
 		});
 	}, true);
 	
+	this.makeSensitive();
+	
 }
 
 /**

@@ -1,9 +1,13 @@
 "use strict";
 
 /* inspector */
+/**
+ * @file 1.inspector.js
+ */
 
 /**
  * This method gets overwritten by the specific GUI
+ * @function updateInspector
  */
 GUI.updateInspector = function() {
 	//overwritten	
@@ -11,6 +15,7 @@ GUI.updateInspector = function() {
 
 /**
  * Get inspectors content and provide it to the given inspector object
+ * @function setupInspectorContent
  * @param {InspectorObject} inspector The inspector object (e.g. jquery.jDesktopInspector)
  */
 GUI.setupInspectorContent = function(inspector) {
@@ -323,7 +328,7 @@ GUI.setupInspectorContent = function(inspector) {
 
 
 /**
- * ?
+ * @function initInspectorAttributeUpdate
  */
 GUI.initInspectorAttributeUpdate = function() {
 	

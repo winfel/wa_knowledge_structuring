@@ -65,6 +65,8 @@ ReferenceContainer.register=function(type){
 		});
 	}, true);
 	
+	this.makeSensitive();
+	
 }
 
 /**

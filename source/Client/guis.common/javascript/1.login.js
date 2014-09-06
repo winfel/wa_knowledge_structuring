@@ -1,8 +1,11 @@
 "use strict";
-
+/**
+ * @file 1.login.js
+ */
+/**
 /**
  * Show login prompt
- * 
+ * @function showLogin
  * @param {bool|String} [err=false] Optional error message 
  */
 GUI.showLogin = function(err) {
@@ -52,6 +55,7 @@ GUI.showLogin = function(err) {
 
 /**
  * Hide the login prompt
+ * @function hideLogin
  */
 GUI.hideLogin = function() {
   $("#login").hide();
@@ -70,6 +74,7 @@ GUI.isLoggedIn = false;
 
 /**
  * Called when the user is logged in
+ *@function loggedIn
  */
 GUI.loggedIn = function() {
   if (GUI.isLoggedIn)
@@ -83,7 +88,7 @@ GUI.loggedIn = function() {
 
 /**
  * Called when the login failed
- * 
+ * @function loginFailed
  * @param {bool|String} [err=false] Optional error message
  */
 GUI.loginFailed = function(err) {
@@ -104,6 +109,7 @@ GUI.externalSession = false;
 
 /**
  * Called when hitting the login-button
+ *@function login
  */
 GUI.login = function() {
 

@@ -11,7 +11,8 @@ GUI.chat = {};
 GUI.chat.newMessages = 0;
 
 /**
- * adds components for chat and event handlers for sending chat messages
+ * Adds components for chat and event handlers for sending chat messages
+ * @function init
  */
 GUI.chat.init = function() {
 
@@ -37,6 +38,7 @@ GUI.chat.init = function() {
 
 /**
  * Sets active users for chat online list
+ * @function setUsers
  * Content of users:
  * [
  * 	{
@@ -59,6 +61,7 @@ GUI.chat.setUsers = function(users) {
 
 /**
  * clears all chat messages
+ * @function clear
  */
 GUI.chat.clear = function() {
 	
@@ -68,8 +71,9 @@ GUI.chat.clear = function() {
 
 /**
  * add a single message to the chat window
- * @param {String} username The username of the sender
- * @param {String} text The text of the message
+ * @function addMessage
+ * @param {String} username : The username of the sender
+ * @param {String} text : The text of the message
  * @param {String} [userColor=#000000] The senders user color
  * @param {Boolean} read True, if it is an old message
  */
@@ -96,8 +100,11 @@ GUI.chat.addMessage = function(username, text, userColor, read) {
 	
 	text = text.replace(/<(?:.|\n)*?>/gm, '');
 	
-	/* emoticons */
 	
+	/**
+	* @class replaceEmoticon
+	* @classdesc This is for emoticons in chat messages 
+	*/
 	var replaceEmoticon = function(code, image, str) {
 		
 		code = code.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -133,6 +140,7 @@ GUI.chat.addMessage = function(username, text, userColor, read) {
 
 /**
  * called when chat is opened in GUI
+ * @function opened
  */
 GUI.chat.opened = function() {
 	GUI.chat.newMessages = 0;
@@ -144,6 +152,7 @@ GUI.chat.opened = function() {
 /**
  * show a notification (e.g. an icon badge) with the number of unread messages
  * called by GUI.chat.addMessage
+ * @function showNotifier
  */
 GUI.chat.showNotifier = function() {
 	$("#chat_notifier").html(GUI.chat.newMessages);
@@ -152,6 +161,7 @@ GUI.chat.showNotifier = function() {
 
 /**
  * hide the notification
+ * @function hideNotifier
  */
 GUI.chat.hideNotifier = function() {
 	$("#chat_notifier").css("opacity", 0);

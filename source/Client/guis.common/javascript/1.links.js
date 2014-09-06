@@ -1,6 +1,9 @@
 "use strict";
 
 /**
+ * @file 1.links.js
+ */
+/**
  * Functions for displaying links between objects
  */
 
@@ -11,6 +14,7 @@ GUI.currentLinkObject = undefined;
 
 /**
  * update all links for the current object
+ * @function updateLinks
  */
 GUI.updateLinks = function() {
 	GUI.hideLinks(GUI.currentLinkObject);
@@ -19,6 +23,7 @@ GUI.updateLinks = function() {
 
 /**
  * show links for a given object
+ * @ function showLinks
  * @param {webarenaObject} object The webarena objects the links will be displayed for
  */
 GUI.showLinks = function(object) {
@@ -132,6 +137,7 @@ GUI.showLinks = function(object) {
 
 /**
  * Hide all shown links
+ * @function hideLinks
  * @param {webarenaObject} object
  */
 GUI.hideLinks = function(object) {

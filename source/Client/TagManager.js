@@ -85,11 +85,15 @@ var TagManager = new function() {
    */  
   this.updMainTagName = function(oldName, newName, tagID) {
 
-    Modules.SocketClient.serverCall('updMainTagName', {
-		'oldName': oldName,
-		'newName': newName,
-		'tagID': tagID
-	});
+	  Dispatcher.registerCall("updMainTagName", function(result) {
+		  callback(result);
+		  Dispatcher.removeCall("updMainTagName");
+	  });
+	  Modules.SocketClient.serverCall('updMainTagName', {
+		  'oldName': oldName,
+		  'newName': newName,
+		  'tagID': tagID
+	  });
   };
   
   /**
@@ -102,7 +106,7 @@ var TagManager = new function() {
   this.deleteMainTag = function(mainTagID, callback) {
 
 	Dispatcher.registerCall("deleteMainTag", function(result) {
-	    callback(result);
+		callback(result);
 	    Dispatcher.removeCall("deleteMainTag");
 	});
 	  
@@ -114,15 +118,19 @@ var TagManager = new function() {
   /**
    * Updates name of the specified secondary tag
    * 
-   * @param {type} mainTag The name of the main tag.
+   * @param {type} mainTagID The id of the main tag.
    * @param {type} oldName The old name of the secondary tag.
    * @param {type} newName The new name of the secondary tag.
    * @return {undefined}
    */
-  this.updSecTagName = function(mainTag, oldName, newName) {
+  this.updSecTagName = function(mainTagID, oldName, newName, callback) {
 
+	Dispatcher.registerCall("updSecTagName", function(result) {
+		callback(result);
+		Dispatcher.removeCall("updSecTagName");
+	});
     Modules.SocketClient.serverCall('updSecTagName', {
-    	'mainTag': mainTag,
+    	'mainTagID': mainTagID,
 		'oldName': oldName,
 		'newName': newName,
 	});
@@ -132,18 +140,22 @@ var TagManager = new function() {
   /**
    * Moves the specified secondary tag from one main tag to another one
    * 
-   * @param {type} oldMainTag The name of old main tag.
-   * @param {type} newMainTag The name of new main tag.
+   * @param {type} oldMainTagID The ID of old main tag.
+   * @param {type} newMainTagID The ID of new main tag.
    * @param {type} secTag The name of the secondary tag.
    * @return {undefined}
    */
-  this.moveSecTag = function(oldMainTag, newMainTag, secTag) {
-
-    Modules.SocketClient.serverCall('moveSecTag', {
-    	'oldMainTag': oldMainTag,
-		'newMainTag': newMainTag,
-		'secTag': secTag,
-	});
+  this.moveSecTag = function(oldMainTagID, newMainTagID, secTag, callback) {
+	  
+		Dispatcher.registerCall("moveSecTag", function(result) {
+			callback(result);
+			Dispatcher.removeCall("moveSecTag");
+		});
+		Modules.SocketClient.serverCall('moveSecTag', {
+			'oldMainTagID': oldMainTagID,
+			'newMainTagID': newMainTagID,
+			'secTag': secTag,
+		});
   };
   
   /**

@@ -1,5 +1,7 @@
 "use strict";
-
+/**
+ * @file 1.load.js
+ */
 /**
  * Indicates if the GUI is fully loaded
  */
@@ -7,6 +9,7 @@ GUI.loaded = false;
 
 /**
  * Called when a room is entered
+ * @function entered
  */
 GUI.entered = function() {
   if (GUI.loaded) {
@@ -19,9 +22,8 @@ GUI.entered = function() {
 
 /**
  * Load of GUI (seperated in different steps to ensure working dependencies).
- * 
  * Step 1 indicates
- * 
+ * @function loadGUI
  * @param {int} step Loading step which should be performed
  */
 GUI.loadGUI = function(step) {

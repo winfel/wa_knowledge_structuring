@@ -92,7 +92,7 @@ var TagManager = function() {
 		});
 		
 		Dispatcher.registerCall('updMainTagName', function(socket, data, responseID) {
-			that.updMainTagName(data.tagID, data.newName, function(error, containerID) {
+			that.updMainTagName(data.tagID, data.newName, function(error, msg, containerID) {
 			    if (!error) {
 	                var context = Modules.UserManager.getConnectionBySocket(socket);
 	                
@@ -101,6 +101,7 @@ var TagManager = function() {
 	                    object.setAttribute('name', data.newName);
 	                });
 	            }
+			    Modules.SocketServer.sendToSocket(socket, 'updMainTagName', {"error": error, "msg": msg});
 			}); 
 		});
 		
@@ -129,16 +130,19 @@ var TagManager = function() {
 	    });
 		
 		Dispatcher.registerCall('updSecTagName', function(socket, data, responseID) {
-			that.updSecTagName(socket, data.mainTag, data.oldName, data.newName); 
+			that.updSecTagName(socket, data.mainTagID, data.oldName, data.newName, function(error, msg){
+				Modules.SocketServer.sendToSocket(socket, 'updSecTagName', {"error": error, "msg": msg});
+			}); 
 		});
 		
 		Dispatcher.registerCall('moveSecTag', function(socket, data, responseID) {
-			that.moveSecTag(socket, data.oldMainTag, data.newMainTag, data.secTag); 
+			that.moveSecTag(socket, data.oldMainTagID, data.newMainTagID, data.secTag, function(error, msg){
+				Modules.SocketServer.sendToSocket(socket, 'moveSecTag', {"error": error, "msg": msg});
+			}); 
 		});
 		
 		Dispatcher.registerCall('deleteSecTags', function(socket, data, responseID) {
-			that.deleteSecTags(socket, data.mainTag, data.secTag, function(error, msg){
-				
+			that.deleteSecTags(socket, data.mainTag, data.secTag, function(error, msg){				
 				Modules.SocketServer.sendToSocket(socket, 'deleteSecTags', {"error": error, "msg": msg});
 			}); 
 		});
@@ -181,7 +185,7 @@ var TagManager = function() {
 	};
 	
 	/**
-     * Returns all secondary tags for a specified main tag 
+     * Returns all secondary tags for a specified main tag
      * 
      * @param {Object} socket The socket of the client.
      * @param {Object} mainTag The main tag for which secondary tags are returned. 
@@ -306,19 +310,51 @@ var TagManager = function() {
      * Updates name of the specified secondary tag
      * 
      * @param {Object} socket The socket of the client.
-     * @param {Object} mainTag The name of the main tag.
+     * @param {Object} mainTagID The id of the main tag.
      * @param {Object} oldName The old name of the secondary tag.
      * @param {Object} newName The new name of the secondary tag.
      */
-	this.updSecTagName = function(socket, mainTag, oldName, newName) {
+	this.updSecTagName = function(socket, mainTagID, oldName, newName, callback) {
 		var dbMainTags = db.get('MainTags');
 		
-		//delete the old secondary tag
-		dbMainTags.update( {name: mainTag}, {
-		    $pull: { secTags:  oldName }
-		});
-		dbMainTags.update( {name: mainTag}, {
-		   $addToSet: { secTags:  newName }
+		var promise = dbMainTags.findOne({
+											id: mainTagID, 
+											secondaryTags : {$in : [new RegExp("^" + newName + "$", 'i')] } 
+										});
+		promise.on('complete', function(err, obj) {
+			 if (err) {
+	                console.log("updSecTagName::ERROR " + err);
+	                callback(true, "The secondary tag cannot be renamed: " + err);
+			 } else {
+				 if(obj != null){
+					 console.log("updSecTagName::ERROR " + err);
+		             callback(true, "The secondary tag cannot be renamed since secondary tag with the same name alredy exists");
+				 } else {
+				 	 //delete the old secondary tag
+					 var promise1 = dbMainTags.update( {id: mainTagID}, {
+					     $pull: { secTags:  oldName }
+					 });
+					 promise1.on('complete', function(err, obj) {
+						 if (err || obj == null) {
+				                console.log("updSecTagName::ERROR " + err);
+				                callback(true, "The secondary tag cannot be renamed: " + err);
+						 } else {
+							//add the new tag
+							 var promise2 = dbMainTags.update( {id: mainTagID}, {
+							 	$addToSet: { secTags:  newName }
+							 });
+							 promise2.on('complete', function(err, obj) {
+								 if (err || obj == null) {
+						                console.log("updSecTagName::ERROR " + err);
+						                callback(true, "The secondary tag cannot be renamed: " + err);
+								 } else {
+									 callback(false, null);
+								 }
+							 });
+						 }						
+					 });					
+				 }				
+			 }
 		});
 	};
 	
@@ -331,15 +367,57 @@ var TagManager = function() {
      * @param {Object} newMainTag The name of new main tag.
      * @param {Object} secTag The name of the secondary tag.
      */
-	this.moveSecTag = function(socket, oldMainTag, newMainTag, secTag) {
+	this.moveSecTag = function(socket, oldMainTagID, newMainTagID, secTag, callback) {
 		var dbMainTags = db.get('MainTags');
 		
-		//delete the old secondary tag
-		dbMainTags.update( {name: oldMainTag}, {
-		    $pull: { secTags:  secTag }
+		var promise = dbMainTags.findOne({
+			id: newMainTagID, 
+			//secondaryTags : {$in : [new RegExp('^' + secTag + '$', 'i')] } 
 		});
-		dbMainTags.update( {name: newMainTag}, {
-		   $addToSet: { secTags:  secTag }
+		
+		promise.on('complete', function(err, obj) {
+			if (err) {
+	        	console.log("moveSecTag::ERROR " + err);
+	         	callback(true, "The secondary tag cannot be moved: " + err);
+			} else {
+				if(obj != null){
+					var secondaryTagExists = false;
+					
+					for (var item in obj.secTags) {
+						if(obj.secTags[item].toLowerCase() == secTag.toLowerCase()){
+							secondaryTagExists = true;
+							break;
+						}
+					}
+					if(secondaryTagExists){
+						console.log("The secondary tag cannot be moved since secondary tag with the same name alredy exists");
+						callback(true, "tagManager.duplicateSecondaryTag.error");
+					} else {
+						//delete the old secondary tag
+						var promise1 = dbMainTags.update( {id: oldMainTagID}, {
+						    $pull: { secTags:  secTag }
+						});
+						promise1.on('complete', function(err, obj) {
+							if (err) {
+					        	console.log("moveSecTag::ERROR " + err);
+					         	callback(true, "The secondary tag cannot be moved: " + err);
+							} else {
+								var promise2 = dbMainTags.update( {id: newMainTagID}, {
+									$addToSet: { secTags:  secTag }
+								});
+								promise2.on('complete', function(err, obj) {
+									if (err) {
+							        	console.log("moveSecTag::ERROR " + err);
+							         	callback(true, "The secondary tag cannot be moved: " + err);
+									} else {
+										callback(false, null);
+									}
+								});
+							}
+						});
+					}
+				}
+			}
 		});
 	};
 	
@@ -358,17 +436,38 @@ var TagManager = function() {
         promise.on('complete', function(err, obj) {
             if (err || obj == null) {
                 console.log("updMainTagName::ERROR " + err);
-                callback(true, null);
+                callback(true, "updMainTagName::ERROR " + err);
             } else {
-                var containerID = obj.containerID;
+            	var tagToBeUpdated = obj;
+            	var promise1 = dbMainTags.findOne({name: {$regex: "^" + newName + "$", $options: 'i'}});
+            	promise1.on('complete', function(err, obj) {
+            		if (err) {
+                        console.log("updMainTagName::ERROR " + err);
+                        callback(true, "updMainTagName::ERROR " + err);
+                    } else {
+                    	if(obj != null){
+        					console.log("updSecTagName::ERROR " + err);
+        		            callback(true, "The main tag cannot be renamed since main tag with the same name alredy exists.");
+        				} else {
+	                    	var containerID = tagToBeUpdated.containerID;
+	                        
+	                        var promise2 = dbMainTags.update( {id: tagID.toString()}, { 
+	                            $set: { name:  newName } 
+	                        }); 
+	                        promise2.on('complete', function(err, obj) {
+	                            if (err) {
+	                            	callback(true, null);
+	                            }  else {
+	                            	console.log("Success");
+	                            	callback(false, containerID);
+	                            }
+	                        });
+        				}
+                    }
+            		
+            		            		
+            	});
                 
-                var promise2 = dbMainTags.update( {id: tagID.toString()}, { 
-                    $set: { name:  newName } 
-                }); 
-                promise2.on('complete', function(err, obj) {
-                    if (err) callback(true, null);
-                    else callback(false, containerID);
-                });
             }
         });
     };
