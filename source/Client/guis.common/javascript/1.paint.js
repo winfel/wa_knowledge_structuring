@@ -1,6 +1,8 @@
 "use strict";
 
-/* paint */
+/**
+ * @file 1.paint.js 
+ */
 
 /**
  * true if paint mode is active
@@ -10,6 +12,7 @@ GUI.paintModeActive = false;
 
 /**
  * Set a color to paint with
+ * @function setPaintColo
  * @param {String} color The (hex-) color to paint with
  * @param {String} colorName The colors name
  */
@@ -24,6 +27,7 @@ GUI.setPaintColor = function(color, colorName) {
 
 /**
  * Set the cursor
+ * @function setPaintCursor
  * @param {String} cursorName The name of the cursor icon
  */
 GUI.setPaintCursor = function(cursorName) {
@@ -32,6 +36,7 @@ GUI.setPaintCursor = function(cursorName) {
 
 /**
  * Set the size of the "pencil"
+ * @function setPaintSize
  * @param {int} value Size of the "pencil"
  */
 GUI.setPaintSize = function(value) {
@@ -96,6 +101,10 @@ var CUT = {		started     : false,
 				cancel : ""
 };
 
+/**
+ * @function start
+ * @param event
+ */
 COPY.start = function(event)
 {
 	if ( !COPY.enabled ) { return; }
@@ -143,7 +152,10 @@ COPY.start = function(event)
 	}
 	else { return; }
 }
-
+/**
+ * @function move
+ * @param event
+ */
 COPY.move = function(event)
 {
 	if ( !COPY.enabled ) { return; }
@@ -213,7 +225,10 @@ COPY.move = function(event)
 		);
 	}
 }
-
+/**
+ * @function end
+ * @param event
+ */
 COPY.end = function(event)
 {
 	if ( !COPY.enabled ) { return; }
@@ -233,7 +248,9 @@ COPY.end = function(event)
 		COPY.timingPaste = setTimeout(function(){COPY.paste();}, 2000);
 	}
 };
-
+/**
+ * @function paste
+ */
 COPY.paste = function()
 {
 	COPY.started = false;
@@ -261,7 +278,9 @@ COPY.paste = function()
 	
 	GUI.savePaintMode();
 };
-
+/**
+ * @function cancel
+ */
 COPY.cancel = function()
 {
 	COPY.started = false;
@@ -276,7 +295,10 @@ COPY.cancel = function()
 	$(".header_button").css("display", "inline");
 	$("#abortButton").css("display", "none");
 };
-
+/**
+ * @function CUT.start
+ * @param event
+ */
 CUT.start = function(event)
 {
 	if ( !CUT.enabled ) { return; }
@@ -324,7 +346,10 @@ CUT.start = function(event)
 	}
 	else { return; }
 }
-
+/**
+ * @function CUT.move
+ * @param event
+ */
 CUT.move = function(event)
 {
 	if ( !CUT.enabled ) { return; }
@@ -384,7 +409,10 @@ CUT.move = function(event)
 	}
 
 }
-
+/**
+ * @function CUT.end
+ * @param event
+ */
 CUT.end = function(event)
 {
 	if ( !CUT.enabled ) { return; }
@@ -408,7 +436,9 @@ CUT.end = function(event)
 		CUT.timingPaste = setTimeout(function(){CUT.paste();}, 2000);
 	}
 }
-
+/**
+ * @function CUT.paste
+ */
 CUT.paste = function()
 {
 	CUT.started = false;
@@ -431,7 +461,9 @@ CUT.paste = function()
 	
 	GUI.savePaintMode();
 };
-
+/**
+ * @function CUT.cancel
+ */
 CUT.cancel = function()
 {
 	CUT.started = false;
@@ -450,6 +482,7 @@ CUT.cancel = function()
 
 /**
  * Reset all paint colors
+ * @function resetPaintColors
  */
 GUI.resetPaintColors = function() {
 	GUI.paintColors = [];
@@ -457,6 +490,7 @@ GUI.resetPaintColors = function() {
 
 /**
  * Reset all paint sizes
+ * @function resetPaintSizes
  */
 GUI.resetPaintSizes = function() {
 	GUI.paintSizes = [];
@@ -464,6 +498,7 @@ GUI.resetPaintSizes = function() {
 
 /**
  * Add a paint color
+ * @function addPaintColor
  * @param {String} color The (hex-) color value
  * @param {String} colorName The colors name
  */
@@ -476,6 +511,7 @@ GUI.addPaintColor = function(color, colorName) {
 
 /**
  * Set the size of the "pencil"
+ * @function addPaintSize
  * @param {int} size Size of the "pencil"
  */
 GUI.addPaintSize = function(size) {
@@ -484,6 +520,7 @@ GUI.addPaintSize = function(size) {
 
 /**
  * Enter the paint edit mode
+ * @function editPaint
  * @param {webarenaObject} webarenaObject The webarena object to save/load the paint data
  * @param {bool} highlighterMode True if the paint mode should be displayed in highlighter mode (different colors, sizes and opacity)
  */
@@ -690,6 +727,10 @@ GUI.editPaint = function() {
 	$("#webarena_paintCanvas").unbind("mousedown");
 	$("#webarena_paintCanvas").unbind("touchend");
 	
+	/**
+	* @function start
+	* @param event
+	*/
 	var start = function(event) {
 
 		GUI.paintLastPoint = undefined;
@@ -743,7 +784,10 @@ GUI.editPaint = function() {
 			}
 			
 		}
-
+	/**
+	* @function move
+	* @param event
+	*/
 		var move = function(event) {
 			
 			event.preventDefault();
@@ -766,7 +810,10 @@ GUI.editPaint = function() {
 			}
 
 		}
-
+	/**
+	* @function end
+	* @param event
+	*/
 		var end = function(event) {
 			
 			event.preventDefault();
@@ -834,6 +881,7 @@ GUI.paintShiftKeyDirection = undefined;
 
 /**
  * Paint a line to position x,y
+ * @function paintPaint
  * @param {int} x x position of the lines end
  * @param {int} y y position of the lines end
  */
@@ -914,6 +962,7 @@ GUI.paintPaint = function(x,y) {
 
 /**
  * Move to position x,y without painting
+ *@function paintMove
  *@param {int} x x position
  *@param {int} y y position
  */
@@ -930,6 +979,7 @@ GUI.paintMove = function(x,y) {
 
 /**
  * Erease around position x,y
+ *@functoin paintErase
  *@param {int} x x position
  *@param {int} y y position
  */
@@ -951,6 +1001,7 @@ GUI.paintErase = function(x,y) {
 
 /**
  * Cancel the paint mode (without saving) and close it
+ * @function cancelPaintMode
  */
 GUI.cancelPaintMode = function() {
 	
@@ -964,6 +1015,7 @@ GUI.cancelPaintMode = function() {
 
 /**
  * Close the paint mode
+ * @function closePaintMode
  */
 GUI.closePaintMode = function() {
 	
@@ -994,6 +1046,7 @@ GUI.closePaintMode = function() {
 
 /**
  * Save the wonderful painting and close the paint mode
+ * @function savePaintMode
  */
 GUI.savePaintMode = function() {
 	
