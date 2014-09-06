@@ -1,13 +1,14 @@
 "use strict";
-
+/**
+ * @file 0.cookie.js
+ */
 /**
  * Creates a new cookie.
- * 
- * -> Why don't we use JQuery for that? $.cookie(...).
- * 
+ * @function createCookie
  * @param {String} name name of the new cookie
  * @param {String} value value of the new cookie
  * @param {int} days lifetime of the new cookie
+ * @return { String}
  */
 function createCookie(name, value, days) {
   var expires;
@@ -24,8 +25,9 @@ function createCookie(name, value, days) {
 
 /**
  * Read an existing cookie identified by a given name
- * 
+ * @function readCookie
  * @param {String} name name of the cookie
+ * @return { String }
  */
 function readCookie(name) {
   var nameEQ = name + "=";
@@ -42,8 +44,9 @@ function readCookie(name) {
 
 /**
  * Delete a cookie identified by a given name
- * 
+ * @function eraseCookie
  * @param {String} name name of the cookie
+ * @return {String}
  */
 function eraseCookie(name) {
   createCookie(name, "", -1);
