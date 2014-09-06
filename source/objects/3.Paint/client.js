@@ -1,10 +1,17 @@
+
 Paint.execute=function(){
 
 	alert('Zeichnungen können nicht mehr bearbeitet werden!');
 	
 }
 
-
+/**
+* @param otherx
+* @param othery
+* @param otherwidth
+* @param otherheight
+* @return {boolean}
+*/
 Paint.boxIntersectsWith=function(otherx,othery,otherwidth,otherheight){
 	
 	if (otherwidth <= 0) otherwidth = 1;
@@ -57,6 +64,9 @@ Paint.createCanvas=function() {
 	
 }
 
+/**
+* @param imageURL
+*/
 Paint.updateCanvas=function(imageURL) {
 	var self = this;
 	

@@ -39,7 +39,7 @@ ActionManager.toString=function(){
 
 
 /**
-* @function toString
+* @function registerAction
 * @param name
 * @param func
 * @param single

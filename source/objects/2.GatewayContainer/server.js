@@ -9,6 +9,7 @@
 
 var theObject=Object.create(require('./common.js'));
 var Modules=require('../../server.js');
+var async = require("async");
 module.exports=theObject;
 
 var TRASH_ROOM = 'trash';
@@ -19,30 +20,52 @@ theObject.getAllGatewayObjects = function(user, cb) {
 	
 	Modules.Connector.getObjectDataByQuery({type: { $in: [ p, s ] }, inRoom: {$nin:[TRASH_ROOM] } }, function(data){
 	
-		var arr = new Array();
+		var objects = new Array();
 	
-		for(var key in data){
+		var arr = new Array();
+		
+		var counter = -1;
+		
+		var funcs = new Array();
+	
+		for(var i = 0; i<data.length; i++){
 			
 			var o = {
-				id : data[key].attributes.id,
-				type : data[key].type
+				id : data[i].attributes.id,
+				type : data[i].type
 			}
 			
-			Modules.RightManager.hasAccess("read", o, user, function(d){
-				
-				if(d != false){
-					console.log("push");
-					arr.push(data[key]);
+			objects[i] = o;
+			
+			funcs.push(function(callback){ 
+				counter++;
+				Modules.RightManager.hasAccess("read", objects[counter], {username : user}, function(d){
+					if(d != false){
+						callback(null, true);
+					}
+					else{
+						callback(null, false);
+					}
+				});
+			});
+		}
+			
+		async.series(funcs, function(err, results){
+			
+			for(var j = 0; j < results.length; j++){
+			
+				if(results[j]){
+					arr.push(data[j]);
 				}
 			
-			})
+			}
 			
-		}
-	
-		cb(arr);
+			cb(arr);
+			
+		});
 	
 	});
-	
+
 }
 
 

@@ -1,3 +1,4 @@
+
 File.contentUpdated = function() {
   this.updateIcon();
 };
@@ -15,6 +16,9 @@ File.openFile = function() {
   window.open(this.getContentURL(), "_blank");
 };
 
+/**
+* @return {undefined}
+*/
 File.isPreviewable = function() {
   return GUI.mimeTypeIsPreviewable(this.getAttribute("mimeType"));
 };

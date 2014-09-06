@@ -11,7 +11,13 @@ var theObject=Object.create(require('./common.js'));
 var Modules=require('../../server.js');
 
 
-//is called when ANY object is repositioned within a room
+
+/**
+* Is called when ANY object is repositioned within a room
+* @function evaluatePositionFor
+* @param object
+* @param data
+*/
 theObject.evaluatePositionFor = function(object, data) {
 
     // when the object is structuring or sensitive ("the background"), its
@@ -32,7 +38,10 @@ theObject.evaluatePositionFor = function(object, data) {
     });
 }
 
-//sets active objects to their positions
+/**
+* @function placeActiveObjects
+*sets active objects to their positions
+*/
 theObject.placeActiveObjects = function() {
 	var objects = this.getInventory();
 	
@@ -158,6 +167,9 @@ theObject.placeActiveObjects = function() {
 	
 }
 
+/**
+* @return {undefined}
+*/
 theObject.getInventory = function() {
     console.warn("Depricated!! use the Async version");
     
@@ -165,14 +177,27 @@ theObject.getInventory = function() {
     return Modules.ObjectManager.getObjects(this.id, this.context);
 }
 
+/**
+* @param cb
+* @return {undefined}
+*/
 theObject.getInventoryAsync = function(cb) {
     return Modules.ObjectManager.getObjects(this.id, this.context, cb);
 }
 
+/**
+* @param type
+* @param callback
+* @return {undefined}
+*/
 theObject.createObject = function(type, callback) {
     return Modules.ObjectManager.createObject(this.id, type, false, false, this.context.socket, false, callback);
 }
 
+/**
+* @param content
+* @param callback
+*/
 theObject.saveUserPaintingData=function(content,callback) {
 	var self = this;
 	
@@ -194,6 +219,9 @@ theObject.saveUserPaintingData.neededRights = {
     write : true
 }
 
+/**
+* @param callback
+*/
 theObject.getUserPaintings=function(callback){
 	
 	Modules.Connector.getPaintings(this.inRoom,this.context,function(rawData){
@@ -208,6 +236,7 @@ theObject.getUserPaintings.public = true;
 theObject.getUserPaintings.neededRights = {
     read : true
 }
+
 
 theObject.deleteUserPainting=function(){
 	var self = this;

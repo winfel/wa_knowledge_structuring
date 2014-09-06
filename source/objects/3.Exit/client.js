@@ -1,3 +1,6 @@
+/**
+* @function showDialog
+*/
 Exit.showDialog=function() {
 	var that = this;
 

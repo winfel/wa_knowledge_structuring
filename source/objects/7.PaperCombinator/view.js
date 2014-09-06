@@ -5,10 +5,16 @@
 *
 */
 
+/**
+* @return {undefined}
+*/
 PaperCombinator.getStatusIcon = function() {
 	return this.getIconPath() + "/paper";
 }
 
+/**
+* @return {undefined}
+*/
 PaperCombinator.getIconText = function() {
     return this.getAttribute("name");
 }

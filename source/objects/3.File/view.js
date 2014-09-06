@@ -5,6 +5,10 @@
 *
 */
 
+/**
+* @function draw
+* @param external
+*/
 File.draw = function(external) {
 	
 	GeneralObject.draw.call(this,external);
@@ -46,7 +50,11 @@ File.draw = function(external) {
 	this.createPixelMap();
 }
 
-/* get the width of the objects bounding box */
+/**
+* @function getViewBoundingBoxWidth
+* @return {undefined}
+* Get the width of the objects bounding box
+**/
 File.getViewBoundingBoxWidth = function() {
 	if (this.hasContent() == false || this.getAttribute("preview") == false) {
 		if (this.getAttribute("bigIcon")) {
@@ -57,7 +65,12 @@ File.getViewBoundingBoxWidth = function() {
 	}
 }
 
-/* get the height of the objects bounding box */
+
+/**
+* @function getViewBoundingBoxHeight
+* @return {undefined}
+* Get the height of the objects bounding box
+**/
 File.getViewBoundingBoxHeight = function() {
 	if (this.hasContent() == false || this.getAttribute("preview") == false) {
 		if (this.getAttribute("bigIcon")) {
@@ -68,6 +81,9 @@ File.getViewBoundingBoxHeight = function() {
 	}
 }
 
+/**
+* @return {undefined}
+*/
 File.getStatusIcon = function() {
 	if (this.hasContent() == false) {
 		return this.getIconPath() + "/upload";
@@ -95,16 +111,24 @@ File.getStatusIcon = function() {
 	}
 }
 
+/**
+* @return {boolean}
+*/
 File.getIconText = function() {
     if ((this.getAttribute("preview") == false || this.getAttribute("preview") == undefined) && this.hasContent()) {
         return this.getAttribute("name");
     } else return false;
 }
 
+
 File.setTag = function() {
 	GUI.tagAssigner.open(this, 600, 600, false);	
 }
 
+/**
+* @param parent
+* @return {undefined}
+*/
 File.createRepresentation = function(parent) {
 
 	var rep = IconObject.createRepresentation.call(this, parent);
