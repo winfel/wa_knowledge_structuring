@@ -179,7 +179,7 @@ GUI.tagAssigner = new function() {
 		// creates new main tag and assigns it to the file object
 		
 		
-		that.$containerMainTags.delegate("#custom-Main-tag", "keyup", function() {
+		that.$containerMainTags.delegate("#custom-Main-tag", "keyup", function(event) {
 		//$("#custom-Main-tag").die().live("keyup", function(event) {
 			var that = GUI.tagAssigner;
 			var customMainTagValue;
