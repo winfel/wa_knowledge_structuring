@@ -22,7 +22,8 @@
     background: #3a3a3d; width:260px;
     /*overflow:hidden;*/
     position:relative; bottom:0; z-index:9;
-    float: right;
+    /*float: right;*/
+    display: inline-block;
     margin-right: 3px;
 }
 

@@ -38,7 +38,8 @@ GUI.chat.init = function() {
 }
 
 var minimize_box = function(){
-    var rand_id = $(this).attr("data-rand-id");
+    var rand_id = $(this).attr("id");
+    rand_id = rand_id.split("-").pop();
     console.log('### rand-id is '+ rand_id);
     $('#toggle-chat-'+rand_id).slideToggle();
 };
@@ -72,7 +73,6 @@ GUI.chat.setUsers = function(users) {
 
         var random_id = Math.floor((Math.random()*10000)+1);
         GUI.chat.createChatbox(usr, random_id);
-        $('.minimize_btn').click(minimize_box);
     });
 
 
@@ -231,8 +231,8 @@ GUI.chat.createChatbox = function(user, random_id) {
     var newbox =
         '<div class="chat-box" id="chat-' +user+ '">\
             <div class="chat-header">' +user+
-                '<div data-rand-id="'+ random_id +'" class="close_btn">&nbsp;</div>\
-                <div data-rand-id="'+ random_id +'" class="minimize_btn">&nbsp;</div>\
+                '<div id="close-btn-'+ random_id +'" class="close_btn">&nbsp;</div>\
+                <div id="minimize-btn-'+ random_id +'" class="minimize_btn">&nbsp;</div>\
             </div>\
             <div class="toggle_chat" id="toggle-chat-'+random_id+'">\
                 <div class="message-box" id="message-box-'+random_id+'">\
@@ -254,6 +254,7 @@ GUI.chat.createChatbox = function(user, random_id) {
 
     //$('.minimize_btn').click(minimize_box);
     $('.chat-header').dblclick(minimize_box);
+    $('#minimize-btn-'+random_id).click(minimize_box);
 
     $("#chat-message-"+random_id).keypress(function(evt) {
         if(evt.which == 13) {
