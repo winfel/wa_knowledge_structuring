@@ -53,19 +53,24 @@ ReferenceContainer.removeReference = function(ref){
 
 
 ReferenceContainer.getReferences = function(){
-		
-	this.References = new Array();	
 	var that = this;
+
+	//get project name
+	var destFromURL = document.URL.substring(document.URL.lastIndexOf("/") + 1, document.URL.length);
+	UserManager.getDataOfSpaceWithDest(destFromURL,"ProjectNameLink",function(pname){
+		that.References = new Array();	
 		
-	UserManager.getDataOfSpaceWithDest(this.getRoom().getAttribute('name'), "references" , function(d){
+		UserManager.getDataOfSpaceWithDest(pname[0].value, "references" , function(d){
 	
-		if(d != "error"){
-			var key;
-			for(key in d[0].value){
-				that.References.push(d[0].value[key]);
+			if(d != "error"){
+				var key;
+				for(key in d[0].value){
+					that.References.push(d[0].value[key]);
+				}
 			}
-		}
 		
+		});
+
 	});
 }
 
