@@ -503,13 +503,13 @@ if (!Modules.Config.presentationMode) {
 if (!Modules.Config.presentationMode) {
 
   var searchButton = document.createElement("img");
-  $(searchButton).attr("src", "../../guis.common/images/fileicons/selectBidFile.png").attr("alt", "");
+  $(searchButton).attr("src", "../../guis.common/images/oxygen/16x16/actions/view-filter.png").attr("alt", "");
   $(searchButton).attr("width", "24").attr("height", "24");
 
   $(searchButton).attr("id", "search_Button");
   $(searchButton).addClass("sidebar_button header_tab");
 
-  $(searchButton).attr("title", GUI.translate("Search"));
+  $(searchButton).attr("title", GUI.translate("Filter"));
 
   var click = function() {
     $("#mainTagSel").empty();

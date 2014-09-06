@@ -32,7 +32,7 @@ GUI.sidebar.elementConfig = {
   },
   "search": {
     order: 2,
-    title: GUI.translate("Search"),
+    title: GUI.translate("Filter"),
   },
   "chat": {
     order: 3,
