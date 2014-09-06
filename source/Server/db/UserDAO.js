@@ -23,21 +23,37 @@ UserDAO.init = function(theModules) {
     db = require('monk')(Modules.MongoDBConfig.getURI());
 }
 
+/**
+* @param username
+* @param callback
+*/
 UserDAO.usersByUserName = function(username, callback) {
     var users = db.get('users');
     users.find({username: username.toLowerCase()}, {}, callback);
 }
 
+/**
+* @param id
+* @param callback
+*/
 UserDAO.usersById = function(id, callback) {
     var users = db.get('users');
     users.findById(id, callback);
 }
 
+/**
+* @param newUserArrt
+* @param callback
+*/
 UserDAO.createUsers = function(newUserAttr, callback) {
     var users = db.get('users');
     users.insert({username: newUserAttr.login.toLowerCase(), password: newUserAttr.password, e_mail: newUserAttr.e_mail }, callback);
 }
 
+/**
+* @param id
+* @param newUserAttr
+*/
 UserDAO.updateUsersById = function(id, newUserAttr) {
     var users = db.get('users');
     users.update({_id:id}, {$set:newUserAttr});

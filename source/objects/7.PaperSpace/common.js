@@ -61,6 +61,30 @@ PaperSpace.register = function(type) {
   }, true);
 
   this.registerAttribute('Project name', {type: 'text',standard:'Type your name here' ,hidden: false, changedFunction: function(object, value) {
+    // ---------------
+    // update ProjectNameDestinationLink
+    // ----------------
+    var destination = object.getAttribute('destination');
+
+    if (!destination) {
+      var random = new Date().getTime() - 1296055327011;
+
+      object.setAttribute('destination', random);
+      destination = random;
+
+      // store destination in database to link it to the project name
+      UserManager.setDataOfSpaceWithDest(random,'ProjectNameLink',value);
+    }else{
+      // remove old link
+      UserManager.removeDataOfSpaceWithDest(object.getAttribute('destination'),'ProjectNameLink');
+
+      // set new link
+      UserManager.setDataOfSpaceWithDest(object.getAttribute('destination'),'ProjectNameLink',value);      
+    }
+
+    // -----------------
+    // updating remaining storage space
+    // -----------------
     var oldNames = [];
 
       // store id of the corresponding project
@@ -131,8 +155,6 @@ PaperSpace.register = function(type) {
       });
 }});
 
-
-
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
   this.registerAttribute('bigIcon', {hidden: true});
 }
@@ -155,6 +177,10 @@ PaperSpace.execute = function(openInNewWindow) {
     this.setAttribute('destination', random);
     destination = random;
 
+    // store destination in database to link it to the project name
+    UserManager.setDataOfSpaceWithDest(random,'ProjectNameLink',this.getAttribute('Project name'));
+
+    // add destination to tabs
     GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
     GUI.tabs.redrawTabContent();
   }

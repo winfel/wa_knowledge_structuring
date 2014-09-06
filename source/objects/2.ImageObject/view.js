@@ -5,7 +5,11 @@
 *
 */
 
-
+/**
+* @function createRepresentation
+* @param parent
+* @return {undefined}
+*/
 ImageObject.createRepresentation=function(parent) {
 
 	var rep = GUI.svg.group(parent,this.getAttribute('id'));
@@ -26,6 +30,10 @@ ImageObject.createRepresentation=function(parent) {
 	
 }
 
+/**
+* @function createPixelMap
+* @param SVGImage
+*/
 ImageObject.createPixelMap=function(SVGImage){
 	
 	if (!SVGImage) SVGImage=$(this.getRepresentation()).find("image")[0];
@@ -85,7 +93,9 @@ ImageObject.createPixelMap=function(SVGImage){
 	
 }
 
-
+/**
+* @param external
+*/
 ImageObject.draw = function(external) {
 	
 	GeneralObject.draw.call(this,external);
@@ -131,13 +141,18 @@ ImageObject.updateImage=function(){
 
 }
 
-
+/**
+* @param value
+*/
 ImageObject.setViewWidth = function(value) {
 	GeneralObject.setViewWidth.call(this, value);
 	$(this.getRepresentation()).find("image").attr("width", parseInt(value));
 	$(this.getRepresentation()).find("rect").attr("width", parseInt(value));
 }
 
+/**
+* @param value
+*/
 ImageObject.setViewHeight = function(value) {
 	GeneralObject.setViewHeight.call(this, value);
 	$(this.getRepresentation()).find("image").attr("height", parseInt(value));

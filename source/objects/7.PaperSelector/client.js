@@ -1,11 +1,21 @@
+/**
+* @param obj
+*/
 PaperSelector.filterObject = function(obj) {
 
 }
 
+/**
+* @param id
+* @param name
+*/
 PaperSelector.selectFile = function(id, name) {
 
 }
 
+/**
+* @return {Boolean}
+*/
 PaperSelector.hasContent = function() {
     return true;
 }

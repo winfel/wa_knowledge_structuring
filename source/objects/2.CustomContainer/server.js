@@ -11,6 +11,12 @@ var theObject=Object.create(require('./common.js'));
 var Modules=require('../../server.js');
 module.exports=theObject;
 
+/**
+* @fucntion onEnter
+* @param object
+* @param oldData
+* @param newData
+*/
 theObject.onEnter=function(object,oldData,newData){
 	
 	var data = {

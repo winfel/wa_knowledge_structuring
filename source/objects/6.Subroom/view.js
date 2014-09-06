@@ -5,10 +5,16 @@
 *
 */
 
+/**
+* @return {undefined}
+*/
 Subroom.getStatusIcon = function() {
 	return this.getIconPath() + "/link";
 }
 
+/**
+* @return {undefined}
+*/
 Subroom.getIconText = function() {
     return this.getAttribute("name");
 }

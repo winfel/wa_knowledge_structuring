@@ -59,14 +59,20 @@ var TagManager = new function() {
    * 
    * @param {type} mainTag The name of the new main tag.
    * @param {type} newId The ID of the new main tag.
+   * @param {type} callback callback function
    * @return {undefined}
    */
-  this.updMainTags = function(mainTag, newId) {
+  this.updMainTags = function(mainTag, newId, callback) {
 
-    Modules.SocketClient.serverCall('updMainTags', {
-		'mainTag': mainTag,
-		'newId': newId,
-	});
+        Dispatcher.registerCall("updMainTags", function(result) {
+            callback(result);
+            Dispatcher.removeCall("updMainTags");
+        });
+
+        Modules.SocketClient.serverCall('updMainTags', {
+            'mainTag' : mainTag,
+            'newId' : newId,
+        });
   }
   
   /**
@@ -146,15 +152,19 @@ var TagManager = new function() {
    * 
    * @param {type} mainTag The main tag.
    * @param {type} secTag The name of the newly added secondary tag.
-   * @return {undefined}
+   * @param {type} callback callback function
    */
-  this.updSecTags = function(mainTag, secTag) {
+    this.updSecTags = function(mainTag, secTag, callback) {
+        Dispatcher.registerCall("updSecTags", function(result) {
+            callback(result);
+            Dispatcher.removeCall("updSecTags");
+        });
 
-    Modules.SocketClient.serverCall('updSecTags', {
-        'mainTag': mainTag,
-        'secTag': secTag
-    });
-  };
+        Modules.SocketClient.serverCall('updSecTags', {
+            'mainTag' : mainTag,
+            'secTag' : secTag
+        });
+    };
   
   /**
    * Deletes the specified secondary tag from the list of 

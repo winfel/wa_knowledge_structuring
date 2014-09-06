@@ -12,10 +12,17 @@ var Modules = require('../../server.js');
 
 var TRASH_ROOM = 'trash';
 
+/**
+* @function getAllFileObjects
+* @param cb
+*/
 theObject.getAllFileObjects = function(cb) {
     Modules.Connector.getObjectDataByQuery({mainTag: this.getAttribute('name'), inRoom: {$nin:[TRASH_ROOM] } }, cb);
 }
 
+/**
+* @param d
+*/
 theObject.changeMainTag = function(d) {
 
     Modules.ObjectManager.getObject(d.room, d.id, true, function(o) {

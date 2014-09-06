@@ -21,6 +21,10 @@ var exec = require('child_process').exec;
 var MongoDBLauncher = {};
 var modules = false;
 
+/**
+* @param theModules
+* @return {MongoDBLauncher}
+*/
 MongoDBLauncher.init = function(theModules) {
     modules = theModules;
     return this;
@@ -41,6 +45,9 @@ MongoDBLauncher.launch = function() {
     }
 }
 
+/**
+* @param callback
+*/
 MongoDBLauncher.isRunning = function(callback) {
     var running = false; 
     var uri = modules.MongoDBConfig.getURI();

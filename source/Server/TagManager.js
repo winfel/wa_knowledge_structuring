@@ -35,7 +35,6 @@ var fillCurrentDbWithTestData = function() {
 			    secTags: ["Cryptography", "Algorithms", "Complexity", "Theory of Distributed Systems", "Swarm Intelligence"] }
 		   ]	
 	);	
-	
 };
 
 var TagManager = function() {
@@ -65,16 +64,29 @@ var TagManager = function() {
 			that.getMainTagsAndSecTags(socket);
 		});
 	   
-	    Dispatcher.registerCall('updSecTags', function(socket, data, responseID) {
-			that.updSecTags(socket, data.mainTag, data.secTag); 
-		});
-		
-		Dispatcher.registerCall('updMainTags', function(socket, data, responseID) {
+		Dispatcher.registerCall('updMainTags', function(socket, data) {
 			// for every Main Tag a GlobalContainer object is created
 			var context = Modules.UserManager.getConnectionBySocket(socket);
-			that.createGlobalContainer(context, data, function (error, object) {
-			    if (!error) {
-			        that.updMainTags(data.mainTag, data.newId, object.id); 
+			
+			db.get("MainTags").findOne({name: data.mainTag }, function(error, tags) {
+			    if (error) {
+			        console.log("updMainTags::ERROR " + error);
+			    } else {
+			        if (tags != null) {
+			            var msg = "tagManager.duplicateMainTag.error";
+			            Modules.SocketServer.sendToSocket(socket, "updMainTags", {"error": true, "msg": msg});
+			        } else {
+			            that.createGlobalContainer(context, data, function (error, object) {
+	                        if (!error) {
+	                            that.updMainTags(data.mainTag, data.newId, object.id); 
+	                        } else {
+	                            that.deleteGlobalContainer(object.id, context, null);
+	                        }
+	                        
+	                        var msg = (error) ? "tagManager.maintagcreation.error" : "success";
+	                        Modules.SocketServer.sendToSocket(socket, 'updMainTags', {"error": error, "msg": msg});
+	                    });   
+			        }
 			    }
 			});
 		});
@@ -131,6 +143,12 @@ var TagManager = function() {
 			}); 
 		});
 		
+		Dispatcher.registerCall('updSecTags', function(socket, data) {
+            that.updSecTags(socket, data.mainTag, data.secTag, function (error, message) {
+                Modules.SocketServer.sendToSocket(socket, 'updSecTags', {"error": error, "msg": message});
+            }); 
+        });
+        
 		// we create our context
 		var context = {
 	            user: { username : "root"}
@@ -206,12 +224,21 @@ var TagManager = function() {
      * @param {Object} socket The socket of the client.
      * @param {Object} mainTag The main tag.
      * @param {Object} newSecTag The newly added secondary tag.
+     * @param {Object} callback the function to call back.
      */
-	this.updSecTags = function(socket, mainTag, newSecTag) {
+	this.updSecTags = function(socket, mainTag, newSecTag, callback) {
 		var dbMainTags = db.get('MainTags');
-		dbMainTags.update( {name: mainTag}, { 
-		    $addToSet: { secTags:  newSecTag } 
-	    });
+		
+		dbMainTags.findOne( { name: mainTag, secTags: {$in:[newSecTag]}}, function(error, secTag) {
+		    if (!secTag) {
+		        dbMainTags.update( {name: mainTag}, { 
+                    $addToSet: { secTags:  newSecTag } 
+                });
+		    } 
+		    
+		    var message = (secTag != null) ? "tagManager.duplicateSecondaryTag.error" : "success";
+		    callback((secTag != null), message);
+		});
 	};
 	
 	/**
@@ -461,7 +488,7 @@ var TagManager = function() {
 	            y : obj.get('y')
 	        }; 
 	        Modules.ObjectManager.remove(obj);
-	        callback(coordinates);
+	        if (callback != null && callback != undefined) callback(coordinates);
 	    });
 	}
 	

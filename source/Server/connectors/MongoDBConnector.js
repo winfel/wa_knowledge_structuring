@@ -275,7 +275,7 @@ function buildObjectFromDBObject (roomID, attr, callback) {
         });
     } catch(ex) {
 		Modules.Log.warn(ex);
-		console.log('... this happens then and when and can be ignored.\nIvan or Alejandro will fix it... hopefully... ;-)');
+		console.log('... this happens then and when and can be ignored.\nIvan will fix it... hopefully... ;-)');
 		console.dir(arguments);
     }
 }

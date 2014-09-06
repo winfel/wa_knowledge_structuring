@@ -5,6 +5,10 @@
 *
 */
 
+/**
+* @function draw
+* @param external
+*/
 Polygon.draw=function(external){
 	
 	var rep=this.getRepresentation();
@@ -22,6 +26,7 @@ Polygon.draw=function(external){
 	this.drawPolygon();
 	
 }
+
 
 
 Polygon.drawPolygon = function() {
@@ -60,7 +65,10 @@ Polygon.drawPolygon = function() {
 
 }
 
-
+/**
+* @param parent
+* @return {undefined}
+*/
 Polygon.createRepresentation = function(parent) {
 	
 	this.points = [];
@@ -75,16 +83,25 @@ Polygon.createRepresentation = function(parent) {
 	
 }
 
-/* view getter */
+// view getter
 
+/**
+* @return {undefined}
+*/
 Polygon.getViewBoundingBoxX = function() {
 	return this.getViewX()-this.getViewWidth();
 }
 
+/**
+* @return {undefined}
+*/
 Polygon.getViewBoundingBoxY = function() {
 	return this.getViewY()-this.getViewHeight();
 }
 
+/**
+* @return {undefined}
+*/
 Polygon.getViewBoundingBoxWidth = function() {
 	if (this.hasAttribute('linesize')) {
 		var linesize = this.getAttribute('linesize')/2;
@@ -94,6 +111,9 @@ Polygon.getViewBoundingBoxWidth = function() {
 	return this.getViewWidth()*2+linesize;
 }
 
+/**
+* @return {undefined}
+*/
 Polygon.getViewBoundingBoxHeight = function() {
 	if (this.hasAttribute('linesize')) {
 		var linesize = this.getAttribute('linesize')/2;
@@ -105,12 +125,18 @@ Polygon.getViewBoundingBoxHeight = function() {
 
 /* view setter */
 
+/**
+* @param value
+*/
 Polygon.setViewWidth = function(value) {
 	$(this.getRepresentation()).attr("width", value);
 	GUI.adjustContent(this);
 	this.drawPolygon();
 }
 
+/**
+* @param value
+*/
 Polygon.setViewHeight = function(value) {
 	$(this.getRepresentation()).attr("height", value);
 	GUI.adjustContent(this);

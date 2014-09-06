@@ -5,6 +5,19 @@ var elabConnector=require('./FileConnector.js');
 elabConnector.elabConnections = {};
 elabConnector.externalSessions = {};
 
+/**
+* @class ElabConnector
+* @classdesc This is the ElabConnector
+*/
+
+/**
+* @function login
+* @param username
+* @param password
+* @param externalSession
+* @param context
+* @param rp
+*/
 elabConnector.login=function(username,password,externalSession,context, rp){
 
 	var self = this;
@@ -61,17 +74,31 @@ elabConnector.login=function(username,password,externalSession,context, rp){
 	}	
 }
 
+/**
+* @param context
+* @return {Boolean}
+*/
 elabConnector.isLoggedIn=function(context) {
 	return (this.elabConnections[context.socket.id] !== undefined);
 }
 
-
+/**
+* @param data
+*/
 elabConnector.addExternalSession=function(data) {
 	this.externalSessions[data.id] = data;
 }
 
 /* RIGHTS */
 
+/**
+* @function mayWrite
+* @param roomID
+* @param objectID
+* @param connection
+* @param callback
+* @return {undefined}
+*/
 elabConnector.mayWrite=function(roomID,objectID,connection,callback) {
 	this.Modules.Log.debug("Check right: write (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(connection)+"')");
 
@@ -108,6 +135,14 @@ elabConnector.mayWrite=function(roomID,objectID,connection,callback) {
 	});
 }
 
+/**
+* @function mayRead
+* @param roomID
+* @param objectID
+* @param connection
+* @param callback
+* @return {undefined}
+*/
 elabConnector.mayRead=function(roomID,objectID,connection,callback) {
 	this.Modules.Log.debug("Check right: read (roomID: '"+roomID+"', objectID: '"+objectID+"', user: '"+this.Modules.Log.getUserFromContext(connection)+"')");
 	
@@ -143,14 +178,36 @@ elabConnector.mayRead=function(roomID,objectID,connection,callback) {
 	});
 }
 
+/**
+* @function mayDelete
+* @param roomID
+* @param objectID
+* @param connection
+* @param callback
+* @return {undefined}
+*/
 elabConnector.mayDelete=function(roomID,objectID,connection,callback) {
 	this.mayWrite(roomID, null, connection, callback);
 }
 
+/**
+* @function mayEnter
+* @param roomID
+* @param connection
+* @param callback
+* @return {undefined}
+*/
 elabConnector.mayEnter=function(roomID,connection,callback) {
 	this.mayRead(roomID, null, connection, callback);
 }
 
+/**
+* @function mayWrite
+* @param roomID
+* @param connection
+* @param callback
+* @return {undefined}
+*/
 elabConnector.mayInsert=function(roomID,connection,callback) {
 	this.mayWrite(roomID, null, connection, callback);
 }

@@ -52,10 +52,9 @@ GUI.tagManager = new function() {
 					 onblur    : 'submit'
 			};	
 
-	this.createMainTag = function(mainTag, newId) {
+	this.createMainTag = function(mainTag, newId, callback) {
 		// saves the newly created main tag "mainTag" in the database  
-		Modules.TagManager.updMainTags(mainTag, newId);
-		// TODO: add tag to the mainTags array
+		Modules.TagManager.updMainTags(mainTag, newId, callback);
 	}
 	
 	this.updateMainTagName = function(oldName, newName, tagID){		
@@ -70,9 +69,9 @@ GUI.tagManager = new function() {
 		});
 	}
 	
-	this.createSecondaryTag = function(mainTag, secondaryTag){
+	this.createSecondaryTag = function(mainTag, secondaryTag, callback) {
 		// saves the newly created secondary tag "secondaryTag" in the database		
-		Modules.TagManager.updSecTags(mainTag, secondaryTag);		
+		Modules.TagManager.updSecTags(mainTag, secondaryTag, callback);		
 	}
 	
 	this.updateSecondaryTagName = function(mainTag, oldName, newName){
@@ -126,10 +125,18 @@ GUI.tagManager = new function() {
 					 // console.log(value);					
 					 if (that.mainTagOperation == "create") {
 					     var newId = new Date().getTime() - 1296055327011;
-						 that.createMainTag(value, newId);
-						 that.mainTagOperation = "";
-						 $(this).closest('.portlet').data('maintag', newId);			 
-						 
+						 that.createMainTag(value, newId, function(result) {
+						     if (!result.error) {
+						         that.mainTagOperation = "";
+	                             $(this).closest('.portlet').data('maintag', newId);
+						     } else {
+						         $("#container-notifier").notify("create", "withIcon", {
+                                     title : GUI.translate("error"),
+                                     text: GUI.translate(result.msg),
+                                     icon: '/guis.common/images/toast/warning.png'
+                                 });
+						     }
+						 });
 					 } else {
 						 var tagID = $(this).closest('.portlet').data('maintag');						 						 
 						 that.updateMainTagName(oldName, value, tagID);
@@ -160,9 +167,19 @@ GUI.tagManager = new function() {
 								 }									
 							 });
 							 
-							 if(!existenceOfSecondaryTag){
-								 that.createSecondaryTag(that.currentMainTag, value);
-								 that.secTagOperation = "";
+							 if (!existenceOfSecondaryTag) {
+								 that.createSecondaryTag(that.currentMainTag, value, function (result) {
+								     if (!result.error) {
+								         that.secTagOperation = "";
+		                             } else {
+		                                 $(this).closest( "li" ).remove();
+		                                 $("#container-notifier").notify("create", "withIcon", {
+		                                     title : GUI.translate("error"),
+		                                     text: GUI.translate(result.msg),
+		                                     icon: '/guis.common/images/toast/warning.png'
+		                                 });
+		                             }
+								 });
 							 } else {
 								 $("#container-notifier").notify("create", "withIcon", {
 	                                    title :  GUI.translate("error"),

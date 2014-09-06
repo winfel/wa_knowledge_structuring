@@ -21,6 +21,10 @@ ReferenceContainer.Files = new Array();
 ReferenceContainer.References = new Array();
 
 
+/**
+* @function removeReference
+* @param ref
+*/
 ReferenceContainer.removeReference = function(ref){
 		
 	var that = this;	
@@ -49,19 +53,24 @@ ReferenceContainer.removeReference = function(ref){
 
 
 ReferenceContainer.getReferences = function(){
-		
-	this.References = new Array();	
 	var that = this;
+
+	//get project name
+	var destFromURL = document.URL.substring(document.URL.lastIndexOf("/") + 1, document.URL.length);
+	UserManager.getDataOfSpaceWithDest(destFromURL,"ProjectNameLink",function(pname){
+		that.References = new Array();	
 		
-	UserManager.getDataOfSpaceWithDest(this.getRoom().getAttribute('name'), "references" , function(d){
+		UserManager.getDataOfSpaceWithDest(pname[0].value, "references" , function(d){
 	
-		if(d != "error"){
-			var key;
-			for(key in d[0].value){
-				that.References.push(d[0].value[key]);
+			if(d != "error"){
+				var key;
+				for(key in d[0].value){
+					that.References.push(d[0].value[key]);
+				}
 			}
-		}
 		
+		});
+
 	});
 }
 
@@ -90,7 +99,9 @@ ReferenceContainer.getFiles = function(){
 		
 }
 
-
+/**
+* @param files
+*/
 ReferenceContainer.searchAndFilter = function(files){
 	
 	var filteredFiles1 = new Array();
@@ -217,7 +228,9 @@ ReferenceContainer.searchAndFilter = function(files){
 	
 }
 
-
+/**
+* @param files
+*/
 ReferenceContainer.sortFiles = function(files){ //bubble sort
 
 	var sortingCriterion = this.sortingCriterion;

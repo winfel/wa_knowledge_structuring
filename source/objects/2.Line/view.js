@@ -4,7 +4,11 @@
 *    @author Felix Winkelnkemper, University of Paderborn, 2011
 *
 */
-	
+
+/**
+* @function draw
+* @param external
+*/	
 Line.draw=function(external){
 
 	var rep=this.getRepresentation();
@@ -51,7 +55,10 @@ Line.draw=function(external){
 
 }
 
-
+/**
+* @param parent
+* @return {undefined}
+*/
 Line.createRepresentation = function(parent) {
 
 	var rep = GUI.svg.group(parent,this.getAttribute('id'));
@@ -71,7 +78,10 @@ Line.createRepresentation = function(parent) {
 	
 }
 
-
+/**
+* @param widthChanged
+* @param heightChanged
+*/
 Line.determineDirection = function(widthChanged, heightChanged) {
 
 	if (this.getAttribute("direction") == 1) {
@@ -148,7 +158,9 @@ Line.resizeHandler = function() {
 }
 
 
-
+/**
+* @param value
+*/
 Line.setViewWidth = function(value) {
 	
 	var rep = this.getRepresentation();
@@ -168,6 +180,9 @@ Line.setViewWidth = function(value) {
 	GUI.adjustContent(this);
 }
 
+/**
+* @param value
+*/
 Line.setViewHeight = function(value) {
 	
 	var rep = this.getRepresentation();

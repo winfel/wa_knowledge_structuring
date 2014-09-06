@@ -5,7 +5,9 @@
 *
 */
 
-
+/**
+* @param external
+*/
 Paint.draw=function(external){
 
 	var rep=this.getRepresentation();
@@ -21,6 +23,10 @@ Paint.draw=function(external){
 	*/
 }
 
+/**
+* @param
+* @return {undefined}
+*/
 Paint.createRepresentation = function(parent) {
 
 	var rep=ImageObject.createRepresentation.call(this,parent);

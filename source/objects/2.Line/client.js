@@ -5,6 +5,12 @@
 *
 */
 
+/**
+* @function hasPixelAt
+* @param x
+* @param y
+* @return {boolean}
+*/
 Line.hasPixelAt=function(x,y){
 	
 	//assume, that the GeneralObject is full of pixels.

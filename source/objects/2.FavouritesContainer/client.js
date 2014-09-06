@@ -20,6 +20,10 @@ FavouritesContainer.sortingOrder = "From A to Z";
 FavouritesContainer.Files = new Array();
 FavouritesContainer.Favourites = new Array();
 
+/**
+* @function removeFavourite
+* @param fav
+*/
 FavouritesContainer.removeFavourite = function(fav){
 		
 	this.Favourites.splice(this.Favourites.indexOf(fav), 1);	
@@ -87,7 +91,9 @@ FavouritesContainer.getFiles = function(){
 		
 }
 
-
+/**
+* @param files
+*/
 FavouritesContainer.searchAndFilter = function(files){
 	
 	var filteredFiles1 = new Array();
@@ -214,7 +220,9 @@ FavouritesContainer.searchAndFilter = function(files){
 	
 }
 
-
+/**
+* @param files
+*/
 FavouritesContainer.sortFiles = function(files){ //bubble sort
 
 	var sortingCriterion = this.sortingCriterion;

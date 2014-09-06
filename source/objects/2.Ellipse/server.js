@@ -11,6 +11,10 @@ var theObject=Object.create(require('./common.js'));
 var Modules=require('../../server.js');
 module.exports=theObject;
 
+/**
+* @function getBoundingBox
+* @return {undefined}
+*/
 theObject.getBoundingBox=function(){
 	
 	if (this.hasAttribute('linesize')) {

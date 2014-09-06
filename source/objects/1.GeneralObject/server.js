@@ -397,28 +397,23 @@ theObject.copyContentFromFile = function(filename, callback) {
 * @return {undefined}
 */
 theObject.getCurrentUserName = function() {
-  if (!this.context)
-    return 'root';
-  return this.context.user.username;
+    if (!this.context) {
+      return 'root';
+    }
+  
+    return this.context.user.username;
 }
 
 /**
- *  Gget the object's content
+ *  get the object's content
  *	@function getContent
- *
  */
 theObject.getContent = function(callback) {
-	if (!this.context)
-		throw new Error('Missing context in GeneralObject.getContent');
+	if (!this.context) throw new Error('Missing context in GeneralObject.getContent');
 
-	Modules.Connector.getContent(this.inRoom, this.id, this.context, function(content){
-		if (_.isFunction(callback)) {
-			callback(content);
-		} else {
-			return content;
-		}
-	});
+	Modules.Connector.getContent(this.inRoom, this.id, this.context, callback);
 }
+
 theObject.getContent.public = true;
 theObject.getContent.neededRights = {
   read: true
@@ -430,13 +425,11 @@ theObject.getContent.neededRights = {
 * @return {undefined}
 */
 theObject.getContentAsString = function(callback) {
-  if (callback === undefined) {
-    return GeneralObject.utf8.parse(this.getContent());
-  } else {
+    if (_.isUndefined(callback)) throw new Error('Missing callback in GeneralObject.getContentAsString');
+    
     this.getContent(function(content) {
-      callback(GeneralObject.utf8.parse(content));
+        callback(GeneralObject.utf8.parse(content));
     });
-  }
 }
 
 /**

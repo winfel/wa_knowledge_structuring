@@ -17,7 +17,10 @@ CustomContainer.searchForText = true;
 CustomContainer.sortingCriterion = "By Name";
 CustomContainer.sortingOrder = "From A to Z";
 
-
+/**
+* @function newFile
+* @param id
+*/
 CustomContainer.newFile = function(id){
 	
 	var o = ObjectManager.getObject(id);
@@ -61,7 +64,9 @@ CustomContainer.newFile = function(id){
 	
 }
 
-
+/**
+* @function getFiles
+*/
 CustomContainer.getFiles = function(){
 		
 	var files = this.getAttribute('files');
@@ -72,7 +77,10 @@ CustomContainer.getFiles = function(){
 	this.searchAndFilter(files);	
 }
 
-
+/**
+* @function searchAndFilter
+* @param files
+*/
 CustomContainer.searchAndFilter = function(files){
 	
 	var filteredFiles1 = new Array();
@@ -199,7 +207,10 @@ CustomContainer.searchAndFilter = function(files){
 	
 }
 
-
+/**
+* @function sortFiles
+* @param files
+*/
 CustomContainer.sortFiles = function(files){ //bubble sort
 
 	var sortingCriterion = this.sortingCriterion;

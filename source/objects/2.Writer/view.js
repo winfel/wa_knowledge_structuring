@@ -5,6 +5,10 @@
 *
 */
 
+/**
+* @function draw
+* @param external
+*/
 Writer.draw = function(external) {
     var rep = this.getRepresentation();
     this.drawDimensions(external);
@@ -28,6 +32,10 @@ Writer.updateContent = function() {
     });
 }
 
+/**
+* @param parent
+* @return {undefined}
+*/
 Writer.createRepresentation = function(parent) {
 	var rep = GUI.svg.other(parent, "foreignObject");
     rep.dataObject = this;

@@ -1,3 +1,8 @@
+/**
+* @class RightManager
+* @classdesc This is the RightManager
+*/
+
 var db = false;
 var Modules = false;
 

@@ -11,7 +11,9 @@ GUI.setTranslations('en',{
     'error' : 'Error',
     'tagManager.duplicateMainTag.error' :'A main tag with the specified name already exists',
     'tagManager.duplicateSecondaryTag.error' :'A secondary tag with the specified name already exists',
-    'tagManager.maintagdeletion.error' : 'The main tag cannot be deleted since there are files tagged with this tag'
+    'tagManager.maintagdeletion.error' : 'The main tag cannot be deleted since there are files tagged with this tag',
+    'tagManager.maintagcreation.error' : "An unexpected error occurred during the creation of the main tag",
+    'tagManager.sectagdeletion.duplicate.error' : ""
     }
 );
 
@@ -92,7 +94,9 @@ GUI.setTranslations('de',{
     'error' : 'Fehler',
     'tagManager.duplicateMainTag.error' :'Ein Haupt Tag mit dem angegebenen Namen ist bereits vorhanden',
     'tagManager.duplicateSecondaryTag.error' :'Ein Sekundär Tag mit dem angegebenen Namen ist bereits vorhanden',
-    'tagManager.maintagdeletion.error' : 'Der Haupt Tag kann nicht gelöscht werden, da es Dateien mit diesem Tag vorliegen'
+    'tagManager.maintagdeletion.error' : 'Der Haupt Tag kann nicht gelöscht werden, da es Dateien mit diesem Tag vorliegen',
+    'tagManager.maintagcreation.error' : "Ein unerwarteter Fehler ist aufgetreten Während der Erstellung des HauptTags",
+    'tagManager.sectagdeletion.duplicate.error' : ""
 }
 );
 
@@ -173,6 +177,8 @@ GUI.setTranslations('es',{
     'error' : 'Error',
     'tagManager.duplicateMainTag.error' :'Una etiqueta principal con el nombre especificado ya existe',
     'tagManager.duplicateSecondaryTag.error' :'Una etiqueta secundaria con el nombre especificado ya existe',
-    'tagManager.maintagdeletion.error' : 'La etiqueta principal no se puede eliminar ya que hay archivos etiquetados con esta etiqueta'
+    'tagManager.maintagdeletion.error' : 'La etiqueta principal no se puede eliminar ya que hay archivos etiquetados con esta etiqueta',
+    'tagManager.maintagcreation.error' : "Un error inesperado se produjo durante la creación de la etiqueta principal",
+    'tagManager.sectagdeletion.duplicate.error' : ""
 }
 );

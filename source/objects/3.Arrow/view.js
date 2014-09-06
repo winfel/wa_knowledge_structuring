@@ -4,7 +4,11 @@
 *    @author Felix Winkelnkemper, University of Paderborn, 2011
 *
 */
-	
+
+/**
+* @function draw
+* @param external
+*/	
 Arrow.draw=function(external){
 
 	Line.draw.call(this, external);
@@ -28,7 +32,10 @@ Arrow.draw=function(external){
 
 }
 
-
+/**
+* @param parent
+* @return {undefined}
+*/
 Arrow.createRepresentation = function(parent) {
 
 	var rep = Line.createRepresentation.call(this,parent);

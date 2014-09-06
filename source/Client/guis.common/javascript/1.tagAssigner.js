@@ -179,7 +179,7 @@ GUI.tagAssigner = new function() {
 		// creates new main tag and assigns it to the file object
 		
 		
-		that.$containerMainTags.delegate("#custom-Main-tag", "keyup", function() {
+		that.$containerMainTags.delegate("#custom-Main-tag", "keyup", function(event) {
 		//$("#custom-Main-tag").die().live("keyup", function(event) {
 			var that = GUI.tagAssigner;
 			var customMainTagValue;
@@ -281,9 +281,10 @@ GUI.tagAssigner = new function() {
 				
 				//insert the newly created secondary tag into the list of assigned secondary tags
 				// and redraw the assigned secondary tags
-				if(checkedCustomSecTagValue != ""){
+				if (checkedCustomSecTagValue != "") {
 					customSecTagValue = checkedCustomSecTagValue;
 				}
+				
 				that.assignedSecTags.push(customSecTagValue);
 				that.drawAssignedTags();
 				

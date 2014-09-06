@@ -17,7 +17,7 @@ var Modules = require('../../server.js');
  * 
  * @param {type} object
  * @param {type} data
- * @returns {undefined}
+ * @return {undefined}
  */
 theObject.onMoveOutside = function(object, data) {
 
@@ -27,10 +27,20 @@ theObject.onMoveOutside = function(object, data) {
   }
 };
 
+/** 
+* @function onMoveWithin
+ * @param {type} object
+ * @param {type} data
+ */
 theObject.onMoveWithin = function(object, data) {
   // Do nothing...
 };
 
+/** 
+ * @param {type} object
+ * @param {type} oldData
+ * @param {type} newData
+ */
 theObject.onEnter = function(object, oldData, newData) {
   /*method to set secondaryTags by dragging a text object onto the file--->Maybe we use it in the future
    var name = object.getAttribute('name');

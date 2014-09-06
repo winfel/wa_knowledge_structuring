@@ -5,7 +5,9 @@
 *
 */
 
-
+/**
+* @param external
+*/
 Highlighter.draw=function(external){
 
 	var rep=this.getRepresentation();
