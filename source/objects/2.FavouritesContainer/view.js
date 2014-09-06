@@ -541,6 +541,8 @@ FavouritesContainer.upd = function(){
 		'</div>'+
 		'</div>');
 
+	this.getFavourites();	
+		
 	this.getFiles();
 
 }

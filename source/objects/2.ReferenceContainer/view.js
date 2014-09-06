@@ -537,6 +537,8 @@ ReferenceContainer.upd = function(){
 		'</div>'+
 		'</div>');
 
+	this.getReferences();	
+		
 	this.getFiles();
 
 }
