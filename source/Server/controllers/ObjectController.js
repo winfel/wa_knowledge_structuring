@@ -1,6 +1,12 @@
 /**
  * Provides API methods for Object related tasks
  */
+
+ /**
+ * @class ObjectController
+ * @classdesc This is the ObjectController
+ */
+
 "use strict";
 
 var fs = require('fs');
@@ -13,11 +19,19 @@ var ObjectController = {};
 var Modules = false;
 var ObjectManager = false;
 
+/**
+* @param theModules
+*/
 ObjectController.init = function(theModules) {
   Modules = theModules;
   ObjectManager = Modules.ObjectManager;
 };
 
+/**
+* @param data
+* @param context
+* @param callback
+*/
 ObjectController.createObject = function(data, context, callback) {
   var roomID = data.roomID;
   var type = data.type;
@@ -42,6 +56,11 @@ ObjectController.createObject = function(data, context, callback) {
   Modules.Connector.mayInsert(roomID, context, afterRightsCheck)
 };
 
+/**
+* @param data
+* @param context
+* @param cb
+*/
 ObjectController.executeServersideAction = function(data, context, cb) {
     // console.log("ObjectController.executeServersideAction " + JSON.stringify(data));
     

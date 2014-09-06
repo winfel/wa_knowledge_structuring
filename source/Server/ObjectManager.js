@@ -87,23 +87,28 @@ ObjectManager.init = function (theModules) {
     });
 }
 
+/**
+* @return {String}
+*/
 ObjectManager.toString = function () {
 	return 'ObjectManager (server)';
 }
 
 /**
- *  registerType
+ *  @function registerType
  *
- *  registers an object type, so objects can be created by this objectManager
+ *  Registers an object type, so objects can be created by this ObjectManager
+ * @param type
+ * @param constr
  */
 ObjectManager.registerType = function (type, constr) {
 	prototypes[type] = constr;
 }
 
 /**
- *  getPrototype / getPrototypeFor
+ *  @function getPrototype
  *
- *  gets the prototype (the class) of an object.
+ *  Gets the prototype (the class) of an object
  *
  *  @param  the chosen object
  *  @return the prototype (the class) of an object.
@@ -117,11 +122,11 @@ ObjectManager.getPrototype = function (objType) {
 ObjectManager.getPrototypeFor = ObjectManager.getPrototype;
 
 /**
- *  remove
+ *  @function remove
  *
- *  deletes an object and informs clients about the deletion
+ *  Deletes an object and informs clients about the deletion
  *
- *  @param obj the object that should be removed
+ *  @param obj The object that should be removed
  */
 ObjectManager.remove = function (obj) {
 	if(obj.type == "PaperSpace"){
@@ -163,9 +168,13 @@ ObjectManager.remove = function (obj) {
 	obj.updateClients('objectDelete');
 }
 
-//Deletes an object:
-//1) If the object is in the trash room it is deleted completely from the database
-//2) If it is in any other room it is moved to the trash room
+/** Deletes an object.
+* If the object is in the trash room it is deleted completely from the database.
+* If it is in any other room it is moved to the trash room.
+* @param data
+* @param context
+* @param callback
+*/
 ObjectManager.deleteObject = function (data, context, callback) {
     var that = this;
     
@@ -534,6 +543,9 @@ ObjectManager.countSubrooms = function (roomID, context) {
  *  3.2 after finishing recursion update the room structures
  * 4. Change destinations
  * 5. Update object link targets
+ * @param data
+ * @param context
+ * @param cbo
  */
 ObjectManager.duplicateNew = function (data, context, cbo) {
     // console.log(JSON.stringify(data));
@@ -569,6 +581,9 @@ ObjectManager.duplicateNew = function (data, context, cbo) {
 /**
  * THIS METHOD IS DEPRECATED 
  * USE duplicateNew INSTEAD
+ * @param data
+ * @param context
+ * @param cbo
  */
 ObjectManager.duplicateNew2 = function (data, context, cbo) {
 	var cut = data.cut;

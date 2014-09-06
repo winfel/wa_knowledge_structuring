@@ -16,6 +16,9 @@ var showDebugLineNumbers;
  **/
 BuildTool.clientCode = '"use strict";' + enter + '//Object Code for WebArena Client ' + enter;
 
+/**
+* @param filename
+*/
 BuildTool.addToClientCode = function(filename) {
 	var fileContent = false;
 	try {
@@ -55,14 +58,18 @@ BuildTool.buildClientCode = function() {
 };
 
 /**
- *  getClientCode
+ *  @function getClientCode
  *
- *  get the combined client side sourcecode for objects.
+ *  Get the combined client side sourcecode for objects
+ * @return {undefined}
  **/
 BuildTool.getClientCode = function () {
 	return this.clientCode;
 };
 
+/**
+* @param theModules
+*/
 BuildTool.init = function(theModules){
 	Modules = theModules;
 	showDebugLineNumbers = !!Modules.config.debugMode;

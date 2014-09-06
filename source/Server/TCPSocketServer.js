@@ -79,6 +79,7 @@ var onConnectionEnd = function () {
 }
 /**
  * @function createServer
+ * @return {undefined}
  */
 var createServer = function () {
 	return Object.create(TcpSocketServer);

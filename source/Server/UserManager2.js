@@ -1,3 +1,8 @@
+/**
+* @class UserManager2
+* @classdesc This is the UserManager2
+*/
+
 var db = false;
 var DEBUG_OF_USERMANAGEMENT = false;
 

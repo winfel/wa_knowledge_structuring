@@ -266,6 +266,10 @@ UserManager.login = function(socketOrUser, data) {
 
 };
 
+/**
+* @param socketOrUser
+* @param lang
+*/
 UserManager.setUserPreferredLanguage = function(socketOrUser, lang) {
 	if (typeof socketOrUser.id == 'string')
 		var userID = socketOrUser.id;
@@ -280,6 +284,11 @@ UserManager.setUserPreferredLanguage = function(socketOrUser, lang) {
 }
 UserManager.setUserPreferredLanguage.public = true;
 
+/**
+* @param socketOrUser
+* @param data
+* @param responseID
+*/
 UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
   var shouldInclude = [ PAPER_WRITER+"#Writer#20#200#700#2#locked;true#paper;"+data.roomID,
@@ -293,6 +302,12 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 
+/**
+* @param socketOrUser
+* @param data
+* @param responseID
+* @shouldInclude
+*/
 UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, responseID, shouldInclude){
   UserManager.enterRoom(socketOrUser, data, responseID);
   var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
@@ -373,10 +388,20 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
     });
   };
 
+/**
+* @param socketOrUser
+* @param data
+* @param responseID
+*/
 UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, []);
 };
 
+/**
+* @param socketOrUser
+* @param data
+* @param responseID
+*/
 UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
   var shouldInclude = ["Textarea#PublicSpaceInfo#20#45#100#1#content;This is the private space of user "+
@@ -385,6 +410,9 @@ UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 
+/**
+* @param data
+*/
 UserManager.setDataOfSpaceWithDestServerSide = function(data){
 	var ss = db.get('SpaceStorage');
 
@@ -402,6 +430,10 @@ UserManager.setDataOfSpaceWithDestServerSide = function(data){
 	});
 };
 
+/**
+* @param data
+* @param callback
+*/
 UserManager.getDataOfSpaceWithDestServerSide = function(data, callback){
      var ss = db.get('SpaceStorage');
 
@@ -414,22 +446,40 @@ UserManager.getDataOfSpaceWithDestServerSide = function(data, callback){
     });
 };
 
+/**
+* @param socketOrUser
+* @param data
+* @param responseID
+*/
 UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID){
 	UserManager.setDataOfSpaceWithDestServerSide.call(this, data);
 };
 
+/**
+* @param socketOrUser
+* @param data
+* @param responseID
+*/
 UserManager.removeDataOfSpaceWithDest = function(socketOrUser, data, responseID){
      var ss = db.get('SpaceStorage');
 
      ss.remove({'destination': data.destination, 'key':data.key});
 };
 
+/**
+* @param data
+*/
 UserManager.removeDataOfSpaceWithDestServerSide = function(data){
      var ss = db.get('SpaceStorage');
 
      ss.remove({'destination': data.destination, 'key':data.key});
 };
 
+/**
+* @param socketOrUser
+* @param data
+* @param responseID
+*/
 UserManager.getDataOfSpaceWithDest = function(socketOrUser, data, responseID){
      var ss = db.get('SpaceStorage');
     ss.find({'destination':data.destination, 'key':data.key}, {}, function(e, docs){

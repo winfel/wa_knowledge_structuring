@@ -81,6 +81,9 @@ var PdfEdit = {
 
 	},
 
+	/**
+	* @param theModules
+	*/
 	init: function (theModules) {
 		Modules = theModules;
 	},

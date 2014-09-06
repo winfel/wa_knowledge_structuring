@@ -21,6 +21,10 @@ var ETHP_ERROR_CODE = -1;
 var EtherpadLauncher = {};
 var modules = false;
 
+/**
+* @param theModules
+* @return {EtherpadLauncher}
+*/
 EtherpadLauncher.init = function(theModules) {
     modules = theModules;
     return this;
@@ -44,6 +48,9 @@ EtherpadLauncher.launch = function() {
     }
 }
 
+/**
+* @param callback
+*/
 EtherpadLauncher.isRunning = function(callback) {
     var running = false; 
     
