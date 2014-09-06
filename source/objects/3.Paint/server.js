@@ -7,15 +7,18 @@
 
 "use strict";
 
-var theObject=Object.create(require('./common.js'));
+var theObject=Object.create(requ
+	ire('./common.js'));
 var Modules=require('../../server.js');
 module.exports=theObject;
 
 
 /**
-*	setContent
+* @function setContent
+* @param content
+* @param callback
 *
-*	set a new content. If the content is base64 encoded png data,
+*	Set a new content. If the content is base64 encoded png data,
 *	it is decoded first.
 */
 theObject.setContent=function(content,callback){

@@ -5,11 +5,18 @@
 *
 */
 
-
+/**
+* @function getIconText
+* @return {undefined}
+*/
 Exit.getIconText = function() {
 	return this.getAttribute("name");
 }
 
+/**
+* @function getStatusIcon
+* @return {undefined}
+*/
 Exit.getStatusIcon = function() {
 	var destination=this.getAttribute('destination');
 	

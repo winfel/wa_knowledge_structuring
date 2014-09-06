@@ -17,6 +17,11 @@ theObject.createNew = function() {
     p.createNew(null);
 }
 
+/**
+* @param object
+* @param oldData
+* @param newData
+*/
 theObject.onEnter=function(object,oldData,newData){
     var that = this;
 

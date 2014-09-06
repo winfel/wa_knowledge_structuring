@@ -1,7 +1,14 @@
+/**
+* @param obj
+*/
 PaperChapter.filterObject = function(obj) {
 
 }
 
+/**
+* @param id
+* @param name
+*/
 PaperChapter.selectFile = function(id, name) {
 
 }

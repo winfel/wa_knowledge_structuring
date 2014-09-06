@@ -5,14 +5,24 @@
 *
 */
 
+/**
+* @function getStatusIcon
+* @return {undefined}
+*/
 PaperChapter.getStatusIcon = function() {
 	return this.getIconPath() + "/paper";
 }
 
+/**
+* @return {undefined}
+*/
 PaperChapter.getIconText = function() {
     return this.getAttribute("name");
 }
 
+/**
+* @param external
+*/
 PaperChapter.draw=function(external){
 	
 	var rep=this.getRepresentation();

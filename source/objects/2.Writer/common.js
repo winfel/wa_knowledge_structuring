@@ -5,10 +5,20 @@
 *
 */
 
+/**
+ * Writer
+ * @class
+ * @classdesc This is the writer
+ */
+
 var Modules=require('../../server.js');
 
 var Writer=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
+/**
+* @function register
+* @param type
+*/
 Writer.register=function(type){
 	var that = this;
 	// Registering the object
@@ -41,6 +51,11 @@ Writer.register=function(type){
 
 //Writer.restrictedMovingArea = true;
 Writer.isCreatable=true;
+
+/**
+* @function alwaysOnTop
+* @return {Boolean}
+*/
 Writer.alwaysOnTop = function() {
   return true;
 };
