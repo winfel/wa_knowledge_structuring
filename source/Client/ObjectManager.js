@@ -690,9 +690,16 @@ ObjectManager.init = function() {
     GUI.error("server error", data, false, true);
   });
   
-  Modules.Dispatcher.registerCall('newObjectForCustomContainer', function(data) {
+  Modules.Dispatcher.registerCall('newObjectForContainer', function(data) {
+  
     var con = ObjectManager.getObject(data.ContainerId);
-	con.newFile(data.objectId);
+	
+	if(data.type == "custom"){
+		con.newFile(data.objectId);
+	}
+	if(data.type == "favourite" || data.type == "reference"){
+		con.upd();
+	}
   });
 
   Modules.Dispatcher.registerCall('inform', function(data) {

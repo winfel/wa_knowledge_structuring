@@ -390,6 +390,7 @@ GatewayContainer.upd = function(){
 	var rep=this.getRepresentation();
 	
 	$(rep).find(".ui-widget-content").remove();
+	$(rep).find("#sortablefiles").html("");
 	
 	$(rep).find(".spinner").remove();
 

@@ -415,7 +415,7 @@ ReferenceContainer.addFiles = function(files){
 	$(rep).find(".spinner").remove();
 	
 	if(files.length == 0){
-		$(rep).find("#sortablefiles").html("Add your reference files by right click on any file in the global space containers!");
+		$(rep).find("#sortablefiles").html("Add your reference files by right click on any file in the global space containers or by simply drag and drop!");
 		return;
 	}
 	else{
@@ -498,7 +498,7 @@ ReferenceContainer.addFiles = function(files){
 				$("div.addremove-menu").remove();
 				
 				if($(rep).find(".ui-widget-content").length == 0){
-					$(rep).find("#sortablefiles").html("Add your reference files by right click on any file in the global space containers!");
+					$(rep).find("#sortablefiles").html("Add your reference files by right click on any file in the global space containers or by simply drag and drop!");
 				}
 				
 			});
@@ -513,6 +513,7 @@ ReferenceContainer.upd = function(){
 	var rep=this.getRepresentation();
 	
 	$(rep).find(".ui-widget-content").remove();
+	$(rep).find("#sortablefiles").html("");
 	
 	$(rep).find(".spinner").remove();
 
