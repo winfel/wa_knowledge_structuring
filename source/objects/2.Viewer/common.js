@@ -16,6 +16,9 @@ Viewer.register = function(type) {
   GeneralObject = Modules.ObjectManager.getPrototype('GeneralObject');
   GeneralObject.register.call(this, type);
 
+	// react to events of other objects
+	this.makeSensitive();
+
   this.registerAttribute('file', {type: 'text', changedFunction: function(object, value) {
       object.reloadDocument(value);
     }});
