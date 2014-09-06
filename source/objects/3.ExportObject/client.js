@@ -35,7 +35,7 @@ ExportObject.exportAsFile = function(type, position) {
  */
 ExportObject.exportAsUrl = function(type) {
 	// we need to open the window immediate, as otherwise it is not associated to a users click and will be blocked by popup blockers
-	var deferredWindow = window.open('data:waitforit', '_blank');
+	var deferredWindow = window.open('data:,waitforit', '_blank');
 	this.serverCall('exportAsUrl', type, function(url){
 		deferredWindow.location = url;
 	});
