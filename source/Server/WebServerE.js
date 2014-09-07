@@ -1,5 +1,5 @@
 /**
- *    Webarena - A web application for responsive graphical knowledge work
+ *    CoW - A web application for responsive graphical knowledge work
  *
  *    @author University of Paderborn, 2014
  *    
@@ -91,13 +91,13 @@ everyauth.password
             if (!newUserAttributes.login) {
                 errors.push('Missing username');
             } else if (!validator.isLength(newUserAttributes.login, 3, 10)) {
-                errors.push('Username should be 3 to 8 characters long');
+                errors.push('Username should be 3 to 10 characters long');
             }
             
             if (!newUserAttributes.password) {
                 errors.push('Missing password');
-            } else if (!validator.isLength(newUserAttributes.password, 4, 8)) {
-                errors.push('Password should be 4 to 8 characters long');
+            } else if (!validator.isLength(newUserAttributes.password, 3, 8)) {
+                errors.push('Password should be 3 to 8 characters long');
             }
             
             if ((newUserAttributes.e_mail) && (!validator.isEmail(newUserAttributes.e_mail))) {
@@ -108,11 +108,22 @@ everyauth.password
         })
         .registerUser(function(newUserAttributes) {
             var promise = this.Promise();
-            Modules.UserDAO.createUsers(newUserAttributes, function(err, user) {
+            
+            Modules.UserDAO.usersByUserName(newUserAttributes.login, function(err, user) {
                 if (err) return promise.fulfill([err]);
-                promise.fulfill(user);
+                else {
+                    
+                    if ((user != null) && (user.length > 0)) {
+                        return promise.fulfill(["A user with the same name already exists. Use a different name"]);
+                    }
+                    
+                    Modules.UserDAO.createUsers(newUserAttributes, function(err, user) {
+                        if (err) return promise.fulfill([err]);
+                        promise.fulfill(user);
+                    });
+                }
             });
-        
+            
             return promise;
         })
         .registerSuccessRedirect('/room/public'); // Where to redirect to
