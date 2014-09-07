@@ -5,8 +5,6 @@
  *
  * @requires underscore
  */
- 
- //var _ = require('underscore');
 
 GUI.tagManager = new function() {
 	
@@ -39,11 +37,10 @@ GUI.tagManager = new function() {
 					var newMainTagID = ui.item.closest('.portlet').data('maintag').toString();
 					var secTag = ui.item.find('.editable-sec').html();					
 					
-					
 					that.moveSecTag(that.oldMainTagID, newMainTagID, secTag, function(result){
 						if(result.error){
 							$("#container-notifier").notify("create", "withIcon", {
-                                title :  GUI.translate("error"),
+                                title : GUI.translate("error"),
                                 text: GUI.translate(result.msg),
                                 icon: '/guis.common/images/toast/warning.png'
                             });	
@@ -142,39 +139,54 @@ GUI.tagManager = new function() {
 	
 	this.enableEditable = function() {
 		var that = GUI.tagManager;
-		$('.editable').editable( 
-			function(value, settings) {
+		$('.editable').editable(function(value, settings) {
 		        var oldName = this.revert;
 		        var mainTagExists = false;
+		        
 		        if (oldName != value) {
     				// client-side check 
 		        	// if the MainTag with this name already exists, discard the new entry
 		        	$.each(that.mainTags, function( index, mainTag ) {		
-						if (mainTag.name.toLowerCase() == value.toLowerCase()){
+						if (mainTag.name.toLowerCase() == value.toLowerCase()) {
 							mainTagExists = true;
 							return false;
 						}									
-					});		        	
-                    if(mainTagExists){
+					});		        
+		        	
+                    if(mainTagExists) {
                     	$("#container-notifier").notify("create", "withIcon", {
                             title :  GUI.translate("error"),
                             text: GUI.translate("tagManager.duplicateMainTag.error"),
                             icon: '/guis.common/images/toast/warning.png'
                         });
+                    	
                         if (that.mainTagOperation == "create") {
                         	$(this).closest(".portlet").remove();
                         }
+                        
                         that.mainTagOperation = ""; //reset the main tag operation
                         return this.revert;
                     } else {
                     	if (that.mainTagOperation == "create") {
-    					    var newId = new Date().getTime() - 1296055327011;
-    						that.createMainTag(value, newId);
-    						
-    						$(this).closest('.portlet').data('maintag', newId);
+                    	    var myPortlet = this;
+                    	    var newId = new Date().getTime() - 1296055327011;
+                            that.createMainTag(value, newId, function(result) {
+                                
+                                if (!result.error) {
+                                    that.mainTagOperation = "";
+                                    var portlet = $(myPortlet).closest('.portlet');
+                                    portlet.data('maintag', newId);
+                                } else {
+                                    $("#container-notifier").notify("create", "withIcon", {
+                                        title : GUI.translate("error"),
+                                        text: GUI.translate(result.msg),
+                                        icon: '/guis.common/images/toast/warning.png'
+                                    });
+                                }
+                            });
     					} else { // update operation
     						var tagID = $(this).closest('.portlet').data('maintag');						 						 
-    						that.updateMainTagName(oldName, value, tagID, function(){
+    						that.updateMainTagName(oldName, value, tagID, function() {
     							 
     						});
     					}		
@@ -247,7 +259,7 @@ GUI.tagManager = new function() {
 			 
 	}
 	
-	this.bindEvents = function(){
+	this.bindEvents = function() {
 		//Shows or hides secondary tags
 		$("#main-tag-container").delegate(".portlet-toggle", "click", function() {
 		    var icon = $( this );
@@ -255,12 +267,14 @@ GUI.tagManager = new function() {
 		    icon.closest( ".portlet" ).find( ".portlet-content" ).toggle();
 		});
 		
-		$("#main-tag-container").delegate(".portlet-delete", "click", function() {
+		$("#main-tag-container").delegate(".portlet-delete", "click", function(event) {
 			var self = this;
 			var that = GUI.tagManager;
 			
 			// ID of the Main Tag to be deleted
-		    var mainTagID = $(this).closest('.portlet').data('maintag').toString();		    
+		    var portlet = $(this).closest('.portlet');
+		    var name = portlet[0].innerText.trim();
+		    var mainTagID = portlet.data('maintag').toString();  
 		    		    
             that.deleteMainTag(mainTagID, function(obj) {
                 if (obj.error && obj.error == true) {
@@ -272,6 +286,7 @@ GUI.tagManager = new function() {
                 } else {
                     var icon = $(self);
                     icon.closest(".portlet").remove();
+                    that.mainTags = _.filter(that.mainTags, function(mainTag){ return mainTag.name.toLowerCase() != name.toLowerCase()});
                 }
             });
 		});
@@ -283,7 +298,6 @@ GUI.tagManager = new function() {
 			var mainTag = $(this).closest('.portlet').find('.editable').html();
 			var secondaryTagToBeDeleted = $(this).parent().find('.editable-sec').html();
 			
-		    
 		    that.deleteSecondaryTag(mainTag, secondaryTagToBeDeleted, function(obj){
 		    	if(obj.error && obj.error == true) {
 		    		$("#container-notifier").notify("create", "withIcon", 
@@ -335,16 +349,13 @@ GUI.tagManager = new function() {
 			//that.createMainTag(mainTagToBeCreated);	
 		});
 		
-		
 	}
-	
 	
 	//sets the content of the dialog 
 	this.setDialogContent = function(){		
 		var mainTagTemplate = $("#tag-manager-content-tmpl").html();
 		this.dialogDom = $(mainTagTemplate);
 	}
-	
 	
 	/**
 	 * Set/Edit tags using a dialog
