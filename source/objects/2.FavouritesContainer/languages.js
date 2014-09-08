@@ -1,14 +1,14 @@
 FavouritesContainer.setTranslations('de',{
-    'favorite.container':'Favoriten-Behälter'
+    'favourite.container':'Favoriten-Behälter'
 }
 );
 
 FavouritesContainer.setTranslations('en',{
-    'favorite.container':'Favorite container'
+    'favourite.container':'Favorite container'
 }
 );
 
 FavouritesContainer.setTranslations('es',{
-    'favorite.container':'Contenedor de mis favoritos'
+    'favourite.container':'Contenedor de mis favoritos'
 }
 );
