@@ -110,6 +110,8 @@ CustomContainer.searchAndFilter = function(files){
 		
 			if(stringEntered){  //the user has entered a search string, search through all files and check if name matches to the search string
 				var n = files[key].attributes.name;
+				n = n.toLowerCase();
+				s = s.toLowerCase();
 				
 				if(n.indexOf(s) == -1){ //searchString is not part of the name of the object
 					continue;
