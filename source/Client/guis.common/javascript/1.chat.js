@@ -40,7 +40,6 @@ GUI.chat.init = function() {
 var minimize_box = function(){
     var rand_id = $(this).attr("id");
     rand_id = rand_id.split("-").pop();
-    console.log('### rand-id is '+ rand_id);
     $('#toggle-chat-'+rand_id).slideToggle();
 };
 
