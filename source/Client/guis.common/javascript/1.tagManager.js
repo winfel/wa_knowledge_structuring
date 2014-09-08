@@ -1,8 +1,12 @@
 "use strict";
 
 /**
+ * @file 1.tagManager.js
+ */
+ 
+/**
  * Object providing functions for tagging	
- *
+ * @function tagManager
  * @requires underscore
  */
 
@@ -60,12 +64,27 @@ GUI.tagManager = new function() {
 					 cssclass  : 'editableInput',
 					 onblur    : 'submit'
 	};	
-
+	
+	/**
+ 	* creates the main tag for the new id
+ 	* @function createMainTag
+ 	* @param mainTag
+ 	* @param {int} newId
+	* @param callback
+ 	*/
 	this.createMainTag = function(mainTag, newId, callback) {
 		// saves the newly created main tag "mainTag" in the database  
 		Modules.TagManager.updMainTags(mainTag, newId, callback);
 	}
 	
+	/**
+ 	* updates the main tag name with the id
+ 	* @function updateMainTagName
+ 	* @param {String} oldName
+ 	* @param {String} newName
+ 	* @param {int} tagId
+	* @param callback
+ 	*/
 	this.updateMainTagName = function(oldName, newName, tagID, callback){		
 		// updates the name of the main tag with ID "tagID" in the database  
 		Modules.TagManager.updMainTagName(oldName, newName, tagID, function(){
@@ -74,7 +93,13 @@ GUI.tagManager = new function() {
 			}
 		});
 	}
-
+	
+	/**
+ 	* deletes the main tag with the id
+ 	* @function deleteMainTag
+ 	* @param {int} mainTagId
+	* @param callback
+ 	*/
 	this.deleteMainTag = function(mainTagID, callback) {
 		// deletes the main tag with ID "tagID" from the database
 		Modules.TagManager.deleteMainTag(mainTagID, function(obj) {
@@ -82,11 +107,26 @@ GUI.tagManager = new function() {
 		});
 	}
 	
+	/**
+ 	* creates the secondary tag 
+ 	* @function createSecondaryTag
+ 	* @param mainTag
+ 	* @param secondaryTag
+	* @param callback
+ 	*/
 	this.createSecondaryTag = function(mainTag, secondaryTag, callback) {
 		// saves the newly created secondary tag "secondaryTag" in the database		
 		Modules.TagManager.updSecTags(mainTag, secondaryTag, callback);		
 	}
 	
+	/**
+ 	* updates the secondary tag 
+ 	* @function updateSecondaryTagName
+ 	* @param {int} mainTagId
+ 	* @param {String} oldName
+ 	* @param {String} newName
+	* @param callback
+ 	*/
 	this.updateSecondaryTagName = function(mainTagID, oldName, newName, callback){
 		// updates the name of the secondary tag "oldName" to "newName"  
 		Modules.TagManager.updSecTagName(mainTagID, oldName, newName, function(result){
@@ -96,6 +136,14 @@ GUI.tagManager = new function() {
 		});
 	}
 	
+	/**
+ 	* moves the secondary tag 
+ 	* @function moveSecTag
+ 	* @param oldMainTag 
+ 	* @param newMainTag
+ 	* @param secTag
+	* @param callback
+ 	*/
 	this.moveSecTag = function(oldMainTag, newMainTag, secTag, callback){
 		// moves the secondary tag "secTag" from main tag "oldMainTag" to "newMainTag"
 		Modules.TagManager.moveSecTag(oldMainTag, newMainTag, secTag, function(result){
@@ -105,6 +153,13 @@ GUI.tagManager = new function() {
 		});
 	}
 	
+	/**
+ 	* deletes the secondary tag 
+ 	* @function deleteSecondaryTag
+ 	* @param mainTag 
+ 	* @param secondaryTag
+	* @param callback
+ 	*/
 	this.deleteSecondaryTag = function(mainTag, secondaryTag, callback){
 		// deletes the secondary tag "secondaryTag" from the database
 		Modules.TagManager.deleteSecTags(mainTag, secondaryTag, function(result){
@@ -112,6 +167,12 @@ GUI.tagManager = new function() {
 		});
 	}
 	
+	/**
+ 	* Checks the existence of secondary tag
+ 	* @function checkExistenceOfSecondaryTag
+ 	* @param secondaryTag 
+ 	* @param {int} mainTagId
+ 	*/
 	this.checkExistenceOfSecondaryTag = function(secondaryTag, mainTagId){
 		var that = GUI.tagManager;
 		var secondaryTagExists = false;
@@ -131,12 +192,20 @@ GUI.tagManager = new function() {
 		return secondaryTagExists;
 	}
 		
+	/**
+ 	* allows sorting based on tags
+ 	* @function enableSortable
+ 	*/	
 	this.enableSortable = function() {
 		var that = GUI.tagManager;
 		$( ".connectedSortable" ).sortable(that.$sortableOptions).disableSelection();
 		
 	}
 	
+	/**
+ 	* allows editing of tags
+ 	* @function enableEditable
+ 	*/	
 	this.enableEditable = function() {
 		var that = GUI.tagManager;
 		$('.editable').editable(function(value, settings) {
@@ -238,7 +307,10 @@ GUI.tagManager = new function() {
 		);	
 	}
 			
-	//initialization of the dialog
+	/**
+	* initialization of the dialog
+	* @function init
+	*/
 	this.init = function() {
 			
 		var that = GUI.tagManager;
@@ -259,6 +331,9 @@ GUI.tagManager = new function() {
 			 
 	}
 	
+	/**
+	* @function bindEvents
+	*/
 	this.bindEvents = function() {
 		//Shows or hides secondary tags
 		$("#main-tag-container").delegate(".portlet-toggle", "click", function() {
@@ -351,7 +426,10 @@ GUI.tagManager = new function() {
 		
 	}
 	
-	//sets the content of the dialog 
+	/** 
+	* sets the content of the dialog 
+	* @function setDialogContent
+	*/
 	this.setDialogContent = function(){		
 		var mainTagTemplate = $("#tag-manager-content-tmpl").html();
 		this.dialogDom = $(mainTagTemplate);
