@@ -1,11 +1,16 @@
 "use strict";
 
+/**
+ * @file 1.toolbar.js
+ */
+
 /* SETTINGS */
 var popover_positionOffsetX = 8;
 var popover_positionOffsetY = 21;
 
 /**
  * Init. the toolbar
+ * @function initToolbar
  */
  GUI.initToolbar = function() {
 
@@ -217,7 +222,10 @@ var popover_positionOffsetY = 21;
 
 
     }
-
+	
+	/**
+	* @function effect
+	*/
     var effect = function() {
       $(this).animate({opacity: 1}, 500, function() {
         $(this).animate({opacity: 0.6}, 500);
@@ -642,6 +650,7 @@ if (!Modules.Config.presentationMode) {
   $(bugButton).attr("title", GUI.translate("Bugreport"));
 
   $("#header > .header_tabs_sidebar").append(bugButton);
+
 
   var click = function() {
     GUI.sidebar.openPage("bug", bugButton);
