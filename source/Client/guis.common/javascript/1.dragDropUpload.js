@@ -1,12 +1,13 @@
 "use strict";
-
 /**
  * Upload of files via drag and drop (HTML5)
+ * @class dragDropUpload
  */
 $(function() {
 
 	/**
 	 * called when an object was dropped
+	 * @function drop
 	 * @param {event} event The drop event
 	 */
 	var drop = function(event) {
@@ -26,6 +27,14 @@ $(function() {
 			/* get dropped files */
 			var files = event.dataTransfer.files;
 			
+	/**
+	 * @function upload
+	 * @param file
+	 * @param {int} x
+	 * @param {int} y
+	 * @param callback
+	 */
+
 			var upload = function(file, x, y, callback){
 					
 				var progressBarId = GUI.progressBarManager.addProgress(GUI.translate("Create file object"));
@@ -88,7 +97,12 @@ $(function() {
 					
 			}
 			
-			
+	/**
+	 * @function doRecursion
+	 * @param {int} i
+	 */
+
+	
 			var doRecursion = function(i){
 				if (i < files.length) {
 					if(i != 0){

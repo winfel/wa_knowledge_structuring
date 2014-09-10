@@ -15,6 +15,7 @@ Viewer.register = function(type) {
   GeneralObject = Modules.ObjectManager.getPrototype('GeneralObject');
   GeneralObject.register.call(this, type);
 
+
   // Registers the available rights ...
   this.registerRight("create", "You may create new content within this viewer.");
   this.registerRight("read",   "You may access the content within this viewer.");
@@ -23,7 +24,8 @@ Viewer.register = function(type) {
   // ... and default roles for this object.
   this.registerDefaultRole("Reader", ["read"]);
   this.registerDefaultRole("Coworker", ["create", "read"]);
-  
+
+  this.makeSensitive();
   this.registerAttribute('file', {type: 'text', changedFunction: function(object, value) {
       object.reloadDocument(value);
     }});

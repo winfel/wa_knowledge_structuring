@@ -1,14 +1,16 @@
 "use strict";
-
+/**
+ * @class actionsheet
+ */
 /**
  * actionsheets are horizontal context menus
  */
 
 /**
- * 
  *  Hides the currently visible actionsheet
- *   
+ *  @function hideActionsheet
  */
+ 
 GUI.hideActionsheet = function() {
 
 	$("#actionsheet").hide();
@@ -18,9 +20,8 @@ GUI.hideActionsheet = function() {
 
 
 /**
- * 
  * Shows the actionsheet at position (x,y) (opt.: bound to a webarena object)
- * 
+ * @function showActionsheet
  * @param {int} x	initial x position
  * @param {int} y	initial y position
  * @param {object} webarenaObject	webarena object to bind actionsheet to

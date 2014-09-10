@@ -5,6 +5,10 @@
 *
 */	
 
+/**
+* @function draw
+* @param external
+*/
 GlobalContainer.draw=function(external){
 	var rep=this.getRepresentation();
 	
@@ -50,7 +54,10 @@ GlobalContainer.updateInnerHeight = function() {
 	
 }
 
-
+/**
+* @param parent
+* @return {undefined}
+*/
 GlobalContainer.createRepresentation = function(parent) { 	
 	
 	var rep = GUI.svg.other(parent,"foreignObject");
@@ -74,6 +81,9 @@ GlobalContainer.adjustControls = function() {
 	GeneralObject.adjustControls.call(this);
 }
 
+/**
+* @param rep
+*/
 GlobalContainer.drawContent = function(rep){
 
 	var that = this;
@@ -396,7 +406,9 @@ GlobalContainer.drawContent = function(rep){
 	});	
 }
 
-
+/**
+* @param files
+*/
 GlobalContainer.addFiles = function(files){
 	
 	var that = this;
@@ -521,6 +533,7 @@ GlobalContainer.upd = function(){
 	var rep=this.getRepresentation();
 	
 	$(rep).find(".ui-widget-content").remove();
+	$(rep).find("#sortablefiles").html("");
 	
 	$(rep).find(".spinner").remove();
 

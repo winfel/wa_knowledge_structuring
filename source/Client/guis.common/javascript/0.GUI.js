@@ -1,7 +1,8 @@
 "use strict";
 
 /**
- * @namespace holds methods and variables for GUI
+ * holds methods and variables for GUI
+ * @class GUI
  */
 var GUI = {};
 
@@ -15,7 +16,7 @@ GUI.currentLanguage = Modules.Config.language;
 /**
  * This is called then forward or backwards-buttons are used in the browser.
  * See ObjectManager.onload for pushState.
- * 
+ * @function onpopstate
  * @param {type} event
  * @returns {undefined}
  */
@@ -31,24 +32,26 @@ window.onpopstate = function(event) {
   }
 };
 
-
 GUI.translationManager = Object.create(TranslationManager);
+
+/**
+*@function init
+* @param undefined
+*/
 GUI.translationManager.init(undefined);
 
 /**
- * 
+ * @function setTranslations
  * @param {type} language
  * @param {type} data
- * @returns {GUI@pro;translationManager@call;addTranslations}
  */
 GUI.setTranslations = function(language, data) {
   return this.translationManager.addTranslations(language, data);
 };
 
 /**
- * 
+ * @function translate
  * @param {type} text
- * @returns {GUI@pro;translationManager@call;get}
  */
 GUI.translate = function(text) {
   return this.translationManager.get(this.currentLanguage, text);
@@ -61,6 +64,8 @@ GUI.translate = function(text) {
 GUI.isTouchDevice = false;
 
 /**
+ * @function updateGUI
+ * @param {webarenaObject} webarenaObject
  * @deprecated still needed?
  */
 GUI.updateGUI = function(webarenaObject) {
@@ -69,7 +74,7 @@ GUI.updateGUI = function(webarenaObject) {
 
 /**
  * Check room size on browser window resize
- * 
+ * @function initResizeHandler
  * @returns {undefined}
  */
 GUI.initResizeHandler = function() {
@@ -80,8 +85,8 @@ GUI.initResizeHandler = function() {
 
 /**
  * Set room width and height depending on objects in room
- * 
- * @param {webarenaObject} [webarenaObject] concrete object to check for
+ * @function adjustContent
+ * @param  {webarenaObject} [webarenaObject] concrete object to check for
  */
 GUI.adjustContent = function(webarenaObject) {
 
@@ -151,7 +156,7 @@ GUI.adjustContent = function(webarenaObject) {
 
 /**
  * Set width of room / svg area
- * 
+ * @function setRoomWidth
  * @param {int} width new width of the room
  */
 GUI.setRoomWidth = function(width) {
@@ -172,7 +177,7 @@ GUI.setRoomWidth = function(width) {
 
 /**
  * Set height of room / svg area
- * 
+ * @function setRoomHeight
  * @param {int} height new height of the room
  */
 GUI.setRoomHeight = function(height) {
@@ -192,8 +197,8 @@ GUI.setRoomHeight = function(height) {
 };
 
 /**
- * 
- * Deselects all objects in the current room
+  * Deselects all objects in the current room
+  * @function deselectAllObjects
  */
 GUI.deselectAllObjects = function() {
   $.each(ObjectManager.getSelected(), function(index, object) {
@@ -210,7 +215,7 @@ GUI.shiftKeyDown = false;
 
 /**
  * Add event handlers for shift key
- * 
+ * @function initShiftKeyHandling
  * @returns {undefined}
  */
 GUI.initShiftKeyHandling = function() {
@@ -245,7 +250,7 @@ GUI.blockKeyEvents = false;
 
 /**
  * Add event handlers for object movement by arrow-keys.
- * 
+ * @function initMoveByKeyboard
  * @returns {undefined}
  */
 GUI.initMoveByKeyboard = function() {
@@ -297,7 +302,7 @@ GUI.initMoveByKeyboard = function() {
 };
 
 /**
- * 
+ * @function initUndoByKeyboard
  * @returns {undefined}
  */
 GUI.initUndoByKeyboard = function() {
@@ -313,7 +318,7 @@ GUI.initUndoByKeyboard = function() {
 
 /**
  * Add event handler for removing selected objects by pressing delete-key
- * 
+ * @function initObjectDeletionByKeyboard
  * @returns {undefined}
  */
 GUI.initObjectDeletionByKeyboard = function() {
@@ -347,7 +352,7 @@ GUI.initObjectDeletionByKeyboard = function() {
 
 /**
  * Add event handler for copy, cut and paste by ctrl + c, ctrl + x, ctrl + v
- * 
+ * @function initObjectCopyCutPasteHandlingByKeyboard
  * @returns {undefined}
  */
 GUI.initObjectCopyCutPasteHandlingByKeyboard = function() {
@@ -379,7 +384,7 @@ GUI.initObjectCopyCutPasteHandlingByKeyboard = function() {
 
 /**
  * Add event handler for object selection (based on clicked position and layers)
- * 
+ * @function initMouseHandler
  * @returns {undefined}
  */
 GUI.initMouseHandler = function() {
@@ -503,9 +508,9 @@ GUI.initMouseHandler = function() {
 
 /**
  * Get the topmost object at point x,y which is visible
+ *@function getObjectAt
  * @param {int} x x position
- * @param {int} y y position
- * 
+ * @param {int} y y position * 
  * @returns {type} description
  */
 GUI.getObjectAt = function(x, y) {
@@ -535,6 +540,7 @@ GUI.previewableMimeTypes = undefined;
 
 /**
  * Load list of mime types for GUI.previewableMimeTypes
+ * @function loadListOfPreviewableMimeTypes
  */
 GUI.loadListOfPreviewableMimeTypes = function() {
   /* get list of inline displayable mime types */
@@ -547,7 +553,7 @@ GUI.loadListOfPreviewableMimeTypes = function() {
 
 /**
  * Check if a preview image can be generated for an object with the given mime type.
- * 
+ * @function mimeTypeIsPreviewable
  * @param {String} mimeType mime type to check for
  */
 GUI.mimeTypeIsPreviewable = function(mimeType) {
@@ -566,7 +572,7 @@ GUI.mimeTypeIsPreviewable = function(mimeType) {
 
 /**
  * GUI specific display of general messages (and complex control dialogs)
- * 
+ * @function dialog
  * @param {String} heading A title for the dialog
  * @param {String|DOMObject} content A message or DOM object that will be used as the body of the dialog
  * @param {Object} [buttons] The Buttons of the dialog (e.g. close, save, ...)
@@ -639,7 +645,7 @@ GUI.dialog = function(heading, content, buttons, dialogWidth, passThrough) {
 
 /**
  * GUI specific display of errors
- * 
+ * @function error
  * @param {String} heading A title for the upload dialog
  * @param {String} message A message including the errors message
  * @param {webarenaObject} [webarenaObject] An optional webarena object the error is related to
@@ -676,6 +682,7 @@ GUI.error = function(heading, message, webarenaObject, fatal) {
 
 /**
  * called when the socket is disconnected
+ * @function disconnected
  */
 GUI.disconnected = function() {
   GUI.showDisconnected();
@@ -685,6 +692,7 @@ GUI.disconnected = function() {
 
 /**
  * Called when the socket is connected
+ * @function connected
  */
 GUI.connected = function() {
   if (GUI.relogin === true) {
@@ -699,6 +707,7 @@ GUI.connected = function() {
 
 /**
  * Display a error message on disconnect
+ * @function showDisconnected
  */
 GUI.showDisconnected = function() {
 
@@ -712,6 +721,7 @@ GUI.showDisconnected = function() {
 
 /**
  * Timer to prevent objects "flying in" when getting a bunch of new objects (room load)
+ * @function startNoAnimationTimer
  */
 GUI.startNoAnimationTimer = function() {
   GUI.noAnimation = window.setTimeout(function() {
@@ -721,8 +731,9 @@ GUI.startNoAnimationTimer = function() {
 
 /**
  * Ask user to confirm the question in the message
- * 
+ * @function confirm
  * @param {String}  message   The question that the user has to confirm.
+ * @return {String} .
  */
 GUI.confirm = function(message) {
   return confirm(message);

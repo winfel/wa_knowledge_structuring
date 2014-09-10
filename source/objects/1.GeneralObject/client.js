@@ -7,18 +7,21 @@
  *
  */
 
-
 GeneralObject.content = false;
 GeneralObject.contentFetched = false;
 GeneralObject.hasContent = false;
 GeneralObject.normalOpacity = 1;
 
+/**
+ * @function setContent
+ * @param content
+ */
 GeneralObject.setContent = function(content) {
   this.content = content;
   this.contentFetched = true;
 
   this.serverCall('setContent', content, this.afterSetContent);
-}
+};
 
 /**
  * Call RPC-Method on server-side. Could be called like:
@@ -59,15 +62,20 @@ GeneralObject.serverCall = function() {
       name: remoteFnName,
       params: args
     }
-  }
+  };
 
   if (callback)
     Modules.Dispatcher.query('serverCall', remoteCall, callback);
   else
     Modules.Dispatcher.query('serverCall', remoteCall);
 
-}
+};
 
+/**
+ * @function fetchContent
+ * @param worker
+ * @param forced
+ */
 GeneralObject.fetchContent = function(worker, forced) {
 
   if (this.contentURLOnly)
@@ -76,7 +84,7 @@ GeneralObject.fetchContent = function(worker, forced) {
   if (!worker)
     worker = function(data) {
       //console.log(data);
-    }
+    };
 
   if (this.contentFetched && forced !== true) {
     worker(this.content);
@@ -91,11 +99,15 @@ GeneralObject.fetchContent = function(worker, forced) {
     that.contentFetched = true;
     worker(newContent);
     return;
-  }
+  };
 
   this.serverCall('getContent', functionLoadedCallback);
-}
+};
 
+/**
+ * @function getContentAsString
+ * @return {undefined}
+ */
 GeneralObject.getContentAsString = function(callback) {
   if (callback === undefined) {
     if (!this.contentFetched) {
@@ -108,22 +120,33 @@ GeneralObject.getContentAsString = function(callback) {
       callback(GeneralObject.utf8.parse(content));
     });
   }
-}
+};
 
+/**
+ * @function getContentAsString
+ * @return {Boolean}
+ */
 GeneralObject.hasContent = function() {
   return this.getAttribute('hasContent');
-}
+};
 
+/**
+ * @function contentUpdated
+ */
 GeneralObject.contentUpdated = function() {
   var that = this;
   this.contentFetched = false;
   this.fetchContent(function() {
     that.draw();
   }, true);
-}
+};
 
 
-//triggered by non local change of values
+
+/**
+ * Triggered by non local change of values
+ * @function refresh
+ */
 GeneralObject.refresh = function() {
 
   //do not trigger a draw if the refreshed object is the room object
@@ -133,17 +156,28 @@ GeneralObject.refresh = function() {
   if (this.moving)
     return;
   this.draw(true);
-}
+};
 
-
+/**
+ * @function getPreviewContentURL
+ * @return {String}
+ */
 GeneralObject.getPreviewContentURL = function() {
   return "/getPreviewContent/" + this.getRoomID() + "/" + this.id + "/" + this.getAttribute('contentAge') + "/" + ObjectManager.userHash;
-}
+};
 
+/**
+ * @function getContentURL
+ * @return {String}
+ */
 GeneralObject.getContentURL = function() {
   return "/getContent/" + this.getRoomID() + "/" + this.id + "/" + this.getAttribute('contentAge') + "/" + ObjectManager.userHash;
-}
+};
 
+/**
+ * @function create
+ * @param atrributes
+ */
 GeneralObject.create = function(attributes) {
 
   if (attributes === undefined) {
@@ -155,8 +189,11 @@ GeneralObject.create = function(attributes) {
 
   ObjectManager.createObject(this.type, attributes);
 
-}
+};
 
+/**
+ * @function removeRepresentation
+ */
 GeneralObject.removeRepresentation = function() {
 
   var rep = this.getRepresentation();
@@ -165,28 +202,48 @@ GeneralObject.removeRepresentation = function() {
 
   $(rep).remove();
 
-}
-
-
-GeneralObject.getIconPath = function() {
-  return "/objectIcons/" + this.getType();
-}
-
-GeneralObject.justCreated = function() {
-  //react on client side if an object has just been created and needs further input
-  //GUI.rightmanagerDialog.show(this);
 };
 
-GeneralObject.getRoom = function() {
-  return Modules.ObjectManager.getCurrentRoom();
-}
-
-GeneralObject.getCurrentUserName = function() {
-  return Modules.ObjectManager.getUser().username;
-}
+/**
+ * @function getIconPath
+ * @return {String}
+ */
+GeneralObject.getIconPath = function() {
+  return "/objectIcons/" + this.getType();
+};
 
 /**
- *	determine if the current object intersects with the square x,y,width,height
+ * @function justCreated
+ */
+GeneralObject.justCreated = function() {
+  //react on client side if an object has just been created and needs further input
+  GUI.rightmanagerDialog.show(this);
+};
+
+/**
+ * @function getRoom
+ * @return {undefined}
+ */
+GeneralObject.getRoom = function() {
+  return Modules.ObjectManager.getCurrentRoom();
+};
+
+/**
+ * @function getCurrentUserName
+ * @return {undefined}
+ */
+GeneralObject.getCurrentUserName = function() {
+  return Modules.ObjectManager.getUser().username;
+};
+
+/**
+ *	Determine if the current object intersects with the square x,y,width,height
+ * @function boxInsersectsWith
+ * @param otherx
+ * @param othery
+ * @param otherwidth
+ * @param otherheight
+ * return {Boolean}
  */
 GeneralObject.boxIntersectsWith = function(otherx, othery, otherwidth, otherheight) {
   if (!this.isGraphical)
@@ -208,10 +265,13 @@ GeneralObject.boxIntersectsWith = function(otherx, othery, otherwidth, otherheig
 
   return true;
 
-}
+};
 
 /**
- *	determine if the current object intersects with oanother object
+ * Determine if the current object intersects with oanother object
+ * @function intersectsWith
+ * @param other
+ * @return {Boolean}
  */
 GeneralObject.intersectsWith = function(other) {
   var otherx = other.getViewBoundingBoxX();
@@ -221,6 +281,21 @@ GeneralObject.intersectsWith = function(other) {
 
   return this.boxIntersectsWith(otherx, othery, otherw, otherh);
 
+};
+
+/**
+ * @function hasPixelAt
+ * @param x
+ * @param y
+ * @return {Boolean}
+ */
+GeneralObject.hasPixelAt = function(x, y) {
+
+  //assume, that the GeneralObject is full of pixels.
+  //override this if you can determine better, where there
+  //object is nontransparent
+
+  return this.boxIntersectsWith(x, y, 0, 0);
 };
 
 GeneralObject.hasPixelAt = function(x, y) {

@@ -5,10 +5,16 @@
 *
 */
 
+/**
+* @return {undefined}
+*/
 PaperSpace.getStatusIcon = function() {
 	return this.getIconPath() + "/paper";
 }
 
+/**
+* @return {undefined}
+*/
 PaperSpace.getIconText = function() {
     return this.getAttribute("name");
 }

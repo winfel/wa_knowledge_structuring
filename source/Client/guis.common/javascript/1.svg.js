@@ -1,10 +1,14 @@
 "use strict";
 
+/**
+ * @file 1.svg.js
+ */
 /* SVG */
 // http://keith-wood.name/svgRef.html
 
 /**
  * Refresh the SVG
+ * @function refreshSVG
  */
 GUI.refreshSVG = function() {
 	$("#room_left").hide().show();
@@ -13,6 +17,7 @@ GUI.refreshSVG = function() {
 
 /**
  * Create the SVG area
+ * @function initSVG
  */
 GUI.initSVG = function() {
 	
@@ -51,6 +56,7 @@ GUI.initSVG = function() {
 
 /**
  * Resort all svg elements by their layer
+ * @function updateLayers
  */
 GUI.updateLayers = function() {
 	// in coupling mode refresh layers of both rooms
@@ -112,6 +118,7 @@ GUI.updateLayersDelayedTimer = undefined;
 
 /**
  * Resort all svg elements by their layer (delayed by 1 sec.)
+ * @function updateLayersDelayed
  */
 GUI.updateLayersDelayed = function() {
 	
@@ -126,6 +133,7 @@ GUI.updateLayersDelayed = function() {
 
 /**
  * Get DOM ID of svg marker (svg markers are used to define design of arrow line caps)
+ * @function getSvgMarkerId
  * @param {String} type Type of the marker (e.g. "arrow")
  * @param {String} color Color of the marker
  * @param {bool} up True if the direction of the marker is up

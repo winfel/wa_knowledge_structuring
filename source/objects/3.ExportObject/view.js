@@ -175,6 +175,9 @@ ExportObject.createExportIcons = function(rep) {
 			width: 32,
 			height: 32,
 		});
+		// a title
+		GUI.svg.title(box,
+			exportOptions[i]);
 		// a rect for border
 		GUI.svg.rect(box,
 			0,

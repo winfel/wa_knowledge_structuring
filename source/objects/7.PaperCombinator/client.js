@@ -1,11 +1,21 @@
+/**
+* @param obj
+*/
 PaperCombinator.filterObject = function(obj) {
 
 }
 
+/**
+* @param id
+* @param name
+*/
 PaperCombinator.selectFile = function(id, name) {
 
 }
 
+/**
+* @return {Boolean}
+*/
 PaperCombinator.hasContent = function() {
     return true;
 }

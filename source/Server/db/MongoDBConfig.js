@@ -30,16 +30,25 @@ MongoDBConfig.init = function() {
     }
 }
 
+/**
+* @return {undefined}
+*/
 MongoDBConfig.getURI = function() {
     return uri; 
 }
 
+/**
+* @return {undefined}
+*/
 MongoDBConfig.getPath2bin = function() {
     return path2bin; 
 }
 
-// URI Format: http://docs.mongodb.org/manual/reference/connection-string/
-// example 'mongodb://username:password@host:port/database?options...';
+/**
+* URI Format: http://docs.mongodb.org/manual/reference/connection-string/
+* example 'mongodb://username:password@host:port/database?options...';
+* @return {undefined}
+*/
 var createURI = function() {
     var uri = 'mongodb://';
     

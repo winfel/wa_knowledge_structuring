@@ -6,6 +6,7 @@ var Modules = false;
 
 /**
  * Object providing functions for object management
+ * @class ObjectManager
  */
 var ObjectManager = {
 	get user(){
@@ -46,9 +47,8 @@ ObjectManager.prototypes = {};
 ObjectManager.clipBoard = {};
 
 /**
- * 
  * Registers an object type, so an object of that type can be created using the ObjectManager
- * 
+ * @function registerType
  * @param type
  * @param constr
  */
@@ -57,9 +57,7 @@ ObjectManager.registerType = function(type, constr) {
 };
 
 /**
- * 
- * Returns an array of all prototypes  
- * 
+ * @function getTypes
  * @returns {Array} array of prototypes
  */
 ObjectManager.getTypes = function() {
@@ -67,9 +65,7 @@ ObjectManager.getTypes = function() {
 };
 
 /**
- * 
- * Returns the prototype of an object 
- * 
+ * @function getPrototype
  * @param objType
  * @returns	The prototype of the object
  */
@@ -85,11 +81,9 @@ ObjectManager.getPrototype = function(objType) {
 }
 
 /**
- * 
- * Returns the index of an object (important in coupling mode) otherwise it always returns default value 'left'
- * 
- * @param objectID
- * @returns {string} 
+ * @function getIndexOfObject
+ * @param {String} objectID
+ * @returns {string} Returns the index of an object (important in coupling mode) otherwise it always returns default value 'left'
  */
 ObjectManager.getIndexOfObject = function(objectID) {
     
@@ -110,9 +104,7 @@ ObjectManager.getIndexOfObject = function(objectID) {
 }
 
 /**
- * 
- *  Returns an object specified by objectID
- *  
+ *  @function getObject
  *  @param  {string} objectID    The ID of the object that should be returned  
  *  @return {object}    The object having the specified ID
  */
@@ -135,7 +127,7 @@ ObjectManager.getObject = function(objectID) {
 /**
  * 
  *  Creates an object of a type 'type' with attributes specified by 'attributes'
- * 
+ * @function buildObject
  *  @param  {string} type    
  *  @param  {object} attributes    
  *  @return {object}    the created object
@@ -178,13 +170,10 @@ ObjectManager.buildObject = function(type, attributes) {
 
 }
 
-/**
- * getObjects - get an array of all objects including the room
- */
 
 /**
  *  Gets an array of all objects in the room
- *
+ * @function getObjects
  *  @param  {string} index  
  *  @returns {Array}    array of objects
  */
@@ -197,12 +186,8 @@ ObjectManager.getObjects = function(index) {
 ObjectManager.getInventory = ObjectManager.getObjects;
 
 /**
- * getObjectsByLayer - get an array of all objects ordered by layer (highest layer first)
- */
-
-/**
  *  Gets an array of all objects ordered in ascending layer order (highest layer first)
- *  
+ *  @function getObjectsByLayer
  *  @param  {string} index  
  *  @returns {Array}    array of objects
  */
@@ -239,15 +224,9 @@ ObjectManager.getObjectsByLayer = function(index) {
 
 }
 
-
-/**
- * getObjectsByLayer - get an array of all objects ordered by layer (lowest layer first)
- */
-
-
 /**
  *  Gets an array of all objects ordered in descending layer order (lowest layer first)     
- *  
+ *  @function getObjectsByLayerInverted
  *  @param  {string} index
  *  @returns {Array}    array of objects
  */
@@ -263,11 +242,8 @@ ObjectManager.getObjectsByLayerInverted = function(index) {
 
 
 /**
- *	hasObject - determine, if an object is within the current inventory
- */
-/**
  *  Checks whether an object is in the current inventory
- *  
+ *  @function hasObject
  *  @param  {object} obj
  *  @returns {Boolean}    array of objects
  */
@@ -278,9 +254,8 @@ ObjectManager.hasObject = function(obj) {
 
 /**
  *  Updates the old object attributes with the new ones specified in 'data'
- * 
+ *  @function objectUpdate
  *  @param  {object} data    new attribute values of the object
- *  
  */
 ObjectManager.objectUpdate = function(data) {
   var object = ObjectManager.getObject(data.id);
@@ -332,7 +307,13 @@ ObjectManager.objectUpdate = function(data) {
   }
 
 }
-
+/**
+ *  @function attributeChanged
+ *  @param  {type} object
+ *  @param  {type} key
+ *  @param  {type} newValue
+ *  @param  {type} local
+ */
 ObjectManager.attributeChanged = function(object, key, newValue, local) {
 
   if (!object.attributeManager.getAttributes()[key])
@@ -351,15 +332,29 @@ ObjectManager.attributeChanged = function(object, key, newValue, local) {
 }
 
 ObjectManager.informGUI = false;
+
+
+/**
+ *  @function registerAttributeChangedFunction
+ *  @param  {function} theFunction
+ */
 ObjectManager.registerAttributeChangedFunction = function(theFunction) {
   this.informGUI = theFunction;
 }
 
+/**
+ *  @function contentUpdate
+ *  @param  {object} data    new attribute values of the object
+ */
 ObjectManager.contentUpdate = function(data) {
   var object = ObjectManager.getObject(data.id);
   object.contentUpdated();
 }
 
+/**
+ *  @function remove
+ *  @param  {type} object
+ */
 ObjectManager.remove = function(object) {
   var that = this;
   if (!this.transactionId) {
@@ -384,7 +379,10 @@ ObjectManager.remove = function(object) {
     'userId': GUI.userid
   });
 };
-
+/**
+ *  @function removeLocally
+ *  @param  {object} data
+ */
 ObjectManager.removeLocally = function(data) {
   var object = ObjectManager.getObject(data.id);
 
@@ -396,6 +394,12 @@ ObjectManager.removeLocally = function(data) {
   delete(ObjectManager.objects[ObjectManager.getIndexOfObject(data.id)][data.id]);
 };
 
+/**
+ *  @function login
+ *  @param  {String} username
+ *  @param  {String} password
+ *  @param  {type} externalSession
+ */
 ObjectManager.login = function(username, password, externalSession) {
   if (!username)
     username = 'guest';
@@ -408,7 +412,9 @@ ObjectManager.login = function(username, password, externalSession) {
   });
 };
 
-
+/**
+ *  @function goParent
+ */
 ObjectManager.goParent = function() {
   var parent = ObjectManager.getCurrentRoom().getAttribute('parent');
   if (parent) {
@@ -418,10 +424,16 @@ ObjectManager.goParent = function() {
   }
 };
 
+/**
+ *  @function goHome
+ */
 ObjectManager.goHome = function() {
   ObjectManager.loadRoom(ObjectManager.user.home);
 };
 
+/**
+ *  @function loadRoom
+ */
 ObjectManager.loadRoom = function(roomid, byBrowserNav, index, callback) {
   var self = this;
 
@@ -468,6 +480,13 @@ ObjectManager.loadRoom = function(roomid, byBrowserNav, index, callback) {
 
 }
 
+/**
+ *  @function loadPaperWriter
+ *  @param {type} roomid
+ *  @param {type} byBrowserNav
+ *  @param {type} index
+ *  @param {Function} callback
+ */
 ObjectManager.loadPaperWriter = function(roomid, byBrowserNav, index, callback) {
   var self = this;
 
@@ -507,7 +526,14 @@ ObjectManager.loadPaperWriter = function(roomid, byBrowserNav, index, callback) 
     alert(GUI.translate("Room already displayed"));
   }
 }
-
+/**
+ *  @function loadSpecificSpace
+ *  @param {type} roomid
+ *  @param {type} byBrowserNav
+ *  @param {type} index
+ *  @param {type} space
+ *  @param {Function} callback
+ */
 ObjectManager.loadSpecificSpace = function(roomid, byBrowserNav, index, space, callback) {
   var self = this;
 
@@ -549,6 +575,12 @@ ObjectManager.loadSpecificSpace = function(roomid, byBrowserNav, index, space, c
   }
 }
 
+/**
+ *  @function leaveRoom
+ *  @param {type} roomid
+ *  @param {type} index
+ *  @param {type} serverCall
+ */
 ObjectManager.leaveRoom = function(roomid, index, serverCall) {
   var self = this;
 
@@ -584,6 +616,14 @@ ObjectManager.leaveRoom = function(roomid, index, serverCall) {
   }
 }
 
+/**
+ *  @function createObject
+ *  @param {type} type
+ *  @param {type} attributes
+ *  @param {type} content
+ *  @param {Function} callback
+ *  @param {type} index
+ */
 ObjectManager.createObject = function(type, attributes, content, callback, index) {
   if (!index)
     var index = 'left';
@@ -626,7 +666,9 @@ ObjectManager.createObject = function(type, attributes, content, callback, index
 
   });
 }
-
+/**
+ *  @function init
+ */
 ObjectManager.init = function() {
   this.transactionId = false;
   this.transactionTimeout = 500;
@@ -690,9 +732,16 @@ ObjectManager.init = function() {
     GUI.error("server error", data, false, true);
   });
   
-  Modules.Dispatcher.registerCall('newObjectForCustomContainer', function(data) {
+  Modules.Dispatcher.registerCall('newObjectForContainer', function(data) {
+  
     var con = ObjectManager.getObject(data.ContainerId);
-	con.newFile(data.objectId);
+	
+	if(data.type == "custom"){
+		con.newFile(data.objectId);
+	}
+	if(data.type == "favourite" || data.type == "reference"){
+		con.upd();
+	}
   });
 
   Modules.Dispatcher.registerCall('inform', function(data) {
@@ -776,20 +825,28 @@ ObjectManager.init = function() {
 
   });
 }
-
+/**
+ *  @function getRoomID
+ *  @param {type} index
+ */
 ObjectManager.getRoomID = function(index) {
   if (!index)
     var index = 'left';
   return this.currentRoomID[index];
 }
-
+/**
+ *  @function getCurrentRoom
+ *  @param {type} index
+ */
 ObjectManager.getCurrentRoom = function(index) {
   if (!index)
     var index = 'left';
   return this.currentRoom[index];
 }
 
-
+/**
+ *  @function getSelected
+ */
 ObjectManager.getSelected = function() {
   var result = [];
 
@@ -807,7 +864,9 @@ ObjectManager.getSelected = function() {
   return result;
 }
 
-
+/**
+ *  @function getActionsForSelected
+ */
 ObjectManager.getActionsForSelected = function() {
 
   var selectedObjects = this.getSelected();
@@ -838,7 +897,11 @@ ObjectManager.getActionsForSelected = function() {
 
 }
 
-
+/**
+ *  @function performActionForSelected
+ *  @param {type} actionName
+ *  @param {type} clickedObject
+ */
 ObjectManager.performActionForSelected = function(actionName, clickedObject) {
 
   var selectedObjects = this.getSelected();
@@ -850,7 +913,10 @@ ObjectManager.performActionForSelected = function(actionName, clickedObject) {
 
 }
 
-
+/**
+ *  @function renumberLayers
+ *  @param {type} noUpdate
+ */
 ObjectManager.renumberLayers = function(noUpdate) {
 
   /* get all objects and order by layer */
@@ -889,15 +955,25 @@ ObjectManager.renumberLayers = function(noUpdate) {
   }
 
 }
-
+/**
+ *  @function getUser
+ * @returns the user
+ */
 ObjectManager.getUser = function() {
   return this.user;
 }
-
+/**
+ *  @function serverMemoryInfo
+ */
 ObjectManager.serverMemoryInfo = function() {
   ObjectManager.Modules.Dispatcher.query('memoryUsage', '', console.log);
 }
-
+/**
+ *  @function inform
+ *  @param {type} type
+ *  @param {type} content
+ *  @param {type} index
+ */
 ObjectManager.inform = function(type, content, index) {
   var data = {};
   data.message = {};
@@ -909,26 +985,45 @@ ObjectManager.inform = function(type, content, index) {
   ObjectManager.Modules.Dispatcher.query('inform', data);
 }
 
+/**
+ *  @function tell
+ *  @param {type} text
+ */
 ObjectManager.tell = function(text) {
   ObjectManager.inform('text', text);
 }
-
+/**
+ *  @function informAboutSelection
+ *  @param {String} id
+ */
 ObjectManager.informAboutSelection = function(id) {
   ObjectManager.inform('selection', id, ObjectManager.getIndexOfObject(id));
 }
-
+/**
+ *  @function informAboutDeselection
+ *  @param {String} id
+ */
 ObjectManager.informAboutDeselection = function(id) {
   ObjectManager.inform('deselection', id, ObjectManager.getIndexOfObject(id));
 }
-
+/**
+ *  @function requestAttentionToObject
+ *  @param {String} id
+ */
 ObjectManager.requestAttentionToObject = function(id) {
   ObjectManager.inform('requestAttention', id, ObjectManager.getIndexOfObject(id));
 }
-
+/**
+ *  @function reportBug
+ *  @param {object} data
+ *  @param {Function} callback
+ */
 ObjectManager.reportBug = function(data, callback) {
   ObjectManager.Modules.Dispatcher.query('bugreport', data, callback);
 }
-
+/**
+ *  @function showAll
+ */
 ObjectManager.showAll = function() {
 
   var objects = ObjectManager.getObjects();
@@ -939,7 +1034,10 @@ ObjectManager.showAll = function() {
   }
 
 }
-
+/**
+ *  @function copyObjects
+ *  @param {type} objects
+ */
 ObjectManager.copyObjects = function(objects) {
   if (objects != undefined && objects.length > 0) {
     ObjectManager.clipBoard.cut = false;
@@ -955,7 +1053,10 @@ ObjectManager.copyObjects = function(objects) {
     ObjectManager.clipBoard.objects = array;
   }
 }
-
+/**
+ *  @function cutObjects
+ *  @param {type} objects
+ */
 ObjectManager.cutObjects = function(objects) {
   if (objects != undefined && objects.length > 0) {
     ObjectManager.clipBoard.cut = true;
@@ -971,7 +1072,9 @@ ObjectManager.cutObjects = function(objects) {
     ObjectManager.clipBoard.objects = array;
   }
 }
-
+/**
+ *  @function pasteObjects
+ */
 ObjectManager.pasteObjects = function() {
 
   if (ObjectManager.clipBoard.objects != undefined && ObjectManager.clipBoard.objects.length > 0) {
@@ -1042,7 +1145,10 @@ ObjectManager.pasteObjects = function() {
     }
   }
 }
-
+/**
+ *  @function duplicateObjects
+ *  @param {type} objects
+ */
 ObjectManager.duplicateObjects = function(objects) {
   if (objects != undefined && objects.length > 0) {
 
@@ -1111,7 +1217,12 @@ ObjectManager.duplicateObjects = function(objects) {
     }
   }
 }
-
+/**
+ *  @function moveObjectBetweenRooms
+ *  @param {type} fromRoom
+ *  @param {type} toRoom
+ *  @param {type} cut
+ */
 ObjectManager.moveObjectBetweenRooms = function(fromRoom, toRoom, cut) {
   var objects = ObjectManager.getSelected();
 
@@ -1151,7 +1262,10 @@ ObjectManager.moveObjectBetweenRooms = function(fromRoom, toRoom, cut) {
     });
   }
 }
-
+/**
+ *  @function paintingUpdate
+ *  @param {object} data
+ */
 ObjectManager.paintingUpdate = function(data)
 {
   if (!ObjectManager.getCurrentRoom().getAttribute("showUserPaintings"))

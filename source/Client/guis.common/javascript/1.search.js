@@ -1,13 +1,21 @@
-/* 
+/* *
  * Sidebar: File Search
  */
 
+ /** @static */
 var NON_MATCHING_FILE_OPACITY = 0.3;
+ /** @static */
 var FILE_TYPE_NAME = 'File';
 
+/**
+* @class  search
+* @classdesc  This function is used for  searching and filtering of files in private and global space
+*/
 GUI.search = new function () {
 
-	
+	/**
+	* @function init
+	*/
     this.init = function () {
         var that = GUI.search;
         
@@ -18,12 +26,19 @@ GUI.search = new function () {
         
         var matchedFiles = [];
 
-        // Events
+        /**
+		* Event for searching file name from sidebar
+		* @event #searchFilenameTxt
+		*/
         $("#searchFilenameTxt").keyup(function () {
         	filterByFilename = $("#searchFilenameTxt").val();
         	doFiltering();
         });
         
+		/**
+		* Check box event to search based on file type.
+		* @event #search.
+		*/
         $('#search').delegate('.mimeTypeChk', 'change', function () {
         	var mimeTypeValue = $(this).val();
         	if($(this).is(':checked')) {
@@ -34,7 +49,10 @@ GUI.search = new function () {
         	doFiltering();
         });
        
-                
+        /**
+		* Event for selecting main Tag from dropdown.
+		* @event #mainTagSel
+		*/        
         $("#mainTagSel").change(function () {        	
         	filterByMainTag = $(this).val();       	
         	filterBySecondaryTag = [];
@@ -54,6 +72,10 @@ GUI.search = new function () {
         	});
         });
         
+		/**
+		* Event for checking if mainTag has been selected before selecting secondary tag.
+		* @event #secondaryTagSel
+		*/
         $("#secondaryTagSel").click(function (){        	
         	if($("#mainTagSel").val() == " "){        		
 	        	$("#container-notifier").notify("create", "withIcon", {
@@ -64,6 +86,10 @@ GUI.search = new function () {
         	}
         });
         
+		/**
+		* Event for filtering files based on secondary tag.
+		* @event #secondaryTagSel
+		*/
         $("#secondaryTagSel").change(function () {
         	filterBySecondaryTag = [];
         	$("#secondaryTagSel > option:selected").each(function() {
@@ -71,7 +97,11 @@ GUI.search = new function () {
             });        	
         	doFiltering();
         });
-
+		
+		/** 
+		* Filering of files based on file name, file type, main tag and secondary tag.
+		* @function doFiltering
+		*/
         function doFiltering(){
 			var fileObjects = getFileObjectsFromInventory();
 			var matchByFilename = true;
@@ -138,29 +168,53 @@ GUI.search = new function () {
 									
 		}
         
-        //Reset functions
+        /**
+		* This event is used for resetting all events in search and filter
+		* @event #resetBtn
+		*/
         $("#resetBtn").click(function () { 
         	resetAllFilters();
         });
         
+		/**
+		* This event is used for resetting file name in search and filter
+		* @event #resetFilterByFilenameBtn
+		*/
         $("#resetFilterByFilenameBtn").click(function(){
         	resetFilterByFilename();
         });
         
+		/**
+		* This event is used for resetting file type in search and filter
+		* @event #resetFilterByMimeTypeBtn
+		*/
         $("#resetFilterByMimeTypeBtn").click(function(){
         	resetFilterByMimeType();
         });
         
+		/**
+		* This event is used for resetting main tag in search and filter
+		* @event #resetFilterByMainTagBtn
+		*/
         $("#resetFilterByMainTagBtn").click(function(){
         	resetFilterByMainTag();
         	resetFilterBySecondaryTag();
         	$("#secondaryTagSel").empty(); 
         });
         
+		/**
+		* This event is used for resetting secondary tag in search and filter
+		* @event #resetFilterBySecondaryTagBtn
+		*/
         $("#resetFilterBySecondaryTagBtn").click(function(){
         	resetFilterBySecondaryTag();
         });
         
+		/**
+		* Searches files with file name or resets file name if resetted
+		* @function resetFilterByFilename
+		* @param {string} isGlobalReset  - checks if reset all filter is clicked
+		*/
         function resetFilterByFilename(isGlobalReset){
         	$("#searchFilenameTxt").val('');
         	filterByFilename = "";
@@ -169,6 +223,11 @@ GUI.search = new function () {
         	}        	
         }
         
+		/**
+		* Searches files with file type or resets file type if resetted
+		* @function resetFilterByMimeType
+		 * @param {string} isGlobalReset  - checks if reset all filter is clicked
+		*/
         function resetFilterByMimeType(isGlobalReset){
         	$(".mimeTypeChk").prop('checked', false);
         	filterByMimeType = [];
@@ -177,6 +236,11 @@ GUI.search = new function () {
         	} 
         }        
         
+		/**
+		* Searches files with main tag or resets main tag if resetted
+		* @function resetFilterByMainTag
+		* @param {string} isGlobalReset  - checks if reset all filter is clicked
+		*/
         function resetFilterByMainTag(isGlobalReset){
         	$("#mainTagSel").prop('selectedIndex', 0);
         	filterByMainTag = "";
@@ -185,6 +249,11 @@ GUI.search = new function () {
         	} 
         }
         
+		/**
+		* Searches files with secondary tag or resets secondary tag if resetted
+		* @function resetFilterBySecondaryTag
+		* @param {string} isGlobalReset  - checks if reset all filter is clicked
+		*/
         function resetFilterBySecondaryTag(isGlobalReset){
         	$("#secondaryTagSel option:selected").prop("selected", false);
         	filterBySecondaryTag = [];
@@ -193,6 +262,10 @@ GUI.search = new function () {
         	} 
         }
         
+		/**
+		* Resets all filter if reset button clicked
+		* @function resetAllFilters
+		*/
         function resetAllFilters(){
         	var fileObjects = getFileObjectsFromInventory();
         	$.each( fileObjects, function( key, file ) {
@@ -208,7 +281,12 @@ GUI.search = new function () {
         	$("#matchesCounterSpan").html("");
         }
         
-        //Helper functions
+        /**
+		* Logic to search files based on secondary tags
+		* @function matchArrays
+		* @param {string} arrayA  - secondary tags associated with file
+		* @param {string} arrayB  - secondary tag selected from sidebar
+		*/
         function matchArrays(arrayA, arrayB) {
             var matches = 0;
             for (var i = 0; i < arrayB.length; i++) {
@@ -230,6 +308,11 @@ GUI.search = new function () {
             }
         }
         
+		/**
+		* Searches files from inventory
+		* @function getFileObjectsFromInventory
+		* @returns {array} fileObjects  - files present in room
+		*/
         function getFileObjectsFromInventory(){
         	var inventory = Modules.ObjectManager.getInventory();
         	var fileObjects = [];
@@ -243,6 +326,13 @@ GUI.search = new function () {
             return fileObjects
         }
         
+		/**
+		* Removes element for a file type, checks for fie type been checked		
+		* @function removeElementFromArray
+		 * @param {array} array  - list of file type that are selected initially blank.
+		 * @param {string} itemToBeRemoved  - file type not selected
+		 * @returns {array} array  - selected file type
+		*/
         function removeElementFromArray(array, itemToBeRemoved){
         	array = jQuery.grep(array, function(value) {
         		  return value != itemToBeRemoved;

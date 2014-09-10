@@ -1,4 +1,7 @@
 "use strict";
+/**
+ * @file 1.progressBarManager.js
+ */
 
 /**
  * @namespace Holds functions and variables for displaying a progress bar
@@ -24,6 +27,7 @@ GUI.progressBarManager.visible = false;
 	
 /**
  * Show progress bar manager
+ *@function show
  */
 GUI.progressBarManager.show = function() {
 
@@ -40,6 +44,7 @@ GUI.progressBarManager.show = function() {
 
 /**
  * Hide progress bar manager
+ *@function hide
  */
 GUI.progressBarManager.hide = function() {
 
@@ -59,6 +64,8 @@ GUI.progressBarManager.hide = function() {
 	
 /**
  * Generate a unique id for a progress
+ * @function generateId
+ * @returns {int} currentId
  */
 GUI.progressBarManager.generateId = function() {
 	this.currentId++;
@@ -67,6 +74,7 @@ GUI.progressBarManager.generateId = function() {
 	
 /**
  * Adjust position of all shown progress bares
+ *@function adjustPosition
  * @param {bool} [noAnimation=false] True to prevent animation
  */
 GUI.progressBarManager.adjustPosition = function(noAnimation) {
@@ -94,6 +102,7 @@ GUI.progressBarManager.adjustPosition = function(noAnimation) {
 	
 /**
  * Add a new progress
+ *@function addProgress
  * @param {String} title Initial Title of the new progress
  * @param {int|String} [id] Custom ID of the new progress
  * @returns {int|String} ID of new progress
@@ -132,6 +141,7 @@ GUI.progressBarManager.addProgress = function(title, id) {
 
 /**
  * Remove progress
+ * @function removeProgress
  * @param {int|String} id Id of the progress to remove
  */
 GUI.progressBarManager.removeProgress = function(id) {
@@ -155,8 +165,10 @@ GUI.progressBarManager.removeProgress = function(id) {
 
 /**
  * Update progress bar for a progress
+ *@function updateProgress
  * @param {int|String} id Id of the progress to update
  * @param {String} value New title for the progress
+ * @param title
  * @param {bool} [ignoreUnknownId=false] True if an unknown ID should be ignored
  */
 GUI.progressBarManager.updateProgress = function(id, value, title, ignoreUnknownId) {
@@ -189,6 +201,7 @@ GUI.progressBarManager.updateProgress = function(id, value, title, ignoreUnknown
 
 /**
  * Display and error for a progress and remove it after 2 sec.
+ *@function error
  * @param {int|String} id Id of the progress
  * @param {String} title New title for the progress
  * @param {bool} [ignoreUnknownId=false] True if an unknown ID should be ignored

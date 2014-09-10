@@ -7,17 +7,17 @@ var Modules = false;
 
 /**
  * Object providing functions for database management.
+ * @class DBManager
  */
 var DBManager = {};
 
 /**
  * Gets all documents from the given collection of a specific object.
- * 
+ * @function getDocuments
  * @param {type} object               The object where the data is related to
  * @param {type} collection           The mongo db collection, where the data is stored
  * @param {type} [callback]           The callback which will receive the result (optional)
  * @param {type} [column]             Default is "objectid" (optional)
- * @returns {undefined}
  */
 DBManager.getDocuments = function(object, collection, callback, column) {
 
@@ -40,13 +40,12 @@ DBManager.getDocuments = function(object, collection, callback, column) {
 
 /**
  * Adds the given data object to the collection, given by its name.
- * 
+ * @function addDocument
  * @param {type} object       The object where the data is related to
  * @param {type} collection   The mongo db collection, where the data is about to be stored
  * @param {type} id           The unique id of this data element (some sort of hash)
  * @param {type} data         The data to be stored
  * @param {type} callback     [Optional]. A callback. If given, the server will only send a message to the client who called. 
- * @returns {undefined}
  */
 DBManager.addDocument = function(object, collection, id, data, callback) {
   if (callback) {
@@ -67,12 +66,11 @@ DBManager.addDocument = function(object, collection, id, data, callback) {
 
 /**
  * Removes the given data object from the collection, given by its name.
- * 
+ * @function removeDocument
  * @param {type} object       The object where the data is related to
  * @param {type} collection   The mongo db collection, where the data is stored
  * @param {type} id           The unique id of the data element, which should be removed (some sort of hash)
  * @param {type} callback     [Optional]. A callback. If given, the server will only send a message to the client who called. 
- * @returns {undefined}
  */
 DBManager.removeDocument = function(object, collection, id, callback) {
   if (callback) {

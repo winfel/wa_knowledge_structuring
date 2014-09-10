@@ -13,6 +13,12 @@ var _ = require('lodash');
 
 module.exports=theObject;
 
+/**
+* @function browse
+* @param data
+* @param callback
+* @return {undefined}
+*/
 theObject.browse = function(data, callback) {
 	var roomId = data.id;
 	var result = [];
@@ -149,6 +155,11 @@ theObject.browse = function(data, callback) {
     }
 }
 
+/**
+* @function filterObject
+* @param obj
+* @return {boolean}
+*/
 theObject.filterObject = function(obj) {
     if (this.getAttribute("filterObjects")) {
         if (obj.type != "Subroom") {

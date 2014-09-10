@@ -1,8 +1,4 @@
 /**
- * Webarena - A web application for responsive graphical knowledge work
- * 
- * @author Felix Winkelnkemper, University of Paderborn, 2012
- * 
  * @class Dispatcher 
  * @classdesc Object holding functions for server communication
  */
@@ -28,8 +24,8 @@ Dispatcher.counter = 1;
 
 /**
  * Manages a response from the server
- * 
- * @param {Object} message the received from the server.
+ * @function response
+ * @param {Object} message  the received from the server.
  */
 Dispatcher.response = function(message) {
   var id = message.id;
@@ -45,7 +41,7 @@ Dispatcher.response = function(message) {
 
 /**
  * Make a query to the server
- * 
+ * @function query
  * @param {Object} queryName The type of query
  * @param {Object} queryArguments The arguments of the query
  * @param {Object} responseFunction The response function (callback function)
@@ -70,7 +66,7 @@ Dispatcher.query = function(queryName, queryArguments, responseFunction) {
 
 /**
  * Manages a call from the server
- * 
+ * @function call
  * @param {Object} message the received from the server.
  */
 Dispatcher.call = function(message) {
@@ -98,7 +94,7 @@ Dispatcher.call = function(message) {
 
 /**
  * Register a new callfunction by type
- * 
+ * @function registerCall
  * @param {Object} type the type of call function
  * @param {Object} callFunction the call function to be registered.
  */
@@ -121,7 +117,7 @@ Dispatcher.registerCall = function(type, callFunction) {
 
 /**
  * Removes a callfunction for a certain type, if there is no array item left.
- * 
+ * @function removeCall
  * @param {Object} type the type of call function
  */
 Dispatcher.removeCall = function(type) {
@@ -133,6 +129,7 @@ Dispatcher.removeCall = function(type) {
 
 /**
  * Init function called in index.html to initialize this module
+ * @function init
  */
 Dispatcher.init = function() {
   // do nothing

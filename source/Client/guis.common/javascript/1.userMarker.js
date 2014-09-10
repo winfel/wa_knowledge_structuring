@@ -1,6 +1,10 @@
 "use strict";
 
 /**
+* @file 1.userMarker.js
+*/
+
+/**
  * @namespace Functions to control markers which display user activity
  */
 GUI.userMarker = {
@@ -25,7 +29,7 @@ GUI.userMarker = {
 	/**
 	 * 
 	 * Sets position of markers for an webarena object
-	 * 
+	 * @function setPosition
 	 * @param {int} objId ID of the webarena object
 	 * @param {bool} noAnimation True to prevent animation
 	 */
@@ -61,7 +65,7 @@ GUI.userMarker = {
 	/**
 	 * 
 	 * Adds new marker
-	 * 
+	 * @function select
 	 * @param {object} data Object of options
 	 * @param {int} data.objectId The webarena object id
 	 * @param {string} data.identifier Unique use identifier for the marker
@@ -106,7 +110,7 @@ GUI.userMarker = {
 	/**
 	 * 
 	 * Removes a marker
-	 * 
+	 * @function deselect
 	 * @param {object} data Object of options
 	 * @param {int} data.objectId The webarena object id
 	 * @param {string} data.identifier Unique use identifier for the marker
@@ -122,6 +126,7 @@ GUI.userMarker = {
 		
 	/**
 	 * Remove markers of offline listeners
+	 * @function removeOfflineUsers
 	 * @param {Object} an array of user objects who are online
 	 */	
 	"removeOfflineUsers": function (users){

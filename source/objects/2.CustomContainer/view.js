@@ -5,6 +5,10 @@
 *
 */	
 
+/**
+* @function draw
+* @param external
+*/
 CustomContainer.draw=function(external){
 	var rep=this.getRepresentation();
 	
@@ -30,7 +34,9 @@ CustomContainer.draw=function(external){
 	this.adjustControls();
 }
 
-
+/**
+* @function updateInnerHeight
+*/
 CustomContainer.updateInnerHeight = function() {
 	
 	var rep=this.getRepresentation();
@@ -50,7 +56,11 @@ CustomContainer.updateInnerHeight = function() {
 	
 }
 
-
+/**
+* @function createRepresentation
+* @param parent
+* @return {undefined}
+*/
 CustomContainer.createRepresentation = function(parent) { 	
 	
 	var rep = GUI.svg.other(parent,"foreignObject");
@@ -67,11 +77,15 @@ CustomContainer.createRepresentation = function(parent) {
 	
 }
 
+
 CustomContainer.adjustControls = function() {
 	this.updateInnerHeight();
 	GeneralObject.adjustControls.call(this);
 }
 
+/**
+* @param rep
+*/
 CustomContainer.drawContent = function(rep){
 
 	var that = this;
@@ -378,7 +392,9 @@ CustomContainer.drawContent = function(rep){
 	});	
 }
 
-
+/**
+* @param newName
+*/
 CustomContainer.rename = function(newName){
 
 	var rep=this.getRepresentation();
@@ -387,6 +403,9 @@ CustomContainer.rename = function(newName){
 		
 }
 
+/**
+* @param files
+*/
 CustomContainer.addFiles = function(files){
 	
 	var that = this;
@@ -494,11 +513,15 @@ CustomContainer.addFiles = function(files){
 		
 }
 
+/**
+* @function upd
+*/
 CustomContainer.upd = function(){
 
 	var rep=this.getRepresentation();
 	
 	$(rep).find(".ui-widget-content").remove();
+	$(rep).find("#sortablefiles").html("");
 
 	$(rep).find("#containment-wrapper").prepend('<div class="spinner">'+
 		'<div class="spinner-container container1">'+

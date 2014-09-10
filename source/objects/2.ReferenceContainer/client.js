@@ -21,47 +21,62 @@ ReferenceContainer.Files = new Array();
 ReferenceContainer.References = new Array();
 
 
+/**
+* @function removeReference
+* @param ref
+*/
 ReferenceContainer.removeReference = function(ref){
 		
 	var that = this;	
 	
 	this.References.splice(this.References.indexOf(ref), 1);
+	
+	//get project name
+	var destFromURL = ObjectManager.currentRoomID.left; 
+	
+	UserManager.getDataOfSpaceWithDest(destFromURL,"ProjectNameLink",function(pname){
 		
-	UserManager.getDataOfSpaceWithDest(this.getRoom().getAttribute('name'), "references" , function(d){
+		UserManager.getDataOfSpaceWithDest(pname[0].value, "references" , function(d){
 	
-		var arr = new Array();
+			var arr = new Array();
 			
-		if(d != "error"){
-			var key;
-			for(key in d[0].value){
-				if(d[0].value[key] != ref){
-					arr.push(d[0].value[key]);
+			if(d != "error"){
+				var key;
+				for(key in d[0].value){
+					if(d[0].value[key] != ref){
+						arr.push(d[0].value[key]);
+					}
 				}
+				UserManager.removeDataOfSpaceWithDest(pname[0].value, "references");
 			}
-			UserManager.removeDataOfSpaceWithDest(that.getRoom().getAttribute('name'), "references");
-		}
 				
-		setTimeout(function(){ UserManager.setDataOfSpaceWithDest(that.getRoom().getAttribute('name'), "references", arr) }, 500);
-	
+			setTimeout(function(){ UserManager.setDataOfSpaceWithDest(pname[0].value, "references", arr) }, 500);
+		});
 	});
 	
 }
 
 
 ReferenceContainer.getReferences = function(){
-		
-	this.References = new Array();	
 	var that = this;
-		
-	UserManager.getDataOfSpaceWithDest(this.getRoom().getAttribute('name'), "references" , function(d){
+
+	//get project name
+	var destFromURL = ObjectManager.currentRoomID.left; 
 	
-		if(d != "error"){
-			var key;
-			for(key in d[0].value){
-				that.References.push(d[0].value[key]);
-			}
-		}
+	UserManager.getDataOfSpaceWithDest(destFromURL,"ProjectNameLink",function(pname){
+		that.References = new Array();	
 		
+		UserManager.getDataOfSpaceWithDest(pname[0].value, "references" , function(d){
+	
+			if(d != "error"){
+				var key;
+				for(key in d[0].value){
+					that.References.push(d[0].value[key]);
+				}
+			}
+		
+		});
+
 	});
 }
 
@@ -90,7 +105,9 @@ ReferenceContainer.getFiles = function(){
 		
 }
 
-
+/**
+* @param files
+*/
 ReferenceContainer.searchAndFilter = function(files){
 	
 	var filteredFiles1 = new Array();
@@ -120,6 +137,8 @@ ReferenceContainer.searchAndFilter = function(files){
 		
 			if(stringEntered){  //the user has entered a search string, search through all files and check if name matches to the search string
 				var n = files[key].attributes.name;
+				n = n.toLowerCase();
+				s = s.toLowerCase();
 				
 				if(n.indexOf(s) == -1){ //searchString is not part of the name of the object
 					continue;
@@ -217,7 +236,9 @@ ReferenceContainer.searchAndFilter = function(files){
 	
 }
 
-
+/**
+* @param files
+*/
 ReferenceContainer.sortFiles = function(files){ //bubble sort
 
 	var sortingCriterion = this.sortingCriterion;

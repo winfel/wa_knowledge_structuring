@@ -61,62 +61,30 @@ PaperSpace.register = function(type) {
   }, true);
 
   this.registerAttribute('Project name', {type: 'text',standard:'Type your name here' ,hidden: false, changedFunction: function(object, value) {
-    var dbCleanUpForNames = function(o){
+    // ---------------
+    // update ProjectNameDestinationLink
+    // ----------------
+    var destination = object.getAttribute('destination');
 
-        // function is not supported at the moment
-        return;
+    if (!destination) {
+      var random = new Date().getTime() - 1296055327011;
 
-        var deleteNames = [];
-        var arr = new Array();
+      object.setAttribute('destination', random);
+      destination = random;
 
-        if(d != "error"){
-          var key;
-          for(key in d[0].value){
+      // store destination in database to link it to the project name
+      UserManager.setDataOfSpaceWithDest(random,'ProjectNameLink',value);
+    }else{
+      // remove old link
+      UserManager.removeDataOfSpaceWithDest(object.getAttribute('destination'),'ProjectNameLink');
 
-            // store old names of this paperspace (via id)
-            if(true /* object.id is not in the system anymore */){
-              deleteNames.push(d[0].value[key].split("#")[1]);
-            }else{
-              arr.push(d[0].value[key]);
-            }
-          }
-          UserManager.removeDataOfSpaceWithDest("ProjectNames","ID#Name");
-        }
-        
-        if(arr.indexOf(object.id+"#"+value) == -1){
-          arr.push(object.id+"#"+value);
-        }
+      // set new link
+      UserManager.setDataOfSpaceWithDest(object.getAttribute('destination'),'ProjectNameLink',value);      
+    }
 
-        // store data
-        setTimeout(function(){UserManager.setDataOfSpaceWithDest("ProjectNames","ID#Name",arr) }, 500);
-
-        // store name
-        UserManager.getDataOfSpaceWithDest("ProjectNames", "name" , function(d){
-
-          var arr = new Array();
-
-          if(d != "error"){
-            var key;
-            for(key in d[0].value){
-
-              // if name is not an old name of this paperpspace -> store it
-              if(deleteNames.indexOf(d[0].value[key]) == -1){
-                arr.push(d[0].value[key]);
-              }
-            }
-            UserManager.removeDataOfSpaceWithDest("ProjectNames","name");
-          }
-
-          if(arr.indexOf(value) == -1){
-            arr.push(value);
-          }
-
-          setTimeout(function(){ UserManager.setDataOfSpaceWithDest("ProjectNames", "name", arr) }, 500);
-
-        });
-
-      };
-
+    // -----------------
+    // updating remaining storage space
+    // -----------------
     var oldNames = [];
 
       // store id of the corresponding project
@@ -187,8 +155,6 @@ PaperSpace.register = function(type) {
       });
 }});
 
-
-
   this.registerAttribute('isMain', {type: 'boolean', hidden: true});
   this.registerAttribute('bigIcon', {hidden: true});
 }
@@ -211,6 +177,10 @@ PaperSpace.execute = function(openInNewWindow) {
     this.setAttribute('destination', random);
     destination = random;
 
+    // store destination in database to link it to the project name
+    UserManager.setDataOfSpaceWithDest(random,'ProjectNameLink',this.getAttribute('Project name'));
+
+    // add destination to tabs
     GUI.tabs.addTab(this.getAttribute('name')+" (Room)",this.getAttribute('destination'),this.id);
     GUI.tabs.redrawTabContent();
   }

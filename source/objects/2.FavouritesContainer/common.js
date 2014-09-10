@@ -65,6 +65,8 @@ FavouritesContainer.register=function(type){
 		});
 	}, true);
 	
+	this.makeSensitive();
+	
 }
 
 /**
@@ -104,6 +106,6 @@ FavouritesContainer.isCreatable=true;
 FavouritesContainer.contentURLOnly = false; //content is only accessible via URL
 
 FavouritesContainer.category='Active';
-FavouritesContainer.menuItemLabel = 'favorite.container';
+FavouritesContainer.menuItemLabel = 'favourite.container';
 
 module.exports=FavouritesContainer;

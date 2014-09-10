@@ -20,6 +20,10 @@ FavouritesContainer.sortingOrder = "From A to Z";
 FavouritesContainer.Files = new Array();
 FavouritesContainer.Favourites = new Array();
 
+/**
+* @function removeFavourite
+* @param fav
+*/
 FavouritesContainer.removeFavourite = function(fav){
 		
 	this.Favourites.splice(this.Favourites.indexOf(fav), 1);	
@@ -87,7 +91,9 @@ FavouritesContainer.getFiles = function(){
 		
 }
 
-
+/**
+* @param files
+*/
 FavouritesContainer.searchAndFilter = function(files){
 	
 	var filteredFiles1 = new Array();
@@ -117,6 +123,8 @@ FavouritesContainer.searchAndFilter = function(files){
 		
 			if(stringEntered){  //the user has entered a search string, search through all files and check if name matches to the search string
 				var n = files[key].attributes.name;
+				n = n.toLowerCase();
+				s = s.toLowerCase();
 				
 				if(n.indexOf(s) == -1){ //searchString is not part of the name of the object
 					continue;
@@ -214,7 +222,9 @@ FavouritesContainer.searchAndFilter = function(files){
 	
 }
 
-
+/**
+* @param files
+*/
 FavouritesContainer.sortFiles = function(files){ //bubble sort
 
 	var sortingCriterion = this.sortingCriterion;

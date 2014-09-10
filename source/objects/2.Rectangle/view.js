@@ -4,7 +4,11 @@
 *    @author Felix Winkelnkemper, University of Paderborn, 2011
 *
 */
-	
+
+/**
+* @function draw
+* @param external
+*/	
 Rectangle.draw=function(external){
 
 	var rep=this.getRepresentation();
@@ -20,7 +24,11 @@ Rectangle.draw=function(external){
 
 }
 
-
+/**
+* @function createRepresentation
+* @param parent
+* @return {undefined}
+*/
 Rectangle.createRepresentation = function(parent) {
 
 	var rep = GUI.svg.rect(parent,

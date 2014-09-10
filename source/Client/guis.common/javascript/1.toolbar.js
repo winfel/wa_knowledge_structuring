@@ -1,11 +1,16 @@
 "use strict";
 
+/**
+ * @file 1.toolbar.js
+ */
+
 /* SETTINGS */
 var popover_positionOffsetX = 8;
 var popover_positionOffsetY = 21;
 
 /**
  * Init. the toolbar
+ * @function initToolbar
  */
  GUI.initToolbar = function() {
 
@@ -217,7 +222,10 @@ var popover_positionOffsetY = 21;
 
 
     }
-
+	
+	/**
+	* @function effect
+	*/
     var effect = function() {
       $(this).animate({opacity: 1}, 500, function() {
         $(this).animate({opacity: 0.6}, 500);
@@ -503,13 +511,13 @@ if (!Modules.Config.presentationMode) {
 if (!Modules.Config.presentationMode) {
 
   var searchButton = document.createElement("img");
-  $(searchButton).attr("src", "../../guis.common/images/fileicons/selectBidFile.png").attr("alt", "");
+  $(searchButton).attr("src", "../../guis.common/images/oxygen/16x16/actions/view-filter.png").attr("alt", "");
   $(searchButton).attr("width", "24").attr("height", "24");
 
   $(searchButton).attr("id", "search_Button");
   $(searchButton).addClass("sidebar_button header_tab");
 
-  $(searchButton).attr("title", GUI.translate("Search"));
+  $(searchButton).attr("title", GUI.translate("Filter"));
 
   var click = function() {
     $("#mainTagSel").empty();
@@ -542,10 +550,12 @@ if (!Modules.Config.presentationMode) {
                     	 { "name": "text/plain", "label": "text" },
                          { "name": "image/", "label": "image" },
                     	 { "name": "audio/", "label": "audio" }, 
-                         { "name": "video/", "label": "video" }    	 				 
+                         { "name": "video/", "label": "video" },
                         ];
-     
+
+     //organize into two columns
      var columnToAppendTo = $("#mimeTypesColumn1");
+     var middleOfArray = Math.round(allMimeTypes.length / 2) - 1; 
      $.each(allMimeTypes, function(key, mimeType){
      	var checkbox = $("<input />");
      	checkbox.attr({
@@ -562,7 +572,7 @@ if (!Modules.Config.presentationMode) {
      	});
      	label.text(mimeType.label);
      	
-     	if(key > 2) {
+     	if(key > middleOfArray) {
      		columnToAppendTo = $("#mimeTypesColumn2");
      	}
      	columnToAppendTo.append(checkbox);
@@ -640,6 +650,7 @@ if (!Modules.Config.presentationMode) {
   $(bugButton).attr("title", GUI.translate("Bugreport"));
 
   $("#header > .header_tabs_sidebar").append(bugButton);
+
 
   var click = function() {
     GUI.sidebar.openPage("bug", bugButton);

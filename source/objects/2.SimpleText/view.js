@@ -5,6 +5,10 @@
 *
 */
 
+/**
+* @function draw
+* @param external
+*/
 SimpleText.draw=function(external){
 	
 	var rep=this.getRepresentation();
@@ -58,7 +62,10 @@ SimpleText.draw=function(external){
 }
 
 
-
+/**
+* @param parent
+* @return {undefined}
+*/
 SimpleText.createRepresentation = function(parent) {
 	
 	var rep = GUI.svg.group(parent,this.getAttribute('id'));
@@ -88,12 +95,16 @@ SimpleText.editText = function() {
 
 
 
-/* get the y position of the objects bounding box (this is the top position of the object) */
+/** Get the y position of the objects bounding box (this is the top position of the object) 
+* @return {undefined}
+*/
 SimpleText.getViewBoundingBoxY = function() {
 	return this.getViewY();
 }
 
-/* get the height of the objects bounding box */
+/** Get the height of the objects bounding box
+* @return {undefined}
+*/
 SimpleText.getViewBoundingBoxHeight = function() {
 	var rep = this.getRepresentation();
 	return this.getRepresentation().getBBox().height; //<--TODO: this value is too high

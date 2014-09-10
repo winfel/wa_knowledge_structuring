@@ -37,7 +37,7 @@ IconObject.register=function(type){
 	
 	this.attributeManager.registerAttribute('layer',{hidden: true});
 	this.registerAttribute('bigIcon',{type:'boolean',standard:true, changedFunction: function(object) { object.updateIcon(); }});
-	this.registerAttribute('verybigIcon',{type:'boolean',standard:false, changedFunction: function(object) { object.updateIcon(); }});
+	this.registerAttribute('verybigIcon',{type:'boolean',hidden:true,standard:false, changedFunction: function(object) { object.updateIcon(); }});
 	this.registerAttribute('width',{hidden:true});
 	this.registerAttribute('height',{hidden:true});
 	this.registerAttribute('fillcolor',{hidden:true});

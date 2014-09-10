@@ -34,6 +34,7 @@ theObject.exportAsFile = function(type, position, createFile) {
 	}
 	var inputPaperIds = this.getAttribute('inputPapers'),
 		outputContent = [],
+		outputFilename = [],
 		outputCount = 0;
 
 	// createFile performs as a callback here
@@ -54,24 +55,28 @@ theObject.exportAsFile = function(type, position, createFile) {
 		};
 	}
 
+	/* internal function to add content */
 	var addContent = function(object, content) {
 		outputContent[inputPaperIds.indexOf(object.getId())] = content;
+		outputFilename[inputPaperIds.indexOf(object.getId())] = object.getName();
 		if(++outputCount == inputPaperIds.length) {
 			// all content is there, create a file object
 
+			var filename = outputFilename.join('+');
+
 			if(type == 'html') {
 				// create a html file object
-				createFile(that.getId() + '.html', outputContent.join('\r\n'), 'text/html');
+				createFile(filename + '.html', outputContent.join('\r\n'), 'text/html');
 			}
 			else if(type == 'text') {
 				// create plain textfile
-				createFile(that.getId() + '.txt', outputContent.join('\r\n'), 'text/plain');
+				createFile(filename + '.txt', outputContent.join('\r\n'), 'text/plain');
 			}
 			else if(type == 'pdf') {
 				// convert html to pdf
 				Modules.EtherpadController.convertToPdf(outputContent.join('\r\n'), function(pdfcontent) {
 					// create pdf file object in webarena
-					createFile(that.getId() + '.pdf', pdfcontent, 'application/pdf');
+					createFile(filename + '.pdf', pdfcontent, 'application/pdf');
 				});
 			}
 			else {
@@ -81,12 +86,13 @@ theObject.exportAsFile = function(type, position, createFile) {
 				Modules.EtherpadController.convertToImage(outputContent.join('\r\n'), imgtype, function(imgcontent) {
 
 					// create image file object in webarena
-					createFile(object.getName() + '.' + imgtype, imgcontent, 'image/' + imgtype);
+					createFile(filename + '.' + imgtype, imgcontent, 'image/' + imgtype);
 				});
 			}
 		}
 	};
 
+	/* internal function to add the content of a PaperSpace */
 	var getPaperContent = function(object, asText) {
 		if(!asText) {
 			asText = false;
@@ -110,7 +116,7 @@ theObject.exportAsFile = function(type, position, createFile) {
 
 			chapterPadIDs.forEach(function(chapterPadID) {
 				// read the html from etherpad
-				Modules.EtherpadController.pad.getHTML( {
+				Modules.EtherpadController.pad[asText?'getText':'getHTML']( {
 					padID : chapterPadID
 				}, function(error, data) {
 					if(error) {
@@ -118,18 +124,18 @@ theObject.exportAsFile = function(type, position, createFile) {
 						//return;
 					}
 
-					// due to async access it might happen, that the order of chapters is mixed - we'll find a solution later
-					if(cPos < chapterPadIDs.length-1) {
-						if(data != null) {
+					if(data != null) {
+						if(asText) {
+							summedText += data.text;
+						}
+						else {
 							summedText += data.html;
 						}
-						cPos++;
 					}
-					else {
+
+					// due to async access it might happen, that the order of chapters is mixed - we'll find a solution later
+					if(cPos++ >= chapterPadIDs.length-1) {
 						// last round
-						if(data != null) {
-							summedText += data.html;
-						}
 						addContent(object, summedText);
 					}
 				});
@@ -138,13 +144,14 @@ theObject.exportAsFile = function(type, position, createFile) {
 		});
 	};
 
+	/* internal function to add the content of a PaperChapter */
 	var getChapterContent = function(object, asText) {
 		if(!asText) {
 			asText = false;
 		}
 		var chapterPadID = object.getAttribute('chapterID');
 		// read the html from etherpad
-		Modules.EtherpadController.pad.getHTML( {
+		Modules.EtherpadController.pad[asText?'getText':'getHTML']( {
 			padID : chapterPadID,
 		}, function(error, data) {
 			var text = "";
@@ -152,11 +159,43 @@ theObject.exportAsFile = function(type, position, createFile) {
 				console.error("PadID "+ chapterPadID + " >> Error pad.getText: ", error.message);
 				//text = ("PadID "+ chapterPadID + " >> Error pad.getText: ", error.message); // chapter has no content
 			}else if(data != null) {
-				text = data.html;
+				if(asText) {
+					text = data.text;
+				}
+				else {
+					text = data.html;
+				}
 			}
 			addContent(object, text);
 		});
 	};
+
+	/* internal function to get the content of a File */
+	var getFileContent = function(object, asText) {
+		if(!asText) {
+			asText = false;
+		}
+		if(object.getType()=='File' &&
+			(!!asText && (object.getAttribute('mimeType')=='text/plain' || object.getName().match(/\.txt?$/i))) ||
+			(!asText && (object.getAttribute('mimeType')=='text/html' || object.getName().match(/\.html?$/i)))) {
+		object.getContentAsString(function(data) {
+			var text = "";
+			if(data != null) {
+				text = data;
+			}
+			else {
+				console.error("File "+ object.getId() + " >> Error in getContentAsString");
+			}
+
+			addContent(object, text);
+		});
+		}
+		else {
+			addContent(object, 'Files with type ' + object.getAttribute('mimeType') + ' are currently not supported for PDF-Export.');
+		}
+	};
+
+
 
 	// get the real objects of input papers
 	this.getInputPapers(function(objects) {
@@ -168,11 +207,8 @@ theObject.exportAsFile = function(type, position, createFile) {
 			else if(object.getType()=='PaperChapter') {
 				getChapterContent(object, type == 'text');
 			}
-			else if(object.getType()=='File' && type != 'text' && (object.getAttribute('mimeType')=='text/html' || object.getName().match(/\.html?$/i))) {
-				addContent(object, object.getContentAsString());
-			}
-			else if(object.getType()=='File' && type == 'text' && (object.getAttribute('mimeType')=='text/plain' || object.getName().match(/\.txt?$/i))) {
-				addContent(object, object.getContentAsString());
+			else if(object.getType()=='File') {
+				getFileContent(object, type == 'text');
 			}
 			else {
 				addContent(object, '<div>Object currently not supported!<br />Id: ' + object.getId() + ', Type: ' + object.getType() + '</div>');
@@ -234,9 +270,7 @@ theObject.onEnter = function(object,oldData,newData) {
 	inputPapers.push(object.getId());
 
 	this.getRoom(function(room){
-		console.log('async sucks');
 		room.getInventoryAsync(function(inventory){
-			console.log('really sucks');
 
 			// sort papers by y coordinate
 			var y_coordinates = {};

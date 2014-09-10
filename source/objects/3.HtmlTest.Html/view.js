@@ -5,6 +5,7 @@
 *
 */
 
+
 HtmlTest.updateContent = function() {
 	var self = this;
 	

@@ -5,6 +5,10 @@
 *
 */
 
+/**
+* @function draw
+* @param external
+*/
 Textarea.draw=function(external){
 
 	var rep=this.getRepresentation();
@@ -77,7 +81,10 @@ Textarea.updateInnerHeight = function() {
 	
 }
 
-
+/**
+* @param parent
+* @return {undefined}
+*/
 Textarea.createRepresentation = function(parent) {
 	
 	var rep = GUI.svg.other(parent,"foreignObject");

@@ -102,7 +102,7 @@ Exit.execute=function(openInNewWindow){
 }
 
 Exit.register('Exit');
-Exit.isCreatable=true;
+Exit.isCreatable=false;
 
 /**
  * Returns always true.

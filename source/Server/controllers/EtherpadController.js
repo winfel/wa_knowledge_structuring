@@ -2,6 +2,10 @@
  * Provides API methods for Object related tasks
  */
 
+/**
+* @class EtherpadController
+* @classdesc This is the EtherpadController
+*/
 "use strict";
 
 var api = require('etherpad-lite-client'),
@@ -14,6 +18,9 @@ var api = require('etherpad-lite-client'),
 var EtherpadController = {};
 var Modules = false;
 
+/**
+* @param theModules
+*/
 EtherpadController.init = function(theModules) {
 	Modules = theModules;
 	
@@ -22,6 +29,10 @@ EtherpadController.init = function(theModules) {
 	}
 };
 
+/**
+* @param html
+* @param callback
+*/
 EtherpadController.convertToPdf = function(html, callback) {
     
 	if (global.config.wkhtmltox.path == '') {
@@ -68,6 +79,11 @@ EtherpadController.convertToPdf = function(html, callback) {
 	});
 }
 
+/**
+* @param html
+* @param imgtype
+* @param callback
+*/
 EtherpadController.convertToImage = function(html, imgtype, callback) {
     
 	if (global.config.wkhtmltox.path == '') {

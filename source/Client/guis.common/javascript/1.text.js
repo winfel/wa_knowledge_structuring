@@ -1,7 +1,12 @@
 "use strict";
 
 /**
+ * @file 1.text.js
+ */
+ 
+/**
  * Edit a text using a dialog
+ * @function editText
  * @param {webarenaObject} webarenaObject The web arena object
  * @param {bool} multiLine True if multiple lines should be edited
  * @param {int} width Width of the dialog

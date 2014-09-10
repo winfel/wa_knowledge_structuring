@@ -1,7 +1,11 @@
 "use strict";
 
 /**
- * Object providing functions for tagging	
+ * @file 1.tagAssigner
+ */
+/**
+ * Object providing functions for tagging
+ * @function tagAssigner	
  */
 
 GUI.tagAssigner = new function() {
@@ -58,10 +62,12 @@ GUI.tagAssigner = new function() {
 	// number of unassigned secondary tags per page 
 	var tagsPerPage;
 	
-	
-	
-	
-	//initialization of the dialog
+/**
+ * creates the area for webarenaObject
+ * @function init	
+ * @param {webarenaObject} webarenaObject
+ */
+//initialization of the dialog
 	this.init = function(webarenaObject){
 				
 		// sets the the content of the dialog (html)
@@ -121,14 +127,20 @@ GUI.tagAssigner = new function() {
 	    
 	}
 	
-	//sets the content of the dialog for tag assignment/unassignment
-	//the content (html) is defined in "index.html" as underscore template 
+	/**
+	*sets the content of the dialog for tag assignment/unassignment
+	*the content (html) is defined in "index.html" as underscore template
+	*@function setDialogContent
+	*/
 	this.setDialogContent = function(){
 		var tagAssignerTemplate = $("#tag-assigner-content-tmpl").html();
 		this.dialogDom = $(tagAssignerTemplate);
 	}
 	
-
+	/**
+ 	* 
+ 	* @function bindEvents	
+ 	*/
 	this.bindEvents = function(){
 		var that = GUI.tagAssigner;
 		
@@ -179,7 +191,7 @@ GUI.tagAssigner = new function() {
 		// creates new main tag and assigns it to the file object
 		
 		
-		that.$containerMainTags.delegate("#custom-Main-tag", "keyup", function() {
+		that.$containerMainTags.delegate("#custom-Main-tag", "keyup", function(event) {
 		//$("#custom-Main-tag").die().live("keyup", function(event) {
 			var that = GUI.tagAssigner;
 			var customMainTagValue;
@@ -252,7 +264,7 @@ GUI.tagAssigner = new function() {
 		// event handler for the input field for creation of custom secondary tags
 		// creates new secondary tag and assigns it to the file object	
 		
-		that.$containerSecondaryTags.delegate("#custom-Sec-tag", "keyup", function() {
+		that.$containerSecondaryTags.delegate("#custom-Sec-tag", "keyup", function(event) {
 		//$("#custom-Sec-tag").die().live("keyup", function(event) {
 			var that = GUI.tagAssigner;
 			var customSecTagValue = $(this).val();
@@ -281,9 +293,10 @@ GUI.tagAssigner = new function() {
 				
 				//insert the newly created secondary tag into the list of assigned secondary tags
 				// and redraw the assigned secondary tags
-				if(checkedCustomSecTagValue != ""){
+				if (checkedCustomSecTagValue != "") {
 					customSecTagValue = checkedCustomSecTagValue;
 				}
+				
 				that.assignedSecTags.push(customSecTagValue);
 				that.drawAssignedTags();
 				
@@ -351,7 +364,12 @@ GUI.tagAssigner = new function() {
 	
 
 
-	//remove specified element from an array and return the deleted element
+	/**
+	* remove specified element from an array and return the deleted element
+	* @function removeListItem
+	* @param arr
+	* @param item
+	*/
 	this.removeListItem = function(arr, item) {
 		var removedItem = "";
 	    for (var index = 0; index < arr.length; index++) {
@@ -364,8 +382,12 @@ GUI.tagAssigner = new function() {
 	    return removedItem;
 	}
 	
-	// sets the list main tags to the all existing main tags 
-	// which are retrieved from the database, filters them and draws them
+	/**
+	* sets the list main tags to the all existing main tags 
+	* which are retrieved from the database, filters them and draws them
+	* @function setMainTags
+	* @param list
+	*/
 	this.setMainTags = function(list) {
 		var that = GUI.tagAssigner;
 		
@@ -375,8 +397,12 @@ GUI.tagAssigner = new function() {
 			
 	};
 
-	// sets the list of unassigned secondary tags to the secondary tags 
-	//which are retrieved from the database, filters them and draws them
+	/**
+	* sets the list of unassigned secondary tags to the secondary tags 
+	* which are retrieved from the database, filters them and draws them
+	* @function setSecondaryTags
+	* @param data
+	*/
 	this.setSecondaryTags = function(data){
 		var that = GUI.tagAssigner;
 		
@@ -394,7 +420,11 @@ GUI.tagAssigner = new function() {
 	};
 	
 	
-	//removes already assigned secondary tags from the list of all unassigned secondary tags (edit mode)
+	/**
+	* removes already assigned secondary tags from the list of all unassigned secondary tags (edit mode)
+	* @function filterSecondaryTags
+	* @param list
+	*/
 	this.filterSecondaryTags = function (list){
 		var that = GUI.tagAssigner;
 		$.each(list, function( index, value ) {		
@@ -405,7 +435,10 @@ GUI.tagAssigner = new function() {
 	};
 	
 	
-	//returns unassigned secondary tags for the current page
+	/**
+	* returns unassigned secondary tags for the current page
+	* @function getCurrentPageTags
+	*/
 	this.getCurrentPageTags = function(){
 		var that = GUI.tagAssigner;
 		
@@ -420,8 +453,12 @@ GUI.tagAssigner = new function() {
 	};
 	
 	
-	// moves secondary tag from the list of unassigned tags into the list of assigned tags
-	// called when tag is assigned
+	/**
+	* moves secondary tag from the list of unassigned tags into the list of assigned tags
+	* called when tag is assigned
+	* @function moveIntoListOfAssignedTags
+	* @param value
+	*/
 	this.moveIntoListOfAssignedTags = function( value ) {
 		var that = GUI.tagAssigner;
 		
@@ -434,8 +471,12 @@ GUI.tagAssigner = new function() {
 	};
 	
 	
-	// moves secondary tag from the list of assigned tags into the list of unassigned tags
-	// called when tag is unassigned
+	/**
+	* moves secondary tag from the list of assigned tags into the list of unassigned tags
+	* called when tag is unassigned
+	* @function moveIntoListOfUnassignedTags
+	* @param value
+	*/
 	this.moveIntoListOfUnassignedTags = function( value ) {
 		var that = GUI.tagAssigner;
 		
@@ -450,7 +491,10 @@ GUI.tagAssigner = new function() {
 	};
 	
 
-	// updates paging parameters in case there is assignment or unassignment of a tag 
+	/**
+	* updates paging parameters in case there is assignment or unassignment of a tag 
+	* @function updatePagingParameters
+	*/
 	this.updatePagingParameters = function(){
 		var that = GUI.tagAssigner;
 		
@@ -468,7 +512,10 @@ GUI.tagAssigner = new function() {
 	
 	};
 	
-	//draws the current page unassigned tags  
+	/**
+	* draws the current page unassigned tags  
+	* @function drawUnassignedTags
+	*/
 	this.drawUnassignedTags = function(){
 		var that = GUI.tagAssigner;
 		
@@ -485,7 +532,10 @@ GUI.tagAssigner = new function() {
 	};
 	
 	
-	//draws the assigned tags
+	/**
+	* draws the assigned tags
+	* @function drawAssignedTags
+	*/
 	this.drawAssignedTags = function(){
 	
 		var that = GUI.tagAssigner;
@@ -501,32 +551,38 @@ GUI.tagAssigner = new function() {
 		
 	};
 	
+	/**
+	* 
+	* @function drawTag
+	* @param value
+	* @param container
+	* @param s
+	*/
 	this.drawTag = function(value, container, s){
 	
 		var that = GUI.tagAssigner;
 		
-		if(s=="assigned"){
-		
+		if(s == "assigned"){		
 			$(
 			  '<li class="ui-widget-content" data-sectag="'+value+'">'+
 				  '<h5 class="ui-widget-header tagValue">'+value+'</h5>'+
 			  '</li>'
 			 ).appendTo(container);
-		}
-		else{
+		} else {
 			$(
 			  '<li class="ui-widget-content" data-sectag="'+value+'">'+
 				  '<h5 class="ui-widget-header tagValue">'+value+'</h5>'+			
 			  '</li>'
-			 ).appendTo(container);
-		
-		}
-		
+			 ).appendTo(container);		
+		}		
 		that.makeTagItemsDraggable(container);
 		
 	};
 	
-	//draws the main tags
+	/**
+	* draws the main tags
+	* @function drawMainTags
+	*/
 	this.drawMainTags = function(){
 		
 		var that = GUI.tagAssigner; 
@@ -550,7 +606,11 @@ GUI.tagAssigner = new function() {
 	}
 	
 	
-	//makes the tag items draggable
+	/**
+	* makes the tag items draggable
+	* @function makeTagItemsDraggable
+	* @param container
+	*/
 	this.makeTagItemsDraggable = function(container) {		
 
 		  $( "li", container ).draggable({
@@ -564,7 +624,10 @@ GUI.tagAssigner = new function() {
 		
 	};
 
-	//makes the containers for assigned and unassigned tags droppable
+	/**
+	* makes the containers for assigned and unassigned tags droppable
+	* @function makeContainersDroppable
+	*/
 	this.makeContainersDroppable = function() { 
 		
 		var that = GUI.tagAssigner; 
@@ -594,7 +657,11 @@ GUI.tagAssigner = new function() {
 		});
 	};
 	
-	// assign tag to the file object
+	/**
+	* assign tag to the file object
+	* @function assignTag
+	* @param item
+	*/
 	this.assignTag = function( $item ) {
 		var that = GUI.tagAssigner; 
 		$item.fadeOut(function() {
@@ -615,7 +682,11 @@ GUI.tagAssigner = new function() {
 				  		  
 	};
 	
-	// unassign tag from the file object object
+	/**
+	* unassign tag from the file object 
+	* @function unassignTag
+	* @param item
+	*/
 	this.unassignTag = function( $item ) {
 		var that = GUI.tagAssigner;
 		
@@ -633,7 +704,10 @@ GUI.tagAssigner = new function() {
 		that.drawUnassignedTags();
 	};
 
-	// update the main tag and secondary tag atrributes of the file object
+	/**
+	* update the main tag and secondary tag atrributes of the file object
+	* @function saveChanges
+	*/
 	this.saveChanges = function (){
 		var that = GUI.tagAssigner;
 

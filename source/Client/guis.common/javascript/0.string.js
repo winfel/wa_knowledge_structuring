@@ -1,9 +1,11 @@
 "use strict";
-
 /**
- * 
+ * @class string
+ */
+
+/** 
  * Splits a string into string parts of length L - last string part can be shorter than L.
- *
+ * @function splitSubstr
  * @param {string} str	Item that should be split
  * @param {int} len	Length of resulting string parts
  * @returns {Array.<String>} Array of string parts
@@ -17,9 +19,8 @@ function splitSubstr(str, len) {
 }
 
 /**
- *
  * Replaces special characters with html representations
- *
+ * @function htmlEscape
  * @param {string} str	String that should be escaped
  * @returns {string} Escaped string
  */
@@ -34,7 +35,7 @@ function htmlEscape(str) {
 
 /**
  * Replaces a newline with html <br /> tag
- *
+ * @function nl2br
  * @param {string} str
  * @returns {string} 
  */
@@ -45,7 +46,7 @@ function nl2br(str){
 /**
  *
  * Replaces special characters with html representations and replaces a newline with html <br /> tag
- *
+ * @function htmlEncode
  * @param {string} str
  * @returns {string} 
  */
@@ -56,7 +57,7 @@ function htmlEncode(str){
 /**
  *
  * Converts a string that is HTML-encoded into a decoded string
- *
+ * @function htmlDecode
  * @param {string} str
  * @returns {string}
  */

@@ -5,6 +5,10 @@
 *
 */	
 
+/**
+* @function draw
+* @param external
+*/
 ReferenceContainer.draw=function(external){
 	var rep=this.getRepresentation();
 	
@@ -50,7 +54,10 @@ ReferenceContainer.updateInnerHeight = function() {
 	
 }
 
-
+/**
+* @param parent
+* @return {undefined}
+*/
 ReferenceContainer.createRepresentation = function(parent) { 	
 	
 	var rep = GUI.svg.other(parent,"foreignObject");
@@ -74,6 +81,9 @@ ReferenceContainer.adjustControls = function() {
 	GeneralObject.adjustControls.call(this);
 }
 
+/**
+* @param rep
+*/
 ReferenceContainer.drawContent = function(rep){
 
 	var that = this;
@@ -382,7 +392,9 @@ ReferenceContainer.drawContent = function(rep){
 	});	
 }
 
-
+/**
+* @param newName
+*/
 ReferenceContainer.rename = function(newName){
 
 	var rep=this.getRepresentation();
@@ -391,6 +403,9 @@ ReferenceContainer.rename = function(newName){
 		
 }
 
+/**
+* @param files
+*/
 ReferenceContainer.addFiles = function(files){
 
 	var that = this;
@@ -400,7 +415,7 @@ ReferenceContainer.addFiles = function(files){
 	$(rep).find(".spinner").remove();
 	
 	if(files.length == 0){
-		$(rep).find("#sortablefiles").html("Add your reference files by right click on any file in the global space containers!");
+		$(rep).find("#sortablefiles").html("Add your reference files by right click on any file in the global space containers or by simply drag and drop!");
 		return;
 	}
 	else{
@@ -483,7 +498,7 @@ ReferenceContainer.addFiles = function(files){
 				$("div.addremove-menu").remove();
 				
 				if($(rep).find(".ui-widget-content").length == 0){
-					$(rep).find("#sortablefiles").html("Add your reference files by right click on any file in the global space containers!");
+					$(rep).find("#sortablefiles").html("Add your reference files by right click on any file in the global space containers or by simply drag and drop!");
 				}
 				
 			});
@@ -498,6 +513,7 @@ ReferenceContainer.upd = function(){
 	var rep=this.getRepresentation();
 	
 	$(rep).find(".ui-widget-content").remove();
+	$(rep).find("#sortablefiles").html("");
 	
 	$(rep).find(".spinner").remove();
 
@@ -522,6 +538,8 @@ ReferenceContainer.upd = function(){
 		'</div>'+
 		'</div>');
 
+	this.getReferences();	
+		
 	this.getFiles();
 
 }

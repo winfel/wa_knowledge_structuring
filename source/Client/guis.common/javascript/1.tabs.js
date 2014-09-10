@@ -1,5 +1,10 @@
+/**
+ * @file 1.tabs.js
+ */
+
 /* 
  * Sidebar: tabs
+ * @function tabs
  */
 GUI.tabs = new function() {
   var tabs, tabs_content;
@@ -14,7 +19,7 @@ GUI.tabs = new function() {
   var internalID;
 
   /**
-   * 
+   * @function init
    * @returns {undefined}
    */
   this.init = function() {
@@ -44,6 +49,12 @@ GUI.tabs = new function() {
     this.redrawTabContent();
   };
 
+  /** 
+   * @function addTab
+   * @param {String} nameOfTheTab name of the tab
+   * @param linkTo
+   * @param {int} id id of the tab
+   **/
   this.addTab = function(nameOfTheTab, linkTo, id) {
     if (currentlyStoredTab.indexOf(id) >= 0) {
       // do nothing
@@ -59,7 +70,8 @@ GUI.tabs = new function() {
 
   /** 
    * Removes a tab from the sidebar
-   * 
+   * @function removeTab
+   * @param {int} id id of the tab
    **/
   this.removeTab = function(id) {
     var findID = -1;
@@ -78,7 +90,11 @@ GUI.tabs = new function() {
   /** 
    * The function creates a new cache entry. If there is already an entry with that id
    * it does nothing.
-   *
+   * @function createCacheEntry
+   * @param {int} id is of the tab
+   * @param isPO
+   * @param {String}name name of the tab
+   * @param dest
    **/
   this.createCacheEntry = function(id, isPO, name, dest) {
     var found = false;
@@ -95,7 +111,12 @@ GUI.tabs = new function() {
         dest: dest});
     }
   };
-
+/** 
+   * The function updates the name of tab with id
+   * @function updateNameOfTabWithID
+   * @param {int} id id of tab
+   * @param {String}name name of tab
+   **/
   this.updateNameOfTabWithID = function(id, name) {
     cache.forEach(function(tab) {
       if (tab.id == id) {
@@ -119,7 +140,8 @@ GUI.tabs = new function() {
   /**
    *  The function updates the cache if an object has been changed from the outside (i.e., 
    *   the name has been changed)-
-   *
+   * @function updateCache
+   * @param object
    **/
   this.updateCache = function(object) {
     var objectIsUsedInCache = false;
@@ -144,7 +166,8 @@ GUI.tabs = new function() {
 
   /**
    *  Loads important object data from the cache
-   *
+   * @function getFromCache
+   * @param id
    **/
   this.getFromCache = function(id) {
     var returnVal;
@@ -160,7 +183,7 @@ GUI.tabs = new function() {
   /**
    *   This function stores the tabs for the current user with the cache
    *   in the database
-   *
+   * @function storeCacheInDB
    */
   this.storeCacheInDB = function() {
     Modules.UserManager.storeTabCache(currentlyStoredTab, cache);
@@ -169,7 +192,7 @@ GUI.tabs = new function() {
 
   /**
    * Redraws the content of the tab sidebar
-   *
+   * @function redrawTabContent
    **/
   this.redrawTabContent = function() {
     var that = this;

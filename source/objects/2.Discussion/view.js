@@ -5,6 +5,10 @@
  *    @author Viktor Koop
  *
  */
+
+ /**
+ * @function drawEmbedded
+ */
 Discussion.drawEmbedded = function () {
 
     var rep = this.getRepresentation();
@@ -41,11 +45,18 @@ Discussion.drawEmbedded = function () {
     this.bindAdminControlls();
 }
 
+/**
+* @function updateHeading
+* @param newHeading
+*/
 Discussion.updateHeading = function(newHeading){
     var rep = this.getRepresentation();
     $(rep).find(".discussion-heading").html(newHeading);
 }
 
+/**
+* @function drawIcon
+*/
 Discussion.drawIcon = function () {
     var rep = this.getRepresentation();
 
@@ -63,6 +74,10 @@ Discussion.drawIcon = function () {
     $(rep).attr("layer", this.getAttribute('layer'));
 }
 
+/**
+* @function draw
+* @param external
+*/
 Discussion.draw = function (external) {
 
     //GeneralObject.draw.call(this,external);
@@ -76,6 +91,9 @@ Discussion.draw = function (external) {
     this.adjustControls();
 }
 
+/**
+* @function bindAdminControlls
+*/
 Discussion.bindAdminControlls = function () {
     var rep = this.getRepresentation();
     var that = this;
@@ -90,6 +108,9 @@ Discussion.bindAdminControlls = function () {
     });
 }
 
+/**
+* @function enableInlineEditors
+*/
 Discussion.enableInlineEditors = function () {
     var rep = this.getRepresentation();
     var that = this;
@@ -135,13 +156,18 @@ Discussion.enableInlineEditors = function () {
     });
 }
 
+/**
+* @function switchStateView
+*/
 Discussion.switchStateView = function(){
     $('#' + this.getAttribute('id')).remove();
     this.getRepresentation();
     this.deselect()
 }
 
-
+/**
+* @function switchState
+*/
 Discussion.switchState = function () {
     var embedded = this.getAttribute("show_embedded") || false;
     this.setAttribute("show_embedded", !embedded);
@@ -157,7 +183,11 @@ Discussion.switchState = function () {
     this.switchStateView();
 }
 
-
+/**
+* @function createRepresentationEmbedded
+* @param parent
+* @return {undefined}
+*/
 Discussion.createRepresentationEmbedded = function (parent) {
     var that = this;
 
@@ -235,6 +265,11 @@ Discussion.createRepresentationEmbedded = function (parent) {
     return rep;
 }
 
+/**
+* @function createRepresentationIcon
+* @param parent
+* return {undefined}
+*/
 Discussion.createRepresentationIcon = function (parent) {
 
     //var rep = GUI.svg.group(this.getAttribute('id'));
@@ -253,11 +288,19 @@ Discussion.createRepresentationIcon = function (parent) {
 
 }
 
+/**
+* @function getFileIcon
+* @return {String}
+*/
 Discussion.getFileIcon = function () {
     return "../../guis.common/images/discussion.png";
 }
 
-
+/**
+* @function createRepresentation
+* @param parent
+* @return {undefined}
+*/
 Discussion.createRepresentation = function (parent) {
     var embedded = this.getAttribute("show_embedded");
     var rep;
@@ -270,6 +313,11 @@ Discussion.createRepresentation = function (parent) {
     return rep;
 }
 
+/**
+* @function renderMessage
+* @param message
+* @return {undefined}
+*/
 Discussion.renderMessage = function (message) {
     var text = message.text
 
@@ -288,13 +336,21 @@ Discussion.renderMessage = function (message) {
     return compiled(templateData);
 }
 
-/* view setter */
+/** 
+* View setter
+* @function setViewHeight
+* @param value
+*/
 Discussion.setViewHeight = function (value) {
     GeneralObject.setViewHeight.call(this, value);
     $(this.getRepresentation()).attr("height", parseInt(value));
     this.updateInnerHeight(parseInt(value));
 }
 
+/**
+* @function updateInnerHeight
+* @param value
+*/
 Discussion.updateInnerHeight = function (value) {
     var embedded = this.getAttribute("show_embedded");
 
@@ -305,6 +361,10 @@ Discussion.updateInnerHeight = function (value) {
     }
 }
 
+/**
+* @function updateInnerHeightEmbedded
+* @param value
+*/
 Discussion.updateInnerHeightEmbedded = function (value) {
     var rep = this.getRepresentation();
 
@@ -317,6 +377,10 @@ Discussion.updateInnerHeightEmbedded = function (value) {
     $(rep).find(".discussion-content").css("height", (value  - ih - 60) + "px");
 }
 
+/**
+* @function updateInnerHeightIcon
+* @param value
+*/
 Discussion.updateInnerHeightIcon = function (value) {
     var rep = this.getRepresentation();
 
@@ -326,6 +390,10 @@ Discussion.updateInnerHeightIcon = function (value) {
     $(rep).find(".wrapped-text").dotdotdot();
 }
 
+/**
+* @function
+* @return {undefined}
+*/
 Discussion.representationCreated = function () {
     GeneralObject.representationCreated.call(this);
     var that = this;

@@ -27,6 +27,9 @@ GlobalContainer.getFiles = function() {
 	});
 };
 
+/**
+* @param fav
+*/
 GlobalContainer.sendNewFavourite = function(fav) {
 		
 	UserManager.getDataOfSpaceWithDest(ObjectManager.user.username, "favourites" , function(d) {
@@ -49,6 +52,10 @@ GlobalContainer.sendNewFavourite = function(fav) {
 	});
 }
 
+/**
+* @param ref
+* @param paperspace
+*/
 GlobalContainer.sendNewReference = function(ref, paperspace) {
 		
 	UserManager.getDataOfSpaceWithDest(paperspace, "references" , function(d) {
@@ -71,6 +78,8 @@ GlobalContainer.sendNewReference = function(ref, paperspace) {
 	});	
 }
 
+
+
 GlobalContainer.deleteIt = function() {
     $("#container-notifier").notify("create", "withIcon", {
         title: this.translate(GUI.currentLanguage, "globalContainer.delte.titel"), 
@@ -79,6 +88,11 @@ GlobalContainer.deleteIt = function() {
     });
 }
 
+/**
+* @param objectId
+* @param newTag
+* @roomId
+*/
 GlobalContainer.changeMainTag = function(objectId, newTag, roomId) {
 	var d = {
 		id : objectId,
@@ -88,6 +102,7 @@ GlobalContainer.changeMainTag = function(objectId, newTag, roomId) {
 
 	this.serverCall("changeMainTag", d);
 }
+
 
 GlobalContainer.getAllPaperSpaces = function() {
 	var that = this;
@@ -104,6 +119,9 @@ GlobalContainer.getAllPaperSpaces = function() {
 	});
 }
 
+/**
+* @param files
+*/
 GlobalContainer.searchAndFilter = function(files) {
 	var filteredFiles1 = new Array();
 	var filteredFiles2 = new Array();
@@ -130,6 +148,8 @@ GlobalContainer.searchAndFilter = function(files) {
 		
 			if(stringEntered){  //the user has entered a search string, search through all files and check if name matches to the search string
 				var n = files[key].attributes.name;
+				n = n.toLowerCase();
+				s = s.toLowerCase();
 				
 				if(n.indexOf(s) == -1){ //searchString is not part of the name of the object
 					continue;
@@ -218,7 +238,9 @@ GlobalContainer.searchAndFilter = function(files) {
 	
 }
 
-
+/**
+* @param files
+*/
 GlobalContainer.sortFiles = function(files){ //bubble sort
 	var sortingCriterion = this.sortingCriterion;
 	var sortingOrder = this.sortingOrder;

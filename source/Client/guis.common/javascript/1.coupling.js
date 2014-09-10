@@ -1,4 +1,6 @@
 /**
+* @file 1.coupling.js
+/**
  * true if coupling mode is active
  */
 GUI.couplingModeActive = false;
@@ -15,6 +17,7 @@ GUI.couplingTransformMatrix = { 'left': [1,0,0,1,0,0], 'right' : [1,0,0,1,0,0] }
 
 /**
  * Enter the coupling mode
+ * @function enterCouplingMode
  */
 GUI.enterCouplingMode = function() {
 
@@ -206,6 +209,7 @@ GUI.enterCouplingMode = function() {
 
 /**
  * Close the coupling mode
+ *@function closeCouplingMode
  */
 GUI.closeCouplingMode = function() {
 	
@@ -251,6 +255,12 @@ GUI.closeCouplingMode = function() {
 	$('#room_right').html("");
 }
 
+/**
+ *@function addZoomPanControl
+ *@param { int} index
+ *@param { int} x
+ *@param { int} y
+ */
 GUI.addZoomPanControl = function(index, x, y) {
 	if ($("#"+index+"CouplingControl").length == 0) {
 		var control = GUI.svg.svg($('#canvas'));
@@ -310,6 +320,11 @@ GUI.addZoomPanControl = function(index, x, y) {
 	}
 }
 
+/**
+ *@function zoom
+ *@param {int} index
+ *@param {int} factor
+ */
 GUI.zoom = function(index, factor) {
 	var width = $('#room_'+index).width();
 	var height = $('#room_'+index).height();
@@ -325,6 +340,12 @@ GUI.zoom = function(index, factor) {
   	$('#room_'+index).attr("transform", newMatrix);
 }
 
+/**
+ *@function pan
+ *@param {int} index
+ *@param {int} dx
+ *@param {int} dy
+ */
 GUI.pan = function(index, dx, dy) {
 	if (GUI.couplingTransformMatrix[index][4] + dx > 0 || GUI.couplingTransformMatrix[index][5] + dy > 0) return;
 
@@ -335,14 +356,28 @@ GUI.pan = function(index, dx, dy) {
   	$('#room_'+index).attr("transform", newMatrix);
 }
 
+/**
+ *@function getPanX
+ *@param {int} index
+ */
 GUI.getPanX = function(index) {
 	return GUI.couplingTransformMatrix[index][4];
 }
 
+/**
+ *@function getPanY
+ *@param {int} index
+ */
 GUI.getPanY = function(index) {
 	return GUI.couplingTransformMatrix[index][5];
 }
 
+/**
+ *@function defaultZoomPanState
+ *@param {int} index
+ *@param roomChange
+  *@param event
+ */
 GUI.defaultZoomPanState = function(index, roomChange, event) {
 	var defaultMatrix = [1,0,0,1,0,0];
 	if (roomChange) {
