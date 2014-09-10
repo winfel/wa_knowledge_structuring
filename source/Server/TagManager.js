@@ -153,20 +153,16 @@ var TagManager = function() {
             }); 
         });
         
+
+		// TODO: move this out of init, because this is dangerous as some object creation may fail due to still unfinished server/database startup process
+		// OrderContainers is now bound to Event 'room::public::userEntered' in InternalDispatcher
 		// we create our context
 		var context = {
-	            user: { username : "root"}
-	    };
-		
+			user: { username : "root"}
+		};
 		// Check if there are tags without Container
 		// If there are any; then let's create the containers
-		that.createMissingContainers(context, function (newContainers) {
-		    if (true) {
-		    //if (newContainers > 0) {
-		        // Order the containers
-		        that.OrderContainers(context); 
-		    }
-		});
+		that.createMissingContainers(context, function (newContainers) {});
 	};
   
 	/**
@@ -653,6 +649,7 @@ var TagManager = function() {
                             if (object) {
                                 object.setAttribute('x', cX);
                                 object.setAttribute('y', cY);
+                                object.persist();
                                 
                                 cX += HORIZONTAL_GAP + CONTAINER_WIDTH;
                                 

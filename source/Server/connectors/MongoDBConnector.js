@@ -261,23 +261,21 @@ function buildObjectFromDBObject (roomID, attr, callback) {
     data.inRoom = roomID;
     data.attributes.inRoom = roomID;
     data.attributes.hasContent = false;
-    
-    try {
-        GridStore.exist(mongoConnector.db, attributes.id, function(err, result) {
-        	if (err) { throw err; }
-        	if (result) {
-        		//console.log ("File " + attributes.id + "  exist");
-        		data.attributes.hasContent = true;
-                data.attributes.contentAge = new Date().getTime();	
-        	}
-        	
-        	callback(data);
-        });
-    } catch(ex) {
-		Modules.Log.warn(ex);
-		console.log('... this happens then and when and can be ignored.\nIvan will fix it... hopefully... ;-)');
-		console.dir(arguments);
-    }
+
+	if(!mongoConnector.db) {
+		Modules.Log.error(new Error('call to .buildObjectFromDBObject before database finished connecting'));
+	}
+
+	GridStore.exist(mongoConnector.db, attributes.id, function(err, result) {
+		if (err) { throw err; }
+		if (result) {
+			//console.log ("File " + attributes.id + "  exist");
+			data.attributes.hasContent = true;
+			data.attributes.contentAge = new Date().getTime();	
+		}
+
+		callback(data);
+	});
 }
 
 /**

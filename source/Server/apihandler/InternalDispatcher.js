@@ -36,6 +36,11 @@ InternalDispatcher.init = function(theModules){
     Modules.EventBus.on('pdfAdded', function(data){
 		Modules.PdfEdit.convertToHtml(data);
     });
+
+	// if a user enters the public space, reorder GlobalContainers
+	Modules.EventBus.on('room::public::userEntered', function(data) {
+		Modules.TagManager.OrderContainers({user:data});
+	});
 };
 
 
