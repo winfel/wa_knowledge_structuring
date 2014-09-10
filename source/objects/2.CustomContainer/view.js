@@ -167,10 +167,10 @@ CustomContainer.drawContent = function(rep){
 			 
 				var selectMainTags;
 				if(that.mainTag != ""){
-					selectMainTags = '<select id="selectMainTags_for_'+that.id+'" size="1"><option value="1" disabled>Select a main tag</option>';
+					selectMainTags = '<select id="selectMainTags_for_'+that.id+'" size="1"><option value="1" style="color:silver">Select a main tag</option>';
 				}
 				else{
-					selectMainTags = '<select id="selectMainTags_for_'+that.id+'" size="1"><option value="1" disabled selected>Select a main tag</option>';
+					selectMainTags = '<select id="selectMainTags_for_'+that.id+'" size="1"><option value="1" style="color:silver" selected>Select a main tag</option>';
 				}
 			 
 				for(var i = 0; i < o.length; i++){
@@ -186,10 +186,10 @@ CustomContainer.drawContent = function(rep){
 			 
 			 	var selectSecTags;
 				if(that.secTag != ""){
-					selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="1" disabled>Select a secondary tag</option>';
+					selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="1" style="color:silver">Select a secondary tag</option>';
 				}
 				else{
-					selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="1" disabled selected>Select a secondary tag</option>';
+					selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="1" style="color:silver" selected>Select a secondary tag</option>';
 				}
 				
 				selectSecTags = selectSecTags + '</select>';
@@ -292,9 +292,10 @@ CustomContainer.drawContent = function(rep){
 				
 					sel2.innerHTML = '';
 				
+					$('<option value="1" style="color:silver" selected>Select a secondary tag</option>').appendTo(sel2);
+				
 					for(var j = 0; j<o.length; j++){
 						if(o[j].name == this.value){
-							$('<option value="1" disabled selected>Select a secondary tag</option>').appendTo(sel2);
 							for(var i = 0; i<o[j].secTags.length; i++){
 								$('<option value="'+o[j].secTags[i]+'">'+o[j].secTags[i]+'</option>').appendTo(sel2);
 							}

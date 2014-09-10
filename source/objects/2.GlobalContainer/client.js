@@ -136,7 +136,7 @@ GlobalContainer.searchAndFilter = function(files) {
 	var text = this.searchForText;
 	
 	var stringEntered = (s != "");
-	var tagEntered = (tag != "");
+	var tagEntered = ((tag != "") && (tag != "1"));
 	
 	if(!stringEntered && !tagEntered){
 		filteredFiles1 = files;

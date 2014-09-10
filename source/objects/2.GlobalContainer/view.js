@@ -213,10 +213,10 @@ GlobalContainer.drawContent = function(rep){
 			 
 			 var selectSecTags;
 			 if(that.secTag != ""){
-				selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="1" disabled>Select a secondary tag</option>';
+				selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="1" style="color:silver">Select a secondary tag</option>';
 			}
 			else{
-				selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="1" disabled selected>Select a secondary tag</option>';
+				selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="1" style="color:silver" selected>Select a secondary tag</option>';
 			}
 			 
 			TagManager.getSecTags(that.getAttribute('name'), function(o){ 
