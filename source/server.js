@@ -92,11 +92,12 @@ Modules.config = config;
 Modules.Config = config;
 
 Modules.MongoDBConfig   = require('./Server/db/MongoDBConfig.js');
+Modules.RightManager    = require('./Server/RightManager.js');
+Modules.UserManager     = require('./Server/UserManager.js');
 Modules.ObjectManager   = require('./Server/ObjectManager.js');
 Modules.Dispatcher      = require('./Server/Dispatcher.js');
 Modules.WebServer       = require('./Server/WebServerE.js');
 Modules.SocketServer    = require('./Server/SocketServer.js');
-Modules.UserManager     = require('./Server/UserManager.js');
 Modules.DBManager       = require('./Server/DBManager.js');
 Modules.Helper          = require('./Server/Helper.js');
 Modules.EventBus        = require("./Server/EventBus.js");
@@ -110,7 +111,6 @@ Modules.DataSet             = require('./Common/DataSet.js');
 Modules.AttributeManager    = require('./Common/AttributeManager.js');
 Modules.TranslationManager  = require('./Common/TranslationManager.js');
 Modules.ActionManager       = require('./Common/ActionManager.js');
-Modules.RightManager        = require('./Server/RightManager.js');
 //Modules.UserManager2      = require('./Server/UserManager2.js'); 
 Modules.TagManager          = require('./Server/TagManager.js');
 
