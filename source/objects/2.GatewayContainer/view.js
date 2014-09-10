@@ -140,7 +140,7 @@ GatewayContainer.drawContent = function(rep){
              var page = popover.addPage(GUI.translate('Search/Filter'));
              var section = page.addSection();
 
-			 var s = that.searchString;
+			var s = that.searchString;
 			if(s == 0 || s == ""){
 				s = 'value="""" placeholder = "search by name"';
 			}
@@ -171,6 +171,7 @@ GatewayContainer.drawContent = function(rep){
 			var clickDeselectAll = function(){
 				$('#checkPaperSpaces_for'+that.id).prop('checked',false);
 				$('#checkSubrooms_for'+that.id).prop('checked',false);
+				$('#textName_for'+that.id).val('');
 			}
 			var search = section.addElement('<button id= "searchButton_for_'+that.id+'" type="submit" height="30">Search</button>');
 			var clickSearch = function(){

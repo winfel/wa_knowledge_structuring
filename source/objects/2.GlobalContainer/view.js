@@ -213,10 +213,10 @@ GlobalContainer.drawContent = function(rep){
 			 
 			 var selectSecTags;
 			 if(that.secTag != ""){
-				selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="" disabled>Select a secondary tag</option>';
+				selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="1" disabled>Select a secondary tag</option>';
 			}
 			else{
-				selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="" disabled selected>Select a secondary tag</option>';
+				selectSecTags = '<select id="selectSecTags_for_'+that.id+'" size="1"><option value="1" disabled selected>Select a secondary tag</option>';
 			}
 			 
 			TagManager.getSecTags(that.getAttribute('name'), function(o){ 
@@ -264,6 +264,8 @@ GlobalContainer.drawContent = function(rep){
 					$('#checkVideo_for'+that.id).prop('checked',false);
 					$('#checkText_for'+that.id).prop('checked',false);
 					$('#checkImage_for'+that.id).prop('checked',false);
+					$('#textName_for'+that.id).val('');
+					$('#selectSecTags_for_'+that.id+' option[value="1"]').attr('selected',true);
 				}
 				var search = section.addElement('<button id= "searchButton_for_'+that.id+'" type="submit" height="30">Search</button>');
 				var clickSearch = function(){

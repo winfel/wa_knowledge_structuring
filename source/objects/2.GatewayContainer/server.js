@@ -13,12 +13,11 @@ var async = require("async");
 module.exports=theObject;
 
 var TRASH_ROOM = 'trash';
-var p = 'PaperSpace';
-var s = 'Subroom';
+var targets = ['Subroom'];
 
 theObject.getAllGatewayObjects = function(user, cb) {
 	
-	Modules.Connector.getObjectDataByQuery({type: { $in: [ p, s ] }, inRoom: {$nin:[TRASH_ROOM] } }, function(data){
+	Modules.Connector.getObjectDataByQuery({type: { $in: targets }, inRoom: {$nin:[TRASH_ROOM] } }, function(data){
 	
 		var objects = new Array();
 	
@@ -30,16 +29,20 @@ theObject.getAllGatewayObjects = function(user, cb) {
 	
 		for(var i = 0; i<data.length; i++){
 			
-			var o = {
-				id : data[i].attributes.id,
-				type : data[i].type
-			}
-			
-			objects[i] = o;
+			objects[i] = data[i];
 			
 			funcs.push(function(callback){ 
 				counter++;
-				Modules.RightManager.hasAccess("read", objects[counter], {username : user}, function(d){
+				
+				//console.log("call");
+				//console.log(objects[counter]);
+				//console.log(user);
+				
+				Modules.RightManager.hasAccess(objects[counter], {username : user}, "enter", function(d){
+				
+					//console.log("back");
+					//console.log(d);
+				
 					if(d != false){
 						callback(null, true);
 					}
@@ -51,6 +54,9 @@ theObject.getAllGatewayObjects = function(user, cb) {
 		}
 			
 		async.series(funcs, function(err, results){
+			
+			//console.log("results");
+			//console.log(results);
 			
 			for(var j = 0; j < results.length; j++){
 			
