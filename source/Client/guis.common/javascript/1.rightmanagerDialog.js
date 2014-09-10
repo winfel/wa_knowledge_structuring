@@ -44,17 +44,21 @@ GUI.rightmanagerDialog = new function() {
    * @param {type} typeOfObject
    * @returns {undefined}
    */
-  this.show = function() {
-    var selectedObjects = ObjectManager.getSelected();
-    if (selectedObjects.length > 0) {
-      if (selectedObjects.length == 1) {
-        currentObject = selectedObjects[0];
-      } else {
-        currentObject = false;
-      }
+  this.show = function(theObject) {
+    if (theObject) {
+      currentObject = theObject;
     } else {
-      // ObjectManager.currentRoom["left"] did not return the current room...
-      currentObject = {id: ObjectManager.currentRoomID["left"], type: "Room"};
+      var selectedObjects = ObjectManager.getSelected();
+      if (selectedObjects.length > 0) {
+        if (selectedObjects.length == 1) {
+          currentObject = selectedObjects[0];
+        } else {
+          currentObject = false;
+        }
+      } else {
+        // ObjectManager.currentRoom["left"] did not return the current room...
+        currentObject = {id: ObjectManager.currentRoomID["left"], type: "Room"};
+      }
     }
 
     // Check whether this object is supposed to have a right manager dialog or not.
