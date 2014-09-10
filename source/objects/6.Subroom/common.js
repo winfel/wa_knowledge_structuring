@@ -32,8 +32,8 @@ Subroom.register = function(type) {
   IconObject.register.call(this, type);
 
   // Registers the available rights ...
-  this.registerRight("manage", "A user may manage this subroom.");
-  this.registerRight("enter", "A user may enter this subroom.");
+  this.registerRight("manage", "A user may manage this subroom.", "Room");
+  this.registerRight("enter", "A user may enter this subroom.", "Room");
   // ... and default roles for this object.
   this.registerDefaultRole("Coworker", ["enter"]);
 

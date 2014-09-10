@@ -12,61 +12,61 @@ var Modules = require('../../server.js');
 
 
 theObject.createNew = function() {
-    // TODO
-    var p = new PaperEntity();
-    p.createNew(null);
-}
+  // TODO
+  var p = new PaperEntity();
+  p.createNew(null);
+};
 
 /**
-* @param object
-* @param oldData
-* @param newData
-*/
-theObject.onEnter=function(object,oldData,newData){
-    var that = this;
+ * @param object
+ * @param oldData
+ * @param newData
+ */
+theObject.onEnter = function(object, oldData, newData) {
+  var that = this;
 
-    // get id of the chapter
-    var id = object.getAttribute('chapterID');
+  // get id of the chapter
+  var id = object.getAttribute('chapterID');
 
-    // FIXME: send to writer
-    var currentRoom = that.getCurrentRoom();
+  // FIXME: send to writer
+  var currentRoom = that.getCurrentRoom();
 
-    // get writer
-    Modules.ObjectManager.getObject(currentRoom,object.getAttribute('writer'),object.context, function(o){
-        if(o != false){
-            o.setAttribute('paper',id);
-            o.setAttribute('initFinished',true);
-        }
-    });
-}
+  // get writer
+  Modules.ObjectManager.getObject(currentRoom, object.getAttribute('writer'), object.context, function(o) {
+    if (o) {
+      o.setAttribute('paper', id);
+      o.setAttribute('initFinished', true);
+    }
+  });
+};
 
 theObject.createReview = function() {
-    // TODO
-}
+  // TODO
+};
 
 theObject.exportFile = function() {
-    // TODO
-}
+  // TODO
+};
 
 theObject.open = function() {
-    // TODO
-}
+  // TODO
+};
 
 theObject.deleteIt = function() {
-    // TODO
-}
+  // TODO
+};
 
 theObject.addChild = function() {
-    // TODO
-}
+  // TODO
+};
 
 theObject.deleteChild = function() {
-    // TODO
-}
+  // TODO
+};
 
 theObject.publish = function() {
-    // TODO
-}
+  // TODO
+};
 
 theObject.commonRegister = theObject.register;
 

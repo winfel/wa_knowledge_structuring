@@ -1329,11 +1329,12 @@ GeneralObject.deleteIt = GeneralObject.remove;
  * @function registerRight
  * @param {type} name
  * @param {type} comment
+ * @param {type} mask     Masks the object type to another one.
  * @returns {undefined}
  */
-GeneralObject.registerRight = function(name, comment) {
+GeneralObject.registerRight = function(name, comment, mask) {
   try {
-    Modules.RightManager.registerRight(this, name, comment);
+    Modules.RightManager.registerRight(this, name, comment, mask);
   } catch (e) {
     // Do nothing if registerRight is not available on the client side.
   }
