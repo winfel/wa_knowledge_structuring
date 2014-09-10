@@ -12,6 +12,10 @@ var RightManager = new function() {
   var supportedObjects = new Array();
   var rights = {};
   var rightObjects = {};
+  
+  // Type masks is only needed to access the local stored information.
+  // The server side of the right manager has it's own mapping functionality.
+  var typeMasks = {};
 
   var listener = {};
 
@@ -106,10 +110,17 @@ var RightManager = new function() {
    * @param {type} object
    * @param {type} name
    * @param {type} comment
+   * @param {type} mask       The mask is used to treat certain object types as other object type. E.g. paper spaces or subrooms as rooms.
    * @returns {undefined}
    */
-  this.registerRight = function(object, name, comment) {
+  this.registerRight = function(object, name, comment, mask) {
     var dataObject = this.reduceObject(object);
+    if (mask) {
+      // Store the type mask. This is used to pass the supports function.
+      typeMasks[dataObject.type] = mask;
+      dataObject.type = mask;
+    }
+
     var rightObject = {name: name, comment: comment};
 
     if (rights[dataObject.type]) {
@@ -132,7 +143,11 @@ var RightManager = new function() {
    */
   this.supports = function(object) {
     var dataObject = this.reduceObject(object);
-
+    
+    // Important for subroom and paperspace
+    if(typeMasks[dataObject.type])
+      dataObject.type = typeMasks[dataObject.type];
+    
     return supportedObjects.indexOf(dataObject.type) >= 0;
   };
 
@@ -155,6 +170,11 @@ var RightManager = new function() {
    */
   this.getAvailableRights = function(object) {
     var dataObject = this.reduceObject(object);
+    
+    // Important for subroom and paperspace
+    if(typeMasks[dataObject.type])
+      dataObject.type = typeMasks[dataObject.type];
+    
     return rightObjects[dataObject.type] || [];
   };
 

@@ -19,6 +19,8 @@ var RightManager = function() {
   this.mapObject = function(object, isRegister) {
     var dataObject = {id: object.id, type: object.type};
     switch (object.type) {
+      // PaperSpace and Subroom are technically still a room.
+      case "PaperSpace":
       case "Subroom":
         if (!isRegister) {
           if (object.getAttribute) {
@@ -67,9 +69,11 @@ var RightManager = function() {
    * @param {type} object
    * @param {type} name
    * @param {type} comment
+   * @param {type} mask
    * @returns {undefined}
    */
-  this.registerRight = function(object, name, comment) {
+  this.registerRight = function(object, name, comment, mask) {
+    
     var dataObject = this.mapObject(object, true);
 
     var dbRights = db.get('rights');
@@ -127,7 +131,7 @@ var RightManager = function() {
    * @returns {undefined}
    */
   this.getObjectRights = function(object, callback) {
-    var dataObject = this.mapObject(object, true);
+    var dataObject = this.mapObject(object);
 
     var dbRights = db.get('rights');
     dbRights.distinct("name", {type: dataObject.type}, function(e, docs) {
@@ -278,6 +282,7 @@ var RightManager = function() {
    * @param {type}   role      The role that should be changed
    * @param {type}   grant     The grant paramter is set to true, if the access right should be
    *                           granted. Set false, to revoke access.
+   * @param {type} callback     
    */
   this.modifyAccess = function(object, right, role, grant, callback) {
     var dataObject = this.mapObject(object);
@@ -325,7 +330,6 @@ var RightManager = function() {
     var dbRights = db.get('rights');
     dbRights.distinct("type", {}, function(e, docs) {
       if (callback) {
-        docs.push("Subroom"); // Quick fix for subrooms...
         callback(docs);
       }
     });
@@ -377,7 +381,7 @@ var RightManager = function() {
     var dataObject = this.mapObject(object);
 
     var role = {
-      objectid: dataObject.id,
+      objectid: String(dataObject.id),
       name: rolename,
       deletable: deletable
     };
@@ -401,12 +405,7 @@ var RightManager = function() {
        role.mode = "overwrite";
        }*/
 
-      dbRoles.insert({
-        objectid: String(role.objectid),
-        //mode: role.mode,
-        name: role.name,
-        rights: role.rights,
-        users: role.users});
+      dbRoles.insert(role);
 
       if (callback)
         callback(role);
