@@ -175,13 +175,13 @@ GUI.tabs = new function() {
     var that = this;
 
     var destFromURL = document.URL.substring(document.URL.lastIndexOf("/") + 1, document.URL.length);
-    
+
     // ===== small hack to preventing accessing the private space of somesome ===
-      if(destFromURL.indexOf(GUI.username) == -1 && destFromURL.indexOf("PrivateSpace") > -1){
-          ObjectManager.loadRoom("public", false, 'left');
-          var audio = new Audio('/guis.common/sounds/cant_touch_this.mp3');
-          audio.play();
-      }
+    if (destFromURL.indexOf(GUI.username) == -1 && destFromURL.indexOf("PrivateSpace") > -1) {
+      ObjectManager.loadRoom("public", false, 'left');
+      var audio = new Audio('/guis.common/sounds/cant_touch_this.mp3');
+      audio.play();
+    }
     // =====================
 
     $("#tabs_content").html(""); // clear
@@ -268,7 +268,7 @@ GUI.tabs = new function() {
 
         if (drawName.indexOf('(PS)') > 0) {
 
-          Modules.RightManager.hasAccess("read", {id: getCurrentObject.id, type: getCurrentObject.type}, GUI.username, function(result) {
+          Modules.RightManager.hasAccess(getCurrentObject, "read", function(result) {
             if (result) {
               ObjectManager.loadPaperWriter(dest, false, 'left');
             } else {
@@ -278,7 +278,7 @@ GUI.tabs = new function() {
           });
 
         } else {
-          Modules.RightManager.hasAccess("read", {id: getCurrentObject.id, type: getCurrentObject.type}, GUI.username, function(result) {
+          Modules.RightManager.hasAccess(getCurrentObject, "enter", function(result) {
             if (result) {
               ObjectManager.loadRoom(dest, false, 'left');
             } else {
