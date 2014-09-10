@@ -1,614 +1,397 @@
-GUI.userdialog = new function() {
+/**
+ * Right manager sidebar object.
+ * 
+ */
+GUI.rightmanager = new function() {
+  var that = this;
+  var rightmanagerArea;
+  var inspectorArea;
+  var inspector;
+  var currentObject;
 
-  var container = null;
-  var friendlist = null;
-  var suggested = null;
-  var searched = null;
-  var inputfield = null;
+  var roles;
 
-  var checkedUsers = null; // Keep track of the selected users. Needed for a delete server call.
-  var checkedSpans = null; // Keep track of the corresponding spans, which display a user.
-
+  /**
+   * Initializes the user interface of the right manager in the sidebar.
+   * 
+   * @function init
+   * @returns {undefined}
+   */
   this.init = function() {
-    console.log("GUI.userdialog initialized");
-    var that = GUI.userdialog;
+    // Some important variables
+    rightmanagerArea = $("#rightmanager");
 
-    // Store important references
-    this.container = $("#manageUserDialog");
-    this.friendlist = $("#manageUserDialogFriendList");
-    this.suggested = $("#manageUserDialogSuggested");
-    this.searched = $("#manageUserDialogSearched");
-    this.inputfield = $("#manageUserDialogNewTextfield");
+    var bottomArea = $("<div>");
+    bottomArea.attr("class", "jDesktopInspector_main");
+    bottomArea.html('<div class="jDesktopInspector_page rightmanager-bottom display-block">'
+            + '<input type="text" class="ui-textfield new-role-textfield" placeholder="Role">'
+            + '<input type="image" class="btn btn-new-role" title="' + GUI.translate("Create a new role for this object") + '" src="/guis.common/images/oxygen/22x22/actions/list-add.png">'
+            + '<input type="image" class="btn btn-save-role" title="' + GUI.translate("Save the new role for this object") + '" src="/guis.common/images/oxygen/22x22/actions/document-save.png">'
+            + '<input type="image" class="btn btn-cancel" title="' + GUI.translate("Cancel") + '" src="/guis.common/images/oxygen/22x22/actions/dialog-cancel.png">'
+            + '</div>');
+    rightmanagerArea.append(bottomArea);
 
-    this.inputfield.on("focus", function(event) {
-      $(this).val("");
+    var input = bottomArea.find("input.new-role-textfield");
+
+    // Add an add user button
+    bottomArea.find(".btn").click(function() {
+      bottomArea.find(".btn").toggle();
+      input.animate({width: 'toggle'});
     });
 
-    this.inputfield.on("keyup", function(event) {
-      if (event.keyCode == 13) {
-        var newUser = $(this).val();
+    bottomArea.find(".btn-save-role").click(function() {
+      var role = bottomArea.find("input[type='text']").val().trim();
+      if (role != "") {
+        RightManager.modifyRole(currentObject, role, true);
+      }
+      input.val("");
+//      bottomArea.find("input:not(.new-role-textfield)").toggle();
+//      bottomArea.find("input.new-role-textfield").animate({width: "toggle"}).val("");
+    });
 
-        if (newUser) {
-            Modules.UserManager.isValidUser(newUser, function(valid) {
-                if (valid) addUserToSection(that, newUser, that.searched, false, false, true, true);
-                else {
-                    $("#container-notifier").notify("create", "withIcon", {
-                        text: GUI.translate("The User " + newUser + " was not found"),
-                        icon: '/guis.common/images/toast/error.png'
-                    }, {expires:false});
-                }
-            });
-        }
-        
+    bottomArea.find(".btn-cancel").click(function() {
+      input.val("");
+    });
+
+    inspectorArea = $("<div>");
+    rightmanagerArea.append(inspectorArea);
+
+    inspectorArea.jDesktopInspector();
+    inspector = inspectorArea.data("jDesktopInspector");
+
+    // Listen for changes to some user.
+    RightManager.listen("userchange", function(data) {
+      if (currentObject.id == data.object.id) {
+        // Update the section only if the object id is the same.
+        that.modifyUserElement(data.user, data.role, data.add);
       }
     });
 
-    // Create the dialog
-    this.container.dialog({
-      title: "Add Users",
-      autoOpen: false,
-      modal: true,
-      width: 300,
-      buttons: [
-        {
-          text: "Add users",
-          click: function() {
-            var callback = $(this).data("resultCallback");
-            $(this).dialog("close");
-            callback(that.checkedUsers);
-          }
-        },
-        {
-          text: "Close",
-          click: function() {
-            $(this).dialog("close");
-          }
-        }
-      ]
-    });
-  };
-
-  /*
-   * 
-   * @param {type} callback
-   * @returns {undefined}
-   */
-  this.show = function(object, role, callback) {
-    var that = GUI.userdialog;
-
-    // Set the content of the dialog
-    Modules.UserManager.getMissingUsers(object, role, function(users) {
-      that.checkedUsers = new Array();
-      that.checkedSpans = new Array();
-
-      that.friendlist.empty();
-      that.suggested.empty();
-      that.searched.empty();
-
-      users.forEach(function(user) {
-        addUserToSection(that, user.username, that.friendlist, false, false, true);
-      });
-
-      var suggestedDummy = ["hugo", "egon", "fritz", "franz", "josef", "heinz"];
-      suggestedDummy.forEach(function(user) {
-        addUserToSection(that, user, that.suggested, false, false, true);
-      });
-
-      that.inputfield.autocomplete({source: ["anna", "cindy", "anouk", "marissa", "dummy"]});
+    // Listen for changes to some rights.
+    RightManager.listen("rightchange", function(data) {
+      if (currentObject.id == data.object.id) {
+        // Update the section only if the object id is the same.
+        that.modifyRightElement(data.right, data.role, data.grant);
+      }
     });
 
-    that.container.data("resultCallback", callback);
-    that.container.dialog("open");
-  };
-};
-
-/* 
- * Sidebar: Right Manager
- */
-GUI.rightmanager = new function() {
-  var rm, rmRoles;
-  var rmRightsHeader, rmRights;
-  var rmUsersHeader, rmUsers;
-  var btnDeleteUsers;
-
-  var obj = null;
-  var objData = null; // It is used...
-
-  var checkedUsers = null; // Keep track of the selected users. Needed for a delete server call.
-  var checkedSpans = null; // Keep track of the corresponding spans, which display a user.
-
-  var selectedRoleSpan;
-  var containerSelected;
-  var containerNoneSelected;
-
-  /* Content of rightmanager sidebar*/
-
-  /**
-   * 
-   * @returns {undefined}
-   */
-  this.init = function() {
-    console.log("GUI.rightmanager initialized");
-    var that = this;
-
-    this.rm = $("#rightmanager");
-    this.rmRoles = $("#rm_roles");
-    this.rmRightsHeader = $("#rm_rightsHead");
-    this.rmRights = $("#rm_rights");
-    this.rmUsersHeader = $("#rm_usersHead");
-    this.rmUsers = $("#rm_users");
-    this.btnDeleteUsers = $("#rmDeleteUsersButton");
-    this.selectedRoleSpan = null;
-    this.containerSelected = $('#rightmanager .rightmanagerSelected');
-    this.containerNoneSelected = $('#rightmanager .rightmanagerNoneSelected');
-
-    // Add role event
-    $("#rmNewRoleButton").click(function(event) {
-      var role = $("#rmNewRoleTextfield").val();
-     
-      Modules.UserManager.addRole(GUI.rightmanager.objData, {name: role});
-
-      GUI.rightmanager.updateContent(GUI.rightmanager.obj);
+    // Listen for changes to some roles.
+    RightManager.listen("rolechange", function(data) {
+      if (currentObject.id == data.object.id) {
+        // Update the section only if the object id is the same.
+        that.modifyRoleSection(data.role, data.add);
+      }
     });
-
-    // Add user event
-    $("#rmAddUsersButton").click(function() {
-      openUserDialog();
-    });
-
-    // Initially no object is selected
-    this.containerSelected.hide();
-
-    // Init the user dialog
-    GUI.userdialog.init();
   };
 
   /**
+   * Modifies a user element in the users section.
    * 
-   * @param {Array} availableRights   Array of the available rights (as objects)
-   * @param {Array} checkedRights     Array of the checked rights (as strings)
+   * @function modifyUserElement
+   * @param {type} user
+   * @param {type} role
+   * @param {type} add
+   * @param {type} sectionUsers
+   * @param {type} rolePage
    * @returns {undefined}
    */
-  this.updateRightsSection = function(availableRights, checkedRights) {
-    var that = GUI.rightmanager;
+  this.modifyUserElement = function(user, role, add, sectionUsers, rolePage) {
+    var elemId = "rightmanagerSidebar_user_" + currentObject.id + "_" + role.name + "_" + user;
 
-        // Update the rights header
-        that.rmRightsHeader.children("span").html("(" + that.selectedRoleSpan.data("role").name + ")");
-        // Clear the rights section
-        that.rmRights.empty();
+    if (add) {
+      // Make sure page and section exist...
+      if (!rolePage || !sectionUsers) {
+        rolePage = $(".jDesktopInspector_pageHead:contains(" + role.name + ")", rightmanagerArea).next();
+        sectionUsers = rolePage.find(".jDesktopInspector_section").first();
+      }
 
-        availableRights.forEach(function(right) {
-          var checked = checkedRights.indexOf(right.name) >= 0;
-          addRightToSection(that, right, that.selectedRoleSpan.data("role"), that.rmRights, checked);
-          that.rmRights.append("<br>");
-        });
+      // Add a user to the list
+      var element;
+      if (sectionUsers.addElement)
+        element = sectionUsers.addElement(user);
+      else
+        element = inspector.addElement(sectionUsers, user, rolePage);
 
-  };
+      var elementDOM = element.getDOM();
 
-  /**
-   * Updates the user section of the right manager sidebar.
-   * 
-   * @param {Array} users
-   * @returns {undefined}
-   */
-  this.updateUsersSection = function(users) {
-    /* sort array in alphabetical order */
-    users.sort();
+      $(elementDOM)
+              .attr("id", elemId)
+              .addClass("user-item")
+              .append('<input type="image" class="btn btn-remove-user" title="' + GUI.translate("Remove this user from this role") + '" src="/guis.common/images/oxygen/16x16/actions/list-remove.png">');
 
-    //users=["Patrick","Jörg","Vanessa","Mohammad","Lisa","Ivan","Oliver","Shari"]; // Demo data
-    var that = GUI.rightmanager;
+      $(elementDOM).find("input").click(function() {
+        var title = GUI.translate("Removing a user from a role");
+        var text = GUI.translate("You are about to remove '[USER]' from the role '[ROLE]'.");
+        text = text.replace("[USER]", user).replace("[ROLE]", role.name);
 
-    // Update the rights header
-    that.rmUsersHeader.children("span").html("(" + that.selectedRoleSpan.data("role").name + ")");
-    // Clear the output.
-    that.rmUsers.empty();
-
-    that.checkedUsers = new Array(); // Keep track of the selected users. Needed for a delete server call.
-    that.checkedSpans = new Array(); // Keep track of the corresponding spans, which display a user.
-
-    that.btnDeleteUsers.on("click", function() {
-      that.checkedSpans.forEach(function(item) {
-        Modules.UserManager.removeUser(that.objData, that.selectedRoleSpan.data("role"), item.data("user"));
-        item.remove();
-      });
-
-      // No users checked anymore
-      that.checkedSpans.length = 0;
-      that.checkedUsers.length = 0;
-
-      that.btnDeleteUsers.removeClass("visible");
-    });
-
-    if (users.length > 0) {
-      users.forEach(function(user) {
-        var span = addUserToSection(that, user, that.rmUsers, that.selectedRoleSpan.data("role"), true);
-
-        span.on("click", function() {
-          if (that.checkedSpans.length > 1) {
-            that.btnDeleteUsers.addClass("visible");
-          } else if (that.checkedSpans.length == 1) {
-            that.btnDeleteUsers.removeClass("visible");
-          }
+        confirmDialog(title, text, function() {
+          RightManager.removeUser(currentObject, user, role);
+          // We do not remove the element here, since we will send a broadcast message to all other managers.
         });
       });
     } else {
-      // No user found => show a corresponding message.
-      var span = $("<span>");
-      span.html("No users found");
-      that.rmUsers.append(span);
+      // Remove the user from the list...
+      $("#" + elemId).remove();
     }
   };
 
   /**
+   * Creates a right element in the rights section.
    * 
-   * @param {type} theObject
+   * @function createRightElement
+   * @param {type} right
+   * @param {type} role
+   * @param {type} sectionRights
    * @returns {undefined}
    */
-  this.updateContent = function(theObject) {
-    var that = GUI.rightmanager;
+  this.createRightElement = function(right, role, sectionRights) {
+    var elemId = "rightmanagerSidebar_right_" + currentObject.id + "_" + role.name + "_" + right.name;
 
-    that.obj = theObject;
-    that.objData = {id: theObject.id, type: theObject.type};
+    var element = sectionRights.addElement(right.name);
+    var elementDOM = element.getDOM();
 
-    if(theObject.type == 'PaperSpace' || theObject.type == 'Subroom'){
-    /* Display selected object information */
-    var selectedObjects = ObjectManager.getSelected();
+    var widget = element.addWidget("boolean");
+    // Initial value
+    widget.setValue(role.rights.indexOf(right.name) >= 0);
 
-    /* Depending on how many objects are selected display nothing, only object information or everything */
+    $(elementDOM)
+            .attr({
+              id: elemId,
+              title: right.comment
+            })
+            .addClass("cursor-pointer")
+            .on("click", function(event) {
+              // Update the widget if the element div (not input) is clicked.
+              if (event.target != $(elementDOM).find("input")[0]) {
+                widget.setValue(!widget.getValue());
+              }
 
-    /* No object selected */
-    if (selectedObjects.length == 0) {
-      this.containerSelected.hide();
-      this.containerNoneSelected.show();
-    }
+              RightManager.modifyAccess(currentObject, right, role, widget.getValue());
+            });
+  };
 
-    /* More than one object selected */
-    else if (selectedObjects.length > 1) {
-      $("#rm_rolesHead").hide();
-      $("#rm_rolesPage").hide();
-      $("#rm_rightsHead").hide();
-      $("#rm_rightsPage").hide();
-      $("#rm_usersHead").hide();
-      $("#rm_usersPage").hide();
+  /**
+   * Updates the checkbox value of a right element.
+   * 
+   * @function modifyRightElement
+   * @param {type} right
+   * @param {type} role
+   * @param {type} grant
+   * @returns {undefined}
+   */
+  this.modifyRightElement = function(right, role, grant) {
+    var elemId = "rightmanagerSidebar_right_" + currentObject.id + "_" + role.name + "_" + right.name;
+    $("#" + elemId).find("input").prop("checked", grant);
+  };
 
-      $("#rm_ID").html("Verschiedene Werte");
-      $("#rm_Name").html("Verschiedene Werte");
-      $("#rm_Type").html("Verschiedene Werte");
+  /**
+   * Creates a section for a role in the sidebar.
+   * 
+   * @function modifyRoleSection
+   * @param role  
+   * @param add
+   * @returns {undefined}
+   */
+  this.modifyRoleSection = function(role, add) {
+    var that = this;
+    var elemId = "rightmanagerSidebar_role_" + currentObject.id + "_" + role.name;
 
-      this.containerSelected.show();
-      this.containerNoneSelected.hide();
-    }
 
-    /* Exactly one object selected */
-    else {
-      $("#rm_rolesHead").show();
-      $("#rm_rolesPage").show();
+    if (add) {
+      var rights = RightManager.getAvailableRights(currentObject);
+      // A new jQueryInspector page...
+      var page = inspector.addPage(role.name);
 
-      $("#rm_rightsHead").show();
-      $("#rm_rightsPage").show();
-      $("#rm_usersHead").show();
-      $("#rm_usersPage").show();
+      // Add an arrow that indicates whether the section is opened or not.
+      var spanArrow = $("<span>");
+      spanArrow.addClass("ui-accordion-header-icon ui-icon ui-icon-triangle-1-e");
 
-      userHasTheRightToChangeStuff(GUI.rightmanager,function(result){
-        if(result == false){
-          $("#rm_rolesPage").hide();
-          $("#rm_usersPage").hide();
-          $("#rm_rightsPage").hide();
-        }
+      var pageObject = $(".jDesktopInspector_pageHead:contains(" + role.name + ")", rightmanagerArea).first();
+      pageObject.prepend(spanArrow);
+      pageObject.attr("id", elemId);
+
+      // Create a remove role button
+      if (role.deletable) {
+        var btnRemoveRole = $("<input>");
+        btnRemoveRole.attr({
+          'type': "image",
+          'class': "btn btn-remove-role",
+          title: GUI.translate("Remove this role"),
+          src: "/guis.common/images/oxygen/16x16/actions/list-remove.png"
+        });
+        btnRemoveRole.click(function() {
+          // Remove 
+          var title = GUI.translate("Removing a role");
+          var text = GUI.translate("You are about to remove the role '[ROLE]'.");
+          text = text.replace("[ROLE]", role.name);
+
+          confirmDialog(title, text, function() {
+            RightManager.modifyRole(currentObject, role.name, false);
+            // We do not remove the element here, since we will send a
+            // broadcast message to all other managers. Include the user
+            // who triggered this action.
+          });
+        });
+        pageObject.append(btnRemoveRole);
+      }
+
+      // Create an add user button
+      var btnAddUser = $("<input>");
+      btnAddUser.attr({
+        'type': "image",
+        'class': "btn btn-add-user",
+        title: GUI.translate("Add a user to this role"),
+        src: "/guis.common/images/oxygen/16x16/actions/list-add.png"
       });
-
-      $("#rm_ID").html(theObject.id);
-      $("#rm_Name").html(theObject.getAttribute("name"));
-      $("#rm_Type").html(theObject.type);
-
-      that.selectedRoleSpan = null;
-
-      /* Get Roles of selected object and write the roles into combobox */
-      Modules.UserManager.getRoles(that.objData, GUI.username, function(roles) {
-        that.rmRoles.empty();
-
-        roles.forEach(function(role) {
-          // Add a span for every user and make it clickable.
-          var span = $("<span>");
-          span.addClass("rightmanager-item rightmanager-role");
-          span.html(role.name);
-          span.data("role", role);
-
-          span.on("mouseenter", function(event) {
-            if (!span.hasClass("checked"))
-              span.data("deleteImg").addClass("visible");
-          });
-
-          span.on("mouseleave", function(event) {
-            if (!span.hasClass("checked"))
-              span.data("deleteImg").removeClass("visible");
-          });
-
-          span.on("click", function(event) {
-            if (that.selectedRoleSpan == span)
-              return;
-
-            if (that.selectedRoleSpan != undefined) {
-              that.selectedRoleSpan.removeClass("checked");
-              that.selectedRoleSpan.data("deleteImg").removeClass("visible");
-            }
-            that.selectedRoleSpan = span;
-            span.addClass("checked");
-            span.data("deleteImg").addClass("visible");
-
-            // Update the other sections
-            // Get rights depending on the selected role...
-            Modules.RightManager.getRights(that.objData, role, GUI.username, that.updateRightsSection);
-            // Get users depending on the selected role...
-            Modules.UserManager.getUsers(that.objData, role, GUI.username, that.updateUsersSection);
-          });
-
-          var deleteImg = $("<img>");
-          deleteImg.attr("alt", "Delete");
-          deleteImg.attr("src", "/guis.common/images/oxygen/16x16/actions/edit-delete.png");
-          deleteImg.on("click", function(event) {
-            span.remove();
-
-            Modules.UserManager.removeRole(that.objData, role);
-
-            // We don't want to fire the span click event. That's why we stop the propagation.
-            event.stopPropagation();
-          });
-          span.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
-          span.append(deleteImg);
-
-          that.rmRoles.append(span);
-
-          // Initially
-          if (!that.selectedRoleSpan) {
-            that.selectedRoleSpan = span;
-            that.selectedRoleSpan.addClass("checked");
-            that.selectedRoleSpan.data("deleteImg").addClass("visible");
+      btnAddUser.click(function() {
+        GUI.userdialog.show(currentObject, role, function(usersToAdd) {
+          for (var i = 0; i < usersToAdd.length; i++) {
+            RightManager.addUser(currentObject, usersToAdd[i], role);
           }
         });
-
-        // Initially
-        if (that.selectedRoleSpan) {
-          // Get rights depending on the selected role...
-          Modules.RightManager.getRights(that.objData, that.selectedRoleSpan.data("role"), GUI.username, that.updateRightsSection);
-          // Get users depending on the selected role...
-          Modules.UserManager.getUsers(that.objData, that.selectedRoleSpan.data("role"), GUI.username, that.updateUsersSection);
-        }
       });
 
-      this.containerSelected.show();
-      this.containerNoneSelected.hide();
+      // Create a user section
+      var sectionUsers = page.addSection(GUI.translate("Users"));
+      // Add an add button to the title of this section
+      pageObject.next().find(".jDesktopInspector_section_title").append(btnAddUser);
+
+      for (var i in role.users) {
+        this.modifyUserElement(role.users[i], role, true, sectionUsers, page);
+      }
+
+      var sectionRights = page.addSection(GUI.translate("Rights"));
+      for (var i in rights) {
+        this.createRightElement(rights[i], role, sectionRights);
+      }
+
+      that.resetAccordion();
     }
+    else {
+      var pageObjectToRemove = $("#" + elemId).first();
+      // Remove the page
+      pageObjectToRemove.next().remove();
+      // Remove the page head
+      pageObjectToRemove.remove();
     }
   };
 
-  function openUserDialog() {
-    var that = GUI.rightmanager;
-    var role = that.selectedRoleSpan.data("role");
+  /**
+   * Resets the accordion animation.
+   */
+  this.resetAccordion = function() {
+    // Initially it is open...
+    inspectorArea.find('.jDesktopInspector_pageHead').first().find("span").addClass("ui-icon-triangle-1-s");
 
-    var resultCallback = function(users) {
-      users.sort();
-
-      users.forEach(function(user) {
-        addUserToSection(that, user, that.rmUsers, role, true);
-        Modules.UserManager.addUser(that.objData, role, user);
-      });
-
-      GUI.rightmanager.updateContent(GUI.rightmanager.obj);
-
-    };
-
-    GUI.userdialog.show(that.objData, role, resultCallback);
-  }
-};
-
-function userHasTheRightToChangeStuff(that, callback){
-
-    // check if user is allowed to change rights
-    Modules.RightManager.hasAccess("update", { id: that.objData.id, type: that.objData.type}, GUI.username, function(result) {
-      if(result) {
-        // user has update right: do it
-        callback(true);
-      }else{
-        // check for manager role
-        Modules.UserManager.isManager({ id: that.objData.id}, function(o){
-          if(o == true){
-            // user is manager: do it
-            callback(true);
-          }else{
-            // no manager and no update right
-            callback(false);
-            //var audio = new Audio('/guis.common/sounds/cant_touch_this.mp3');
-            //audio.play();
-            console.log(">> access denied <<");
-          }
-        });
+    // Accordion without jQuery
+    inspectorArea.find('.jDesktopInspector_pageHead').off("click").on("click", function(event) {
+      if (!$(event.target).hasClass("btn")) {
+        //Expand or collapse this panel
+        $(this).next().slideToggle('fast');
+        $(this).find("span").toggleClass("ui-icon-triangle-1-s");
+        //Hide the other panels
+        inspectorArea.find(".jDesktopInspector_pageHead").not(this).find("span").removeClass("ui-icon-triangle-1-s");
+        inspectorArea.find(".jDesktopInspector_page").not($(this).next()).slideUp('fast');
       }
     });
+  };
 
+  /**
+   * 
+   * @returns {undefined}
+   */
+  this.update = function() {
+    var selectedObjects = ObjectManager.getSelected();
+    if (selectedObjects.length > 0) {
+      if (selectedObjects.length == 1) {
+        currentObject = selectedObjects[0];
+      } else {
+        currentObject = false;
+      }
+    } else {
+      // ObjectManager.currentRoom["left"] did not return the current room...
+      currentObject = {id: ObjectManager.currentRoomID["left"], type: "Room"};
+    }
+
+    this.updateContent();
+  };
+
+  /**
+   * 
+   * @returns {undefined}
+   */
+  this.updateContent = function() {
+    inspector.reset();
+
+    var supportedObjects = RightManager.getSupportedObjects();
+
+    if (RightManager.supports(currentObject)) {
+
+      rightmanagerArea.find(".btn-new-role").show();
+      // Get all roles...
+      RightManager.getRoles(currentObject, function(roles) {
+        for (var i = 0; i < roles.length; i++) {
+          that.modifyRoleSection(roles[i], true);
+        }
+      });
+
+      // Remove the not supported message...
+      rightmanagerArea.find(".not-supported-message").remove();
+
+    } else {
+      rightmanagerArea.find(".btn-new-role").hide();
+
+      var message = '<div class="jDesktopInspector_main">';
+      message += '<div class="jDesktopInspector_main not-supported-message">';
+      if (currentObject)
+        message += "<p>This object is not supported by the right manager.</p>";
+      message += "<p>Supported objects:</p>";
+      message += "<ul>";
+      for (var i = 0; i < supportedObjects.length; i++) {
+        message += "<li>" + supportedObjects[i] + "</li>";
+      }
+      message += "</ul></div></div>";
+
+      // Show the not supported message...
+      rightmanagerArea.append(message);
+    }
+  };
 };
-/**
- * Adds a right to a section.
- * 
- * @param {Object}  that              The reference to GUI.rightmanager, GUI.rightmanagerDialog or GUI.userdialog.
- *                                    The variables objData is needed.
- * @param {String}  right             The right to add.
- * @param {String}  role              The role the right belongs to.
- * @param {Object}  sectionRights     The section where to add the right to.
- * @param {bool}    checkedInitially  Indicates if the right is checked when added.
- * @returns {Object}                  The created checkbox.
- */
-function addRightToSection(that, right, role, sectionRights, checkedInitially) {
-  var inputId = role.name + "-" + right.name + "-" + Math.round(Math.random() * 100); // This id is used to link the input and the label
-
-  var checkbox = $("<input>");
-  checkbox.attr({
-    id: inputId,
-    type: "checkbox",
-    class: "rightmanager-right-checkbox",
-    value: right.name
-  });
-  checkbox.on("click", function() {
-    var checked = checkbox.prop("checked");
-
-    if (checked)
-      Modules.RightManager.grantAccess(right.name, that.objData, role);
-    else
-      Modules.RightManager.revokeAccess(right.name, that.objData, role);
-
-  });
-
-  if (checkedInitially) // Check if the right is actually checked
-    checkbox.prop("checked", true);
-
-  var label = $("<label>");
-  label.attr({
-    for : inputId,
-    class: "rightmanager-right-label",
-    title: right.name + "<br>" + right.comment
-  });
-  label.html(right.name);
-  //label.tooltip();
-
-  // Update the rights section
-  sectionRights.append(checkbox);
-  sectionRights.append(label);
-
-  return checkbox;
-}
 
 /**
- * Adds a user to a section.
+ * Creates and shows a confirm dialog.
  * 
- * @param {Object}  that              The reference to GUI.rightmanager, GUI.rightmanagerDialog or GUI.userdialog.
- *                                    The variables checkedSpans, checkedUsers and objData are needed.
- * @param {String}  user              The user to add
- * @param {Object}  sectionUsers      The section where to add the users to
- * @param {Object}  role              The role the user has.
- * @param {bool}    withDelete        With or without delete button. If that.objData is not set, withDelete is set to false.
- * @param {bool}    forceMulti        Indicates whether multi selection is always enabled or not.
- * @param {bool}    checkedInitially  Indicates if the user is checked when added.
- * 
- * @returns {Object}                  The created span.
+ * @param {type} title      Title of the dialog.
+ * @param {type} text       Text of the dialog.
+ * @param {type} callback   The function which is called, once the user confirms it.
+ * @param {type} okText     An alternative text for the confirm button. Defaults to "OK".
+ * @returns {undefined}
  */
-function addUserToSection(that, user, sectionUsers, role, withDelete, forceMulti, checkedInitially) {
-  if (!that.objData)
-    withDelete = false;
-  
-  if(role.name == "Manager" && user == GUI.username){
-    withDelete = false;
-  }
-        var checkedSpans, checkedUsers;
-          
-          if(that.checkedSpans[role.name]) {
-            checkedSpans = that.checkedSpans[role.name];
-            checkedUsers = that.checkedUsers[role.name];
-          } else {
-            checkedSpans = that.checkedSpans;
-            checkedUsers = that.checkedUsers;
-          }
+function confirmDialog(title, text, callback, okText) {
+  var dialogDiv = $("<div>");
+  dialogDiv.attr("title", title);
+  dialogDiv.html("<p>" + text + "</p>");
 
-          // Add a span for every user and make it clickable.
-          var span = $("<span>");
-          span.addClass("rightmanager-item rightmanager-user");
-          if (withDelete)
-            span.addClass("show-delete-img");
+  if (!okText)
+    okText = "OK";
 
-          span.html(user);
-          span.data("user", user);
-
-          span.on("mouseenter", function(event) {
-            if (!span.hasClass("checked") && withDelete)
-              span.data("deleteImg").addClass("visible");
-          });
-
-          span.on("mouseleave", function(event) {
-            if (!span.hasClass("checked") && withDelete)
-              span.data("deleteImg").removeClass("visible");
-          });
-
-          // The whole click magic ;)...
-          span.on("click", function(event) {
-            var index = checkedSpans.indexOf(span); // The index of the clicked span.
-
-            // Check for multi/single selection
-            if (event.ctrlKey || forceMulti) {
-              // Multi selection
-              if (index >= 0) {
-                checkedSpans.splice(index, 1); // Remove the span from the array
-                checkedUsers.splice(index, 1); // Remove the user from the array
-              } else {
-                checkedSpans.push(span); // Add the span to the array
-                checkedUsers.push(user); // Add the user to the array
-              }
-
-            } else {
-              // Single selection: Uncheck all elements first and then check the current element again..
-              checkedSpans.forEach(function(item) {
-                item.removeClass("checked");
-                if (withDelete)
-                  item.data("deleteImg").removeClass("visible");
-              });
-              checkedSpans.length = 0; // Delete all array items.
-              checkedSpans.push(span);
-
-              checkedUsers.length = 0; // Delete all array items.
-              checkedUsers.push(user);
-            }
-
-            span.toggleClass("checked"); // Toggle the span
-
-            if (withDelete) {
-              var deleteImg = span.data("deleteImg"); // The reference to the delete image.
-
-              // Check if delete buttons are or the delete all button is shown.
-              if (span.hasClass("checked") && checkedSpans.length == 1)
-                deleteImg.addClass("visible");
-              else
-                deleteImg.removeClass("visible");
-
-              if (checkedSpans.length > 1) {
-                checkedSpans.forEach(function(item) {
-                  item.data("deleteImg").removeClass("visible");
-                });
-                // that.btnDeleteUsers.addClass("visible");
-              } else if (checkedSpans.length == 1) {
-                checkedSpans[0].data("deleteImg").addClass("visible");
-                // that.btnDeleteUsers.removeClass("visible");
-              }
-            }
-            
-            console.log(checkedUsers);
-          });
-
-          if (checkedInitially)
-            span.click();
-
-          if (withDelete) {
-            // Setup the delete button if objData is available.
-            var deleteImg = $("<img>");
-            deleteImg.attr({
-              alt: "Delete",
-              src: "/guis.common/images/oxygen/16x16/actions/edit-delete.png"
-            });
-            deleteImg.on("click", function(event) {
-              span.remove();
-              // Update the arrays
-              var index = checkedSpans.indexOf(span); // The index of the clicked span
-              checkedSpans.splice(index, 1); // Remove the span from the array
-              checkedUsers.splice(index, 1); // Remove the user from the array
-
-              Modules.UserManager.removeUser(that.objData, role, user);
-
-              event.stopPropagation(); // We don't want to fire the span click event. That's why we stop the propagation.
-            });
-
-            span.data("deleteImg", deleteImg); // Store the delete image, so it can be used by the span.
-            span.append(deleteImg);
-          }
-
-          // Finally add it to the user section
-          sectionUsers.append(span);
-
-          return span;
+  dialogDiv.dialog({
+    resizable: false,
+    modal: true,
+    buttons: [
+      {
+        text: okText,
+        click: function() {
+          $(this).dialog("close");
+          callback();
+        }
+      },
+      {
+        text: "Cancel",
+        click: function() {
+          $(this).dialog("close");
+        }
+      }
+    ]
+  });
 }

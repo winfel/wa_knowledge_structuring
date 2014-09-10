@@ -1,177 +1,178 @@
 {{#extend "head"}}
-    <link rel="apple-touch-icon" sizes="72x72" href="/guis.common/images/ipad_icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/guis.common/images/ipad_icon.png">
 
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
 
-    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
-    <script type="text/javascript" src="/guis.common/libraries/jquery/jquery.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jPopover.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jsTree/jquery.jstree.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.toastmessage.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/jquery.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jPopover.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jsTree/jquery.jstree.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.toastmessage.js"></script>
 
-    <script type="text/javascript" src="/guis.common/libraries/moment.min.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/lodash.min.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.autogrow.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jeditable-1.7.1.js"></script>    
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jeditable.autogrow.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.dotdotdot.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/moment.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/lodash.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.autogrow.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jeditable-1.7.1.js"></script>    
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jeditable.autogrow.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.dotdotdot.js"></script>
 
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.mousewheel.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.scrollTo.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.scrollTo.min.js"></script>
 
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svg.min.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svgdom.min.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svgfilter.min.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svganim.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svg.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svgdom.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svgfilter.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.svganim.min.js"></script>
 
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.textHighlighter.pack.min.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.textHighlighter.pack.min.js"></script>
 
-    <script type="text/javascript" src="/guis.common/libraries/jquery/jquery-ui.js"></script>
-    <link type="text/css" href="/guis.common/libraries/jquery/css/jquery-ui.css" rel="Stylesheet">
+<script type="text/javascript" src="/guis.common/libraries/jquery/jquery-ui.js"></script>
+<link type="text/css" href="/guis.common/libraries/jquery/css/jquery-ui.css" rel="Stylesheet">
 
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.color.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.color.js"></script>
 
-    <script type="text/javascript" src="/guis.common/libraries/recorder.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/setupRecorder.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/md5.js"></script>
-    <script type="text/javascript" src="/guis.common/libraries/jquery.notify.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/recorder.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/setupRecorder.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/md5.js"></script>
+<script type="text/javascript" src="/guis.common/libraries/jquery.notify.js"></script>
 
 
 <script src="/guis.common/javascript/0.loadTab.js"></script>
 
 
-    <script src="/config.default.js"></script>
-    <script src="/config.local.js"></script>
-    <script src="/Helper.js"></script>
-    <script src="/Dispatcher.js"></script>
-    <script src="/SocketClient.js"></script>
-    <script src="/ObjectManager.js"></script>
-    <script src="/RightManager.js"></script>
-    <script src="/UserManager.js"></script>
-    <script src="/TagManager.js"></script>
-    <script src="/DBManager.js"></script>
+<script src="/config.default.js"></script>
+<script src="/config.local.js"></script>
+<script src="/Helper.js"></script>
+<script src="/Dispatcher.js"></script>
+<script src="/SocketClient.js"></script>
+<script src="/ObjectManager.js"></script>
+<script src="/RightManager.js"></script>
+<script src="/UserManager.js"></script>
+<script src="/TagManager.js"></script>
+<script src="/DBManager.js"></script>
 
-    <script src="/Common/Log.js"></script>
-    <script src="/Common/DataSet.js"></script>
-    <script src="/Common/ActionManager.js"></script>
-    <script src="/Common/AttributeManager.js"></script>
-    <script src="/Common/TranslationManager.js"></script>
+<script src="/Common/Log.js"></script>
+<script src="/Common/DataSet.js"></script>
+<script src="/Common/ActionManager.js"></script>
+<script src="/Common/AttributeManager.js"></script>
+<script src="/Common/TranslationManager.js"></script>
 
-    <script>
-      var Modules = {
-        'Log': Log,
-        'config': Config,
-        'Config': Config,
-        'SocketClient': SocketClient,
-        'Dispatcher': Dispatcher,
-        'ObjectManager': ObjectManager,
-        'Helper': Helper,
-        //Object specific
+<script>
+var Modules = {
+  'Log': Log,
+  'config': Config,
+  'Config': Config,
+  'SocketClient': SocketClient,
+  'Dispatcher': Dispatcher,
+  'ObjectManager': ObjectManager,
+  'Helper': Helper,
+  //Object specific
 
-        'DataSet': DataSet,
-        'AttributeManager': AttributeManager,
-        'TranslationManager': TranslationManager,
-        'ActionManager': ActionManager,
-        //'Schema':Schema,
-        'RightManager': RightManager,
-        'UserManager': UserManager,
-        'TagManager': TagManager,
-        'DBManager': DBManager
-      };
+  'DataSet': DataSet,
+  'AttributeManager': AttributeManager,
+  'TranslationManager': TranslationManager,
+  'ActionManager': ActionManager,
+  //'Schema':Schema,
+  'RightManager': RightManager,
+  'UserManager': UserManager,
+  'TagManager': TagManager,
+  'DBManager': DBManager
+};
 
 
-      $(document).ready(function() {
-        for (var name in Modules) {
-          var module = Modules[name];
-          if (module.init) {
-            module.init(Modules);
-            module.Modules = Modules;
-          }
-        }
+$(document).ready(function() {
+  for (var name in Modules) {
+    var module = Modules[name];
+    if (module.init) {
+      module.init(Modules);
+      module.Modules = Modules;
+    }
+  }
 
-        document.title = Modules.Config.projectTitle || 'WebArena';
-        
-        $("#container-notifier").notify();
-      });
-    </script>
+  document.title = Modules.Config.projectTitle || 'WebArena';
 
-    <!-- /objects is generated in BuildTool.js on the server side. -->
-    <script src="/objects"></script>
-    <script type="text/javascript" src="/defaultJavascripts"></script>
-    <script type="text/javascript" src="/guis.common/translation.js"></script>
+  $("#container-notifier").notify();
+});
+</script>
 
-    <link type="text/css" href="/guis/desktop/style.css" rel="Stylesheet">
-    <link type="text/css" href="/guis.common/css/actionsheet.css" rel="Stylesheet">
-    <link type="text/css" href="/guis.common/css/progressBar.css" rel="Stylesheet">
-    <link type="text/css" href="/guis.common/css/login.css" rel="Stylesheet">
-    <link type="text/css" href="/guis.common/css/studiolo.css" rel="Stylesheet">
+<!-- /objects is generated in BuildTool.js on the server side. -->
+<script src="/objects"></script>
+<script type="text/javascript" src="/defaultJavascripts"></script>
+<script type="text/javascript" src="/guis.common/translation.js"></script>
 
-    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<link type="text/css" href="/guis/desktop/style.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/css/actionsheet.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/css/progressBar.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/css/login.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/css/studiolo.css" rel="Stylesheet">
 
-    <script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jDesktopInspector.js"></script>
-    <link type="text/css" href="/guis.common/libraries/jquery/plugins/css/jquery.jDesktopInspector.css" rel="Stylesheet">
-    <link type="text/css" href="/guis.common/libraries/jquery/plugins/css/jquery.jPopover.desktop.css" rel="Stylesheet">
-    <link type="text/css" href="/guis.common/css/ui.notify.css" rel="Stylesheet">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
-    <link type="text/css" href="/guis/desktop/rightmanager.css" rel="Stylesheet">
-    <link type="text/css" href="/guis/desktop/objects/paperViewer.css" rel="Stylesheet">
-    <link type="text/css" href="/guis/desktop/objects/paperWriter.css" rel="Stylesheet">
-    <link type="text/css" href="/guis.common/css/verTabs.css" rel="Stylesheet">
+<script type="text/javascript" src="/guis.common/libraries/jquery/plugins/jquery.jDesktopInspector.js"></script>
+<link type="text/css" href="/guis.common/libraries/jquery/plugins/css/jquery.jDesktopInspector.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/libraries/jquery/plugins/css/jquery.jPopover.desktop.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/css/ui.notify.css" rel="Stylesheet">
 
-    <script type="text/javascript" src="/guis/desktop/main.js"></script>
-    <script>
+<link type="text/css" href="/guis/desktop/rightmanager.css" rel="Stylesheet">
+<link type="text/css" href="/guis/desktop/rightmanagerDialog.css" rel="Stylesheet">
+<link type="text/css" href="/guis/desktop/objects/paperViewer.css" rel="Stylesheet">
+<link type="text/css" href="/guis/desktop/objects/paperWriter.css" rel="Stylesheet">
+<link type="text/css" href="/guis.common/css/verTabs.css" rel="Stylesheet">
 
-      /**
-       * Define room which will be loaded (value will be replaced by node.js Webserver)
-       */
-      GUI.startRoom = '{{start_room}}';
+<script type="text/javascript" src="/guis/desktop/main.js"></script>
+<script>
 
-      /**
-       * check if device is touch-device
-       */
-      if (!!('ontouchstart' in window)) {
-        GUI.isTouchDevice = true;
-      }
+/**
+ * Define room which will be loaded (value will be replaced by node.js Webserver)
+ */
+GUI.startRoom = '{{start_room}}';
 
-      /**
-       * jQuery extension used to prevent scrolling of sidebar/body when scrolling of sidebar contents hits top/bottom (e.g. for chat messages container)
-       */
-      $.fn.dontScrollParent = function() {
-        this.bind('mousewheel DOMMouseScroll', function(e)
-        {
-          var delta = e.originalEvent.wheelDelta || -e.originalEvent.detail;
+/**
+ * check if device is touch-device
+ */
+if (!!('ontouchstart' in window)) {
+  GUI.isTouchDevice = true;
+}
 
-          if (delta > 0 && $(this).scrollTop() <= 0)
-            return false;
-          if (delta < 0 && $(this).scrollTop() >= this.scrollHeight - $(this).height())
-            return false;
+/**
+ * jQuery extension used to prevent scrolling of sidebar/body when scrolling of sidebar contents hits top/bottom (e.g. for chat messages container)
+ */
+$.fn.dontScrollParent = function() {
+  this.bind('mousewheel DOMMouseScroll', function(e)
+  {
+    var delta = e.originalEvent.wheelDelta || -e.originalEvent.detail;
 
-          return true;
-        });
-      };
+    if (delta > 0 && $(this).scrollTop() <= 0)
+      return false;
+    if (delta < 0 && $(this).scrollTop() >= this.scrollHeight - $(this).height())
+      return false;
 
-      /**
-       * jQuery extension used to calculate the width of some text.
-       * 
-       * @param String text   The text to measure.
-       * @param String font   Optional. The CSS font.
-       * @returns Number  The width the given text.
-       */
-      $.fn.textWidth = function(text, font) {
-        if (!$.fn.textWidth.fakeEl)
-          $.fn.textWidth.fakeEl = $('<span>').hide().appendTo(document.body);
-        $.fn.textWidth.fakeEl.text(text || this.val() || this.text()).css('font', font || this.css('font'));
-        return $.fn.textWidth.fakeEl.width();
-      };
-    </script>
+    return true;
+  });
+};
+
+/**
+ * jQuery extension used to calculate the width of some text.
+ * 
+ * @param String text   The text to measure.
+ * @param String font   Optional. The CSS font.
+ * @returns Number  The width the given text.
+ */
+$.fn.textWidth = function(text, font) {
+  if (!$.fn.textWidth.fakeEl)
+    $.fn.textWidth.fakeEl = $('<span>').hide().appendTo(document.body);
+  $.fn.textWidth.fakeEl.text(text || this.val() || this.text()).css('font', font || this.css('font'));
+  return $.fn.textWidth.fakeEl.width();
+};
+</script>
 {{/extend}}
-    <div id="header">
-      <div class="header_right"></div>
-      <div class="header_left"></div>
+<div id="header">
+  <div class="header_right"></div>
+  <div class="header_left"></div>
   <div class="header_tabs">
     <div class="ui-tabs ui-widget ui-widget-content ui-corner-all header-tabs" id="tabs_content"> DEMO Content </div>
-    </div>
+  </div>
   <div class="header_tabs_sidebar animate">
     <div id="header_toggle_sidebar">
       <img id="header_toggle_sidebar_hide" title="Hide sidebar" src="/guis.common/images/arrow-right.png" alt="" style="width: 18px; height: 18px;">
@@ -180,366 +181,370 @@
   </div>
 </div>
 
-    <div id="couplingNavigation"></div>
+<div id="couplingNavigation"></div>
 
-    <div id="content"></div>
+<div id="content"></div>
 
-    <div id="sidebar">
-      <div id="sidebar_title"><span></span></div>
-      <div id="sidebar_content">
+<div id="sidebar">
+  <div id="sidebar_title"><span></span></div>
+  <div id="sidebar_content">
+    <div>
+
+      <div id="inspector"></div>
+      <div id="rightmanager">
+        <!--<div class="jDesktopInspector_main rightmanagerSelected">
+
+
+
+          <div class="jDesktopInspector_pageHead">Object:</div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_0">
+            <div class="jDesktopInspector_section">	                        	
+              <div class="jDesktopInspector_element">
+                ID
+                <div class="jDesktopInspector_button_right" id= "rm_ID"></div>
+                <br style="clear: both">
+              </div>
+              <div class="jDesktopInspector_element">
+                Type
+                <div class="jDesktopInspector_button_right" id="rm_Type"></div>
+                <br style="clear: both">
+              </div>
+              <div class="jDesktopInspector_element">
+                Name
+                <div class="jDesktopInspector_button_right" id="rm_Name"></div>
+                <br style="clear: both">
+              </div>
+            </div>
+          </div>
+
+          <div class="jDesktopInspector_pageHead" id="rm_rolesHead">Roles</div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_1" id="rm_rolesPage">
+            <div class="jDesktopInspector_section" id="rm_roles"></div>
+            <div class="jDesktopInspector_section">                                                             							
+              <div class="jDesktopInspector_element">
+                <input id="rmNewRoleTextfield" name="newRoleName" type="text" size="15" value="New role" onfocus="this.value = ''">
+                <div class= "jDesktopInspector_button_right">										
+                  <input id="rmNewRoleButton" type="button" value="Add role">
+                </div>
+                <br style="clear: both">										
+              </div>                                    
+            </div>	                   
+          </div>
+
+          <div class="rightmanager-role-separator"></div>
+
+          <div class="jDesktopInspector_pageHead rightmanager-section-header" id="rm_rightsHead">Rights <span>&nbsp;</span></div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_2" id="rm_rightsPage">
+            <div class="jDesktopInspector_section" id="rm_rights"></div>
+          </div>
+
+          <div class="jDesktopInspector_pageHead rightmanager-section-header" id="rm_usersHead">Users <span>&nbsp;</span></div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_3" id="rm_usersPage">
+            <div class="jDesktopInspector_section" id="rm_users">
+            </div>
+            <br style="clear: both;">
+            <div class="jDesktopInspector_section">
+              <div class="jDesktopInspector_element">
+                <div class= "jDesktopInspector_button_right">					
+                  <input id="rmDeleteUsersButton" class="rightmanager-delete-all" type="button" value="Delete users">
+                </div>
+                <br style="clear: both">										
+              </div> 
+              <div class="jDesktopInspector_element">
+                <div class= "jDesktopInspector_button_right">					
+                  <input id="rmAddUsersButton" type="button" value="Add users">
+                </div>
+                <br style="clear: both">										
+              </div> 
+            </div>
+          </div>
+        </div>
+
+        <div class="jDesktopInspector rightmanagerNoneSelected">
+          <div class="jDesktopInspector_main">
+            <div class="jDesktopInspector_page jDesktopInspector_page_0">
+              <div class="jDesktopInspector_section">
+                <div class="jDesktopInspector_element">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>-->
+      </div>
+
+      <div id="search" class="jDesktopInspector">
+        <div class="jDesktopInspector_main content">
+          <div class="jDesktopInspector_pageHead">Filter By Filename</div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_0">					
+            <div class="jDesktopInspector_section">                                                             							
+              <div class="jDesktopInspector_element">
+                <input id="searchFilenameTxt" type="text" size="13" value="" placeholder="Type name of a file">
+                <img id="resetFilterByFilenameBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png">														
+              </div>
+            </div>
+          </div>				
+          <div class="jDesktopInspector_pageHead">Filter By Type</div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_1">	           
+            <div class="jDesktopInspector_section">
+              <div class="jDesktopInspector_element">
+                <div id="mimeTypesColumn1"></div>
+                <div id="mimeTypesColumn2"></div>
+                <img id="resetFilterByMimeTypeBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png">
+              </div>
+            </div>
+          </div>						
+          <div class="jDesktopInspector_pageHead">Filter By Primary Tag</div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_2">	           
+            <div class="jDesktopInspector_section">
+              <div class="jDesktopInspector_element">
+                <select id="mainTagSel" title="Select Main Tag"></select>					
+                <img id="resetFilterByMainTagBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png">
+              </div>
+            </div>
+          </div>				
+          <div class="jDesktopInspector_pageHead">Filter By Secondary Tag</div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_3">				
+            <div class="jDesktopInspector_section">
+              <div class="jDesktopInspector_element">
+                <select id="secondaryTagSel" size="5" multiple="multiple" title="Select one/multiple Secondary Tags"></select>
+                <img id="resetFilterBySecondaryTagBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png">
+              </div>
+            </div>					
+          </div>				
+          <div class="jDesktopInspector_pageHead">Filtering Results</div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_4">
+            <div class="jDesktopInspector_section">
+              <div class="jDesktopInspector_element">
+                <b><span id="matchesCounterSpan"></span></b><br />
+              </div>
+            </div>
+          </div> 
+          <div class="jDesktopInspector_pageHead"></div>
+          <div class="jDesktopInspector_page jDesktopInspector_page_5">
+            <div class="jDesktopInspector_section">
+              <div class="jDesktopInspector_element">
+                <div class="jDesktopInspector_button_right">												
+                  <input id="resetBtn" type="button" value="Reset All Filters">
+                </div>
+              </div>
+            </div>
+          </div>       
+        </div>
+      </div>
+
+      <div id="chat"></div>
+      <div id="bug">                    
+
+
         <div>
+          Did you find an error? Tell us. <br/>
+          Plese be aware that we cannot answer every request personally.<span><br />
+            <!--Ist Ihnen bei der Benutzung ein Fehler aufgefallen? Teilen Sie uns ihn doch bitte mit.<br />
+            Bitte haben Sie Verständnis dafür, dass wir nicht auf jede Anfrage persönlich antworten können.
+            <span><br /> -->
+            <br />
+            Kindly note that you will send a list of all objects with your error message to make an analysis possible for us.
+            <!-- Beachten Sie: Mit Ihrer Fehlermeldung wird eine Liste aller Objekte gesendet, um uns eine Auswertung des Fehlers zu ermöglichen. -->
+          </span>
+        </div>
 
-          <div id="inspector"></div>
-          <div id="rightmanager" class="jDesktopInspector">
-            <div class="jDesktopInspector_main rightmanagerSelected">
-              <div class="jDesktopInspector_pageHead">Object:</div>
-              <div class="jDesktopInspector_page jDesktopInspector_page_0">
-                <div class="jDesktopInspector_section">	                        	
-                  <div class="jDesktopInspector_element">
-                    ID
-                    <div class="jDesktopInspector_button_right" id= "rm_ID"></div>
-                    <br style="clear: both">
-                  </div>
-                  <div class="jDesktopInspector_element">
-                    Type
-                    <div class="jDesktopInspector_button_right" id="rm_Type"></div>
-                    <br style="clear: both">
-                  </div>
-                  <div class="jDesktopInspector_element">
-                    Name
-                    <div class="jDesktopInspector_button_right" id="rm_Name"></div>
-                    <br style="clear: both">
-                  </div>
-                </div>
-              </div>
+        <div id="bug_report">
 
-              <div class="jDesktopInspector_pageHead" id="rm_rolesHead">Roles</div>
-              <div class="jDesktopInspector_page jDesktopInspector_page_1" id="rm_rolesPage">
-                <div class="jDesktopInspector_section" id="rm_roles"></div>
-                <div class="jDesktopInspector_section">                                                             							
-                  <div class="jDesktopInspector_element">
-                    <input id="rmNewRoleTextfield" name="newRoleName" type="text" size="15" value="New role" onfocus="this.value = ''">
-                    <div class= "jDesktopInspector_button_right">										
-                      <input id="rmNewRoleButton" type="button" value="Add role">
-                    </div>
-                    <br style="clear: both">										
-                  </div>                                    
-                </div>	                   
-              </div>
+          <span>What would you like to do?</span>
+          <textarea id="bug_task" style="
+                    border-right-width: 0px;
+                    border-bottom-width: 0px;
+                    border-left-width: 0px;
+                    border-top-width: 0px;
+                    padding-right: 5px;
+                    padding-left: 5px;
+                    "></textarea>
 
-              <div class="rightmanager-role-separator"></div>
+          <span>Which problem occurred?</span>
+          <textarea id="bug_problem" style="
+                    padding-right: 5px;
+                    border-right-width: 0px;
+                    padding-left: 5px;
+                    border-left-width: 0px;
+                    margin-bottom: 0px;
+                    "></textarea>
 
-              <div class="jDesktopInspector_pageHead rightmanager-section-header" id="rm_rightsHead">Rights <span>&nbsp;</span></div>
-              <div class="jDesktopInspector_page jDesktopInspector_page_2" id="rm_rightsPage">
-                <div class="jDesktopInspector_section" id="rm_rights"></div>
-              </div>
+          <span>Your Email-Adress:</span>
+          <input type="email" id="bug_email" style="
+                 padding-right: 5px;
+                 border-right-width: 0px;
+                 border-left-width: 0px;
+                 padding-left: 5px;
+                 " />
 
-              <div class="jDesktopInspector_pageHead rightmanager-section-header" id="rm_usersHead">Users <span>&nbsp;</span></div>
-              <div class="jDesktopInspector_page jDesktopInspector_page_3" id="rm_usersPage">
-                <div class="jDesktopInspector_section" id="rm_users">
-                </div>
-                <br style="clear: both;">
-                <div class="jDesktopInspector_section">
-                  <div class="jDesktopInspector_element">
-                    <div class= "jDesktopInspector_button_right">					
-                      <input id="rmDeleteUsersButton" class="rightmanager-delete-all" type="button" value="Delete users">
-                    </div>
-                    <br style="clear: both">										
-                  </div> 
-                  <div class="jDesktopInspector_element">
-                    <div class= "jDesktopInspector_button_right">					
-                      <input id="rmAddUsersButton" type="button" value="Add users">
-                    </div>
-                    <br style="clear: both">										
-                  </div> 
-                </div>
-              </div>
-            </div>
+          <p><input type="submit" value="Submit" id="bug_submit" /></p>
 
-            <div class="jDesktopInspector rightmanagerNoneSelected">
-              <div class="jDesktopInspector_main">
-                <div class="jDesktopInspector_pageHead">Object:</div>
-                <div class="jDesktopInspector_page jDesktopInspector_page_0">
-                  <div class="jDesktopInspector_section">
-                    <div class="jDesktopInspector_element">Please select a Subroom or PaperSpace to use the rightmanager!</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-		<div id="search" class="jDesktopInspector">
-			<div class="jDesktopInspector_main content">
-				<div class="jDesktopInspector_pageHead">Filter By Filename</div>
-				<div class="jDesktopInspector_page jDesktopInspector_page_0">					
-					<div class="jDesktopInspector_section">                                                             							
-						<div class="jDesktopInspector_element">
-							<input id="searchFilenameTxt" type="text" size="13" value="" placeholder="Type name of a file">
-							<img id="resetFilterByFilenameBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png">														
-						</div>
-					</div>
-				</div>				
-				<div class="jDesktopInspector_pageHead">Filter By Type</div>
-				<div class="jDesktopInspector_page jDesktopInspector_page_1">	           
-					<div class="jDesktopInspector_section">
-						<div class="jDesktopInspector_element">
-							<div id="mimeTypesColumn1"></div>
-							<div id="mimeTypesColumn2"></div>
-							<img id="resetFilterByMimeTypeBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png">
-						</div>
-					</div>
-				</div>						
-				<div class="jDesktopInspector_pageHead">Filter By Primary Tag</div>
-				<div class="jDesktopInspector_page jDesktopInspector_page_2">	           
-					<div class="jDesktopInspector_section">
-						<div class="jDesktopInspector_element">
-							<select id="mainTagSel" title="Select Main Tag"></select>					
-							<img id="resetFilterByMainTagBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png">
-						</div>
-					</div>
-				</div>				
-				<div class="jDesktopInspector_pageHead">Filter By Secondary Tag</div>
-				<div class="jDesktopInspector_page jDesktopInspector_page_3">				
-					<div class="jDesktopInspector_section">
-						<div class="jDesktopInspector_element">
-							<select id="secondaryTagSel" size="5" multiple="multiple" title="Select one/multiple Secondary Tags"></select>
-							<img id="resetFilterBySecondaryTagBtn" title="Reset Filter" alt="Reset Filter" src="/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png">
-						</div>
-					</div>					
-				</div>				
-				<div class="jDesktopInspector_pageHead">Filtering Results</div>
-				<div class="jDesktopInspector_page jDesktopInspector_page_4">
-					<div class="jDesktopInspector_section">
-						<div class="jDesktopInspector_element">
-							<b><span id="matchesCounterSpan"></span></b><br />
-						</div>
-					</div>
-				</div> 
-				<div class="jDesktopInspector_pageHead"></div>
-				<div class="jDesktopInspector_page jDesktopInspector_page_5">
-					<div class="jDesktopInspector_section">
-						<div class="jDesktopInspector_element">
-							<div class="jDesktopInspector_button_right">												
-								<input id="resetBtn" type="button" value="Reset All Filters">
-							</div>
-						</div>
-					</div>
-				</div>       
-			</div>
-		</div>
-          
-          <div id="chat"></div>
-          <div id="bug">                    
+        </div>
 
+        <div id="bug_result"></div>
 
-            <div>
-              Did you find an error? Tell us. <br/>
-              Plese be aware that we cannot answer every request personally.<span><br />
-              <!--Ist Ihnen bei der Benutzung ein Fehler aufgefallen? Teilen Sie uns ihn doch bitte mit.<br />
-              Bitte haben Sie Verständnis dafür, dass wir nicht auf jede Anfrage persönlich antworten können.
-              <span><br /> -->
-                <br />
-                Kindly note that you will send a list of all objects with your error message to make an analysis possible for us.
-                <!-- Beachten Sie: Mit Ihrer Fehlermeldung wird eine Liste aller Objekte gesendet, um uns eine Auswertung des Fehlers zu ermöglichen. -->
-              </span>
-            </div>
-
-            <div id="bug_report">
-
-              <span>What would you like to do?</span>
-              <textarea id="bug_task" style="
-              border-right-width: 0px;
-              border-bottom-width: 0px;
-              border-left-width: 0px;
-              border-top-width: 0px;
-              padding-right: 5px;
-              padding-left: 5px;
-              "></textarea>
-
-              <span>Which problem occurred?</span>
-              <textarea id="bug_problem" style="
-              padding-right: 5px;
-              border-right-width: 0px;
-              padding-left: 5px;
-              border-left-width: 0px;
-              margin-bottom: 0px;
-              "></textarea>
-
-              <span>Your Email-Adress:</span>
-              <input type="email" id="bug_email" style="
-              padding-right: 5px;
-              border-right-width: 0px;
-              border-left-width: 0px;
-              padding-left: 5px;
-              " />
-
-              <p><input type="submit" value="Submit" id="bug_submit" /></p>
-
-            </div>
-
-            <div id="bug_result"></div>
-
-          </div>
-     </div>
-     
-   </div>
- </div>
-
-    <div id="actionsheet"></div>
-    <div id="error_bg"></div>
-    <div id="error_box">
-      <div id="error_box_heading"></div>
-      <div id="error_box_message"></div>
-      <div id="error_box_button"></div>
-    </div>
-
-
-    <!-- BEGIN: GUI rightmanager pop-up dialog -->
-    <div id="rightmanagerDialog" style="display: none;">
-      <div id="rmdTabs">
-        <ul id="rmdTabList">       
-        </ul>
       </div>
     </div>
-    <!-- END: GUI rightmanager pop-up dialog -->
 
-    <!-- BEGIN: GUI add user dialog -->
-    <div id="manageUserDialog" class="rightmanager-user-dialog" style="display: none;">
-      <!-- <h3>Friend list</h3>-->
-      <div id="manageUserDialogFriendList" class="rightmanager-user-dialog-section"></div>
-      <!-- <h3>Suggested</h3>
-      <div id="manageUserDialogSuggested" class="rightmanager-user-dialog-section"></div>
-      <h3>Searched Users</h3>
-      <input id="manageUserDialogNewTextfield" type="text" value="Type in the username" />
-      <div id="manageUserDialogSearched" class="rightmanager-user-dialog-section">
-      </div>-->
-    </div>
-    <!-- END: GUI add user dialog -->
+  </div>
+</div>
 
-    <!-- BEGIN: GUI confirm dialog -->
-    <div id="confirmDialog" style="display: none;">
-      <span id="confirmDialogMessage"></span>
-    </div>
-    <!-- END: GUI confirm dialog -->
+<div id="actionsheet"></div>
+<div id="error_bg"></div>
+<div id="error_box">
+  <div id="error_box_heading"></div>
+  <div id="error_box_message"></div>
+  <div id="error_box_button"></div>
+</div>
 
-    <div id="login_background" style="display: none">&nbsp;</div>
-    <div id="login" style="display: none;">
+
+<!-- BEGIN: GUI rightmanager pop-up dialog -->
+<div id="rightmanagerDialog" style="display: none;">
+  <div id="rmdTabs">
+    <ul id="rmdTabList">       
+    </ul>
+  </div>
+</div>
+<!-- END: GUI rightmanager pop-up dialog -->
+
+<!-- BEGIN: GUI add user dialog -->
+<div id="manageUserDialog" class="rightmanager-user-dialog" style="display: none;">
+  <!-- <h3>Friend list</h3>-->
+  <div id="manageUserDialogFriendList" class="rightmanager-user-dialog-section"></div>
+  <!-- <h3>Suggested</h3>
+  <div id="manageUserDialogSuggested" class="rightmanager-user-dialog-section"></div>
+  <h3>Searched Users</h3>
+  <input id="manageUserDialogNewTextfield" type="text" value="Type in the username" />
+  <div id="manageUserDialogSearched" class="rightmanager-user-dialog-section">
+  </div>-->
+</div>
+<!-- END: GUI add user dialog -->
+
+<!-- BEGIN: GUI confirm dialog -->
+<div id="confirmDialog" style="display: none;">
+  <span id="confirmDialogMessage"></span>
+</div>
+<!-- END: GUI confirm dialog -->
+
+<div id="login_background" style="display: none">&nbsp;</div>
+<div id="login" style="display: none;">
 
   <div class="login_title" id="login_title">Cooperative Writing (CoW)</div>
 
-      <div class="login_error"></div>
+  <div class="login_error"></div>
 
-      <div class="login_icon login_icon_username"></div>
-      <input type="text" name="username" value="{{username}}" id="login_username" class="login_input" autocomplete="off" placeholder="Username" autofocus="autofocus" />
+  <div class="login_icon login_icon_username"></div>
+  <input type="text" name="username" value="{{username}}" id="login_username" class="login_input" autocomplete="off" placeholder="Username" autofocus="autofocus" />
 
-      <br />
+  <br />
 
-      <div class="login_icon login_icon_password"></div><input type="password" name="password" value="{{password}}" id="login_password" class="login_input" autocomplete="off" />
+  <div class="login_icon login_icon_password"></div><input type="password" name="password" value="{{password}}" id="login_password" class="login_input" autocomplete="off" />
 
-      <br />
+  <br />
 
-      <input type="submit" name="login" value="Login" class="login_submit" id="login_submit" />
+  <input type="submit" name="login" value="Login" class="login_submit" id="login_submit" />
 
-    </div>
+</div>
 
-    <div id="progressBar"><div class="progressBar_container"></div></div>
-    
-    <!-- set the container hidden to avoid a flash of unstyled content
-         when the page first loads -->
-	<div id="container-notifier" style="display:none">
-	  <!-- 
-	  http://www.erichynds.com/blog/a-jquery-ui-growl-ubuntu-notification-widget
-	  -->
-	  <div id="basic-notification">
-	      <a class="ui-notify-cross ui-notify-close" href="#">x</a>
-	      <h1>#{title}</h1>
-	      <p>#{text}</p>
-	  </div>
-	  
-	  <div id="withIcon">
-			<a class="ui-notify-close ui-notify-cross" href="#">x</a>
-			<div style="float:left;margin:0 10px 0 0"><img src="#{icon}" alt="warning" /></div>
-			<h1>#{title}</h1>
-			<p>#{text}</p>
-		</div>
-		
-		<div id="confrim-notification">
-			<h1>#{title}</h1>
-			<p>#{text}</p>
-			<p style="margin-top:10px;text-align:center">
-				<input type="button" class="confirm" value="#{Yes}" name="yes" />
-				<input type="button" class="confirm" value="#{No}" name="no" />
-			</p>
-		</div>
-	</div>
-    
-    <!-- BEGIN: Underscore Template Definition. -->
-    <script type="text/template" id="proceeding-statusdialog">
-      <div>
-      <table>
-      <tr>
-      <th></th>
-      <th>Name</th>
-      <th>Startdatum</th>
-      <th>Enddatum</th>
-      </tr>
-      <% _.each(milestones, function(mileStone, index) { %>
-      <tr>
-      <td>
-      <input type="checkbox" name="" value="" <%= mileStone.done ? 'checked disabled' : ''%> >
-      </td>
-      <td>
-      <%- mileStone.name %>
-      </td>
-      <td>
-      <%- mileStone.startdate || "Nicht gesetzt" %>
-      </td>
-      <td>
-      <% if( editable == index){ %>
-      <input readonly='true' class="datepicker-trigger" type="text" value="<%- mileStone.enddate %>">
-      <% } else { %>
-      <%- mileStone.enddate || "Nicht gesetzt" %>
-      <% } %>
-      </td>
-      <tr>
-      <% }); %>
-      </table>
-      </div>
-    </script>
-    <script type="text/template" id="process-log-entry-template">
-      <div>
-      <% _.each(logEntries, function(logEntry) { %>
-      <p class="<%= logEntry.cssclass %>"> <%= moment(logEntry.timestamp).format("DD.MM.YY, HH:mm:ss") %> <br/>
-      <%= logEntry.message %></p>
-      <% }); %>
-      </div>
-    </script>
-    <script type="text/template" id="discussion-message-template">
+<div id="progressBar"><div class="progressBar_container"></div></div>
 
-      <div class='discussion-statement <%- additionalClasses %>' data-message-id='<%- message.timestamp %>'>
-      <div class='discussion-statement-heading'>
-      <span class='message-author'> <%- message.author %> </span>
-      <span class='message-timestamp'>( <%- message.formattedTimestamp %> )</span>
-      </div>
-      <p class='discussion-statement-text'> <%- message.text %> </p>
+<!-- set the container hidden to avoid a flash of unstyled content
+     when the page first loads -->
+<div id="container-notifier" style="display:none">
+  <!-- 
+  http://www.erichynds.com/blog/a-jquery-ui-growl-ubuntu-notification-widget
+  -->
+  <div id="basic-notification">
+    <a class="ui-notify-cross ui-notify-close" href="#">x</a>
+    <h1>#{title}</h1>
+    <p>#{text}</p>
+  </div>
 
-      <div class='statement-delete'>löschen</div>
-      <div class='statement-edit'>bearbeiten</div>
-      </div>
-    </script>
-    <script type="text/template" id="discussion-container-template">
-      <div class="discussion">
-      <div class="embedded-toolbar moveArea">
-      <span class="minimize-button"></span>
-      </div>
-      <div class="discussion-content">
-      <div class="discussion-heading"> <%- heading %>
-      </div>
-      <div class="discussion-text"></div>
-      </div>
-      <input class="discussion-input" placeholder=Texteingabe>
-      </div>
-    </script>
+  <div id="withIcon">
+    <a class="ui-notify-close ui-notify-cross" href="#">x</a>
+    <div style="float:left;margin:0 10px 0 0"><img src="#{icon}" alt="warning" /></div>
+    <h1>#{title}</h1>
+    <p>#{text}</p>
+  </div>
+
+  <div id="confrim-notification">
+    <h1>#{title}</h1>
+    <p>#{text}</p>
+    <p style="margin-top:10px;text-align:center">
+      <input type="button" class="confirm" value="#{Yes}" name="yes" />
+      <input type="button" class="confirm" value="#{No}" name="no" />
+    </p>
+  </div>
+</div>
+
+<!-- BEGIN: Underscore Template Definition. -->
+<script type="text/template" id="proceeding-statusdialog">
+  <div>
+  <table>
+  <tr>
+  <th></th>
+  <th>Name</th>
+  <th>Startdatum</th>
+  <th>Enddatum</th>
+  </tr>
+  <% _.each(milestones, function(mileStone, index) { %>
+  <tr>
+  <td>
+  <input type="checkbox" name="" value="" <%= mileStone.done ? 'checked disabled' : ''%> >
+  </td>
+  <td>
+  <%- mileStone.name %>
+  </td>
+  <td>
+  <%- mileStone.startdate || "Nicht gesetzt" %>
+  </td>
+  <td>
+  <% if( editable == index){ %>
+  <input readonly='true' class="datepicker-trigger" type="text" value="<%- mileStone.enddate %>">
+  <% } else { %>
+  <%- mileStone.enddate || "Nicht gesetzt" %>
+  <% } %>
+  </td>
+  <tr>
+  <% }); %>
+  </table>
+  </div>
+</script>
+<script type="text/template" id="process-log-entry-template">
+  <div>
+  <% _.each(logEntries, function(logEntry) { %>
+  <p class="<%= logEntry.cssclass %>"> <%= moment(logEntry.timestamp).format("DD.MM.YY, HH:mm:ss") %> <br/>
+  <%= logEntry.message %></p>
+  <% }); %>
+  </div>
+</script>
+<script type="text/template" id="discussion-message-template">
+
+  <div class='discussion-statement <%- additionalClasses %>' data-message-id='<%- message.timestamp %>'>
+  <div class='discussion-statement-heading'>
+  <span class='message-author'> <%- message.author %> </span>
+  <span class='message-timestamp'>( <%- message.formattedTimestamp %> )</span>
+  </div>
+  <p class='discussion-statement-text'> <%- message.text %> </p>
+
+  <div class='statement-delete'>löschen</div>
+  <div class='statement-edit'>bearbeiten</div>
+  </div>
+</script>
+<script type="text/template" id="discussion-container-template">
+  <div class="discussion">
+  <div class="embedded-toolbar moveArea">
+  <span class="minimize-button"></span>
+  </div>
+  <div class="discussion-content">
+  <div class="discussion-heading"> <%- heading %>
+  </div>
+  <div class="discussion-text"></div>
+  </div>
+  <input class="discussion-input" placeholder=Texteingabe>
+  </div>
+</script>
 
 <script type="text/template" id="container-template">
   <table class="headline" bgcolor=#CCFFFF><tr>
@@ -559,42 +564,42 @@
 <!-- BEGIN: Tag Assigner Underscore Templates  -->
 
 <script type="text/html" id='tag-assigner-content-tmpl'>
-<div id="tabs"  class="ui-tabs ui-widget ui-widget-content ui-corner-all" style="width: 565px">
-	<ul>
-		<li><a href="#mainTag">Main Tag</a></li>
-		<li><a href="#secondaryTags">Secondary Tag</a></li>
-	</ul>
-	<div id="mainTag">
-		<div class="filename-wrapper">Name of the file: <span class="filename"></span></div>
-		<div class="custom-main-tag-holder">
-			<label for="custom-Main-tag"><b>Custom tag:</b> </label>
-			<input id="custom-Main-tag" placeholder="Type a custom Main Tag" >
-		</div>
-	</div>
-	<div id="secondaryTags">
-		<div class="ui-widget ui-helper-clearfix" style="width: 555px">
-			<div class="unassignedTags">
-				<div class="inner-unassignedTags">
-					<ul id="unassignedTags" class="tags ui-helper-reset ui-helper-clearfix">
-					</ul>
-				</div>
-				<div class="buttons-holder">			
-					<button id="btn-previous"><</button>
-					<button id="btn-next">></button>
-				</div>			
-				<div class="custom-sec-tag-holder">
-					<label for="custom-Sec-tag"><b>Custom tag:</b> </label>
-					<input id="custom-Sec-tag" placeholder="Type a custom Secondary Tag" >
-				</div>	
-			</div>
-			<div id="document" class="ui-widget-content ui-state-default">
-				<h4 class="ui-widget-header"><span class="filename"></span></h4>
-				<ul class="tags ui-helper-reset" id="assignedTags">
-				<ul class="tags" id="assignedTags"></ul>
-			</div>
-		</div>
-	</div>
-</div>
+  <div id="tabs"  class="ui-tabs ui-widget ui-widget-content ui-corner-all" style="width: 565px">
+    <ul>
+      <li><a href="#mainTag">Main Tag</a></li>
+      <li><a href="#secondaryTags">Secondary Tag</a></li>
+    </ul>
+    <div id="mainTag">
+      <div class="filename-wrapper">Name of the file: <span class="filename"></span></div>
+      <div class="custom-main-tag-holder">
+        <label for="custom-Main-tag"><b>Custom tag:</b> </label>
+        <input id="custom-Main-tag" placeholder="Type a custom Main Tag" >
+      </div>
+    </div>
+    <div id="secondaryTags">
+      <div class="ui-widget ui-helper-clearfix" style="width: 555px">
+        <div class="unassignedTags">
+          <div class="inner-unassignedTags">
+            <ul id="unassignedTags" class="tags ui-helper-reset ui-helper-clearfix">
+            </ul>
+          </div>
+          <div class="buttons-holder">			
+            <button id="btn-previous"><</button>
+            <button id="btn-next">></button>
+          </div>			
+          <div class="custom-sec-tag-holder">
+            <label for="custom-Sec-tag"><b>Custom tag:</b> </label>
+            <input id="custom-Sec-tag" placeholder="Type a custom Secondary Tag" >
+          </div>	
+        </div>
+        <div id="document" class="ui-widget-content ui-state-default">
+          <h4 class="ui-widget-header"><span class="filename"></span></h4>
+          <ul class="tags ui-helper-reset" id="assignedTags">
+            <ul class="tags" id="assignedTags"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
 </script>
 
 <!-- END: Tag Assigner Underscore Templates -->
@@ -602,61 +607,61 @@
 <!-- BEGIN: Tag Manager Underscore Templates  -->
 
 <script type="text/html" id='tag-manager-content-tmpl'>
-	<div id="main-tag-container">
-		<div class="portlet portlet-new-main-tag ui-corner-all">
-			<h2>Click to create a new Main Tag</h2>
-		</div>	    	
-	</div>	
+  <div id="main-tag-container">
+    <div class="portlet portlet-new-main-tag ui-corner-all">
+      <h2>Click to create a new Main Tag</h2>
+    </div>	    	
+  </div>	
 </script>
 
 
 <script type="text/html" id='tag-manager-content-tmpl'>
-	<div id="main-tag-container">
-		<div class="portlet portlet-new-main-tag ui-corner-all">
-			<h2>Create New Main Tag</h2>
-		</div>	    	
-	</div>	
+  <div id="main-tag-container">
+    <div class="portlet portlet-new-main-tag ui-corner-all">
+      <h2>Create New Main Tag</h2>
+    </div>	    	
+  </div>	
 </script>
 
 
 <script type="text/html" id='secondary-tag-tmpl1'>	
-    <li class='ui-widget-content' data-sectag='<%= secTag %>'>
-		<h5 class='ui-widget-header tagValue editable-sec'><%= secTag %></h5>
-		<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
-	</li>      	
+  <li class='ui-widget-content' data-sectag='<%= secTag %>'>
+    <h5 class='ui-widget-header tagValue editable-sec'><%= secTag %></h5>
+    <span class='ui-icon ui-icon-trash sec-tag-delete'></span>
+  </li>      	
 </script>
 
 <script type="text/html" id='secondary-tag-tmpl'>	
-    <li class='ui-widget-content' data-sectag='<%= secTag %>'>
-		<h5 class='ui-widget-header tagValue'><div class="editable-sec"><%= secTag %></div></h5>
-		<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
-	</li>      	
+  <li class='ui-widget-content' data-sectag='<%= secTag %>'>
+    <h5 class='ui-widget-header tagValue'><div class="editable-sec"><%= secTag %></div></h5>
+    <span class='ui-icon ui-icon-trash sec-tag-delete'></span>
+  </li>      	
 </script>
 <script type="text/html" id='main-tag-tmpl'>
 
-	<% _.each(items,function(item, key, list){ %>
-		
-		<div class='portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all' data-maintag='<%= item.id %>'>
-			<div class='portlet-header ui-widget-header ui-corner-all'>
-				<span class='ui-icon ui-icon-trash portlet-delete'></span>
-				<span class='ui-icon ui-icon-plusthick portlet-toggle'></span>
-				<div class='editable'><%= item.name %></div>
-			</div>
-			<div class='portlet-content' style='display: none'>
-				<div class='ui-widget-content portlet-new-sec-tag ui-corner-all'>
-					<h2>Click to create a new Secondary Tag</h2>
-				</div>
-				<ul class='managetags ui-helper-reset ui-helper-clearfix connectedSortable'>
-					<% for(var tag in item.secTags) { %>								
-						 <li class='ui-widget-content' data-sectag='<%= item.secTags[tag] %>'>							
-							<h5 class='ui-widget-header tagValue'><div class="editable-sec"><%= item.secTags[tag] %></div></h5>
-							<span class='ui-icon ui-icon-trash sec-tag-delete'></span>
-						</li>
-				   <% } %>
-				</ul>
-			</div>
-		</div>
-	<% }) %>
+  <% _.each(items,function(item, key, list){ %>
+
+  <div class='portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all' data-maintag='<%= item.id %>'>
+    <div class='portlet-header ui-widget-header ui-corner-all'>
+      <span class='ui-icon ui-icon-trash portlet-delete'></span>
+      <span class='ui-icon ui-icon-plusthick portlet-toggle'></span>
+      <div class='editable'><%= item.name %></div>
+    </div>
+    <div class='portlet-content' style='display: none'>
+      <div class='ui-widget-content portlet-new-sec-tag ui-corner-all'>
+        <h2>Click to create a new Secondary Tag</h2>
+      </div>
+      <ul class='managetags ui-helper-reset ui-helper-clearfix connectedSortable'>
+        <% for(var tag in item.secTags) { %>								
+        <li class='ui-widget-content' data-sectag='<%= item.secTags[tag] %>'>							
+          <h5 class='ui-widget-header tagValue'><div class="editable-sec"><%= item.secTags[tag] %></div></h5>
+          <span class='ui-icon ui-icon-trash sec-tag-delete'></span>
+        </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+  <% }) %>
 
 </script>	
 
