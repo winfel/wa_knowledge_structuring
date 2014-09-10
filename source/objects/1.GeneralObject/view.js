@@ -321,11 +321,6 @@ GeneralObject.select = function(multiple, groupSelect) {
     GUI.updateInspector(true);
   }, 100);
 
-  // Update the right manager sidebar on the right
-  
-  GUI.rightmanager.updateContent(this);
-  //GUI.rightmanagerDialog.show(this);
-
   if (!groupSelect && !multiple)
     GUI.showLinks(this);
 
@@ -333,8 +328,7 @@ GeneralObject.select = function(multiple, groupSelect) {
 
   /* inform all clients about the selection */
   ObjectManager.informAboutSelection(this.id);
-
-}
+};
 
 /**
  * Deselects the object
@@ -359,11 +353,7 @@ GeneralObject.deselect = function() {
   
   /* inform all clients about the deselection */
   ObjectManager.informAboutDeselection(this.id);
-  
-//Update the right manager sidebar on the right
-  GUI.rightmanager.updateContent(this);
-
-}
+};
 
 
 /**
@@ -1513,14 +1503,14 @@ GeneralObject.clickHandler = function(event) {
 GeneralObject.clickRevertHandler = function(event) {
   /* for a faster feeling the click event is called when the first click is recognized, even if there will be a second (double) click. In case of a double click we have to revert the click action */
   this.deselect();
-}
+};
 
 /**
  * Called after an object movement
  */
 GeneralObject.moveHandler = function() {
   this.setPosition(this.getViewX(), this.getViewY());
-}
+};
 
 /**
  * Called after an object resizing
@@ -1528,22 +1518,30 @@ GeneralObject.moveHandler = function() {
 GeneralObject.resizeHandler = function() {
   this.setDimensions(this.getViewWidth(), this.getViewHeight());
   this.setPosition(this.getViewX(), this.getViewY());
-}
+};
 
 /**
  * Called after object selection
  */
 GeneralObject.selectHandler = function() {
+  
   GUI.updateInspector(true);
+  
+  // Update the right manager sidebar on the right
+  GUI.rightmanager.update();
+  //GUI.rightmanagerDialog.show();
+  
   GUI.showLinks(this);
-}
+};
 
 /**
  * Called after object deselection
  */
 GeneralObject.deselectHandler = function() {
   GUI.hideLinks(this);
-}
+  
+  GUI.rightmanager.update();
+};
 
 /**
  * Called when a double click was performed
@@ -1551,7 +1549,7 @@ GeneralObject.deselectHandler = function() {
  */
 GeneralObject.dblclickHandler = function(event) {
   this.execute(event);
-}
+};
 
 /**
  * Called when a click was performed and the object is selected

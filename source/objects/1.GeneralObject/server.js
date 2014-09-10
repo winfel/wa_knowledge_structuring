@@ -498,4 +498,16 @@ theObject.fireEvent = function(name, data) {
   Modules.EventBus.emit(name, data);
 }
 
+/**
+ * 
+ * @function hasAccess
+ * @param {type} user     The user object. (Needs to have user.username)
+ * @param {type} right
+ * @param {type} callback
+ * @returns {undefined}
+ */
+theObject.hasAccess = function(user, right, callback) {
+  Modules.RightManager.hasAccess(this, user, right, callback);
+};
+
 theObject.fireEvent.public = true; //Function can be accessed by customObjectFunctionCall

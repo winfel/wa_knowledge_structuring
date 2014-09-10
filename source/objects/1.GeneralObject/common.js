@@ -188,7 +188,7 @@ GeneralObject.register = function(type) {
   this.registerAttribute('id', {type: 'text', readonly: true});
   this.registerAttribute('type', {type: 'text', readonly: true});
   this.registerAttribute('name', {type: 'text', changedFunction: function(object, value) {
-      var obj = {id:object.id, name:value}; 
+      var obj = {id: object.id, name: value};
       Modules.UserManager.broadcastNameChange(obj);
 
       GUI.tabs.updateCache(object);
@@ -599,7 +599,7 @@ GeneralObject.registerAttribute = function(attribute, setter, type, min, max) {
  * @return {boolean} 
  */
 GeneralObject.setAttribute = function(attribute, value, forced, transactionId) {
-    if (this.mayChangeAttributes()) {
+  if (this.mayChangeAttributes()) {
 
     // rights could also be checked in the attribute manager but HAVE to
     // be checked on the server side.
@@ -607,14 +607,14 @@ GeneralObject.setAttribute = function(attribute, value, forced, transactionId) {
     var ret = this.attributeManager.setAttribute(this, attribute, value, forced);
 
     if (this.afterSetAttribute) {
-        this.afterSetAttribute();
+      this.afterSetAttribute();
     }
 
     return ret;
 
   } else {
-      GUI.error('Missing rights', 'No right to change ' + attribute + ' on ' + this, this);
-      return false;
+    GUI.error('Missing rights', 'No right to change ' + attribute + ' on ' + this, this);
+    return false;
   }
 };
 
@@ -1322,6 +1322,38 @@ GeneralObject.updateLinkIds = function(idTranslationList) {
 };
 
 GeneralObject.deleteIt = GeneralObject.remove;
+
+/**
+ * Registers a right used within this object.
+ * 
+ * @function registerRight
+ * @param {type} name
+ * @param {type} comment
+ * @returns {undefined}
+ */
+GeneralObject.registerRight = function(name, comment) {
+  try {
+    Modules.RightManager.registerRight(this, name, comment);
+  } catch (e) {
+    // Do nothing if registerRight is not available on the client side.
+  }
+};
+
+/**
+ * Registers a default role.
+ * 
+ * @function registerDefaultRole
+ * @param {type} name
+ * @param {type} rights
+ * @returns {undefined}
+ */
+GeneralObject.registerDefaultRole = function(name, rights) {
+  try {
+    Modules.RightManager.registerDefaultRole(this, name, rights);
+  } catch (e) {
+    // Do nothing if registerDefaultRole is not available on the client side.
+  }
+};
 
 module.exports = GeneralObject;
 
