@@ -331,6 +331,12 @@ GUI.rightmanagerDialog = new function() {
       RightManager.modifyAccess(currentObject, right, role, value);
     });
 
+
+    if (!role.deletable) {
+      // If not deletable those rights cannot be modified as well...
+      container.find("input").prop("disabled", true);
+    }
+
     rightArea.append(container);
   };
 

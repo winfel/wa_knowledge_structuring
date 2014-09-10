@@ -45,8 +45,6 @@ GUI.rightmanager = new function() {
         RightManager.modifyRole(currentObject, role, true);
       }
       input.val("");
-//      bottomArea.find("input:not(.new-role-textfield)").toggle();
-//      bottomArea.find("input.new-role-textfield").animate({width: "toggle"}).val("");
     });
 
     bottomArea.find(".btn-new-role").click(function() {
@@ -158,20 +156,23 @@ GUI.rightmanager = new function() {
     // Initial value
     widget.setValue(role.rights.indexOf(right.name) >= 0);
 
-    $(elementDOM)
-            .attr({
-              id: elemId,
-              title: right.comment
-            })
-            .addClass("cursor-pointer")
-            .on("click", function(event) {
-              // Update the widget if the element div (not input) is clicked.
-              if (event.target != $(elementDOM).find("input")[0]) {
-                widget.setValue(!widget.getValue());
-              }
+    $(elementDOM).attr({id: elemId, title: right.comment});
 
-              RightManager.modifyAccess(currentObject, right, role, widget.getValue());
-            });
+    if (role.deletable) {
+      $(elementDOM)
+              .addClass("cursor-pointer")
+              .on("click", function(event) {
+                // Update the widget if the element div (not input) is clicked.
+                if (event.target != $(elementDOM).find("input")[0]) {
+                  widget.setValue(!widget.getValue());
+                }
+
+                RightManager.modifyAccess(currentObject, right, role, widget.getValue());
+              });
+    } else {
+      // If not deletable those rights cannot be modified as well...
+      $("#" + elemId).find("input").prop("disabled", true);
+    }
   };
 
   /**
