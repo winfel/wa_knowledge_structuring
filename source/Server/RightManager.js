@@ -11,6 +11,7 @@ var RightManager = function() {
   /**
    * Maps the given object to another type of object. E.g. Subroom to Room.
    * 
+   * @function mapObject
    * @param {type} object       The object to map.
    * @param {type} isRegister   Indicates whether this function is called during some right or role registration process.
    * @returns {undefined}
@@ -46,6 +47,7 @@ var RightManager = function() {
   /**
    * Reverts the mapping done mapObject.
    * 
+   * @function unmapObject
    * @param {type} object
    * @returns {RightManager.unmapObject.dataObject}
    */
@@ -139,6 +141,7 @@ var RightManager = function() {
    * Notifies all users, who have the right to manage the given object and are
    * in the same room who performed some changes.
    * 
+   * @function notifyManagers
    * @param {type} socket
    * @param {type} object
    * @param {type} message
@@ -163,7 +166,8 @@ var RightManager = function() {
   /**
    * This method returns the parent of this object
    * If the parent cannot be determined it returns the root (i.e., the canvas element)
-   *   
+   * 
+   * @function getParentOfObject
    * @param {type} obj
    * @returns {RightManager.getParentOfObject.Anonym$26}
    */
@@ -174,14 +178,15 @@ var RightManager = function() {
     }
   };
   /**
-   *	The function returns a boolean value that 
-   *	represents if the current user has the right 
-   *	to perform a specific command.
+   * The function returns a boolean value that 
+   * represents if the current user has the right 
+   * to perform a specific command.
    *	
-   *	@param {type}       object      The object that should be checked
-   *  @param {type}       user        The user object
-   *	@param {type}       right       The right to be checked, e.g., read, write (CRUD)
-   *  @param {function}   callback    The callback function with one boolean parameter (the answer)
+   * @function hasAccess
+   * @param {type}       object      The object that should be checked
+   * @param {type}       user        The user object
+   * @param {type}       right       The right to be checked, e.g., read, write (CRUD)
+   * @param {function}   callback    The callback function with one boolean parameter (the answer)
    */
   this.hasAccess = function(object, user, right, callback) {
     var dataObject = this.mapObject(object);
@@ -222,6 +227,7 @@ var RightManager = function() {
    * object or not. This function is used by the right manager
    * itself in order to grant access or not.
    * 
+   * @function isManager
    * @param {type} object
    * @param {type} user     The user object
    * @param {type} callback
@@ -240,22 +246,24 @@ var RightManager = function() {
   };
 
   /**
-   *  The function can be used to grant access rights
-   *  @param {type} object    The object that should be used to change the access right
-   *  @param {type} right     The right, which needs to be checked , e.g., read, write (CRUD)
-   *  @param {type} role      The role that should be changed
-   *  A call could look like this:  grantAccess("read","AB","reviewer");
+   * The function can be used to grant access rights
+   * 
+   * @function grantAccess
+   * @param {type} object    The object that should be used to change the access right
+   * @param {type} right     The right, which needs to be checked , e.g., read, write (CRUD)
+   * @param {type} role      The role that should be changed
    */
   this.grantAccess = function(object, right, role) {
     this.modifyAccess(object, right, role, true);
   };
 
   /**
-   *	The function can be used to revoke access rights
-   *	@param {type}	object    The object that should be used to change the access right
-   *  @param {type} right     The right, which needs to be checked , e.g., read, write (CRUD)
-   *	@param {type} role      The role that should be changed
-   *	A call could look like this: revokeAccess("read","AB","reviewer");
+   * The function can be used to revoke access rights
+   * 
+   * @function revokeAccess
+   * @param {type} object    The object that should be used to change the access right
+   * @param {type} right     The right, which needs to be checked , e.g., read, write (CRUD)
+   * @param {type} role      The role that should be changed
    */
   this.revokeAccess = function(object, right, role) {
     this.modifyAccess(object, right, role, false);
@@ -264,12 +272,12 @@ var RightManager = function() {
   /**
    *	The function can be used to modify access rights
    *	
-   *	@param {type}   object    The object that should be used to change the access right
-   *  @param {type}   right     The right, which needs to be checked , e.g., read, write (CRUD)
-   *	@param {type}   role      The role that should be changed
-   *	@param {type}   grant     The grant paramter is set to true, if the access right should be
-   *        granted. Set false, to revoke access.
-   *	A call could look like this: modifyAccess("read","AB","reviewer", true);
+   * @function modifyAccess
+   * @param {type}   object    The object that should be used to change the access right
+   * @param {type}   right     The right, which needs to be checked , e.g., read, write (CRUD)
+   * @param {type}   role      The role that should be changed
+   * @param {type}   grant     The grant paramter is set to true, if the access right should be
+   *                           granted. Set false, to revoke access.
    */
   this.modifyAccess = function(object, right, role, grant, callback) {
     var dataObject = this.mapObject(object);
@@ -293,6 +301,7 @@ var RightManager = function() {
   /**
    * Returns the roles of a given object stored in the database.
    * 
+   * @function getRoles
    * @param {type} object
    * @param {type} callback
    * @returns {undefined}
@@ -309,6 +318,7 @@ var RightManager = function() {
   /**
    * Returns all supported object types to a given callback.
    * 
+   * @function getSupportedObjects
    * @param {type} callback   The callback we the data is given to.
    */
   this.getSupportedObjects = function(callback) {
@@ -421,6 +431,7 @@ var RightManager = function() {
   /**
    * Initializes the right manager on the server,
    * 
+   * @function init
    * @param {type} theModules
    * @returns {undefined}
    */

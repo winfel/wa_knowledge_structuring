@@ -26,6 +26,7 @@ UserManager.connections = {};
 /**
  * Init function called in server.js to initialize this module
  * 
+ * @function init
  * @param {Object} theModules variable to access the other modules.
  */
 UserManager.init = function(theModules) {
@@ -73,7 +74,6 @@ UserManager.init = function(theModules) {
     }
 
   });
-
 
   Dispatcher.registerCall('umGetTabCache', function(socket, data) {
     var responseObject = {};
@@ -145,6 +145,7 @@ UserManager.init = function(theModules) {
 /**
  * In case of a new connection, a new entry is created.
  * 
+ * @function socketConnect
  * @param {Object} socket the socket of the client.
  */
 UserManager.socketConnect = function(socket) {
@@ -155,6 +156,7 @@ UserManager.socketConnect = function(socket) {
  * Delete all connection data, when a socket disconnects and informs all remaining users 
  * in the user's room about the disconnect.
  *
+ * @function socketDisconnect
  * @param {Object} socket the socket of the client.
  */
 UserManager.socketDisconnect = function(socket) {
@@ -175,6 +177,7 @@ UserManager.socketDisconnect = function(socket) {
  * When a user tries to log in, his credentials are tested and added to the
  * connection
  * 
+ * @function login
  * @param {Object} socketOrUser The user.
  * @param {Object} data The credentials of the user.
  */
@@ -250,6 +253,13 @@ UserManager.login = function(socketOrUser, data) {
 
 };
 
+/**
+ * 
+ * @function setUserPreferredLanguage
+ * @param {type} socketOrUser
+ * @param {type} lang
+ * @returns {undefined}
+ */
 UserManager.setUserPreferredLanguage = function(socketOrUser, lang) {
   if (typeof socketOrUser.id == 'string')
     var userID = socketOrUser.id;
@@ -261,9 +271,18 @@ UserManager.setUserPreferredLanguage = function(socketOrUser, lang) {
     }
     Modules.UserDAO.updateUsersById(users[0]._id, {preferredLanguage: lang});
   });
-}
+};
+
 UserManager.setUserPreferredLanguage.public = true;
 
+/**
+ * 
+ * @function enterPaperWriter
+ * @param {type} socketOrUser
+ * @param {type} data
+ * @param {type} responseID
+ * @returns {undefined}
+ */
 UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
   var shouldInclude = [PAPER_WRITER + "#Writer#20#200#700#2#locked;true#paper;" + data.roomID,
@@ -277,6 +296,15 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 
+/**
+ * 
+ * @function loadRoomWithDefaultInventory
+ * @param {type} socketOrUser
+ * @param {type} data
+ * @param {type} responseID
+ * @param {type} shouldInclude
+ * @returns {undefined}
+ */
 UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, responseID, shouldInclude) {
   UserManager.enterRoom(socketOrUser, data, responseID);
   var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
@@ -357,10 +385,26 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
   });
 };
 
+/**
+ * 
+ * @function enterPublicSpace
+ * @param {type} socketOrUser
+ * @param {type} data
+ * @param {type} responseID
+ * @returns {undefined}
+ */
 UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, []);
 };
 
+/**
+ * 
+ * @function enterPrivateSpace
+ * @param {type} socketOrUser
+ * @param {type} data
+ * @param {type} responseID
+ * @returns {undefined}
+ */
 UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
   var shouldInclude = ["Textarea#PublicSpaceInfo#20#45#100#1#content;This is the private space of user " +
@@ -369,6 +413,12 @@ UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 
+/**
+ * 
+ * @function setDataOfSpaceWithDestServerSide
+ * @param {type} data
+ * @returns {undefined}
+ */
 UserManager.setDataOfSpaceWithDestServerSide = function(data) {
   var ss = db.get('SpaceStorage');
 
@@ -378,14 +428,21 @@ UserManager.setDataOfSpaceWithDestServerSide = function(data) {
   },
   {// update
     $set: {
-      'value': data.value,
+      'value': data.value
     }
   },
   {// options
-    upsert: true,
+    upsert: true
   });
 };
 
+/**
+ * 
+ * @function getDataOfSpaceWithDestServerSide
+ * @param {type} data
+ * @param {type} callback
+ * @returns {undefined}
+ */
 UserManager.getDataOfSpaceWithDestServerSide = function(data, callback) {
   var ss = db.get('SpaceStorage');
 
@@ -398,22 +455,52 @@ UserManager.getDataOfSpaceWithDestServerSide = function(data, callback) {
   });
 };
 
+/**
+ * 
+ * @function setDataOfSpaceWithDest
+ * @param {type} socketOrUser
+ * @param {type} data
+ * @param {type} responseID
+ * @returns {undefined}
+ */
 UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID) {
   UserManager.setDataOfSpaceWithDestServerSide.call(this, data);
 };
 
+/**
+ * 
+ * @function removeDataOfSpaceWithDest
+ * @param {type} socketOrUser
+ * @param {type} data
+ * @param {type} responseID
+ * @returns {undefined}
+ */
 UserManager.removeDataOfSpaceWithDest = function(socketOrUser, data, responseID) {
   var ss = db.get('SpaceStorage');
 
   ss.remove({'destination': data.destination, 'key': data.key});
 };
 
+/**
+ * 
+ * @function removeDataOfSpaceWithDestServerSide
+ * @param {type} data
+ * @returns {undefined}
+ */
 UserManager.removeDataOfSpaceWithDestServerSide = function(data) {
   var ss = db.get('SpaceStorage');
 
   ss.remove({'destination': data.destination, 'key': data.key});
 };
 
+/**
+ * 
+ * @function getDataOfSpaceWithDest
+ * @param {type} socketOrUser
+ * @param {type} data
+ * @param {type} responseID
+ * @returns {undefined}
+ */
 UserManager.getDataOfSpaceWithDest = function(socketOrUser, data, responseID) {
   var ss = db.get('SpaceStorage');
   ss.find({'destination': data.destination, 'key': data.key}, {}, function(e, docs) {
@@ -427,7 +514,8 @@ UserManager.getDataOfSpaceWithDest = function(socketOrUser, data, responseID) {
 
 /**
  * Let a user enter a room with a specific roomID
- *  
+ * 
+ * @function enterRoom
  * @param {Object} socketOrUser The user.
  * @param {Object} data The received data.
  * @param {Object} responseID response ID.
@@ -490,6 +578,7 @@ UserManager.enterRoom = function(socketOrUser, data, responseID) {
 /**
  * Let a user leave a room with a specific roomID
  * 
+ * @function leaveRoom
  * @param {Object} socket The socket of the client.
  * @param {Object} data The received data.
  * @param {Object} responseID response ID.
@@ -517,6 +606,7 @@ UserManager.leaveRoom = function(socket, data, responseID) {
  * AwarenessData is a set of information about the users in the current room.
  * This may be extended further, when user get their own objects
  * 
+ * @function getAwarenessData
  * @param {Object} roomID The id of the room.
  * @param {Object} connections ???.
  **/
@@ -539,6 +629,7 @@ UserManager.getAwarenessData = function(roomID, connections) {
 /**
  * Sends awarenessData about a room to all clients within that room.
  * 
+ * @function sendAwarenessData
  * @param {Object} roomID The id of the room.
  **/
 UserManager.sendAwarenessData = function(roomID) {
@@ -564,6 +655,7 @@ UserManager.sendAwarenessData = function(roomID) {
 /**
  * Get the connections of the specified room.
  * 
+ * @function getConnectionsForRoom
  * @param {Object} roomID The id of the room.
  * @return {Object} the connections of the room
  **/
@@ -585,6 +677,7 @@ UserManager.getConnectionsForRoom = function(roomID) {
 /**
  * Get connections by socket.
  * 
+ * @function getConnectionBySocket
  * @param {Object} socket The specified socket
  * @return {boolean} The connections
  **/
@@ -601,6 +694,7 @@ UserManager.getConnectionBySocket = function(socket) {
 /**
  * Get connections by the Id of a socket.
  * 
+ * @function getConnectionBySocketID
  * @param {Object} socketID The specified id of a socket
  * @return {boolean} The connections
  **/
@@ -617,6 +711,7 @@ UserManager.getConnectionBySocketID = function(socketID) {
 /**
  * Get connections by User hash.
  * 
+ * @function getConnectionByUserHash
  * @param {Object} userHash The specified userHash
  * @return {boolean} The connections
  **/
@@ -632,6 +727,7 @@ UserManager.getConnectionByUserHash = function(userHash) {
 
 /**
  * 
+ * @function isManager
  * @param {type} socket
  * @param {type} data
  * @returns {undefined}
@@ -663,10 +759,12 @@ UserManager.isManager = function(socket, data) {
 };
 
 /**
- *  The function can be used to check wheter a user is valid (exists) or not
- *  @param {Object} socket  Socket connection
- *  @param {Object} data    Send data
- *  @param {Sring} responseID  RespondId of the request
+ * The function can be used to check wheter a user is valid (exists) or not
+ *  
+ * @function isValidUser
+ * @param {Object} socket  Socket connection
+ * @param {Object} data    Send data
+ * @param {Sring} responseID  RespondId of the request
  */
 UserManager.isValidUser = function(socket, data, responseID) {
   Modules.UserDAO.usersByUserName(data.user, function(err, docs) {
@@ -677,7 +775,9 @@ UserManager.isValidUser = function(socket, data, responseID) {
 };
 
 /**
+ * Returns all users who are not assigned to the given object and role yet.
  * 
+ * @function getMissingUsers
  * @param {type} object
  * @param {type} role
  * @param {type} callback
@@ -697,6 +797,11 @@ UserManager.getMissingUsers = function(object, role, callback) {
   });
 };
 
+/**
+ * 
+ * @function loggedInInfo
+ * @returns {undefined}
+ */
 function loggedInInfo() {
   var connections = UserManager.connections;
 
