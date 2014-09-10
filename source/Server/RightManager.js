@@ -1,334 +1,163 @@
 var db = false;
 var Modules = false;
 
-var clearTablesAtStartUp = false;
-
-var fillWithDefaultRights = function() {
-  /* one role per default - read only for all users */
-  var pushRoles = ['PaperObject#writer#read,write,create',
-    'PaperObject#reviewer#read,write'];
-
-  /* push default roles */
-  collection = db.get('defroles');
-  pushRoles.forEach(function(item) {
-    var token = item.split("#");
-
-    var aObject = String(token[0]);
-    var aName = String(token[1]);
-    var someRights = String(token[2]).split(",");
-
-    collection.find({object: String(aObject), name: String(aName)}, {}, function(e, docs) {
-      if (typeof docs == 'undefined' || docs.length === 0) {
-        collection.insert({
-          object: aObject,
-          name: aName,
-          rights: someRights});
-        Modules.Log.debug("pushing default object: " + String(aObject));
-      } else {
-        Modules.Log.debug("default object " + aObject + " was already included");
-      }
-    });
-  });
-};
-
-var fillCurrentDbWithLayer0CanvasData = function() {
-
-  Modules.Log.debug("filling Layer 0 data");
-
-  /* minimal rights possible - CRUD */
-  var pushRights = ['1#create', '2#read', '3#update', '4#delete'];
-
-  /* no users per default */
-  var pushUsers = [];
-
-  /* one role per default - read only for all users */
-  var pushRoles = ['0#0#CanvasLayer#read#overwrite#all'];
-
-  /* push default rights */
-  var collection = db.get('rights');
-  pushRights.forEach(function(item) {
-    var token = item.split("#");
-
-    collection.find({id: String(token[0]), name: String(token[1])}, {}, function(e, docs) {
-      if (typeof docs == 'undefined' || docs.length === 0) {
-        collection.insert({id: String(token[0]), name: String(token[1])});
-
-        Modules.Log.debug("pushing default right: " + String(token[1]));
-      } else {
-        Modules.Log.debug("default right " + token[1] + " was already included");
-      }
-    });
-  });
-
-  /* push default users */
-  collection = db.get('users');
-  pushUsers.forEach(function(item) {
-    var token = item.split("#");
-
-    collection.find({username: String(token[0]), password: String(token[1])}, {}, function(e, docs) {
-      if (docs.length === 0) {
-        collection.insert({username: String(token[0]), password: String(token[1])});
-
-        Modules.Log.debug("pushing default user: " + String(token[1]));
-      } else {
-        Modules.Log.debug("default user " + token[1] + " was already included");
-      }
-    });
-  });
-
-  /* push default roles */
-  collection = db.get('roles');
-  pushRoles.forEach(function(item) {
-    var token = item.split("#");
-
-    var aID = String(token[0]);
-    var aContextID = String(token[1]);
-    var aName = String(token[2]);
-    var someRights = String(token[3]).split(",");
-    var aMode = String(token[4]);
-    var someUser = String(token[5]).split(",");
-
-    collection.find({name: String(aName), contextID: String(aContextID)}, {}, function(e, docs) {
-      if (typeof docs == 'undefined' || docs.length === 0) {
-        collection.insert({id: aID,
-          contextID: aContextID,
-          name: aName,
-          rights: someRights,
-          mode: aMode,
-          users: someUser});
-        Modules.Log.debug("pushing default role: " + String(aName));
-      } else {
-        Modules.Log.debug("default role " + aName + " was already included");
-      }
-    });
-  });
-};
-
-var fillCurrentDbWithTestData = function() {
-
-  Modules.Log.debug("filling testdata");
-
-  var pushRights = ['Canvas#1#create#You may create something on the canvas',
-    'Canvas#2#read#You may read something on the canvas',
-    'Canvas#3#update#You may change something on the canvas',
-    'Canvas#4#delete#You may delete something on the canvas',
-    'PaperObject#5#read#You may read the selected PaperObject',
-    'PaperObject#6#update#You may change the selected PaperObject',
-    'PaperObject#7#delete#You may delete the selected PaperObject',
-    'NumberCreator#8#create#You may create the selected NumberCreater and NumericObjects',
-    'NumberCreator#9#update#You may drop something on the PaperObject PaperObject'];
-  var pushUsers = [
-    'joerg#12345',
-    'vanessa#xyz',
-    "shari#345",
-    "oliver#345",
-    "steven#345",
-    "lisa#123",
-    "mohammad#345",
-    "alejandro#345",
-    "sharath#345",
-    "ivan#345",
-    "siby#345",
-    "brice#345",
-    "manasa#345",
-    "nitesh#345",
-    "patrick#234"
-  ];
-  var pushRoles = [
-    '1#1#RandomGuys#create,read#overwrite#',
-    '2#1#Boss#read#overwrite#'
-  ];
-
-  /* clear tables */
-  if(clearTablesAtStartUp){
-    db.get('rights').drop();
-    db.get('users').drop();
-    db.get('roles').drop();
-  }
-
-  /* push test rights */
-  var collectionRights = db.get('rights');
-  pushRights.forEach(function(item) {
-    var token = item.split("#");
-
-    collectionRights.find({type: String(token[0]), name: String(token[2])}, {}, function(e, docs) {
-      if (typeof docs == 'undefined' || docs.length === 0) {
-        collectionRights.insert({type: String(token[0]), id: String(token[1]), name: String(token[2]), comment: String(token[3])});
-
-        Modules.Log.debug("pushing test right: " + String(token[1]));
-      } else {
-        Modules.Log.debug("test right " + token[1] + " was already included");
-      }
-    });
-  });
-
-  /* push test users */
-  collectionUser = db.get('users');
-  pushUsers.forEach(function(item) {
-    var token = item.split("#");
-
-    collectionUser.find({username: String(token[0])}, {}, function(e, docs) {
-      if (typeof docs == 'undefined' || docs.length === 0) {
-        collectionUser.insert({username: String(token[0]), password: String(token[1])});
-
-        Modules.Log.debug("pushing test user: " + String(token[0]));
-      } else {
-        Modules.Log.debug("test user " + token[0] + " was already included");
-      }
-    });
-  });
-
-  /* push test roles */
-  collectionRoles = db.get('roles');
-  pushRoles.forEach(function(item) {
-    var token = item.split("#");
-
-    var aID = String(token[0]);
-    var aContextID = String(token[1]);
-    var aName = String(token[2]);
-    var someRights = String(token[3]).split(",");
-    var aMode = String(token[4]);
-    var someUser = String(token[5]).split(",");
-
-    collectionRoles.find({contextID: aContextID, name : aName}, {}, function(e, docs) {
-      if (typeof docs == 'undefined' || docs.length === 0) {
-        collectionRoles.insert({id: aID,
-          contextID: aContextID,
-          name: aName,
-          rights: someRights,
-          mode: aMode,
-          users: someUser});
-
-        Modules.Log.debug("pushing test role: " + String(aName));
-      } else {
-        Modules.Log.debug("test role " + aName + " was already included");
-      }
-    });
-  });
-};
-
+/**
+ * @class RightManager
+ * @classdesc This is the right manager on the server side.
+ */
 var RightManager = function() {
-
-  var possibleAccessRights = [];
   var that = this;
 
   /**
-   * The function gets all rights from the database and stores them in an internal array
+   * Maps the given object to another type of object. E.g. Subroom to Room.
+   * 
+   * @param {type} object       The object to map.
+   * @param {type} isRegister   Indicates whether this function is called during some right or role registration process.
+   * @returns {undefined}
    */
-  this.initRights = function() {
-    possibleAccessRights = [];
+  this.mapObject = function(object, isRegister) {
+    var dataObject = {id: object.id, type: object.type};
+    switch (object.type) {
+      case "Subroom":
+        if (!isRegister) {
+          if (object.getAttribute) {
+            var destination = object.getAttribute('destination');
+            if (!destination) {
+              // No destination yet? Create one...
+              // This should be done in more general place...
+              destination = (new Date()).getTime() - 1296055327011;
+              object.setAttribute('destination', destination);
+            }
 
-    /* get all exiting access rights from the database */
-    var collection = db.get('rights');
-    collection.find({}, {}, function(e, docs) {
-      if (typeof docs != 'undefined' && docs.length > 0) {
-        docs.forEach(function(entry) {
+            dataObject.id = destination;
+          } else {
+            dataObject.id = object.destination;
+          }
+        }
+        dataObject.type = "Room";
+        dataObject.initial_id = object.id;
+        dataObject.initial_type = object.type;
+        break;
+    }
 
-          Modules.Log.debug("adding right: " + String(entry.name));
+    return dataObject;
+  };
 
-          possibleAccessRights.push(entry.name);
-        });
+  /**
+   * Reverts the mapping done mapObject.
+   * 
+   * @param {type} object
+   * @returns {RightManager.unmapObject.dataObject}
+   */
+  this.unmapObject = function(object) {
+    var dataObject = {id: object.id, type: object.type};
+    if (object.initial_id)
+      dataObject.id = object.initial_id;
+    if (object.initial_type)
+      dataObject.type = object.initial_type;
+    return dataObject;
+  };
+
+  /**
+   * Registers a right for a given object.
+   * 
+   * @function registerRight
+   * @param {type} object
+   * @param {type} name
+   * @param {type} comment
+   * @returns {undefined}
+   */
+  this.registerRight = function(object, name, comment) {
+    var dataObject = this.mapObject(object, true);
+
+    var dbRights = db.get('rights');
+    dbRights.update({
+      type: String(dataObject.type),
+      name: String(name)
+    }, {
+      type: String(dataObject.type),
+      name: String(name),
+      comment: String(comment)
+    }, {
+      upsert: true
+    });
+  };
+
+  /**
+   * Registers a default role for a given object.
+   * 
+   * @function registerDefaultRole
+   * @param {type} object
+   * @param {type} name
+   * @param {type} rights
+   * @returns {undefined}
+   */
+  this.registerDefaultRole = function(object, name, rights) {
+    var dataObject = this.mapObject(object, true);
+    var dbDefRoles = db.get('defroles');
+    if (String(name).toLowerCase() == "manager" && !rights) {
+      // If the rights array is omitted and the role is manager,
+      // then get all rights and call the function again.
+      var dbRights = db.get('rights');
+      dbRights.distinct("name", {type: dataObject.type}, function(e, docs) {
+        that.registerDefaultRole(dataObject, name, docs);
+      });
+      return;
+    }
+    // Overwrite old or insert new right.
+    dbDefRoles.update({
+      object: String(dataObject.type),
+      name: String(name)
+    }, {
+      object: String(dataObject.type),
+      name: String(name),
+      rights: rights
+    }, {
+      upsert: true
+    });
+  };
+
+  /**
+   * 
+   * @function getObjectRights
+   * @param {type} object
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.getObjectRights = function(object, callback) {
+    var dataObject = this.mapObject(object, true);
+
+    var dbRights = db.get('rights');
+    dbRights.distinct("name", {type: dataObject.type}, function(e, docs) {
+      if (callback) {
+        callback(docs);
       }
     });
   };
 
   /**
-   * Initializes the right manager on the server,
+   * Notifies all users, who have the right to manage the given object and are
+   * in the same room who performed some changes.
    * 
-   * @param {type} theModules
+   * @param {type} socket
+   * @param {type} object
+   * @param {type} message
+   * @param {type} data
    * @returns {undefined}
    */
-  this.init = function(theModules) {
-    Modules = theModules;
+  this.notifyManagers = function(socket, object, message, data) {
+    var connection = Modules.UserManager.getConnectionBySocket(socket);
+    // Broadcast to all manager of the object...
+    var roomConnections = Modules.UserManager.getConnectionsForRoom(connection.rooms.left.id);
 
-    db = require('monk')(Modules.MongoDBConfig.getURI());
-    
-    var Dispatcher = Modules.Dispatcher;
-
-    //fillCurrentDbWithTestData();
-    //fillCurrentDbWithLayer0CanvasData();
-    //fillWithDefaultRights();
-
-    this.initRights();
-
-    // Register RightManager related server calls...
-    Dispatcher.registerCall('rmHasAccess', function(socket, data, responseID) {
-      var connection = Modules.UserManager.getConnectionBySocket(socket);
-      
-      that.hasAccess(data.command, data.object, connection.user, function(result) {
-        if (result === true) {
-          Modules.SocketServer.sendToSocket(socket, "rmAccessGranted" + data.object.id);
-        } else {
-          Modules.SocketServer.sendToSocket(socket, "rmAccessDenied" + data.object.id);
+    for (var i in roomConnections) {
+      // Only send a message to other managers.
+      that.isManager(object, roomConnections[i].user, function(result) {
+        if (result) {
+          Modules.SocketServer.sendToSocket(roomConnections[i].socket, message, data);
         }
       });
-    });
-
-    Dispatcher.registerCall('rmGrantAccess', function(socket, data, responseID) {
-      that.grantAccess(data.command, data.object, data.role);
-    });
-
-    Dispatcher.registerCall('rmRevokeAccess', function(socket, data, responseID) {
-      that.revokeAccess(data.command, data.object, data.role);
-    });
-
-    Dispatcher.registerCall("rmGetObjectRoles", function(socket, data) {
-      var dbRights = db.get('defroles');
-
-      dbRights.find({object: String(data.object.type)}, {}, function(e, docs) {
-        Modules.SocketServer.sendToSocket(socket, "rmObjectRoles" + data.object.id, docs);
-      });
-    });
-
-    Dispatcher.registerCall("rmGetAllUsers", function(socket, data) {
-      var dbRights = db.get('users');
-
-      dbRights.find({}, {}, function(e, docs) {
-        Modules.SocketServer.sendToSocket(socket, "rmUsers", docs);
-      });
-    });
-
-    Dispatcher.registerCall("rmGetObjectRights", this.getRights);
-
-    Modules.Log.info("RightManager has been initialized");
-  };
-
-  /**
-   *   The function can be used to put a right into the db.right document space.
-   *   If it is already included, the call will do nothing but log this fact.
-   *
-   *   @param {type} command   The used command (access right), e.g., read, write (CRUD)
-   *   @param {type} object    The object that should be used to change the access right
-   */
-  this.addRightToRightTableIfItIsNotThere = function(command, object) {
-    var collection = db.get('rights');
-    collection.find({type: String(object.type), name: String(command)},
-    {}, function(e, docs) {
-
-      var options = {"limit": 1, "sort": [['id', 'desc']]};
-      collection.find({}, options, function(e2, rightWithMaxID) {
-
-        if (typeof docs == 'undefined' || docs.length === 0) {
-          if(typeof rightWithMaxID == 'undefined'){
-            var newID = Number(rightWithMaxID[0].id) + 1;
-
-            collection.insert({
-              type: String(object.type),
-              id: String(newID),
-              name: String(command),
-              comment: "Insert a comment..."});
-
-            Modules.Log.debug("pushing new right: " + String(command));
-          }
-        } else {
-          Modules.Log.debug("right " + command + " was already included and has, " +
-                  "thus, not been included to the right list");
-          Modules.Log.debug(">> The result was: ");
-          Modules.Log.debug(docs);
-          Modules.Log.debug(">> ---------------- <<");
-        }
-      });
-    });
+    }
   };
 
   /**
@@ -340,143 +169,328 @@ var RightManager = function() {
    */
   this.getParentOfObject = function(obj) {
     var parentHasBeenFound = false;
-
     if (!parentHasBeenFound) {
       return {id: 0, type: "Canvas"};
     }
   };
-
   /**
    *	The function returns a boolean value that 
    *	represents if the current user has the right 
    *	to perform a specific command.
    *	
-   *	@param {type}       command     The used command (access right), e.g., read, write (CRUD)
    *	@param {type}       object      The object that should be checked
    *  @param {type}       user        The user object
+   *	@param {type}       right       The right to be checked, e.g., read, write (CRUD)
    *  @param {function}   callback    The callback function with one boolean parameter (the answer)
    */
-  this.hasAccess = function(command, object, user, callback) {
+  this.hasAccess = function(object, user, right, callback) {
+    var dataObject = this.mapObject(object);
+
     var that = this;
-    // add right also to the right list
-    this.addRightToRightTableIfItIsNotThere(command, object);
+    var dbRoles = db.get('roles');
+    dbRoles.find({objectid: String(dataObject.id)}, {}, function(e, docs) {
 
-    // re-init possible rights
-    this.initRights();
-
-    /* (0) Check if rights are set up for this object. If not: call update for parent */
-    var collection = db.get('roles');
-    collection.find({contextID: String(object.id)}, {}, function(e, docs) {
+      // Check if rights are set up for this object. If not: call update for parent
       if (typeof docs == 'undefined' || docs.length === 0) {
-        var parent = that.getParentOfObject(object);
-
+        // FIX ME!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        var parent = that.getParentOfObject(dataObject);
         // call method for parent
-        parent.hasAccess(command, parent, user, callback);
+        //parent.hasAccess(parent, user, right, callback);
       } else {
         /* (1) get the roles that includes the current command within the context of
          the given object */
-        var found = false;
-        docs.forEach(function(item) {
-          var commandIsInRights = (String(item.rights).split(",").indexOf(String(command)) != -1);
-
-          if (commandIsInRights) {
-            Modules.Log.debug("Command is used in Role " + item.name);
-
-            /* (2) check if current user is inside of one of these roles */
-            var userIsInUserList = (String(item.users).split(",").indexOf(String(user.username)) != -1);
-
-            /* (2') check if 'all' is included in the user list */
-            var userDoesNotMatter = (String(item.users).split(",").indexOf(String("all")) != -1);
-
-            if (userIsInUserList || userDoesNotMatter) {
-              /* (3) if (2) is fulfilled return true */
-              found = true;
+        var accessGranted = false;
+        docs.forEach(function(role) {
+          // Check if the role contains the needed right
+          var roleHasRight = (role.rights.indexOf(String(right)) >= 0);
+          if (roleHasRight) {
+            // Check if current user is inside of one of these roles
+            var userIsInUserList = (role.users.indexOf(String(user.username)) >= 0)
+                    || (role.users.indexOf("all") >= 0);
+            if (userIsInUserList) {
+              accessGranted = true;
             }
           }
         });
-
-        if (found) {
-          callback(true);
-        } else {
-          callback(false);
-        }
+        callback(accessGranted);
       }
     });
-    //return true;
+  };
+
+  /**
+   * Determines whether the user is a manager of the given
+   * object or not. This function is used by the right manager
+   * itself in order to grant access or not.
+   * 
+   * @param {type} object
+   * @param {type} user     The user object
+   * @param {type} callback
+   * @returns {undefined}
+   */
+  this.isManager = function(object, user, callback) {
+    var dataObject = this.mapObject(object);
+    var dbRoles = db.get('roles');
+    dbRoles.find({objectid: String(dataObject.id), name: "Manager"}, {}, function(e, docs) {
+      var result = false;
+      if (docs.length > 0) {
+        result = docs[0].users.indexOf(user.username) >= 0;
+      }
+      callback(result);
+    });
   };
 
   /**
    *  The function can be used to grant access rights
-   *  @param {type} command   The used command (access right), e.g., read, write (CRUD)
    *  @param {type} object    The object that should be used to change the access right
+   *  @param {type} right     The right, which needs to be checked , e.g., read, write (CRUD)
    *  @param {type} role      The role that should be changed
    *  A call could look like this:  grantAccess("read","AB","reviewer");
    */
-  this.grantAccess = function(command, object, role) {
-    // granting access
-    this.modifyAccess(command, object, role, true);
+  this.grantAccess = function(object, right, role) {
+    this.modifyAccess(object, right, role, true);
   };
 
   /**
    *	The function can be used to revoke access rights
-   *	@param {type}	command   The used command (access right), e.g., read, write (CRUD)
    *	@param {type}	object    The object that should be used to change the access right
+   *  @param {type} right     The right, which needs to be checked , e.g., read, write (CRUD)
    *	@param {type} role      The role that should be changed
    *	A call could look like this: revokeAccess("read","AB","reviewer");
    */
-  this.revokeAccess = function(command, object, role) {
-    this.modifyAccess(command, object, role, false);
-    //FIXME: remove right from db.rights IFF it is not used (=> there is no role that includes that right)
+  this.revokeAccess = function(object, right, role) {
+    this.modifyAccess(object, right, role, false);
   };
 
   /**
    *	The function can be used to modify access rights
-   *	@param {type}   command   The used command (access right), e.g., read, write (CRUD)
+   *	
    *	@param {type}   object    The object that should be used to change the access right
+   *  @param {type}   right     The right, which needs to be checked , e.g., read, write (CRUD)
    *	@param {type}   role      The role that should be changed
    *	@param {type}   grant     The grant paramter is set to true, if the access right should be
    *        granted. Set false, to revoke access.
    *	A call could look like this: modifyAccess("read","AB","reviewer", true);
    */
-  this.modifyAccess = function(command, object, role, grant) {
-    /* (1) get the current role */
-    Modules.Log.debug(command + " " + object.id + " " + role.name + " " + grant);
+  this.modifyAccess = function(object, right, role, grant, callback) {
+    var dataObject = this.mapObject(object);
 
     var collection = db.get('roles');
-    collection.find({contextID: String(object.id), name: String(role.name)}, {}, function(e, docs) {
+    collection.find({objectid: String(dataObject.id), name: String(role.name)}, {}, function(e, docs) {
       docs.forEach(function(item) {
         /* (2) update role */
         if (grant == true) {
           /* store to database */
-          collection.update({_id: item._id}, {$addToSet: {rights: command}});
+          collection.update({_id: item._id}, {$addToSet: {rights: right.name}});
         } else {
-          collection.update({_id: item._id}, {$pull: {rights: command}});
+          collection.update({_id: item._id}, {$pull: {rights: right.name}});
         }
-
       });
+      if (callback)
+        callback(docs);
     });
   };
 
   /**
+   * Returns the roles of a given object stored in the database.
    * 
-   * @param {type} socket
-   * @param {type} data
+   * @param {type} object
+   * @param {type} callback
    * @returns {undefined}
    */
-  this.getRights = function(socket, data) {
+  this.getRoles = function(object, callback) {
+    var dataObject = this.mapObject(object);
+
+    var dbRoles = db.get('roles');
+    dbRoles.find({objectid: String(dataObject.id)}, {}, function(e, docs) {
+      callback(docs);
+    });
+  };
+
+  /**
+   * Returns all supported object types to a given callback.
+   * 
+   * @param {type} callback   The callback we the data is given to.
+   */
+  this.getSupportedObjects = function(callback) {
     var dbRights = db.get('rights');
-    var dbRoles = db.get("roles");
+    dbRights.distinct("type", {}, function(e, docs) {
+      if (callback) {
+        docs.push("Subroom"); // Quick fix for subrooms...
+        callback(docs);
+      }
+    });
+  };
 
-    dbRights.find({type: String(data.object.type)}, {}, function(e, docsRights) {
-      // We need to make sure that both data are send to the client in one step...
-      dbRoles.find({contextID: String(data.object.id), name: String(data.role.name)}, {}, function(e, docsRoles) {
-        // Both arrays will be merged on the client side. Why should the server do all the work ;).
-        var dataRights = {
-          "availableRights": docsRights,
-          "checkedRights": (docsRoles.length > 0 ? docsRoles[0].rights : [])
-        };
+  /**
+   *	The function can be used to add/remove a user to/from a specific role.
+   *	
+   *	@function modifyUser
+   *	@param {type}	object    The object that should be used to get the specfic role
+   *	@param {type} user      The user object that should be added
+   *	@param {type}	role      The used role passed as a RoleObject
+   *	@param {type} add       
+   *	@param {type} callback   
+   */
+  this.modifyUser = function(object, user, role, add, callback) {
+    var dataObject = this.mapObject(object);
 
-        Modules.SocketServer.sendToSocket(socket, "rmObjectRights" + data.object.id, dataRights);
+    var dbRoles = db.get('roles');
+
+    dbRoles.find({objectid: String(dataObject.id), name: String(role.name)}, {}, function(e, docs) {
+      docs.forEach(function(item) {
+        if (add == true) {
+          dbRoles.update({_id: item._id}, {$addToSet: {users: user}});
+        } else {
+          dbRoles.update({_id: item._id}, {$pull: {users: user}});
+        }
+//        console.log("I would have " + (add ? "added" : "removed") + " "
+//                + user + " " + (add ? "to" : "from") + " " + item.name);
+      });
+      if (callback)
+        callback();
+    });
+  };
+
+  /**
+   *	The function adds/removes a role to/of an object.
+   *	
+   *	@function modifyRole
+   *	@param {type}	object    The object that should be used to get the specfic role
+   *	@param {type}	rolename  The role name
+   *	@param {type} add       
+   *	@param {type} deletable 
+   *	@param {type} callback
+   *	@param {type} rights    Array of rights. Optional.
+   *	@param {type} users     Array of users. Optional.
+   */
+  this.modifyRole = function(object, rolename, add, deletable, callback, rights, users) {
+    var dataObject = this.mapObject(object);
+
+    var role = {
+      objectid: dataObject.id,
+      name: rolename,
+      deletable: deletable
+    };
+
+    var dbRoles = db.get('roles');
+    if (add) {
+      // Create a new role.
+      // create empty arrays if the arrays are not exisiting
+      if (rights)
+        role.rights = rights;
+      else
+        role.rights = [];
+
+      if (users)
+        role.users = users;
+      else
+        role.users = [];
+
+      // default mode = overwrite
+      /*if (role.mode == null) {
+       role.mode = "overwrite";
+       }*/
+
+      dbRoles.insert({
+        objectid: String(role.objectid),
+        //mode: role.mode,
+        name: role.name,
+        rights: role.rights,
+        users: role.users});
+
+      if (callback)
+        callback(role);
+
+    } else {
+      // Remove the role.
+      if (String(role.name).toLowerCase() != "manager") {
+        dbRoles.remove({
+          objectid: String(role.objectid),
+          name: role.name
+        });
+        if (callback)
+          callback(role);
+      } else {
+        console.log("you cannot remove the manager role!");
+        if (callback)
+          callback(false);
+      }
+    }
+  };
+
+  /**
+   * Initializes the right manager on the server,
+   * 
+   * @param {type} theModules
+   * @returns {undefined}
+   */
+  this.init = function(theModules) {
+    Modules = theModules;
+    db = require('monk')(Modules.MongoDBConfig.getURI());
+
+    // Register RightManager related server calls...
+    Modules.Dispatcher.registerCall('rmHasAccess', function(socket, data, responseID) {
+      var connection = Modules.UserManager.getConnectionBySocket(socket);
+      that.hasAccess(data.object, connection.user, data.right, function(result) {
+        Modules.SocketServer.sendToSocket(socket, "rmHasAccessResult" + data.object.id, result);
+      });
+    });
+
+    Modules.Dispatcher.registerCall('rmModifyAccess', function(socket, data, responseID) {
+      //var connection = Modules.UserManager.getConnectionBySocket(socket);
+      that.modifyAccess(data.object, data.right, data.role, data.grant, function(docs) {
+
+        that.notifyManagers(socket, data.object, "rmModifiedAccess", {
+          object: data.object,
+          right: data.right,
+          role: data.role,
+          grant: data.grant
+        });
+      });
+    });
+
+    Modules.Dispatcher.registerCall("rmModifyUser", function(socket, data) {
+      //var connection = Modules.UserManager.getConnectionBySocket(socket);
+      that.modifyUser(data.object, data.user, data.role, data.add, function() {
+        // Broadcast to all manager of the object...
+        that.notifyManagers(socket, data.object, "rmModifiedUser", {
+          object: data.object,
+          user: data.user,
+          role: data.role,
+          add: data.add
+        });
+      });
+    });
+
+    Modules.Dispatcher.registerCall("rmModifyRole", function(socket, data) {
+      //var connection = Modules.UserManager.getConnectionBySocket(socket);
+      that.modifyRole(data.object, data.rolename, data.add, data.deletable, function(roleObject) {
+        // Broadcast to all manager of the object...
+        that.notifyManagers(socket, data.object, "rmModifiedRole", {
+          object: data.object,
+          role: roleObject,
+          add: data.add,
+          deletable: data.deletable
+        });
+      });
+    });
+
+    Modules.Dispatcher.registerCall("rmGetSupportedObjects", function(socket, data) {
+      that.getSupportedObjects(function(objects) {
+        Modules.SocketServer.sendToSocket(socket, "rmSupportedObjects", objects);
+      });
+    });
+
+    Modules.Dispatcher.registerCall("rmGetRoles", function(socket, data) {
+      that.getRoles(data.object, function(roles) {
+        Modules.SocketServer.sendToSocket(socket, "rmRoles" + data.object.id, roles);
+      });
+    });
+
+    Modules.Dispatcher.registerCall("rmGetAllUsers", function(socket, data) {
+      var dbRights = db.get('users');
+      dbRights.find({}, {}, function(e, docs) {
+        Modules.SocketServer.sendToSocket(socket, "rmUsers", docs);
       });
     });
   };

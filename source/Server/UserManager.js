@@ -33,7 +33,7 @@ UserManager.init = function(theModules) {
   var that = this;
 
   db = require('monk')(Modules.MongoDBConfig.getURI());
-  
+
   var Dispatcher = Modules.Dispatcher;
   Dispatcher.registerCall('login', UserManager.login);
   Dispatcher.registerCall('enter', UserManager.enterRoom);
@@ -41,19 +41,14 @@ UserManager.init = function(theModules) {
 
   Dispatcher.registerCall('setUserPreferredLanguage', UserManager.setUserPreferredLanguage);
 
-  Dispatcher.registerCall("umClearRoles", UserManager.clearRoles);
-  Dispatcher.registerCall("umLoadDefaultRoles", UserManager.loadDefaulRoles);
-  Dispatcher.registerCall('umGetRoles', UserManager.getRoles);
-  Dispatcher.registerCall("umGetMissingUsers", UserManager.getMissingUsers);
-  Dispatcher.registerCall('umAddRole', UserManager.addRole);
-  Dispatcher.registerCall('umRemoveRole', UserManager.removeRole);
+  Dispatcher.registerCall("umGetMissingUsers", function(socket, data) {
+    that.getMissingUsers(data.object, data.role, function(result) {
+      Modules.SocketServer.sendToSocket(socket, "umMissingUsers" + data.object.id, result);
+    });
+  });
 
-  Dispatcher.registerCall('umGetUsers', UserManager.getUsers);
-  Dispatcher.registerCall('umAddUser', UserManager.addUser);
-  Dispatcher.registerCall('umRemoveUser', UserManager.removeUser);
-
-  Dispatcher.registerCall('umSetDataOfSpaceWithDest', UserManager.setDataOfSpaceWithDest);
   Dispatcher.registerCall('umGetDataOfSpaceWithDest', UserManager.getDataOfSpaceWithDest);
+  Dispatcher.registerCall('umSetDataOfSpaceWithDest', UserManager.setDataOfSpaceWithDest);
   Dispatcher.registerCall('umRemoveDataOfSpaceWithDest', UserManager.removeDataOfSpaceWithDest);
 
   Dispatcher.registerCall('enterPaperWriter', UserManager.enterPaperWriter);
@@ -64,13 +59,13 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('umIsManager', UserManager.isManager);
   Dispatcher.registerCall('umisValidUser', UserManager.isValidUser);
 
-  Dispatcher.registerCall('umDeleteObjectFromTabs', function(socket, data){
+  Dispatcher.registerCall('umDeleteObjectFromTabs', function(socket, data) {
     for (var i in that.connections) {
       Modules.SocketServer.sendToSocket(that.connections[i].socket, "umBroadcastDeleteObjectFromTabs", data);
     }
   });
-  
-  Dispatcher.registerCall('umBroadcastNameChange', function(socket, data){
+
+  Dispatcher.registerCall('umBroadcastNameChange', function(socket, data) {
     var object = data;
 
     for (var i in that.connections) {
@@ -80,33 +75,33 @@ UserManager.init = function(theModules) {
   });
 
 
-  Dispatcher.registerCall('umGetTabCache', function(socket, data){
+  Dispatcher.registerCall('umGetTabCache', function(socket, data) {
     var responseObject = {};
 
     var tabsDB = db.get('tabs');
-    tabsDB.find({username:data.username}, {}, function(e, docs){
-      if(typeof docs != 'undefined' && docs.length > 0){
-        responseObject.username   = data.username;
+    tabsDB.find({username: data.username}, {}, function(e, docs) {
+      if (typeof docs != 'undefined' && docs.length > 0) {
+        responseObject.username = data.username;
         responseObject.objectlist = docs[0].objectlist;
-        responseObject.initTabs   = docs[0].initTabs;
-        responseObject.cache      = [];
+        responseObject.initTabs = docs[0].initTabs;
+        responseObject.cache = [];
 
         var runs = 1;
         var objectCache = db.get('objectCache');
-        responseObject.objectlist.forEach(function(entryInCache){
+        responseObject.objectlist.forEach(function(entryInCache) {
 
           /* for each entry in cache: get important data and store it in the
-          response object */
-          objectCache.find({id:entryInCache},{},function(e,docs){
-            if(typeof docs != 'undefined' && docs.length > 0){
+           response object */
+          objectCache.find({id: entryInCache}, {}, function(e, docs) {
+            if (typeof docs != 'undefined' && docs.length > 0) {
 
-              responseObject.cache.push({id:docs[0].id,
-                isPO:docs[0].isPO,
-                name:docs[0].name,
-                dest:docs[0].dest
+              responseObject.cache.push({id: docs[0].id,
+                isPO: docs[0].isPO,
+                name: docs[0].name,
+                dest: docs[0].dest
               });
 
-              if(runs == responseObject.objectlist.length){
+              if (runs == responseObject.objectlist.length) {
                 // data has been gathered: send it back
                 Modules.SocketServer.sendToSocket(socket, "umGetTabCache" + data.username, responseObject);
               }
@@ -116,45 +111,34 @@ UserManager.init = function(theModules) {
           }); // end of objectCache.find
         }); // end of objectlist.foreach
 
-        } /* end of if */ else{
-          console.log("No tabs were saved for this username");
-        }
-      }); // end of tabsDb.find
+      } /* end of if */ else {
+        console.log("No tabs were saved for this username");
+      }
+    }); // end of tabsDb.find
   });
 
-  Dispatcher.registerCall('umStoreTabCache', function(socket, data){
-      var tabsDB = db.get('tabs');
-      // drop old objectlist
-      tabsDB.remove({username:data.username});
+  Dispatcher.registerCall('umStoreTabCache', function(socket, data) {
+    var tabsDB = db.get('tabs');
+    // drop old objectlist
+    tabsDB.remove({username: data.username});
 
-      // push new objectlist
-      tabsDB.insert({username:data.username, objectlist:data.objectlist, initTabs:data.initTabs});
+    // push new objectlist
+    tabsDB.insert({username: data.username, objectlist: data.objectlist, initTabs: data.initTabs});
 
-      // update objectcache
-      var objectCache = db.get('objectCache');
-      data.cache.forEach(function(cacheEntry){
-        objectCache.remove({id:cacheEntry.id});
+    // update objectcache
+    var objectCache = db.get('objectCache');
+    data.cache.forEach(function(cacheEntry) {
+      objectCache.remove({id: cacheEntry.id});
 
-        objectCache.insert({id:cacheEntry.id,
-          isPO:cacheEntry.isPO,
-          name:cacheEntry.name,
-          dest:cacheEntry.dest
-        });
+      objectCache.insert({id: cacheEntry.id,
+        isPO: cacheEntry.isPO,
+        name: cacheEntry.name,
+        dest: cacheEntry.dest
       });
+    });
   });
 
 
-  /* get all exiting access rights from the database */
-  var collection = db.get('rights');
-  collection.find({}, {}, function(e, docs) {
-    if (docs != undefined) {
-      docs.forEach(function(entry) {
-
-        Modules.Log.debug("adding right: " + String(entry.name));
-        possibleAccessRights.push(entry.name);
-      });
-    }
-  });
   Modules.Log.debug("UserManager has been initialized");
 };
 
@@ -216,27 +200,27 @@ UserManager.login = function(socketOrUser, data) {
 
     if (data) {
 
-		// if there is no color yet, create one and store it
-		if(!data.color) {
-			var colors = [
-				"#398da8",
-				"#39a842",
-				"#a84d39",
-				"#a8398e",
-				"#a2a839",
-				"#39a899",
-				"#74a839",
-				"#a87639",
-				"#1d68c4",
-				"#c41d73",
-				"#1dc46e",
-				"#c46b1d"
-			];
+      // if there is no color yet, create one and store it
+      if (!data.color) {
+        var colors = [
+          "#398da8",
+          "#39a842",
+          "#a84d39",
+          "#a8398e",
+          "#a2a839",
+          "#39a899",
+          "#74a839",
+          "#a87639",
+          "#1d68c4",
+          "#c41d73",
+          "#1dc46e",
+          "#c46b1d"
+        ];
 
-			var userColor = colors[Math.floor(Math.random() * colors.length + 1)];
-			data.color = userColor;
-			Modules.UserDAO.updateUsersById(data._id, {color:userColor});
-		}
+        var userColor = colors[Math.floor(Math.random() * colors.length + 1)];
+        data.color = userColor;
+        Modules.UserDAO.updateUsersById(data._id, {color: userColor});
+      }
 
       var userObject = require('./User.js');
       connection.user = new userObject(this);
@@ -267,111 +251,111 @@ UserManager.login = function(socketOrUser, data) {
 };
 
 UserManager.setUserPreferredLanguage = function(socketOrUser, lang) {
-	if (typeof socketOrUser.id == 'string')
-		var userID = socketOrUser.id;
-	else
-		var userID = socketOrUser;
-	Modules.UserDAO.usersByUserName(UserManager.connections[userID].user.username, function(err,users) {
-		if(err || users.length == 0) {
-			return;
-		}
-		Modules.UserDAO.updateUsersById(users[0]._id, {preferredLanguage:lang});
-	});
+  if (typeof socketOrUser.id == 'string')
+    var userID = socketOrUser.id;
+  else
+    var userID = socketOrUser;
+  Modules.UserDAO.usersByUserName(UserManager.connections[userID].user.username, function(err, users) {
+    if (err || users.length == 0) {
+      return;
+    }
+    Modules.UserDAO.updateUsersById(users[0]._id, {preferredLanguage: lang});
+  });
 }
 UserManager.setUserPreferredLanguage.public = true;
 
 UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
-  var shouldInclude = [ PAPER_WRITER+"#Writer#20#200#700#2#locked;true#paper;"+data.roomID,
-                        "SimpleText#WritingAreaInfo#20#145#100#2#height;30#content;Writing Area:",
-                        "SimpleText#ViewerInfo#800#145#100#2#height;30#content;Viewing Area:",
-                        "Viewer#Viewer#800#200#600#0#",
-                        "ReferenceContainer#References#800#800#600#2#locked;true#height;455",
-                        "Textarea#InfoBox#20#800#700#2#height;100#content;For your information: \nYou can use the magnifier to choose a chapter that is shown within the"+
-                          "writing area. Sort the chapters from left to right to create a order.",
-                        "PaperSelector#Selector#220#45#128#0#"];
+  var shouldInclude = [PAPER_WRITER + "#Writer#20#200#700#2#locked;true#paper;" + data.roomID,
+    "SimpleText#WritingAreaInfo#20#145#100#2#height;30#content;Writing Area:",
+    "SimpleText#ViewerInfo#800#145#100#2#height;30#content;Viewing Area:",
+    "Viewer#Viewer#800#200#600#0#",
+    "ReferenceContainer#References#800#800#600#2#locked;true#height;455",
+    "Textarea#InfoBox#20#800#700#2#height;100#content;For your information: \nYou can use the magnifier to choose a chapter that is shown within the" +
+            "writing area. Sort the chapters from left to right to create a order.",
+    "PaperSelector#Selector#220#45#128#0#"];
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 
-UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, responseID, shouldInclude){
+UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, responseID, shouldInclude) {
   UserManager.enterRoom(socketOrUser, data, responseID);
   var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
   var context = UserManager.connections[userID];
 
   Modules.ObjectManager.getObjects(data.roomID, context, function(inventory) {
 
-    shouldInclude.forEach(function(item){
+    shouldInclude.forEach(function(item) {
       var token = item.split('#');
 
       var oType = token[0];
       var oName = token[1];
-      var oX    = token[2];
-      var oY    = token[3];
-      var oWidth= token[4];
-      var oAttsL= token[5];
+      var oX = token[2];
+      var oY = token[3];
+      var oWidth = token[4];
+      var oAttsL = token[5];
       var oAtts = [];
       var oHeight = -1;
       var oContent = "ERROR - Content not defined";
-  
-      var additionalAtts = []; 
-      for(var i = 6; i < oAttsL+6-1; i++){
-        if(typeof token[i] != 'undefined'){
+
+      var additionalAtts = [];
+      for (var i = 6; i < oAttsL + 6 - 1; i++) {
+        if (typeof token[i] != 'undefined') {
           var attToken = token[i].split(';');
 
-          var attName   = attToken[0];
-          var attValue  = attToken[1];
+          var attName = attToken[0];
+          var attValue = attToken[1];
 
-          if(attName.indexOf('content') > -1){
+          if (attName.indexOf('content') > -1) {
             oContent = attValue;
-          }else if(attName.indexOf('height') > -1){
+          } else if (attName.indexOf('height') > -1) {
             oHeight = attValue;
-          }else{
-            additionalAtts.push(attName+";"+attValue);
+          } else {
+            additionalAtts.push(attName + ";" + attValue);
           }
         }
       }
 
       var attr;
-      if(oHeight == -1){ 
-        attr = {x: oX, y: oY, width: oWidth, name: oName , paper: data.roomID};
-      }else{
-        attr = {x: oX, y: oY, width: oWidth, height: oHeight, name: oName , paper: data.roomID};
+      if (oHeight == -1) {
+        attr = {x: oX, y: oY, width: oWidth, name: oName, paper: data.roomID};
+      } else {
+        attr = {x: oX, y: oY, width: oWidth, height: oHeight, name: oName, paper: data.roomID};
       }
 
       var found = false;
       /* it it already there? */
       for (var aux in inventory) {
-      var obj = inventory[aux];
+        var obj = inventory[aux];
 
-        if(obj.getAttribute('name').indexOf(oName) > -1){
+        if (obj.getAttribute('name').indexOf(oName) > -1) {
           found = true;
         }
       }
 
       /* if not found: create it */
-            if (!found) {
-                Modules.ObjectManager.createObject(data.roomID, oType, attr, oContent, context, function(error, obj, addAtts) {
+      if (!found) {
+        Modules.ObjectManager.createObject(data.roomID, oType, attr, oContent, context, function(error, obj, addAtts) {
 
-                    if (typeof addAtts != 'undefined') {
-                        addAtts.forEach(function(item) {
+          if (typeof addAtts != 'undefined') {
+            addAtts.forEach(function(item) {
 
-                            if (typeof item != 'undefined') {
-                                var attToken2 = item.split(';');
+              if (typeof item != 'undefined') {
+                var attToken2 = item.split(';');
 
-                                var attName2 = attToken2[0];
-                                var attValue2 = attToken2[1];
+                var attName2 = attToken2[0];
+                var attValue2 = attToken2[1];
 
-                                obj.setAttribute(attName2, attValue2);
-                            }
-                        });
-                    }
+                obj.setAttribute(attName2, attValue2);
+              }
+            });
+          }
 
-                }, additionalAtts);
-            }
-      });
-
+        }, additionalAtts);
+      }
     });
-  };
+
+  });
+};
 
 UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, []);
@@ -379,66 +363,66 @@ UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
 
 UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
-  var shouldInclude = ["Textarea#PublicSpaceInfo#20#45#100#1#content;This is the private space of user "+
-                          UserManager.getConnectionBySocket(socketOrUser).user.username];
+  var shouldInclude = ["Textarea#PublicSpaceInfo#20#45#100#1#content;This is the private space of user " +
+            UserManager.getConnectionBySocket(socketOrUser).user.username];
 
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, shouldInclude);
 };
 
-UserManager.setDataOfSpaceWithDestServerSide = function(data){
-	var ss = db.get('SpaceStorage');
+UserManager.setDataOfSpaceWithDestServerSide = function(data) {
+  var ss = db.get('SpaceStorage');
 
-	// if data is not included: store it
-	ss.update({ // query
-		'destination':String(data.destination),'key':String(data.key)
-	},
-	{ // update
-		$set: {
-			'value':data.value,
-		}
-	},
-	{ // options
-		upsert: true,
-	});
+  // if data is not included: store it
+  ss.update({// query
+    'destination': String(data.destination), 'key': String(data.key)
+  },
+  {// update
+    $set: {
+      'value': data.value,
+    }
+  },
+  {// options
+    upsert: true,
+  });
 };
 
-UserManager.getDataOfSpaceWithDestServerSide = function(data, callback){
-     var ss = db.get('SpaceStorage');
+UserManager.getDataOfSpaceWithDestServerSide = function(data, callback) {
+  var ss = db.get('SpaceStorage');
 
-    ss.find({'destination':String(data.destination), 'key':String(data.key)}, {}, function(e, docs){
-      if(typeof docs != 'undefined' && docs.length > 0){
-        callback(docs);
-      }else{
-        callback("error");
-      }
-    });
+  ss.find({'destination': String(data.destination), 'key': String(data.key)}, {}, function(e, docs) {
+    if (typeof docs != 'undefined' && docs.length > 0) {
+      callback(docs);
+    } else {
+      callback("error");
+    }
+  });
 };
 
-UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID){
-	UserManager.setDataOfSpaceWithDestServerSide.call(this, data);
+UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID) {
+  UserManager.setDataOfSpaceWithDestServerSide.call(this, data);
 };
 
-UserManager.removeDataOfSpaceWithDest = function(socketOrUser, data, responseID){
-     var ss = db.get('SpaceStorage');
+UserManager.removeDataOfSpaceWithDest = function(socketOrUser, data, responseID) {
+  var ss = db.get('SpaceStorage');
 
-     ss.remove({'destination': data.destination, 'key':data.key});
+  ss.remove({'destination': data.destination, 'key': data.key});
 };
 
-UserManager.removeDataOfSpaceWithDestServerSide = function(data){
-     var ss = db.get('SpaceStorage');
+UserManager.removeDataOfSpaceWithDestServerSide = function(data) {
+  var ss = db.get('SpaceStorage');
 
-     ss.remove({'destination': data.destination, 'key':data.key});
+  ss.remove({'destination': data.destination, 'key': data.key});
 };
 
-UserManager.getDataOfSpaceWithDest = function(socketOrUser, data, responseID){
-     var ss = db.get('SpaceStorage');
-    ss.find({'destination':data.destination, 'key':data.key}, {}, function(e, docs){
-      if(typeof docs != 'undefined' && docs.length > 0){
-        Modules.SocketServer.sendToSocket(socketOrUser, "umGetDataOfSpaceWithDest" + data.destination + data.key, docs);
-      }else{
-        Modules.SocketServer.sendToSocket(socketOrUser, "umGetDataOfSpaceWithDest" + data.destination + data.key, 'error');
-      }
-    });
+UserManager.getDataOfSpaceWithDest = function(socketOrUser, data, responseID) {
+  var ss = db.get('SpaceStorage');
+  ss.find({'destination': data.destination, 'key': data.key}, {}, function(e, docs) {
+    if (typeof docs != 'undefined' && docs.length > 0) {
+      Modules.SocketServer.sendToSocket(socketOrUser, "umGetDataOfSpaceWithDest" + data.destination + data.key, docs);
+    } else {
+      Modules.SocketServer.sendToSocket(socketOrUser, "umGetDataOfSpaceWithDest" + data.destination + data.key, 'error');
+    }
+  });
 };
 
 /**
@@ -449,16 +433,16 @@ UserManager.getDataOfSpaceWithDest = function(socketOrUser, data, responseID){
  * @param {Object} responseID response ID.
  **/
 UserManager.enterRoom = function(socketOrUser, data, responseID) {
-    var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
-    var index = (data.index === undefined) ? 'left' : data.index;
+  var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
+  var index = (data.index === undefined) ? 'left' : data.index;
 
   var roomID = data.roomID;
 
   var connection = UserManager.connections[userID];
   var ObjectManager = Modules.ObjectManager;
 
-    // oldrooom is sent down to the connector, which may use it for parent
-    // creation
+  // oldrooom is sent down to the connector, which may use it for parent
+  // creation
   if (connection.rooms[index]) {
     var oldRoomId = connection.rooms[index].id;
   }
@@ -476,8 +460,8 @@ UserManager.enterRoom = function(socketOrUser, data, responseID) {
   // try to enter the room on the connector
   connector.mayEnter(roomID, connection, function(err, mayEnter) {
 
-        // if the connector responds true, the client is informed about the
-        // successful entering of the room
+    // if the connector responds true, the client is informed about the
+    // successful entering of the room
     // and all clients in the same rooms get new awarenessData.
     if (mayEnter) {
 
@@ -491,9 +475,9 @@ UserManager.enterRoom = function(socketOrUser, data, responseID) {
       //ObjectManager.sendChatMessages(roomID,socket);
 
       Modules.Dispatcher.respond(socket, responseID, false);
-            Modules.EventBus.emit("room::" + roomID + "::userEntered", {
-                username : connection.user.username
-            });
+      Modules.EventBus.emit("room::" + roomID + "::userEntered", {
+        username: connection.user.username
+      });
 
     } else {
       socketServer.sendToSocket(socket, 'error', 'User ' + user.username + ' may not enter ' + roomID);
@@ -646,104 +630,19 @@ UserManager.getConnectionByUserHash = function(userHash) {
   return false;
 };
 
-
-
-
 /**
- *	The function can be used to add a role
- *
- * @param {type} role   The used role passed as a RoleObject
- * @param {type} object The object that should be used to change the access right
- *
- *	A call could look like this: modifyAccess(ReviewRole.create(),"AB");
- */
-UserManager.addRole = function(socket, data) {
-  UserManager.modifyRole(socket, data, true);
-};
-
-/**
- *	The function can be used to remove a role
- *
- * @param {type} role   The used role passed as a RoleObject
- * @param {type} object The object that should be used to change the access right
+ * 
+ * @param {type} socket
+ * @param {type} data
  * @returns {undefined}
  */
-UserManager.removeRole = function(socket, data) {
-  UserManager.modifyRole(socket, data, false);
-};
-
-/**
- *	The function can be used to modify a role
- *	@param {type}	role    The used role passed as a RoleObject
- *	@param {type}	object  The object that should be used to change the access right
- *	@param {type}   add   The grant paramter is set to true, if the access right should be
- *			granted. Set false, to revoke access.
- *	A call could look like this: modifyAccess(ReviewRole.create(),"AB", true);
- */
-UserManager.modifyRole = function(socket, data, add) {
-  var role = {
-    contextID: data.object.id,
-    name: data.role.name
-  };
-
-  var collection = db.get('roles');
-
-  /* create empty arrays if the arrays are not exisiting */
-  if (role.rights == null) {
-    role.rights = [];
-  }
-
-  if (role.users == null) {
-    role.users = [];
-  }
-
-  /* default mode = overwrite */
-  if (role.mode == null) {
-    role.mode = "overwrite";
-  }
-
-  /* add resp. remove the role */
-  if (add == true) {
-    if (role.name == "Manager") {
-      /* overwrite rights and users */
-      role.rights = ["create", "read", "update", "delete"];
-      role.users = [data.username];
-    }
-
-    collection.insert({
-      contextID: String(role.contextID),
-      mode: role.mode,
-      name: role.name,
-      rights: role.rights,
-      users: role.users});
-
-  } else {
-    if (role.name == "Manager") {
-      console.log("you cannot remove the manager role!");
-    } else {
-      console.log("trying to remove : " + role.contextID + " | " + role.name);
-      collection.remove({contextID: String(role.contextID),
-        name: String(role.name)});
-    }
-  }
-};
-
-UserManager.getRoles = function(socket, data) {
-  var collection = db.get('roles');
-
-  collection.find({contextID: String(data.object.id)}, {}, function(e, docs) {
-    Modules.SocketServer.sendToSocket(socket, "umGetRoles" + data.object.id, docs);
-  });
-
-};
-
 UserManager.isManager = function(socket, data) {
   var that = UserManager;
   var connection = that.getConnectionBySocket(socket);
 
   var collection = db.get('roles');
 
-  collection.find({contextID: String(data.object.id)}, {}, function(e, docs) {
+  collection.find({objectid: String(data.object.id)}, {}, function(e, docs) {
     docs.forEach(function(doc) {
       if (doc.name == "Manager") {
 
@@ -764,185 +663,36 @@ UserManager.isManager = function(socket, data) {
 };
 
 /**
- * 
- * @param {type} socket
- * @param {type} data
- * @returns {undefined}
- */
-UserManager.loadDefaulRoles = function(socket, data) {
-  var that = UserManager;
-
-  var object = data.object;
-
-  var dbRights = db.get("rights");
-  var dbDefRoles = db.get("defroles");
-  var dbRoles = db.get("roles");
-
-  var connection = that.getConnectionBySocket(socket);
-
-  // Get the current manager role of the object
-  dbRoles.find({contextID: String(object.id), name: "Manager"}, {}, function(e, owner) {
-
-    // Get all rights for the object type
-    dbRights.find({type: String(object.type)}, {}, function(e, docs) {
-
-      // Create an array of all rights for the object type
-      var managerRights = new Array();
-      docs.forEach(function(right) {
-        managerRights.push(right.name);
-      });
-
-      // Create the default manager role
-      var managerRole = {
-        contextID: String(object.id),
-        name: "Manager",
-        mode: "overwrite"
-      };
-
-      if (owner && owner.length > 0) {
-        managerRole.rights = owner[0].rights;
-        managerRole.users = owner[0].users;
-      } else {
-        managerRole.rights = managerRights;
-        managerRole.users = [connection.user.username];
-      }
-
-      // Clear the current roles
-      dbRoles.remove({contextID: String(object.id)});
-
-      // Load the default roles
-      dbDefRoles.find({object: String(object.type)}, {}, function(e, roles) {
-        roles.push(managerRole);
-
-        roles.forEach(function(role) {
-          // Insert 
-          if (role.users == undefined)
-            role.users = new Array();
-
-          dbRoles.insert({
-            contextID: String(object.id),
-            name: String(role.name),
-            rights: role.rights,
-            mode: String("overwrite"),
-            users: role.users
-          });
-        });
-
-        Modules.SocketServer.sendToSocket(socket, "umDefaultRoles" + object.id, roles);
-      });
-    });
-  });
-};
-
-/**
- * 
- * @param {type} socket
- * @param {type} data
- * @returns {undefined}
- */
-UserManager.clearRoles = function(socket, data) {
-  var object = data.object;
-
-  var collection = db.get("roles");
-
-  Modules.SocketServer.sendToSocket(socket, "umRolesCleared" + object.id);
-};
-
-/**
- *	The function can be used to add a user to a specific role
- *	
- *	@param {Object} socket  Socket connection
- *	@param {Object}	data    Send data
- */
-UserManager.addUser = function(socket, data) {
-  UserManager.modifyUser(data.role, data.object, data.username, true);
-};
-
-/**
- *	The function can be used to remove a user to a specific role
- *	@param {type}	role    The used role passed as a RoleObject
- *	@param {type}	object  The object that should be used to get the specfic role
- *	@param {type}   user    The user object that should be added
- */
-UserManager.removeUser = function(socket, data) {
-  UserManager.modifyUser(data.role, data.object, data.username, false);
-};
-
-/**
  *  The function can be used to check wheter a user is valid (exists) or not
  *  @param {Object} socket  Socket connection
  *  @param {Object} data    Send data
  *  @param {Sring} responseID  RespondId of the request
  */
 UserManager.isValidUser = function(socket, data, responseID) {
-    Modules.UserDAO.usersByUserName(data.user, function(err, docs) {
-        var valid = (!err && docs.length > 0);
-        
-        Modules.SocketServer.respondToSocket(socket, responseID, valid);
-    })
-};
+  Modules.UserDAO.usersByUserName(data.user, function(err, docs) {
+    var valid = (!err && docs.length > 0);
 
-/**
- *	The function can be used to remove a user to a specific role
- *	@param {type}	role    The used role passed as a RoleObject
- *	@param {type}	object  The object that should be used to get the specfic role
- *	@param {type}   username    The user object that should be added
- */
-UserManager.modifyUser = function(role, object, username, add) {
-  /* (1) get the current users */
-  var collection = db.get('roles');
-  collection.find({contextID: String(object.id), name: String(role.name)}, {}, function(e, docs) {
-    Modules.Log.debug(docs);
-
-    docs.forEach(function(item) {
-      /* (2) update role */
-      if (add == true) {
-        /* store to database */
-        collection.update({_id: item._id}, {$addToSet: {users: username}});
-      } else {
-        collection.update({_id: item._id}, {$pull: {users: username}});
-      }
-    });
-
-    // Broadcast to all manager of the object...
-
+    Modules.SocketServer.respondToSocket(socket, responseID, valid);
   });
 };
 
 /**
  * 
- * @param {type} socket
- * @param {type} data
+ * @param {type} object
+ * @param {type} role
+ * @param {type} callback
  * @returns {undefined}
  */
-UserManager.getUsers = function(socket, data) {
-  var dbRoles = db.get('roles');
+UserManager.getMissingUsers = function(object, role, callback) {
+  var dataObject = Modules.RightManager.mapObject(object);
 
-  dbRoles.find({contextID: String(data.object.id), name: String(data.role.name)}, {}, function(e, docs) {
-
-    var result = (docs.length > 0 ? docs[0].users : []);
-
-    Modules.SocketServer.sendToSocket(socket, "umUsers" + data.object.id, result);
-  });
-};
-
-/**
- * 
- * @param {type} socket
- * @param {type} data
- * @returns {undefined}
- */
-UserManager.getMissingUsers = function(socket, data) {
   var dbRoles = db.get('roles');
   var dbUsers = db.get('users');
 
   dbUsers.find({}, {}, function(e, userDocuments) {
-
-    dbRoles.find({contextID: String(data.object.id), name: String(data.role.name)}, {}, function(e, roleDocuments) {
-
+    dbRoles.find({objectid: String(dataObject.id), name: String(role.name)}, {}, function(e, roleDocuments) {
       var result = (roleDocuments && roleDocuments.length > 0 ? roleDocuments[0].users : []);
-
-      Modules.SocketServer.sendToSocket(socket, "umMissingUsers" + data.object.id, {allUsers: userDocuments, alreadyAddedUsers: result});
+      callback({allUsers: userDocuments, alreadyAddedUsers: result});
     });
   });
 };
