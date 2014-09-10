@@ -1,7 +1,8 @@
 "use strict";
 
 /**
- * @namespace Holding methods and variables to display and send chat messages to other users
+ * Holding methods and variables to display and send chat messages to other users
+ * @class chat
  */
 GUI.chat = {};
 
@@ -102,8 +103,11 @@ GUI.chat.addMessage = function(username, text, userColor, read) {
 	
 	
 	/**
-	* @class replaceEmoticon
-	* @classdesc This is for emoticons in chat messages 
+	* This is for emoticons in chat messages
+	* @function replaceEmoticon
+	* @param {type} code
+	* @param {type} image
+	* @param {type} str
 	*/
 	var replaceEmoticon = function(code, image, str) {
 		

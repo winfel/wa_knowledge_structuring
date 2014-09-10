@@ -1,9 +1,8 @@
 "use strict";
+
 /**
- * @file 0.GUI.js
- */
-/**
- * @namespace holds methods and variables for GUI
+ * holds methods and variables for GUI
+ * @class GUI
  */
 var GUI = {};
 
@@ -33,10 +32,6 @@ window.onpopstate = function(event) {
   }
 };
 
-/**
-*@class GUI
-* @classdesc This is the GUI.translationManager
-*/
 GUI.translationManager = Object.create(TranslationManager);
 
 /**

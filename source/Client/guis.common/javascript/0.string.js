@@ -1,6 +1,6 @@
 "use strict";
 /**
- * @file 0.string.js
+ * @class string
  */
 
 /** 

@@ -1,3 +1,6 @@
+/**
+* @class GUI.userdialog
+*/
 GUI.userdialog = new function() {
 
   var container = null;
@@ -8,7 +11,9 @@ GUI.userdialog = new function() {
 
   var checkedUsers = null; // Keep track of the selected users. Needed for a delete server call.
   var checkedSpans = null; // Keep track of the corresponding spans, which display a user.
-
+  /**
+  * @function init
+  */
   this.init = function() {
     console.log("GUI.userdialog initialized");
     var that = GUI.userdialog;
@@ -103,8 +108,8 @@ GUI.userdialog = new function() {
 };
 
 /* 
- * Sidebar: Right Manager
- */
+* @namespace GUI.rightmanager
+*/
 GUI.rightmanager = new function() {
   var rm, rmRoles;
   var rmRightsHeader, rmRights;
@@ -124,7 +129,7 @@ GUI.rightmanager = new function() {
   /* Content of rightmanager sidebar*/
 
   /**
-   * 
+   * @function init
    * @returns {undefined}
    */
   this.init = function() {
@@ -164,7 +169,7 @@ GUI.rightmanager = new function() {
   };
 
   /**
-   * 
+   * @function updateRightsSection
    * @param {Array} availableRights   Array of the available rights (as objects)
    * @param {Array} checkedRights     Array of the checked rights (as strings)
    * @returns {undefined}
@@ -187,7 +192,7 @@ GUI.rightmanager = new function() {
 
   /**
    * Updates the user section of the right manager sidebar.
-   * 
+   * @function updateUsersSection
    * @param {Array} users
    * @returns {undefined}
    */
@@ -240,7 +245,7 @@ GUI.rightmanager = new function() {
   };
 
   /**
-   * 
+   * @function updateContent
    * @param {type} theObject
    * @returns {undefined}
    */
@@ -381,7 +386,9 @@ GUI.rightmanager = new function() {
     }
     }
   };
-
+  /**
+  * @function openUserDialog
+  */
   function openUserDialog() {
     var that = GUI.rightmanager;
     var role = that.selectedRoleSpan.data("role");
@@ -401,7 +408,9 @@ GUI.rightmanager = new function() {
     GUI.userdialog.show(that.objData, role, resultCallback);
   }
 };
-
+  /**
+  * @function userHasTheRightToChangeStuff
+  */
 function userHasTheRightToChangeStuff(that, callback){
 
     // check if user is allowed to change rights
@@ -429,7 +438,7 @@ function userHasTheRightToChangeStuff(that, callback){
 };
 /**
  * Adds a right to a section.
- * 
+ * @function addRightToSection
  * @param {Object}  that              The reference to GUI.rightmanager, GUI.rightmanagerDialog or GUI.userdialog.
  *                                    The variables objData is needed.
  * @param {String}  right             The right to add.
@@ -479,7 +488,7 @@ function addRightToSection(that, right, role, sectionRights, checkedInitially) {
 
 /**
  * Adds a user to a section.
- * 
+ * @function addUserToSection
  * @param {Object}  that              The reference to GUI.rightmanager, GUI.rightmanagerDialog or GUI.userdialog.
  *                                    The variables checkedSpans, checkedUsers and objData are needed.
  * @param {String}  user              The user to add

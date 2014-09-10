@@ -1,7 +1,8 @@
 "use strict";
 /**
- * @file 0.cookie.js
+ * @class 0.cookies
  */
+
 /**
  * Creates a new cookie.
  * @function createCookie

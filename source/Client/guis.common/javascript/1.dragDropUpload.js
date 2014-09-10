@@ -1,10 +1,7 @@
 "use strict";
 /**
- * @file 1.dragDropupload.js
- */
-
-/**
  * Upload of files via drag and drop (HTML5)
+ * @class dragDropUpload
  */
 $(function() {
 

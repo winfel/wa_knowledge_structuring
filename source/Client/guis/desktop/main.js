@@ -1,4 +1,8 @@
 /**
+ * @class main
+ */
+
+/**
  * GUI specific file upload method
  * @function uploadFile
  * @param {webarenaObject} object : The webarena object to upload the file
@@ -90,6 +94,7 @@ GUI.uploadFile=function(object,message){
 /**
  * GUI specific inspector update
  * @function updateInspector 
+ * @param {type} selectionChanged
  */
 GUI.updateInspector = function(selectionChanged) {
 

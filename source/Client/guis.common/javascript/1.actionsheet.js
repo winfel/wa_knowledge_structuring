@@ -1,6 +1,6 @@
 "use strict";
 /**
- * @file 1.actionsheet.js
+ * @class actionsheet
  */
 /**
  * actionsheets are horizontal context menus
