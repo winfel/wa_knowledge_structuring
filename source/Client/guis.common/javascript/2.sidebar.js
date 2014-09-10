@@ -1,6 +1,9 @@
 /**
  * @namespace Holding methods and variables for displaying a sidebar
  */
+ /**
+ * @file 2.sidebar.js
+ */
 GUI.sidebar = {};
 
 /**
@@ -46,10 +49,9 @@ GUI.sidebar.elementConfig = {
 
 };
 
-/**
- * 
+/** 
  * Moves (scrolls) the sidebar to x position
- * 
+ * @function transformX
  * @param {DomElement} target The targets DOM element
  * @param {int} x The x position to move the sidebar to
  */
@@ -65,7 +67,7 @@ GUI.sidebar.transformX = function(target, x) {
 
 /**
  * Opens a sidebar page
- * 
+ * @function openPage
  * @param {string} element The name of the page to open (see GUI.sidebar.elementConfig)
  * @param {DomElement} [button] The button which triggered the opening
  */
@@ -129,6 +131,7 @@ GUI.sidebar.openPage = function(element, button) {
 
 /**
  * Opens the sidebar using animation
+ * @function openSidebar
  */
 GUI.sidebar.openSidebar = function() {
 
@@ -143,7 +146,7 @@ GUI.sidebar.openSidebar = function() {
 };
 /**
  * Closes the sidebar
- * 
+ * @function closeSidebar
  * @param {bool} noReset True if the current element should not be reset (used by GUI.sidebar.saveStateAndHide)
  */
 GUI.sidebar.closeSidebar = function(noReset) {
@@ -166,6 +169,7 @@ GUI.sidebar.closeSidebar = function(noReset) {
 
 /**
  * Saves the current sidebar state and hides it
+ * @function saveStateAndHide
  */
 GUI.sidebar.saveStateAndHide = function() {
 
@@ -180,6 +184,7 @@ GUI.sidebar.saveStateAndHide = function() {
 
 /**
  * Restores the sidebar from the saved state and shows it
+ * @function restoreFromSavedState
  */
 GUI.sidebar.restoreFromSavedState = function() {
 
@@ -197,6 +202,7 @@ GUI.sidebar.restoreFromSavedState = function() {
 
 /**
  * Initializes the sidebar
+ * @function init
  */
 GUI.sidebar.init = function() {
   $("#sidebar_content>div").addClass("animate");

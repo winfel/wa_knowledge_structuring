@@ -1,16 +1,13 @@
-/**
- * Webarena - A web application for responsive graphical knowledge work
- * 
- * @author , University of Paderborn, 2012
- * 
- */
-
 "use strict";
+/**
+* @class SocketClient
+*/
 var SocketClient = {};
 
 /**
- * Init function called in index.html to initialize this module
- */
+* @function init
+* @desc Init function called in index.html to initialize this module
+*/
 SocketClient.init = function() {
   var url = location.protocol + '//' + location.hostname;
   var socket = io.connect(url); // <--- Connects to the server: creates a websocket (socket.IO)
@@ -22,7 +19,7 @@ SocketClient.init = function() {
     if (data.type == 'call') {
       Modules.Dispatcher.call(data);
     }
-      
+    
     if (data.type == 'response') {
       Modules.Dispatcher.response(data);
     }
@@ -40,13 +37,13 @@ SocketClient.init = function() {
 };
 
 /**
- * Sends a message to the server
- * 
+ * @function sendCall
+ * @desc Sends a message to the server
  * @param {Object} type the type of call.
  * @param {Object} data the data to be sent to the server.
  * @param {Object} responseID the response id.
  */
-SocketClient.sendCall = function(type, data, responseID) {
+ SocketClient.sendCall = function(type, data, responseID) {
   Modules.Socket.emit('message', {
     'type': type,
     'data': data,

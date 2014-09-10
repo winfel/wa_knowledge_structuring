@@ -1,4 +1,4 @@
-// This is the client side ObjectManager
+// This is the client side UserManager
 
 "use strict";
 
@@ -6,37 +6,35 @@ var Modules = false;
 
 /**
  * Object providing functions for object management
+ * @class UserManager
  */
-var UserManager = {};
+ var UserManager = {};
 
 /**
- * 
+ * @function addRole
  * @param {type} object
  * @param {type} role
- * @returns {undefined}
  */
-UserManager.addRole = function(object, role) {
+ UserManager.addRole = function(object, role) {
   this.modifyRole(object, role, true);
 };
 
 /**
- * 
+ * @function removeRole
  * @param {type} object
  * @param {type} role
- * @returns {undefined}
  */
-UserManager.removeRole = function(object, role) {
+ UserManager.removeRole = function(object, role) {
   this.modifyRole(object, role, false);
 };
 
 /**
- * 
+ * @function modigyRole
  * @param {type} object
  * @param {type} role
  * @param {type} grant
- * @returns {undefined}
  */
-UserManager.modifyRole = function(object, role, grant) {
+ UserManager.modifyRole = function(object, role, grant) {
   // do nothing
   var serverCall = (grant ? "umAddRole" : "umRemoveRole");
 
@@ -46,7 +44,11 @@ UserManager.modifyRole = function(object, role, grant) {
     'role': role
   });
 };
-
+/**
+* @function StoreTabCache
+* @param {type} ObjectList
+* @param {type} cache
+*/
 UserManager.storeTabCache = function(objectList, cache) {
   // get current user -- FIXME
   var username = GUI.username;
@@ -60,16 +62,20 @@ UserManager.storeTabCache = function(objectList, cache) {
 };
 
 /**
- * Check whether a user exists in the server or not
  * 
+ * @function isValidUser
  * @param {String} newUser
  * @param {Function} callback
+ * @desc Check whether a user exists in the server or not
  */
-UserManager.isValidUser = function(newUser, callback) {
-    Dispatcher.query('umisValidUser', { 'user': newUser } ,callback);
+ UserManager.isValidUser = function(newUser, callback) {
+  Dispatcher.query('umisValidUser', { 'user': newUser } ,callback);
 }
-
-UserManager.getTabCache = function(callback) {
+/**
+ * @function getTabCache
+ * @param {Function} callback
+ */
+ UserManager.getTabCache = function(callback) {
   // get current user -- FIXME
   var username = GUI.username;
 
@@ -85,23 +91,37 @@ UserManager.getTabCache = function(callback) {
     'username': username
   });
 };
-
-UserManager.setDataOfSpaceWithDest = function(dest,key,value){
+/**
+ * @function setDataOfSpaceWithDest
+ * @param {type} dest
+ * @param {type} key
+ * @param {type} value
+ */
+ UserManager.setDataOfSpaceWithDest = function(dest,key,value){
   Modules.SocketClient.serverCall('umSetDataOfSpaceWithDest', {
     'destination': dest,
     'key':key,
     'value':value
   });
 };
-
-UserManager.removeDataOfSpaceWithDest = function(dest,key){
+/**
+ * @function removeDataOfSpaceWithDest
+ * @param {type} dest
+ * @param {type} key
+ */
+ UserManager.removeDataOfSpaceWithDest = function(dest,key){
   Modules.SocketClient.serverCall('umRemoveDataOfSpaceWithDest', {
     'destination': dest,
     'key':key,
   });
 };
-
-UserManager.getDataOfSpaceWithDest = function(dest,key,callback){
+/**
+ * @function getDataOfSpaceWithDest
+ * @param {type} dest
+ * @param {type} key
+ * @param {Function} callback
+ */
+ UserManager.getDataOfSpaceWithDest = function(dest,key,callback){
   Dispatcher.registerCall("umGetDataOfSpaceWithDest" + dest + key, function(data) {
     // call the callback
     callback(data);
@@ -117,8 +137,9 @@ UserManager.getDataOfSpaceWithDest = function(dest,key,callback){
 };
 
 /**
-* broadcasts a change of a name to all other users. 
-* They might need that information for their tab-bar
+* @function broadcastNameChange
+* @param {type} object
+* @desc broadcasts a change of a name to all other users. They might need that information for their tab-bar
 **/
 UserManager.broadcastNameChange = function(object){
   Modules.SocketClient.serverCall('umBroadcastNameChange', {
@@ -127,13 +148,12 @@ UserManager.broadcastNameChange = function(object){
 }
 
 /**
- * 
+ * @function getRoles
  * @param {type} object
  * @param {type} user
- * @param {type} callback
- * @returns {undefined}
+ * @param {Function} callback
  */
-UserManager.getRoles = function(object, user, callback) {
+ UserManager.getRoles = function(object, user, callback) {
 
   Dispatcher.registerCall("umGetRoles" + object.id, function(data) {
     // call the callback
@@ -150,8 +170,12 @@ UserManager.getRoles = function(object, user, callback) {
     'username': user
   });
 };
-
-UserManager.loadDefaultRoles = function(object, callback) {
+/**
+ * @function loadDefaultRoles
+ * @param {type} object
+ * @param {Function} callback
+ */
+ UserManager.loadDefaultRoles = function(object, callback) {
 
   Dispatcher.registerCall("umDefaultRoles" + object.id, function(data) {
     // call the callback
@@ -165,8 +189,12 @@ UserManager.loadDefaultRoles = function(object, callback) {
     'object': object
   });
 };
-
-UserManager.removeAllRoles = function(object, callback) {
+/**
+ * @function removeAllRoles
+ * @param {type} object
+ * @param {Function} callback
+ */
+ UserManager.removeAllRoles = function(object, callback) {
   Dispatcher.registerCall("umRolesCleared" + object.id, function(data) {
     // call the callback
     callback(data);
@@ -181,13 +209,12 @@ UserManager.removeAllRoles = function(object, callback) {
 };
 
 /**
- * 
+ * @function addUser
  * @param {type} object
  * @param {type} role
  * @param {type} user
- * @returns {undefined}
  */
-UserManager.addUser = function(object, role, user) {
+ UserManager.addUser = function(object, role, user) {
   // The responce should be some sort of broadcast to users with a manager role...
   Modules.SocketClient.serverCall('umAddUser', {
     'role': role,
@@ -197,13 +224,12 @@ UserManager.addUser = function(object, role, user) {
 };
 
 /**
- * 
+ * @function removeUser
  * @param {type} object
  * @param {type} role
  * @param {type} user
- * @returns {undefined}
  */
-UserManager.removeUser = function(object, role, user) {
+ UserManager.removeUser = function(object, role, user) {
   // The responce should be some sort of broadcast to users with a manager role...
   Modules.SocketClient.serverCall('umRemoveUser', {
     'object': object,
@@ -213,14 +239,13 @@ UserManager.removeUser = function(object, role, user) {
 };
 
 /**
- * 
+ * @function getUsers
  * @param {type} object
  * @param {type} role
  * @param {type} user
- * @param {type} callback
- * @returns {undefined}
+ * @param {Function} callback
  */
-UserManager.getUsers = function(object, role, user, callback) {
+ UserManager.getUsers = function(object, role, user, callback) {
 
   Dispatcher.registerCall("umUsers" + object.id, function(data) {
     // call the callback
@@ -238,8 +263,12 @@ UserManager.getUsers = function(object, role, user, callback) {
     'username': user
   });
 };
-
-UserManager.isManager = function(object, callback) {
+/**
+ * @function isManager
+ * @param {type} object
+ * @param {Function} callback
+ */
+ UserManager.isManager = function(object, callback) {
 
   Dispatcher.registerCall("umIsManager" + object.id, function(data) {
     // call the callback
@@ -265,13 +294,12 @@ UserManager.isManager = function(object, callback) {
 };
 
 /**
- * 
+ * @function getMissingUsers
  * @param {type} object
  * @param {type} role
  * @param {type} callback
- * @returns {undefined}
  */
-UserManager.getMissingUsers = function(object, role, callback) {
+ UserManager.getMissingUsers = function(object, role, callback) {
 
   Dispatcher.registerCall("umMissingUsers" + object.id, function(data) {
     // call the callback
