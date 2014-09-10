@@ -49,6 +49,10 @@ GUI.rightmanager = new function() {
 //      bottomArea.find("input.new-role-textfield").animate({width: "toggle"}).val("");
     });
 
+    bottomArea.find(".btn-new-role").click(function() {
+      input.focus();
+    });
+
     bottomArea.find(".btn-cancel").click(function() {
       input.val("");
     });
