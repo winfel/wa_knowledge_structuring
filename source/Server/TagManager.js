@@ -4,6 +4,7 @@ var _ = require('underscore');
 var db = false;
 var Modules = false;
 
+var TRASH_ROOM = 'trash';
 var FILE_TYPE_NAME = "File";
 var CONTAINER_ID = "containerID";
 var CONTAINER_WIDTH = 500;
@@ -155,7 +156,6 @@ var TagManager = function() {
         
 
 		// TODO: move this out of init, because this is dangerous as some object creation may fail due to still unfinished server/database startup process
-		// OrderContainers is now bound to Event 'room::public::userEntered' in InternalDispatcher
 		// we create our context
 		var context = {
 			user: { username : "root"}
@@ -487,7 +487,7 @@ var TagManager = function() {
                 //console.log("deleteMainTag::ERROR " + err);
                 callback(true, "The main tag cannot be deleted: " + err);
             } else {	
-				var promise1 = dbObjects.find( {type: FILE_TYPE_NAME, mainTag : obj.name });
+				var promise1 = dbObjects.find( {type: FILE_TYPE_NAME, mainTag : obj.name, inRoom: {$nin:[TRASH_ROOM]} });
 				
 				promise1.on('complete', function(err, obj) {
 		            if (err || obj == null) {
@@ -557,12 +557,10 @@ var TagManager = function() {
                     }
                     
                 } else if (freePlaces.length > 0) {
-                    var coordinates = freePlaces[0]; 
-                    freePlaces = freePlaces.slice(1);
-                    // console.log("++ coordinates: " + JSON.stringify(coordinates));
+                    var freeSpace = getNextFreeSpace();
                     
-                    attr.x = coordinates.x;
-                    attr.y = coordinates.y;
+                    attr.x = freeSpace.x;
+                    attr.y = freeSpace.y;
                 }
             }
             
@@ -629,6 +627,7 @@ var TagManager = function() {
 	 * Order the containers
 	 */
 	this.OrderContainers = function(context) {
+	    freePlaces = [];
 	    var dbMainTags = db.get('MainTags');
 	    
 	    // console.log("sorting containers...");
@@ -670,8 +669,38 @@ var TagManager = function() {
                 recursive(0);
             }
         });
-	}
-	  
+	}  
 };
+
+function getNextFreeSpace() {
+    var freeSpace = null;
+    
+    if (freePlaces.length > 0) {
+        freeSpace = freePlaces[0];
+        
+        if (freePlaces.length > 1) {
+            var counter = 1;
+            var aux = freePlaces[counter]; 
+            
+            while (aux.y == freeSpace.y) {       // This means the two spaces are in the same row
+               
+                if (aux.x < freeSpace.x) {      // if the position of auxiliar is more to the left then choose it
+                    freeSpace = aux;
+                }
+                
+                counter++;
+                if (freePlaces.length == counter) break;
+                
+                aux = freePlaces[counter]; 
+            }
+        }
+        
+        freePlaces = _.filter(freePlaces, function(space) { return (space.x != freeSpace.x) || (space.y != freeSpace.y) } ); 
+    } 
+    
+    //console.log("++ freePlaces: " + JSON.stringify(freePlaces));
+    
+    return freeSpace;
+}
 
 module.exports = new TagManager();

@@ -124,8 +124,8 @@ ReferenceContainer.searchAndFilter = function(files){
 	var text = this.searchForText;
 	
 	var stringEntered = (s != "");
-	var maintagEntered = (maintag != "");
-	var sectagEntered = (sectag != "");
+	var maintagEntered = ((maintag != "") && (maintag != "1"));
+	var sectagEntered = ((sectag != "") && (sectag != "1"));
 	
 	if(!stringEntered && !sectagEntered && !maintagEntered){
 		filteredFiles1 = files;
