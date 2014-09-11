@@ -182,3 +182,18 @@ hr {
   width: 210px;
   white-space: nowrap;
 }
+
+.rightmanagerMessageBox {
+  margin: 10px 0;
+  padding: 5px 10px 5px 35px;
+  display: none;
+  white-space: normal;
+}
+
+.rightmanagerMessageBox.error {
+  border: 1px solid #AF1F1F;
+  background: url("/guis.common/images/oxygen/22x22/actions/dialog-close.png") no-repeat 5px 4px;
+  background-color: #E52727;
+  border-radius: 4px;
+  color: #FFFFFF;
+}

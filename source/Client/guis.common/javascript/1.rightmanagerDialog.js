@@ -33,8 +33,11 @@ GUI.rightmanagerDialog = new function() {
     // Listen for changes to some roles.
     RightManager.listen("rolechange", function(data) {
       if (currentObject.id == data.object.id) {
-        // Update the section only if the object id is the same.
-        that.modifyRoleTab(data.role, data.add);
+        if (!data.role.error) {
+          that.modifyRoleTab(data.role, data.add);
+        } else {
+          that.updateMessageBox(data.role.error.message, data.role.error.type, {ROLE: data.role.name});
+        }
       }
     });
   };
@@ -102,27 +105,27 @@ GUI.rightmanagerDialog = new function() {
       width: 600,
       modal: true,
       buttons: [
-        {
-          text: "Add user",
-          click: function() {
-            $(this).dialog("close");
-            $(this).remove();
-          }
-        },
-        {
-          text: "Load default",
-          click: function() {
-            $(this).dialog("close");
-            $(this).remove();
-          }
-        },
-        {
-          text: "Done",
-          click: function() {
-            $(this).dialog("close");
-            $(this).remove();
-          }
-        },
+        /*{
+         text: "Add user",
+         click: function() {
+         $(this).dialog("close");
+         $(this).remove();
+         }
+         },
+         {
+         text: "Load default",
+         click: function() {
+         $(this).dialog("close");
+         $(this).remove();
+         }
+         },
+         {
+         text: "Done",
+         click: function() {
+         $(this).dialog("close");
+         $(this).remove();
+         }
+         },*/
         {
           text: "Close",
           click: function() {
@@ -135,21 +138,55 @@ GUI.rightmanagerDialog = new function() {
         // Load missing users when the dialog opens.
         var dialog = $(this);
 
-        RightManager.getRoles(currentObject, function(roles) {
-          // Creating an add role tab.
-          that.addNewRoleTab();
-          // Create a tab for each role.
-          for (var i = 0; i < roles.length; i++) {
-            that.modifyRoleTab(roles[i], true);
-          }
-          // Make sure that the first tab is selected.
-          tabs.tabs("select", 0);
-        });
+        // Sometimes the manager role has not been written to the
+        // database yet. Waiting a little bit longer helps here...
+        setTimeout(function() {
+          RightManager.getRoles(currentObject, function(roles) {
+            // Creating an add role tab.
+            that.addNewRoleTab();
+            // Create a tab for each role.
+            for (var i = 0; i < roles.length; i++) {
+              that.modifyRoleTab(roles[i], true);
+            }
+            // Make sure that the first tab is selected.
+            tabs.tabs("select", 0);
+          });
+        }, 300);
       }
     });
 
   };
 
+
+  /**
+   * Updates the message box container.
+   * 
+   * @function updateMessageBox
+   * @param {type} message
+   * @param {type} type
+   * @param {type} mapPlaceholder
+   */
+  this.updateMessageBox = function(message, type, mapPlaceholder) {
+    var messageBox = dialog.find(".rightmanagerMessageBox");
+    if (type)
+      messageBox.addClass(type);
+    if (mapPlaceholder)
+      messageBox.html(GUI.rightmanager.replacePlaceholder(GUI.translate(message), mapPlaceholder));
+    else
+      messageBox.html(GUI.translate(message));
+    messageBox.slideDown();
+    // Hide the warning after 3 seconds...
+    setTimeout(function() {
+      messageBox.slideUp();
+      if (type) {
+        setTimeout(function() {
+          messageBox.removeClass(type);
+          messageBox.html("");
+          messageBox.hide();
+        }, 400);
+      }
+    }, 6000);
+  };
   /**
    * 
    * @returns {undefined}
@@ -166,23 +203,35 @@ GUI.rightmanagerDialog = new function() {
 
     var input = tabHeader.find("input").hide();
 
-    // Do the animation stuff
-    tabHeader.find(".btn").click(function() {
-      tabHeader.find(".btn").toggle();
-      input.animate({width: 'toggle'});
-    });
-
-    tabHeader.find(".btn-new-role").click(function() {
-      input.focus();
-    });
-
-    tabHeader.find(".btn-save-role").click(function() {
+    var saveRole = function() {
       var rolename = input.val().trim();
       if (rolename != "") {
         RightManager.modifyRole(currentObject, rolename, true);
       }
       input.val("");
+    };
+
+    var toggleButtons = function() {
+      tabHeader.find(".btn").toggle();
+      input.animate({width: 'toggle'});
+    };
+
+    // On enter save the role.
+    input.keypress(function(e) {
+      if (e.which == 13) {
+        toggleButtons();
+        saveRole();
+      }
     });
+
+    // Do the animation stuff
+    tabHeader.find(".btn").click(toggleButtons);
+
+    tabHeader.find(".btn-new-role").click(function() {
+      input.focus();
+    });
+
+    tabHeader.find(".btn-save-role").click(saveRole);
 
     tabHeader.find(".btn-cancel").click(function() {
       input.val("");
@@ -229,6 +278,8 @@ GUI.rightmanagerDialog = new function() {
         });
         tabHeader.append(btnRemoveRole);
       }
+
+      tabContent.append('<div class="rightmanagerMessageBox"></div>');
 
       var userArea = $("<div>").attr("class", "rightmanagerDialogUserArea");
       tabContent.append('<div class="jDesktopInspector_pageHead rightmanagerDialogUserHead">' + GUI.translate("Users") + '</div>');

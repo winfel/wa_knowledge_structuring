@@ -73,7 +73,7 @@ var RightManager = function() {
    * @returns {undefined}
    */
   this.registerRight = function(object, name, comment, mask) {
-    
+
     var dataObject = this.mapObject(object, true);
 
     var dbRights = db.get('rights');
@@ -194,8 +194,8 @@ var RightManager = function() {
    */
   this.hasAccess = function(object, user, right, callback) {
     var dataObject = this.mapObject(object);
-
     var that = this;
+    
     var dbRoles = db.get('roles');
     dbRoles.find({objectid: String(dataObject.id)}, {}, function(e, docs) {
 
@@ -357,8 +357,6 @@ var RightManager = function() {
         } else {
           dbRoles.update({_id: item._id}, {$pull: {users: user}});
         }
-//        console.log("I would have " + (add ? "added" : "removed") + " "
-//                + user + " " + (add ? "to" : "from") + " " + item.name);
       });
       if (callback)
         callback();
@@ -405,10 +403,14 @@ var RightManager = function() {
        role.mode = "overwrite";
        }*/
 
-      dbRoles.insert(role);
-
-      if (callback)
-        callback(role);
+      // Search for existing role name (case-insensitive)
+      dbRoles.find({objectid: String(dataObject.id), name: {$regex: "^" + String(role.name) + "$", $options: '-i'}}, {}, function(e, docs) {
+        if (docs.length == 0) {
+          dbRoles.insert(role);
+        } else {
+          role.error = {type: "error", message: 'The role "ROLE" does already exist'};
+        }
+      });
 
     } else {
       // Remove the role.
@@ -417,14 +419,14 @@ var RightManager = function() {
           objectid: String(role.objectid),
           name: role.name
         });
-        if (callback)
-          callback(role);
       } else {
-        console.log("you cannot remove the manager role!");
-        if (callback)
-          callback(false);
+        role.error = {type: "error", message: "You cannot delete the manager role!"};
       }
     }
+    
+    // Call the callback anyway. With or without errors.
+    if (callback)
+      callback(role);
   };
 
   /**

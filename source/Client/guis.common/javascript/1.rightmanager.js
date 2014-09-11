@@ -24,28 +24,40 @@ GUI.rightmanager = new function() {
     var bottomArea = $("<div>");
     bottomArea.attr("class", "jDesktopInspector_main");
     bottomArea.html('<div class="jDesktopInspector_page rightmanager-bottom display-block">'
-            + '<input type="text" class="ui-textfield new-role-textfield" placeholder="Role">'
+            + '<input type="text" class="ui-textfield new-role-textfield" placeholder="New Role">'
             + '<input type="image" class="btn btn-new-role" title="' + GUI.translate("Create a new role for this object") + '" src="/guis.common/images/oxygen/22x22/actions/list-add.png">'
             + '<input type="image" class="btn btn-save-role" title="' + GUI.translate("Save the new role for this object") + '" src="/guis.common/images/oxygen/22x22/actions/document-save.png">'
             + '<input type="image" class="btn btn-cancel" title="' + GUI.translate("Cancel") + '" src="/guis.common/images/oxygen/22x22/actions/dialog-cancel.png">'
-            + '</div>');
+            + '<div class="rightmanagerMessageBox"></div></div>');
     rightmanagerArea.append(bottomArea);
 
     var input = bottomArea.find("input.new-role-textfield");
 
-    // Add an add user button
-    bottomArea.find(".btn").click(function() {
-      bottomArea.find(".btn").toggle();
-      input.animate({width: 'toggle'});
-    });
-
-    bottomArea.find(".btn-save-role").click(function() {
-      var role = bottomArea.find("input[type='text']").val().trim();
+    var saveRole = function() {
+      var role = input.val().trim();
       if (role != "") {
         RightManager.modifyRole(currentObject, role, true);
       }
       input.val("");
+    };
+
+    var toggleButtons = function() {
+      bottomArea.find(".btn").toggle();
+      input.animate({width: 'toggle'});
+    };
+
+    // On enter save the role.
+    input.keypress(function(e) {
+      if (e.which == 13) {
+        toggleButtons();
+        saveRole();
+      }
     });
+
+    // Add an add user button
+    bottomArea.find(".btn").click(toggleButtons);
+
+    bottomArea.find(".btn-save-role").click(saveRole);
 
     bottomArea.find(".btn-new-role").click(function() {
       input.focus();
@@ -81,9 +93,58 @@ GUI.rightmanager = new function() {
     RightManager.listen("rolechange", function(data) {
       if (currentObject.id == data.object.id) {
         // Update the section only if the object id is the same.
-        that.modifyRoleSection(data.role, data.add);
+        if (!data.role.error) {
+          that.modifyRoleSection(data.role, data.add);
+        } else {
+          that.updateMessageBox(data.role.error.message, data.role.error.type, {ROLE: data.role.name});
+        }
       }
     });
+  };
+
+  /**
+   * Replaces placeholder strings, like [ROLE] or [RIGHT], with it's proper values.
+   * 
+   * @param {type} str
+   * @param {type} mapObj
+   * @returns {undefined}
+   */
+  this.replacePlaceholder = function(str, mapObj) {
+    var re = new RegExp(Object.keys(mapObj).join("|"), "g");
+    return str.replace(re, function(matched) {
+      return mapObj[matched];
+    });
+  };
+
+  /**
+   * Updates the message box container.
+   * 
+   * @function updateMessageBox
+   * @param {type} message
+   * @param {type} type
+   * @param {type} mapPlaceholder
+   * @returns {undefined}
+   */
+  this.updateMessageBox = function(message, type, mapPlaceholder) {
+    var messageBox = rightmanagerArea.find(".rightmanagerMessageBox");
+    if (type)
+      messageBox.addClass(type);
+    if (mapPlaceholder)
+      messageBox.html(this.replacePlaceholder(GUI.translate(message), mapPlaceholder));
+    else
+      messageBox.html(GUI.translate(message));
+    messageBox.slideDown();
+    // Hide the warning after 3 seconds...
+    setTimeout(function() {
+      messageBox.slideUp();
+      if (type) {
+        setTimeout(function() {
+          messageBox.removeClass(type);
+          messageBox.html("");
+          messageBox.hide();
+        }, 400);
+      }
+    }, 6000);
   };
 
   /**
@@ -201,7 +262,6 @@ GUI.rightmanager = new function() {
     var that = this;
     var elemId = "rightmanagerSidebar_role_" + currentObject.id + "_" + role.name;
 
-
     if (add) {
       var rights = RightManager.getAvailableRights(currentObject);
       // A new jQueryInspector page...
@@ -211,9 +271,8 @@ GUI.rightmanager = new function() {
       var spanArrow = $("<span>");
       spanArrow.addClass("ui-accordion-header-icon ui-icon ui-icon-triangle-1-e");
 
-      var pageObject = $(".jDesktopInspector_pageHead:contains(" + role.name + ")", rightmanagerArea).first();
-      pageObject.prepend(spanArrow);
-      pageObject.attr("id", elemId);
+      var pageHead = $(page.getDOM(true));
+      pageHead.prepend(spanArrow).attr("id", elemId);
 
       // Create a remove role button
       if (role.deletable) {
@@ -237,7 +296,7 @@ GUI.rightmanager = new function() {
             // who triggered this action.
           });
         });
-        pageObject.append(btnRemoveRole);
+        pageHead.append(btnRemoveRole);
       }
 
       // Create an add user button
@@ -259,7 +318,7 @@ GUI.rightmanager = new function() {
       // Create a user section
       var sectionUsers = page.addSection(GUI.translate("Users"));
       // Add an add button to the title of this section
-      pageObject.next().find(".jDesktopInspector_section_title").append(btnAddUser);
+      pageHead.next().find(".jDesktopInspector_section_title").append(btnAddUser);
 
       for (var i in role.users) {
         this.modifyUserElement(role.users[i], role, true, sectionUsers, page);
