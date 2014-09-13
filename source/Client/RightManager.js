@@ -12,7 +12,7 @@ var RightManager = new function() {
   var supportedObjects = new Array();
   var rights = {};
   var rightObjects = {};
-  
+
   // Type masks is only needed to access the local stored information.
   // The server side of the right manager has it's own mapping functionality.
   var typeMasks = {};
@@ -46,23 +46,21 @@ var RightManager = new function() {
 
     Dispatcher.registerCall("rmModifiedUser", function(data) {
       try {
-        // Iterate over all listeners...
         for (var i = 0; i < listener["userchange"].length; i++)
           listener["userchange"][i](data);
       } catch (e) {
-        // No listener...
       }
     });
 
     Dispatcher.registerCall("rmModifiedAccess", function(data) {
       try {
-        // Iterate over all listeners...
         for (var i = 0; i < listener["rightchange"].length; i++)
           listener["rightchange"][i](data);
       } catch (e) {
-        // No listener...
       }
     });
+
+    Dispatcher.registerCall("rmError", this.fireError);
   };
 
   /**
@@ -79,6 +77,14 @@ var RightManager = new function() {
     listener[event].push(callback);
   };
 
+  this.fireError = function(error) {
+    try {
+      for (var i = 0; i < listener["onerror"].length; i++)
+        listener["onerror"][i](error);
+    } catch (e) {
+    }
+  };
+
   /**
    * Reduces an object to its most important attributes.
    * 
@@ -89,7 +95,7 @@ var RightManager = new function() {
    * @returns {undefined}
    */
   this.reduceObject = function(object) {
-    var dataObject = {id: object.id, type: object.type};
+    var dataObject = {id: object.id, type: object.type, inRoom: object.inRoom};
     if (object.getAttribute && object.getAttribute("destination"))
       dataObject.destination = object.getAttribute("destination");
 
@@ -143,11 +149,11 @@ var RightManager = new function() {
    */
   this.supports = function(object) {
     var dataObject = this.reduceObject(object);
-    
+
     // Important for subroom and paperspace
-    if(typeMasks[dataObject.type])
+    if (typeMasks[dataObject.type])
       dataObject.type = typeMasks[dataObject.type];
-    
+
     return supportedObjects.indexOf(dataObject.type) >= 0;
   };
 
@@ -170,11 +176,11 @@ var RightManager = new function() {
    */
   this.getAvailableRights = function(object) {
     var dataObject = this.reduceObject(object);
-    
+
     // Important for subroom and paperspace
-    if(typeMasks[dataObject.type])
+    if (typeMasks[dataObject.type])
       dataObject.type = typeMasks[dataObject.type];
-    
+
     return rightObjects[dataObject.type] || [];
   };
 
@@ -261,16 +267,22 @@ var RightManager = new function() {
     var dataObject = this.reduceObject(object);
 
     Dispatcher.registerCall("rmRoles" + dataObject.id, function(data) {
-      // Sort rights and users.
-      for (var i = 0; i < data.length; i++) {
-        data[i].rights = data[i].rights.sort();
-        data[i].users = data[i].users.sort();
-      }
+      if (data.length >= 0) {
+        // Data is an array of roles.
+        // Sort rights and users.
+        for (var i = 0; i < data.length; i++) {
+          data[i].rights = data[i].rights.sort();
+          data[i].users = data[i].users.sort();
+        }
 
-      // Finally sort the roles and pass it to the callback.
-      callback(data.sort(function(a, b) {
-        return a.name > b.name;
-      }));
+        // Finally sort the roles and pass it to the callback.
+        callback(data.sort(function(a, b) {
+          return a.name > b.name;
+        }));
+      } else {
+        // If the message attribute is set, it has to be 
+        that.fireError(data);
+      }
       Dispatcher.removeCall("rmRoles" + dataObject.id);
     });
 
