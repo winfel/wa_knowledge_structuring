@@ -40,6 +40,10 @@ GUI.rightmanagerDialog = new function() {
         }
       }
     });
+
+    RightManager.listen("onerror", function(error) {
+      that.updateMessageBox(error.type, error.message, error.placeholderData, error.hide);
+    });
   };
 
   /*
@@ -157,16 +161,16 @@ GUI.rightmanagerDialog = new function() {
 
   };
 
-
   /**
    * Updates the message box container.
    * 
    * @function updateMessageBox
-   * @param {type} message
-   * @param {type} type
-   * @param {type} mapPlaceholder
+   * @param {String}  type            The type of this message.
+   * @param {String}  message         The message.
+   * @param {Object}  mapPlaceholder  The object with placesholders.
+   * @param {Boolean} hide            Indicates if the message should disappear automatically.
    */
-  this.updateMessageBox = function(message, type, mapPlaceholder) {
+  this.updateMessageBox = function(type, message, mapPlaceholder, hide) {
     var messageBox = dialog.find(".rightmanagerMessageBox");
     if (type)
       messageBox.addClass(type);
@@ -175,17 +179,19 @@ GUI.rightmanagerDialog = new function() {
     else
       messageBox.html(GUI.translate(message));
     messageBox.slideDown();
-    // Hide the warning after 3 seconds...
-    setTimeout(function() {
-      messageBox.slideUp();
-      if (type) {
-        setTimeout(function() {
-          messageBox.removeClass(type);
-          messageBox.html("");
-          messageBox.hide();
-        }, 400);
-      }
-    }, 6000);
+    if (hide) {
+      // Hide the warning after 6 seconds...
+      setTimeout(function() {
+        messageBox.slideUp();
+        if (type) {
+          setTimeout(function() {
+            messageBox.removeClass(type);
+            messageBox.html("");
+            messageBox.hide();
+          }, 400);
+        }
+      }, 6000);
+    }
   };
   /**
    * 

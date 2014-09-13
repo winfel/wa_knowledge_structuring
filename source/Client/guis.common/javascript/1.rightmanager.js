@@ -96,18 +96,22 @@ GUI.rightmanager = new function() {
         if (!data.role.error) {
           that.modifyRoleSection(data.role, data.add);
         } else {
-          that.updateMessageBox(data.role.error.message, data.role.error.type, {ROLE: data.role.name});
         }
       }
+    });
+
+    RightManager.listen("onerror", function(error) {
+
+
+      that.updateMessageBox(error.type, error.message, error.placeholderData, error.hide);
     });
   };
 
   /**
    * Replaces placeholder strings, like [ROLE] or [RIGHT], with it's proper values.
    * 
-   * @param {type} str
-   * @param {type} mapObj
-   * @returns {undefined}
+   * @param {String} str
+   * @param {Object} mapObj
    */
   this.replacePlaceholder = function(str, mapObj) {
     var re = new RegExp(Object.keys(mapObj).join("|"), "g");
@@ -120,12 +124,12 @@ GUI.rightmanager = new function() {
    * Updates the message box container.
    * 
    * @function updateMessageBox
-   * @param {type} message
-   * @param {type} type
-   * @param {type} mapPlaceholder
-   * @returns {undefined}
+   * @param {String}  type            The type of this message.
+   * @param {String}  message         The message.
+   * @param {Object}  mapPlaceholder  The object with placesholders.
+   * @param {Boolean} hide            Indicates if the message should disappear automatically.
    */
-  this.updateMessageBox = function(message, type, mapPlaceholder) {
+  this.updateMessageBox = function(type, message, mapPlaceholder, hide) {
     var messageBox = rightmanagerArea.find(".rightmanagerMessageBox");
     if (type)
       messageBox.addClass(type);
@@ -134,28 +138,41 @@ GUI.rightmanager = new function() {
     else
       messageBox.html(GUI.translate(message));
     messageBox.slideDown();
-    // Hide the warning after 3 seconds...
-    setTimeout(function() {
+    // Hide the warning after 6 seconds...
+    if (hide) {
+      setTimeout(this.hideMessageBox, 6000);
+    }
+  };
+
+  /**
+   * Hides the message box
+   * @param {Boolean} immediate   
+   */
+  this.hideMessageBox = function(immediate) {
+    var messageBox = rightmanagerArea.find(".rightmanagerMessageBox");
+    if (immediate) {
+      messageBox.attr("class", "rightmanagerMessageBox");
+      messageBox.html("");
+      messageBox.hide();
+    } else {
       messageBox.slideUp();
-      if (type) {
-        setTimeout(function() {
-          messageBox.removeClass(type);
-          messageBox.html("");
-          messageBox.hide();
-        }, 400);
-      }
-    }, 6000);
+      setTimeout(function() {
+        messageBox.attr("class", "rightmanagerMessageBox");
+        messageBox.html("");
+        messageBox.hide();
+      }, 400);
+    }
   };
 
   /**
    * Modifies a user element in the users section.
    * 
    * @function modifyUserElement
-   * @param {type} user
-   * @param {type} role
-   * @param {type} add
-   * @param {type} sectionUsers
-   * @param {type} rolePage
+   * @param {String}    user          
+   * @param {Object}    role
+   * @param {Boolean}   add
+   * @param {DOMObject} sectionUsers
+   * @param {DOMObject} rolePage
    * @returns {undefined}
    */
   this.modifyUserElement = function(user, role, add, sectionUsers, rolePage) {
@@ -389,11 +406,15 @@ GUI.rightmanager = new function() {
 
     var supportedObjects = RightManager.getSupportedObjects();
 
+    rightmanagerArea.find(".btn-new-role").hide();
+
     if (RightManager.supports(currentObject)) {
 
-      rightmanagerArea.find(".btn-new-role").show();
       // Get all roles...
       RightManager.getRoles(currentObject, function(roles) {
+        rightmanagerArea.find(".btn-new-role").show();
+        that.hideMessageBox(true);
+
         for (var i = 0; i < roles.length; i++) {
           that.modifyRoleSection(roles[i], true);
         }
@@ -403,8 +424,7 @@ GUI.rightmanager = new function() {
       rightmanagerArea.find(".not-supported-message").remove();
 
     } else {
-      rightmanagerArea.find(".btn-new-role").hide();
-
+      // Generate the not supported message...
       var message = '<div class="jDesktopInspector_main">';
       message += '<div class="jDesktopInspector_main not-supported-message">';
       if (currentObject)
