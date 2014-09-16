@@ -183,6 +183,21 @@ hr {
   white-space: nowrap;
 }
 
+#rightmanager .object-area {
+  width: 210px;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 0.8em;
+}
+
+#rightmanager .object-area:first-child {
+  font-style: italic;
+}
+
+#rightmanager .object-area:last-child  {
+  font-style: italic;
+}
+
 .rightmanagerMessageBox {
   margin: 10px 0;
   padding: 5px 10px 5px 35px;

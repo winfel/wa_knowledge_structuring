@@ -2,7 +2,7 @@
  * Right manager sidebar object.
  * 
  */
-GUI.rightmanager = new function() {
+GUI.rightmanager = new function () {
   var that = this;
   var rightmanagerArea;
   var inspectorArea;
@@ -17,9 +17,14 @@ GUI.rightmanager = new function() {
    * @function init
    * @returns {undefined}
    */
-  this.init = function() {
+  this.init = function () {
     // Some important variables
     rightmanagerArea = $("#rightmanager");
+
+    var objectArea = $("<div>");
+    objectArea.addClass("jDesktopInspector_main");
+    objectArea.html('<div class="jDesktopInspector_page object-area display-block"></div>');
+    rightmanagerArea.append(objectArea);
 
     var bottomArea = $("<div>");
     bottomArea.attr("class", "jDesktopInspector_main");
@@ -33,7 +38,7 @@ GUI.rightmanager = new function() {
 
     var input = bottomArea.find("input.new-role-textfield");
 
-    var saveRole = function() {
+    var saveRole = function () {
       var role = input.val().trim();
       if (role != "") {
         RightManager.modifyRole(currentObject, role, true);
@@ -41,13 +46,13 @@ GUI.rightmanager = new function() {
       input.val("");
     };
 
-    var toggleButtons = function() {
+    var toggleButtons = function () {
       bottomArea.find(".btn").toggle();
       input.animate({width: 'toggle'});
     };
 
     // On enter save the role.
-    input.keypress(function(e) {
+    input.keypress(function (e) {
       if (e.which == 13) {
         toggleButtons();
         saveRole();
@@ -59,11 +64,11 @@ GUI.rightmanager = new function() {
 
     bottomArea.find(".btn-save-role").click(saveRole);
 
-    bottomArea.find(".btn-new-role").click(function() {
+    bottomArea.find(".btn-new-role").click(function () {
       input.focus();
     });
 
-    bottomArea.find(".btn-cancel").click(function() {
+    bottomArea.find(".btn-cancel").click(function () {
       input.val("");
     });
 
@@ -74,7 +79,7 @@ GUI.rightmanager = new function() {
     inspector = inspectorArea.data("jDesktopInspector");
 
     // Listen for changes to some user.
-    RightManager.listen("userchange", function(data) {
+    RightManager.listen("userchange", function (data) {
       if (currentObject.id == data.object.id) {
         // Update the section only if the object id is the same.
         that.modifyUserElement(data.user, data.role, data.add);
@@ -82,7 +87,7 @@ GUI.rightmanager = new function() {
     });
 
     // Listen for changes to some rights.
-    RightManager.listen("rightchange", function(data) {
+    RightManager.listen("rightchange", function (data) {
       if (currentObject.id == data.object.id) {
         // Update the section only if the object id is the same.
         that.modifyRightElement(data.right, data.role, data.grant);
@@ -90,7 +95,7 @@ GUI.rightmanager = new function() {
     });
 
     // Listen for changes to some roles.
-    RightManager.listen("rolechange", function(data) {
+    RightManager.listen("rolechange", function (data) {
       if (currentObject.id == data.object.id) {
         // Update the section only if the object id is the same.
         if (!data.role.error) {
@@ -100,7 +105,7 @@ GUI.rightmanager = new function() {
       }
     });
 
-    RightManager.listen("onerror", function(error) {
+    RightManager.listen("onerror", function (error) {
 
 
       that.updateMessageBox(error.type, error.message, error.placeholderData, error.hide);
@@ -113,9 +118,9 @@ GUI.rightmanager = new function() {
    * @param {String} str
    * @param {Object} mapObj
    */
-  this.replacePlaceholder = function(str, mapObj) {
+  this.replacePlaceholder = function (str, mapObj) {
     var re = new RegExp(Object.keys(mapObj).join("|"), "g");
-    return str.replace(re, function(matched) {
+    return str.replace(re, function (matched) {
       return mapObj[matched];
     });
   };
@@ -129,7 +134,7 @@ GUI.rightmanager = new function() {
    * @param {Object}  mapPlaceholder  The object with placesholders.
    * @param {Boolean} hide            Indicates if the message should disappear automatically.
    */
-  this.updateMessageBox = function(type, message, mapPlaceholder, hide) {
+  this.updateMessageBox = function (type, message, mapPlaceholder, hide) {
     var messageBox = rightmanagerArea.find(".rightmanagerMessageBox");
     if (type)
       messageBox.addClass(type);
@@ -149,7 +154,7 @@ GUI.rightmanager = new function() {
    * @function hideMessageBox
    * @param {Boolean} immediate   
    */
-  this.hideMessageBox = function(immediate) {
+  this.hideMessageBox = function (immediate) {
     var messageBox = rightmanagerArea.find(".rightmanagerMessageBox");
     if (immediate) {
       messageBox.attr("class", "rightmanagerMessageBox");
@@ -157,7 +162,7 @@ GUI.rightmanager = new function() {
       messageBox.hide();
     } else {
       messageBox.slideUp();
-      setTimeout(function() {
+      setTimeout(function () {
         messageBox.attr("class", "rightmanagerMessageBox");
         messageBox.html("");
         messageBox.hide();
@@ -176,7 +181,7 @@ GUI.rightmanager = new function() {
    * @param {DOMObject} rolePage
    * @returns {undefined}
    */
-  this.modifyUserElement = function(user, role, add, sectionUsers, rolePage) {
+  this.modifyUserElement = function (user, role, add, sectionUsers, rolePage) {
     var elemId = "rightmanagerSidebar_user_" + currentObject.id + "_" + role.name + "_" + user;
 
     if (add) {
@@ -200,12 +205,12 @@ GUI.rightmanager = new function() {
               .addClass("user-item")
               .append('<input type="image" class="btn btn-remove-user" title="' + GUI.translate("Remove this user from this role") + '" src="/guis.common/images/oxygen/16x16/actions/list-remove.png">');
 
-      $(elementDOM).find("input").click(function() {
+      $(elementDOM).find("input").click(function () {
         var title = GUI.translate("Removing a user from a role");
         var text = GUI.translate("You are about to remove '[USER]' from the role '[ROLE]'.");
         text = text.replace("[USER]", user).replace("[ROLE]", role.name);
 
-        confirmDialog(title, text, function() {
+        confirmDialog(title, text, function () {
           RightManager.removeUser(currentObject, user, role);
           // We do not remove the element here, since we will send a broadcast message to all other managers.
         });
@@ -225,7 +230,7 @@ GUI.rightmanager = new function() {
    * @param {type} sectionRights
    * @returns {undefined}
    */
-  this.createRightElement = function(right, role, sectionRights) {
+  this.createRightElement = function (right, role, sectionRights) {
     var elemId = "rightmanagerSidebar_right_" + currentObject.id + "_" + role.name + "_" + right.name;
 
     var element = sectionRights.addElement(right.name);
@@ -240,7 +245,7 @@ GUI.rightmanager = new function() {
     if (role.deletable) {
       $(elementDOM)
               .addClass("cursor-pointer")
-              .on("click", function(event) {
+              .on("click", function (event) {
                 // Update the widget if the element div (not input) is clicked.
                 if (event.target != $(elementDOM).find("input")[0]) {
                   widget.setValue(!widget.getValue());
@@ -263,7 +268,7 @@ GUI.rightmanager = new function() {
    * @param {type} grant
    * @returns {undefined}
    */
-  this.modifyRightElement = function(right, role, grant) {
+  this.modifyRightElement = function (right, role, grant) {
     var elemId = "rightmanagerSidebar_right_" + currentObject.id + "_" + role.name + "_" + right.name;
     $("#" + elemId).find("input").prop("checked", grant);
   };
@@ -276,7 +281,7 @@ GUI.rightmanager = new function() {
    * @param add
    * @returns {undefined}
    */
-  this.modifyRoleSection = function(role, add) {
+  this.modifyRoleSection = function (role, add) {
     var that = this;
     var elemId = "rightmanagerSidebar_role_" + currentObject.id + "_" + role.name;
 
@@ -301,13 +306,13 @@ GUI.rightmanager = new function() {
           title: GUI.translate("Remove this role"),
           src: "/guis.common/images/oxygen/16x16/actions/list-remove.png"
         });
-        btnRemoveRole.click(function() {
+        btnRemoveRole.click(function () {
           // Remove 
           var title = GUI.translate("Removing a role");
           var text = GUI.translate("You are about to remove the role '[ROLE]'.");
           text = text.replace("[ROLE]", role.name);
 
-          confirmDialog(title, text, function() {
+          confirmDialog(title, text, function () {
             RightManager.modifyRole(currentObject, role.name, false);
             // We do not remove the element here, since we will send a
             // broadcast message to all other managers. Include the user
@@ -325,8 +330,8 @@ GUI.rightmanager = new function() {
         title: GUI.translate("Add a user to this role"),
         src: "/guis.common/images/oxygen/16x16/actions/list-add.png"
       });
-      btnAddUser.click(function() {
-        GUI.userdialog.show(currentObject, role, function(usersToAdd) {
+      btnAddUser.click(function () {
+        GUI.userdialog.show(currentObject, role, function (usersToAdd) {
           for (var i = 0; i < usersToAdd.length; i++) {
             RightManager.addUser(currentObject, usersToAdd[i], role);
           }
@@ -362,12 +367,12 @@ GUI.rightmanager = new function() {
    * Resets the accordion animation.
    * @function resetAccordion
    */
-  this.resetAccordion = function() {
+  this.resetAccordion = function () {
     // Initially it is open...
     inspectorArea.find('.jDesktopInspector_pageHead').first().find("span").addClass("ui-icon-triangle-1-s");
 
     // Accordion without jQuery
-    inspectorArea.find('.jDesktopInspector_pageHead').off("click").on("click", function(event) {
+    inspectorArea.find('.jDesktopInspector_pageHead').off("click").on("click", function (event) {
       if (!$(event.target).hasClass("btn")) {
         //Expand or collapse this panel
         $(this).next().slideToggle('fast');
@@ -383,7 +388,7 @@ GUI.rightmanager = new function() {
    * @function update
    * @returns {undefined}
    */
-  this.update = function() {
+  this.update = function () {
     var selectedObjects = ObjectManager.getSelected();
     if (selectedObjects.length > 0) {
       if (selectedObjects.length == 1) {
@@ -403,7 +408,7 @@ GUI.rightmanager = new function() {
    * @function updateContent
    * @returns {undefined}
    */
-  this.updateContent = function() {
+  this.updateContent = function () {
     inspector.reset();
 
     var supportedObjects = RightManager.getSupportedObjects();
@@ -412,8 +417,10 @@ GUI.rightmanager = new function() {
 
     if (RightManager.supports(currentObject)) {
 
+      this.updateObjectArea();
+
       // Get all roles...
-      RightManager.getRoles(currentObject, function(roles) {
+      RightManager.getRoles(currentObject, function (roles) {
         rightmanagerArea.find(".btn-new-role").show();
         that.hideMessageBox(true);
 
@@ -442,6 +449,23 @@ GUI.rightmanager = new function() {
       rightmanagerArea.append(message);
     }
   };
+
+  /**
+   * 
+   * @returns {undefined}
+   */
+  this.updateObjectArea = function () {
+
+    var objectArea = rightmanagerArea.find(".object-area");
+    var htmlText = "";
+    if (currentObject.getAttribute) {
+      htmlText = '<span>' + currentObject.type + ':</span> <span title="ID: ' + currentObject.id + '">' + currentObject.getAttribute("name") + '</span>';
+    } else {
+      htmlText = '<span>' + currentObject.type + ':</span> <span>' + currentObject.id + '</span>';
+    }
+
+    objectArea.html(htmlText);
+  };
 };
 
 /**
@@ -467,14 +491,14 @@ function confirmDialog(title, text, callback, okText) {
     buttons: [
       {
         text: okText,
-        click: function() {
+        click: function () {
           $(this).dialog("close");
           callback();
         }
       },
       {
         text: "Cancel",
-        click: function() {
+        click: function () {
           $(this).dialog("close");
         }
       }
