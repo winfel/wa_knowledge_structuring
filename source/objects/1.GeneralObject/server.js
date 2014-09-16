@@ -139,7 +139,7 @@ theObject.makeSensitive = function() {
   }
   /**
    *  Get an array of all overlapping objects
-   *	@function getOverlappingObjcts
+   *	@function getOverlappingObjects
    *  return {undefined}
    *	
    **/
@@ -407,6 +407,7 @@ theObject.getCurrentUserName = function() {
 /**
  *  get the object's content
  *	@function getContent
+ *  @param {function} callback
  */
 theObject.getContent = function(callback) {
 	if (!this.context) throw new Error('Missing context in GeneralObject.getContent');
@@ -421,7 +422,7 @@ theObject.getContent.neededRights = {
 
 /**
 * @function getContentAsString
-* @param callback
+* @param {function} callback
 * @return {undefined}
 */
 theObject.getContentAsString = function(callback) {
@@ -460,7 +461,7 @@ theObject.getInlinePreview = function(callback, mimeType) {
 
 /**
 * @function getInlinePreviewMimeType
-* @param callback
+* @param {function} callback
 */
 theObject.getInlinePreviewMimeType = function(callback) {
   Modules.Connector.getInlinePreviewMimeType(this.inRoom, this.id, this.context, callback);
@@ -530,7 +531,7 @@ theObject.evaluatePositionInt = function(data) {
 
 /**
 * @function getRoom
-* @param callback
+* @param {function} callback
 */
 theObject.getRoom = function(callback) {
   if (callback == undefined) return console.warn("GeneralObject/server.js getRoom callback is undefined!!");

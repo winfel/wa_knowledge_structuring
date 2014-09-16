@@ -433,6 +433,10 @@ ObjectManager.goHome = function() {
 
 /**
  *  @function loadRoom
+ *  @param  {type} roomid
+ *  @param  {type} byBrowserNav
+ *  @param  {type} index
+ *  @param  {function} callback
  */
 ObjectManager.loadRoom = function(roomid, byBrowserNav, index, callback) {
   var self = this;

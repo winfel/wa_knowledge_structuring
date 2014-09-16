@@ -60,10 +60,12 @@ GUI.userdialog = new function() {
     input.button();
   };
 
-  /*
+  /**
    * 
    * @function show
-   * @param {type} callback
+   * @param {type} object
+   * @param {type} role
+   * @param {function} callback
    * @returns {undefined}
    */
   this.show = function(object, role, callback) {

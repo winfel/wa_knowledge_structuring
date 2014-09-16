@@ -1,5 +1,7 @@
 /**
 * @file 1.coupling.js
+*/
+
 /**
  * true if coupling mode is active
  */

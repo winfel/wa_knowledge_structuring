@@ -127,7 +127,7 @@ GUI.userMarker = {
 	/**
 	 * Remove markers of offline listeners
 	 * @function removeOfflineUsers
-	 * @param {Object} an array of user objects who are online
+	 * @param {Object} users an array of user objects who are online
 	 */	
 	"removeOfflineUsers": function (users){
 		

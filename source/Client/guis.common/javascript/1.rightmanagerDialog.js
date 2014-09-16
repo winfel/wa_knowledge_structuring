@@ -1,5 +1,6 @@
-/* 
+/*
  * Right Manager Dialog
+ * 
  */
 GUI.rightmanagerDialog = new function() {
   var that = this;
@@ -8,9 +9,9 @@ GUI.rightmanagerDialog = new function() {
   var tabs;
   var roleTabIndex = {};
 
-  /*
+  /**
    * Initializes the right manager dialog.
-   * 
+   * @function init
    * @returns {undefined}
    */
   this.init = function() {
@@ -46,8 +47,8 @@ GUI.rightmanagerDialog = new function() {
     });
   };
 
-  /*
-   * 
+  /**
+   * @function show
    * @param {type} typeOfObject
    * @returns {undefined}
    */
@@ -75,7 +76,7 @@ GUI.rightmanagerDialog = new function() {
   };
 
   /**
-   * 
+   * @function updateContent
    * @returns {undefined}
    */
   this.updateContent = function() {
@@ -194,7 +195,7 @@ GUI.rightmanagerDialog = new function() {
     }
   };
   /**
-   * 
+   * @function addNewRoleTab
    * @returns {undefined}
    */
   this.addNewRoleTab = function() {
@@ -245,7 +246,7 @@ GUI.rightmanagerDialog = new function() {
   };
 
   /**
-   * 
+   * @function modifyRoleTab
    * @param {type} role
    * @param {type} add
    * @returns {undefined}
@@ -331,7 +332,7 @@ GUI.rightmanagerDialog = new function() {
   };
 
   /**
-   * 
+   * @function modifyUserElement
    * @param {type} user
    * @param {type} role
    * @param {type} add
@@ -369,7 +370,7 @@ GUI.rightmanagerDialog = new function() {
   };
 
   /**
-   * 
+   * @function createRightElement
    * @param {type} right
    * @param {type} role
    * @param {type} rightArea

@@ -1,5 +1,6 @@
 /**
 *    Webarena - A webclient for responsive graphical knowledge work
+
 *
 *    University of Paderborn, 2014
 *
@@ -9,6 +10,8 @@
 * @function draw
 * @param external
 */
+
+
 CustomContainer.draw=function(external){
 	var rep=this.getRepresentation();
 	

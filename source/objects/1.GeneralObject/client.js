@@ -27,7 +27,7 @@ GeneralObject.setContent = function(content) {
  * Call RPC-Method on server-side. Could be called like:
  *
  * this.serverCall("rpcMethod", arg1, arg2, arg3, ..., optionalCallback)
- * 
+ * @function serverCall
  * @param{...mixed} - 
  * 		remoteFnName : Name of the function that should be called
  * 		...args :  arbitrary number of arguments
@@ -106,6 +106,7 @@ GeneralObject.fetchContent = function(worker, forced) {
 
 /**
  * @function getContentAsString
+ * @param {function} callback
  * @return {undefined}
  */
 GeneralObject.getContentAsString = function(callback) {
@@ -123,7 +124,7 @@ GeneralObject.getContentAsString = function(callback) {
 };
 
 /**
- * @function getContentAsString
+ * @function hasContent
  * @return {Boolean}
  */
 GeneralObject.hasContent = function() {
@@ -268,7 +269,7 @@ GeneralObject.boxIntersectsWith = function(otherx, othery, otherwidth, otherheig
 };
 
 /**
- * Determine if the current object intersects with oanother object
+ * Determine if the current object intersects with another object
  * @function intersectsWith
  * @param other
  * @return {Boolean}
@@ -311,9 +312,9 @@ GeneralObject.hasPixelAt = function(x, y) {
  *	The function passes a boolean value to the callback
  *	that represents if the current user has the right 
  *	to perform a specific command or not.
- * 
+ * @function hasAccess
  * @param {type} right
- * @param {type} callback
+ * @param {function} callback
  * @returns {undefined}
  */
 GeneralObject.hasAccess = function(right, callback) {

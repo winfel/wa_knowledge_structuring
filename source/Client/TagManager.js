@@ -116,6 +116,7 @@ var TagManager = new function() {
    * @param {type} mainTagID The id of the main tag.
    * @param {type} oldName The old name of the secondary tag.
    * @param {type} newName The new name of the secondary tag.
+   * @param {Function} callback callback function
    * @desc Updates name of the specified secondary tag
    */
    this.updSecTagName = function(mainTagID, oldName, newName, callback) {
@@ -137,6 +138,7 @@ var TagManager = new function() {
    * @param {type} oldMainTagID The ID of old main tag.
    * @param {type} newMainTagID The ID of new main tag.
    * @param {type} secTag The name of the secondary tag.
+   * @param {Function} callback callback function
    * @desc Moves the specified secondary tag from one main tag to another one
    */
    this.moveSecTag = function(oldMainTagID, newMainTagID, secTag, callback) {

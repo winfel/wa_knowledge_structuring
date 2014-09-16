@@ -109,7 +109,7 @@ GUI.rightmanager = new function() {
 
   /**
    * Replaces placeholder strings, like [ROLE] or [RIGHT], with it's proper values.
-   * 
+   * @function replacePlaceholder
    * @param {String} str
    * @param {Object} mapObj
    */
@@ -146,6 +146,7 @@ GUI.rightmanager = new function() {
 
   /**
    * Hides the message box
+   * @function hideMessageBox
    * @param {Boolean} immediate   
    */
   this.hideMessageBox = function(immediate) {
@@ -359,6 +360,7 @@ GUI.rightmanager = new function() {
 
   /**
    * Resets the accordion animation.
+   * @function resetAccordion
    */
   this.resetAccordion = function() {
     // Initially it is open...
@@ -378,7 +380,7 @@ GUI.rightmanager = new function() {
   };
 
   /**
-   * 
+   * @function update
    * @returns {undefined}
    */
   this.update = function() {
@@ -398,7 +400,7 @@ GUI.rightmanager = new function() {
   };
 
   /**
-   * 
+   * @function updateContent
    * @returns {undefined}
    */
   this.updateContent = function() {

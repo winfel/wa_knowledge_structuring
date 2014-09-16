@@ -576,6 +576,7 @@ mongoConnector.moveObjects = function(roomID, toRoom, objectIDs, objectAttribute
 *   @param roomID
 *   @param objectID
 *   @param context
+*   @param callback
 */
 mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
     roomID = roomID.toString();
@@ -631,9 +632,7 @@ function saveObject(obj) {
 /**
 *   internal
 *   read an object file and return the attribute set
-*   @function getObjectDataByFile
 *   @param id
-*   @param callback
 */
 function getObjectDataFromDB(id) {
     return objects.findOne({id: id}); // return a promise
@@ -642,7 +641,6 @@ function getObjectDataFromDB(id) {
 /**
 *   internal
 *   Updates a room
-*   @function getObjectDataByFile
 *   @param roomID
 *   @param data
 */
@@ -654,7 +652,6 @@ function updateRoom(roomID, data) {
 /**
 *   internal
 *   Updates an object
-*   @function getObjectDataByFile
 *   @param id
 *   @param data
 */
@@ -674,7 +671,7 @@ function removeObjectFromDB(id) {
 
 /**
 *   internal
-*   removes an object
+*   removes a room
 *   @param id
 */
 function removeRoomFromDB(id) {
@@ -702,7 +699,6 @@ function moveObjectToTrashRoom(id, oldRoom) {
 /**
 *   internal
 *   Gets a room
-*   @function getObjectDataByFile
 *   @param roomID
 */
 function getRoomFromDB(roomID) {
@@ -1147,7 +1143,7 @@ mongoConnector.getTrashRoom = function(context, callback) {
 /**
  * remove an object from the persistence layer
  * 
- * @function remove
+ * @function removeObject
  * @param roomID
  * @param objectID
  * @param context
@@ -1168,6 +1164,15 @@ mongoConnector.removeObject = function(roomID, objectID, context, callback) {
     	this.moveObjectToTrashRoom(roomID, objectID, context, callback);    	
     }	 
 };
+
+/**
+ * Moves an Object to the Trash room
+*	@function moveObjectToTrashRoom
+*	@param roomID
+*	@param objectID
+*	@param context
+*	@param callback
+*/
 
 mongoConnector.moveObjectToTrashRoom = function(roomID, objectID, context, callback) {
     roomID = roomID.toString();
@@ -1206,6 +1211,15 @@ mongoConnector.moveObjectToTrashRoom = function(roomID, objectID, context, callb
 	});
 };
 
+
+/**
+ * Removes an Object from the DB
+*	@function removeObjectFromDB
+*	@param roomID
+*	@param objectID
+*	@param context
+*	@param callback
+*/
 mongoConnector.removeObjectFromDB = function(roomID, objectID, context, callback) {
     roomID = roomID.toString();
 	this.getObjectData(roomID, objectID, context, function(objectData) {        

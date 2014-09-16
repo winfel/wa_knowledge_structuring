@@ -726,6 +726,7 @@ GUI.tagAssigner = new function() {
 	
 	/**
 	 * Set/Edit tags using a dialog
+	 * @function open
 	 * @param {webarenaObject} webarenaObject The web arena object
 	 * @param {int} width Width of the dialog
 	 * @param {int} [height] Height of the dialog
