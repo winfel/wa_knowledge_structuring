@@ -471,6 +471,7 @@ GUI.initMouseHandler = function() {
         event.stopPropagation();
         GUI.rubberbandStart(event);
         GUI.updateInspector(true);
+        //GUI.rightmanager.update(); // We use the deselectHandler of the GeneralObject. Perhaps we do not need this...
       }
 
     };

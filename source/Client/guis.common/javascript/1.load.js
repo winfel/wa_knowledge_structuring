@@ -14,14 +14,14 @@ GUI.loaded = false;
  * Called when a room is entered
  * @function entered
  */
-GUI.entered = function() {
+GUI.entered = function () {
   //if entering the Global Space, Toolbar and Sidebar shouldn't be shown 
-  if(ObjectManager.getRoomID() == GLOBAL_SPACE_NAME){
-	  GUI.hideToolbar();
-	  GUI.sidebar.hide();
+  if (ObjectManager.getRoomID() == GLOBAL_SPACE_NAME) {
+    GUI.hideToolbar();
+    GUI.sidebar.hide();
   } else {
-	  GUI.showToolbar();
-	  GUI.sidebar.show();
+    GUI.showToolbar();
+    GUI.sidebar.show();
   }
   if (GUI.loaded) {
     // GUI was loaded before --> this is a room change
@@ -37,7 +37,7 @@ GUI.entered = function() {
  * @function loadGUI
  * @param {int} step Loading step which should be performed
  */
-GUI.loadGUI = function(step) {
+GUI.loadGUI = function (step) {
 
   // Not logged in?
   if (!GUI.username) {
@@ -58,7 +58,7 @@ GUI.loadGUI = function(step) {
       if (!GUI.loaded) {
         GUI.chat.init();
       }
-      
+
       GUI.chat.clear(); //clear chats messages
 
       if (!GUI.loaded) {
@@ -79,7 +79,7 @@ GUI.loadGUI = function(step) {
         GUI.loadListOfPreviewableMimeTypes();
 
       // Wait 200 ms before executing step 3
-      window.setTimeout(function() {
+      window.setTimeout(function () {
         GUI.loadGUI(3);
       }, 200);
 
@@ -113,12 +113,12 @@ GUI.loadGUI = function(step) {
         GUI.initObjectCopyCutPasteHandlingByKeyboard();
 
         // Toolbar. Needs: ObjectManager
-        GUI.initToolbar();                
-        
+        GUI.initToolbar();
+
         GUI.rightmanager.init();
         GUI.rightmanagerDialog.init();
         GUI.tabs.init();
-		GUI.search.init();
+        GUI.search.init();
 
       }
 
@@ -136,7 +136,7 @@ GUI.loadGUI = function(step) {
       }
 
       // Wait 200 ms before executing step 4
-      window.setTimeout(function() {
+      window.setTimeout(function () {
         GUI.loadGUI(4);
       }, 200);
 
@@ -150,9 +150,9 @@ GUI.loadGUI = function(step) {
         // Add mouse input event handlers.
         GUI.initMouseHandler();
       }
-      
+
       // Wait 200 ms before executing step 5
-      window.setTimeout(function() {
+      window.setTimeout(function () {
         GUI.loadGUI(5);
       }, 200);
       break;
@@ -162,9 +162,12 @@ GUI.loadGUI = function(step) {
       GUI.progressBarManager.updateProgress("login", 90, GUI.translate('aligning objects'));
       GUI.updateLayers(); //update z-order by layer-attribute
       GUI.updateInspector();
+      // Initially the public room is selected...
+      GUI.rightmanager.update();
+      
       GUI.loaded = true;
       GUI.hideLogin();
-      
+
       //ObjectManager.paintingUpdate();
       break;
 
@@ -177,6 +180,6 @@ GUI.loadGUI = function(step) {
 /**
  * Start loading with step 1 when the document is ready (DOMReady)
  */
-$(function() {
+$(function () {
   GUI.loadGUI(1);
 });
