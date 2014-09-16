@@ -413,29 +413,29 @@ GUI.rightmanager = new function () {
 
     var supportedObjects = RightManager.getSupportedObjects();
 
+    // Hide/remove UI stuff...
     rightmanagerArea.find(".btn-new-role").hide();
+    rightmanagerArea.find(".not-supported-message").parent().remove();
+    this.hideMessageBox(true);
 
     if (RightManager.supports(currentObject)) {
-
       this.updateObjectArea();
 
       // Get all roles...
       RightManager.getRoles(currentObject, function (roles) {
         rightmanagerArea.find(".btn-new-role").show();
-        that.hideMessageBox(true);
 
         for (var i = 0; i < roles.length; i++) {
           that.modifyRoleSection(roles[i], true);
         }
       });
 
-      // Remove the not supported message...
-      rightmanagerArea.find(".not-supported-message").remove();
-
     } else {
+      this.updateObjectArea(true);
+
       // Generate the not supported message...
       var message = '<div class="jDesktopInspector_main">';
-      message += '<div class="jDesktopInspector_main not-supported-message">';
+      message += '<div class="jDesktopInspector_page not-supported-message">';
       if (currentObject)
         message += "<p>This object is not supported by the right manager.</p>";
       message += "<p>Supported objects:</p>";
@@ -452,16 +452,19 @@ GUI.rightmanager = new function () {
 
   /**
    * 
+   * @param  {Boolean}  clear
    * @returns {undefined}
    */
-  this.updateObjectArea = function () {
+  this.updateObjectArea = function (clear) {
 
     var objectArea = rightmanagerArea.find(".object-area");
     var htmlText = "";
-    if (currentObject.getAttribute) {
-      htmlText = '<span>' + currentObject.type + ':</span> <span title="ID: ' + currentObject.id + '">' + currentObject.getAttribute("name") + '</span>';
-    } else {
-      htmlText = '<span>' + currentObject.type + ':</span> <span>' + currentObject.id + '</span>';
+    if (!clear) {
+      if (currentObject.getAttribute) {
+        htmlText = '<span>' + currentObject.type + ':</span> <span title="ID: ' + currentObject.id + '">' + currentObject.getAttribute("name") + '</span>';
+      } else {
+        htmlText = '<span>' + currentObject.type + ':</span> <span>' + currentObject.id + '</span>';
+      }
     }
 
     objectArea.html(htmlText);

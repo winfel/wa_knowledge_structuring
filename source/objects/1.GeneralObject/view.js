@@ -1539,8 +1539,6 @@ GeneralObject.selectHandler = function() {
  */
 GeneralObject.deselectHandler = function() {
   GUI.hideLinks(this);
-  
-  GUI.rightmanager.update();
 };
 
 /**
