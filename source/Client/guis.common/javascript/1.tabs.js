@@ -6,7 +6,7 @@
  * Sidebar: tabs
  * @function tabs
  */
-GUI.tabs = new function() {
+GUI.tabs = new function () {
   var tabs, tabs_content;
 
   var cache = [];
@@ -22,14 +22,13 @@ GUI.tabs = new function() {
    * @function init
    * @returns {undefined}
    */
-  this.init = function() {
-    console.log("GUI.tabs initialized");
+  this.init = function () {
     var that = this;
 
     defaultTabs = ["Private Space#PrivateSpace" + GUI.username, "Global Space#public"];
 
     /* try to load the tab data from db */
-    Modules.UserManager.getTabCache(function(data) {
+    Modules.UserManager.getTabCache(function (data) {
 
       currentlyStoredTab = data.objectlist;
       cache = data.cache;
@@ -55,7 +54,7 @@ GUI.tabs = new function() {
    * @param linkTo
    * @param {int} id id of the tab
    **/
-  this.addTab = function(nameOfTheTab, linkTo, id) {
+  this.addTab = function (nameOfTheTab, linkTo, id) {
     if (currentlyStoredTab.indexOf(id) >= 0) {
       // do nothing
     } else {
@@ -73,7 +72,7 @@ GUI.tabs = new function() {
    * @function removeTab
    * @param {int} id id of the tab
    **/
-  this.removeTab = function(id) {
+  this.removeTab = function (id) {
     var findID = -1;
     findID = currentlyStoredTab.indexOf(id);
 
@@ -96,9 +95,9 @@ GUI.tabs = new function() {
    * @param {String}name name of the tab
    * @param dest
    **/
-  this.createCacheEntry = function(id, isPO, name, dest) {
+  this.createCacheEntry = function (id, isPO, name, dest) {
     var found = false;
-    cache.forEach(function(entry) {
+    cache.forEach(function (entry) {
       if (entry.id == id) {
         found = true;
       }
@@ -111,14 +110,14 @@ GUI.tabs = new function() {
         dest: dest});
     }
   };
-/** 
+  /** 
    * The function updates the name of tab with id
    * @function updateNameOfTabWithID
    * @param {int} id id of tab
    * @param {String}name name of tab
    **/
-  this.updateNameOfTabWithID = function(id, name) {
-    cache.forEach(function(tab) {
+  this.updateNameOfTabWithID = function (id, name) {
+    cache.forEach(function (tab) {
       if (tab.id == id) {
         var newtab = {id: id,
           isPO: tab.isPO,
@@ -143,10 +142,10 @@ GUI.tabs = new function() {
    * @function updateCache
    * @param object
    **/
-  this.updateCache = function(object) {
+  this.updateCache = function (object) {
     var objectIsUsedInCache = false;
     var index = -1;
-    cache.forEach(function(entry) {
+    cache.forEach(function (entry) {
       if (entry == object.id) {
         objectIsUsedInCache = true;
         index = cache.indexOf(entry);
@@ -169,23 +168,23 @@ GUI.tabs = new function() {
    * @function getFromCache
    * @param id
    **/
-  this.getFromCache = function(id) {
+  this.getFromCache = function (id) {
     var returnVal;
-    cache.forEach(function(entryInCache) {
+    cache.forEach(function (entryInCache) {
       if (entryInCache.id == id) {
         returnVal = entryInCache;
       }
     });
 
     return returnVal;
-  }
+  };
 
   /**
    *   This function stores the tabs for the current user with the cache
    *   in the database
    * @function storeCacheInDB
    */
-  this.storeCacheInDB = function() {
+  this.storeCacheInDB = function () {
     Modules.UserManager.storeTabCache(currentlyStoredTab, cache);
   };
 
@@ -194,26 +193,28 @@ GUI.tabs = new function() {
    * Redraws the content of the tab sidebar
    * @function redrawTabContent
    **/
-  this.redrawTabContent = function() {
+  this.redrawTabContent = function () {
     var that = this;
 
     var destFromURL = document.URL.substring(document.URL.lastIndexOf("/") + 1, document.URL.length);
-
     // ===== small hack to preventing accessing the private space of somesome ===
-    if (destFromURL.indexOf(GUI.username) == -1 && destFromURL.indexOf("PrivateSpace") > -1) {
-      ObjectManager.loadRoom("public", false, 'left');
-      var audio = new Audio('/guis.common/sounds/cant_touch_this.mp3');
-      audio.play();
+    if (destFromURL.indexOf("PrivateSpace") > -1) {
+      Modules.RightManager.hasAccess({id: destFromURL, type: "Room"}, "read", function (result) {
+        if (!result) {
+          // No access load the public room again...
+          ObjectManager.loadRoom("public", false, 'left');
+        }
+      });
     }
     // =====================
 
     $("#tabs_content").html(""); // clear
     var upperUl = $("<ul class='ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all header-tabs' style='list-style-type:none;'>").appendTo("#tabs_content");
-    defaultTabs.forEach(function(item) {
+    defaultTabs.forEach(function (item) {
       var token = item.split("#");
 
       var isActive = (token[1] == destFromURL); // boolean value if this tab is the active one
-      var currentLi = $("<li class='header-tabs'><a href='#' title='" + token[0] + "'>" + token[0] + "</a></li>").on("click", function() {
+      var currentLi = $("<li class='header-tabs'><a href='#' title='" + token[0] + "'>" + token[0] + "</a></li>").on("click", function () {
         if (token[0].indexOf('Private Space') > -1) {
           ObjectManager.loadSpecificSpace(token[1], false, 'left', 'enterPrivateSpace');
         } else if (token[0].indexOf('Global Space') > -1) {
@@ -225,7 +226,6 @@ GUI.tabs = new function() {
             ObjectManager.loadRoom(token[1], false, 'left');
           }
         }
-
       }).appendTo(upperUl);
       currentLi.addClass("ui-state-default ui-corner-top");
 
@@ -233,15 +233,15 @@ GUI.tabs = new function() {
         currentLi.addClass("ui-tabs-active");
       }
 
-      currentLi.hover(function() {
+      currentLi.hover(function () {
         currentLi.addClass("ui-state-hover");
-      }, function() {
+      }, function () {
         currentLi.removeClass("ui-state-hover");
       });
 
     });
 
-    currentlyStoredTab.forEach(function(item) {
+    currentlyStoredTab.forEach(function (item) {
       var getCurrentObject = Modules.ObjectManager.getObject(item);
 
       var currentName;
@@ -249,8 +249,7 @@ GUI.tabs = new function() {
       var dest;
 
       /* maybe we need to use a cache */
-      if (typeof getCurrentObject == 'undefined') {
-        // object is in another room - load from cache instead
+      if (typeof getCurrentObject == 'undefined') {           // object is in another room - load from cache instead
         getCurrentObject = that.getFromCache(item);
 
         isPaperSpace = getCurrentObject.isPO;
@@ -263,7 +262,6 @@ GUI.tabs = new function() {
         dest = getCurrentObject.getAttribute('destination');
 
         that.createCacheEntry(getCurrentObject.id, isPaperSpace, currentName, dest);
-
         // if possible: update
         that.updateCache(getCurrentObject);
       }
@@ -286,12 +284,11 @@ GUI.tabs = new function() {
 
         }
       }
-
-      var currentLi = $("<li class='header-tabs'><a href='#' title='" + currentName + "'>" + drawName + "</a></li>").on("click", function() {
+      var currentLi = $("<li class='header-tabs'><a href='#' title='" + currentName + "'>" + drawName + "</a></li>").on("click", function () {
 
         if (drawName.indexOf('(PS)') > 0) {
 
-          Modules.RightManager.hasAccess(getCurrentObject, "read", function(result) {
+          Modules.RightManager.hasAccess(getCurrentObject, "read", function (result) {
             if (result) {
               ObjectManager.loadPaperWriter(dest, false, 'left');
             } else {
@@ -301,7 +298,7 @@ GUI.tabs = new function() {
           });
 
         } else {
-          Modules.RightManager.hasAccess(getCurrentObject, "enter", function(result) {
+          Modules.RightManager.hasAccess(getCurrentObject, "enter", function (result) {
             if (result) {
               ObjectManager.loadRoom(dest, false, 'left');
             } else {
@@ -317,16 +314,16 @@ GUI.tabs = new function() {
         currentLi.addClass("ui-tabs-active");
       }
 
-      currentLi.hover(function() {
+      currentLi.hover(function () {
         currentLi.addClass("ui-state-hover");
-      }, function() {
+      }, function () {
         currentLi.removeClass("ui-state-hover");
       });
 
       if (!namesWithoutDeletePermission.indexOf(currentName) == 0 && !isActive) {
-        var delToken = $("<i>").html("<img src='/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png'>").on("click", function(e) {
+        var delToken = $("<i>").html("<img src='/guis.common/images/oxygen/16x16/actions/edit-delete_grey.png'>").on("click", function (e) {
           e.stopPropagation();
-          that.removeTab(item)
+          that.removeTab(item);
         }).appendTo(currentLi);
       }
 
