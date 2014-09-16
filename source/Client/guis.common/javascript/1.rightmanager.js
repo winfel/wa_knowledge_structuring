@@ -23,12 +23,12 @@ GUI.rightmanager = new function () {
 
     var objectArea = $("<div>");
     objectArea.addClass("jDesktopInspector_main");
-    objectArea.html('<div class="jDesktopInspector_page object-area display-block"></div>');
+    objectArea.html('<div class="jDesktopInspector_page object-area"></div>');
     rightmanagerArea.append(objectArea);
 
     var bottomArea = $("<div>");
     bottomArea.attr("class", "jDesktopInspector_main");
-    bottomArea.html('<div class="jDesktopInspector_page rightmanager-bottom display-block">'
+    bottomArea.html('<div class="jDesktopInspector_page rightmanager-bottom">'
             + '<input type="text" class="ui-textfield new-role-textfield" placeholder="New Role">'
             + '<input type="image" class="btn btn-new-role" title="' + GUI.translate("Create a new role for this object") + '" src="/guis.common/images/oxygen/22x22/actions/list-add.png">'
             + '<input type="image" class="btn btn-save-role" title="' + GUI.translate("Save the new role for this object") + '" src="/guis.common/images/oxygen/22x22/actions/document-save.png">'
@@ -468,6 +468,12 @@ GUI.rightmanager = new function () {
     }
 
     objectArea.html(htmlText);
+    
+    if(!clear) {
+      objectArea.show();
+    } else {
+      objectArea.hide();
+    }
   };
 };
 
