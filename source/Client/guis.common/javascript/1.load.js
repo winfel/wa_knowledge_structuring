@@ -2,6 +2,9 @@
 /**
  * @file 1.load.js
  */
+
+var GLOBAL_SPACE_NAME = 'public';
+
 /**
  * Indicates if the GUI is fully loaded
  */
@@ -12,6 +15,14 @@ GUI.loaded = false;
  * @function entered
  */
 GUI.entered = function() {
+  //if entering the Global Space, Toolbar and Sidebar shouldn't be shown 
+  if(ObjectManager.getRoomID() == GLOBAL_SPACE_NAME){
+	  GUI.hideToolbar();
+	  GUI.sidebar.hide();
+  } else {
+	  GUI.showToolbar();
+	  GUI.sidebar.show();
+  }
   if (GUI.loaded) {
     // GUI was loaded before --> this is a room change
     GUI.progressBarManager.addProgress(GUI.translate('changing room'), "login");
@@ -102,7 +113,7 @@ GUI.loadGUI = function(step) {
         GUI.initObjectCopyCutPasteHandlingByKeyboard();
 
         // Toolbar. Needs: ObjectManager
-        GUI.initToolbar();
+        GUI.initToolbar();                
         
         GUI.rightmanager.init();
         GUI.rightmanagerDialog.init();

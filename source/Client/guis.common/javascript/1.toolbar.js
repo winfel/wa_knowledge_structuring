@@ -46,7 +46,7 @@ var popover_positionOffsetY = 21;
     var newCategoryIcon = document.createElement("img");
     $(newCategoryIcon).attr("src", "../../guis.common/images/categories/" + object[0].category + ".png").attr("alt", "");
     $(newCategoryIcon).attr("width", "24").attr("height", "24");
-
+    
     $("#header>div.header_left").append(newCategoryIcon);
 
     if (object.length > 1) {
@@ -674,3 +674,12 @@ $("#header_toggle_sidebar_show").on("click", function() {
   GUI.sidebar.openSidebar();
 });
 };
+GUI.showToolbar = function(){
+	$("#header>div.header_left").show();
+	$('#header_toggle_sidebar').show();
+}
+
+GUI.hideToolbar = function(){
+	$("#header>div.header_left").hide();
+	$('#header_toggle_sidebar').hide();
+}

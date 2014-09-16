@@ -168,6 +168,24 @@ GUI.sidebar.closeSidebar = function(noReset) {
 };
 
 /**
+ * Shows the sidebar
+ * @function show
+ */
+GUI.sidebar.show = function() {
+  $("#sidebar").show();
+  $('.header_tabs_sidebar').show();
+}
+
+/**
+ * Hide the sidebar
+ * @function show
+ */
+GUI.sidebar.hide = function() {
+  $("#sidebar").hide();
+  $('.header_tabs_sidebar').hide();
+}
+
+/**
  * Saves the current sidebar state and hides it
  * @function saveStateAndHide
  */
