@@ -29,7 +29,7 @@ UserManager.connections = {};
  * @function init
  * @param {Object} theModules variable to access the other modules.
  */
-UserManager.init = function(theModules) {
+UserManager.init = function (theModules) {
   Modules = theModules;
   var that = this;
 
@@ -42,8 +42,8 @@ UserManager.init = function(theModules) {
 
   Dispatcher.registerCall('setUserPreferredLanguage', UserManager.setUserPreferredLanguage);
 
-  Dispatcher.registerCall("umGetMissingUsers", function(socket, data) {
-    that.getMissingUsers(data.object, data.role, function(result) {
+  Dispatcher.registerCall("umGetMissingUsers", function (socket, data) {
+    that.getMissingUsers(data.object, data.role, function (result) {
       Modules.SocketServer.sendToSocket(socket, "umMissingUsers" + data.object.id, result);
     });
   });
@@ -60,13 +60,13 @@ UserManager.init = function(theModules) {
   Dispatcher.registerCall('umIsManager', UserManager.isManager);
   Dispatcher.registerCall('umisValidUser', UserManager.isValidUser);
 
-  Dispatcher.registerCall('umDeleteObjectFromTabs', function(socket, data) {
+  Dispatcher.registerCall('umDeleteObjectFromTabs', function (socket, data) {
     for (var i in that.connections) {
       Modules.SocketServer.sendToSocket(that.connections[i].socket, "umBroadcastDeleteObjectFromTabs", data);
     }
   });
 
-  Dispatcher.registerCall('umBroadcastNameChange', function(socket, data) {
+  Dispatcher.registerCall('umBroadcastNameChange', function (socket, data) {
     var object = data;
 
     for (var i in that.connections) {
@@ -75,11 +75,11 @@ UserManager.init = function(theModules) {
 
   });
 
-  Dispatcher.registerCall('umGetTabCache', function(socket, data) {
+  Dispatcher.registerCall('umGetTabCache', function (socket, data) {
     var responseObject = {};
 
     var tabsDB = db.get('tabs');
-    tabsDB.find({username: data.username}, {}, function(e, docs) {
+    tabsDB.find({username: data.username}, {}, function (e, docs) {
       if (typeof docs != 'undefined' && docs.length > 0) {
         responseObject.username = data.username;
         responseObject.objectlist = docs[0].objectlist;
@@ -88,11 +88,11 @@ UserManager.init = function(theModules) {
 
         var runs = 1;
         var objectCache = db.get('objectCache');
-        responseObject.objectlist.forEach(function(entryInCache) {
+        responseObject.objectlist.forEach(function (entryInCache) {
 
           /* for each entry in cache: get important data and store it in the
            response object */
-          objectCache.find({id: entryInCache}, {}, function(e, docs) {
+          objectCache.find({id: entryInCache}, {}, function (e, docs) {
             if (typeof docs != 'undefined' && docs.length > 0) {
 
               responseObject.cache.push({id: docs[0].id,
@@ -117,7 +117,7 @@ UserManager.init = function(theModules) {
     }); // end of tabsDb.find
   });
 
-  Dispatcher.registerCall('umStoreTabCache', function(socket, data) {
+  Dispatcher.registerCall('umStoreTabCache', function (socket, data) {
     var tabsDB = db.get('tabs');
     // drop old objectlist
     tabsDB.remove({username: data.username});
@@ -127,7 +127,7 @@ UserManager.init = function(theModules) {
 
     // update objectcache
     var objectCache = db.get('objectCache');
-    data.cache.forEach(function(cacheEntry) {
+    data.cache.forEach(function (cacheEntry) {
       objectCache.remove({id: cacheEntry.id});
 
       objectCache.insert({id: cacheEntry.id,
@@ -148,7 +148,7 @@ UserManager.init = function(theModules) {
  * @function socketConnect
  * @param {Object} socket the socket of the client.
  */
-UserManager.socketConnect = function(socket) {
+UserManager.socketConnect = function (socket) {
   this.connections[socket.id] = ({'socket': socket, 'user': false, 'rooms': {'left': false, 'right': false}});
 };
 
@@ -159,7 +159,7 @@ UserManager.socketConnect = function(socket) {
  * @function socketDisconnect
  * @param {Object} socket the socket of the client.
  */
-UserManager.socketDisconnect = function(socket) {
+UserManager.socketDisconnect = function (socket) {
 
   var rooms = this.getConnectionBySocket(socket).rooms;
 
@@ -181,7 +181,7 @@ UserManager.socketDisconnect = function(socket) {
  * @param {Object} socketOrUser The user.
  * @param {Object} data The credentials of the user.
  */
-UserManager.login = function(socketOrUser, data) {
+UserManager.login = function (socketOrUser, data) {
   var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
 
   var connection = UserManager.connections[userID];
@@ -195,13 +195,18 @@ UserManager.login = function(socketOrUser, data) {
   var socketServer = Modules.SocketServer;
 
   // try to login on the connector
-  connector.login(data.username, data.password, data.externalSession, connection, function(data) {
+  connector.login(data.username, data.password, data.externalSession, connection, function (data) {
 
     // if the connector returns data, login was successful. In this case
     // a new user object is created and a loggedIn event is sent to the
     // client
 
     if (data) {
+      // Create the private space manager role.
+      var privateSpace = {id: "PrivateSpace" + data.username, type: "Room"};
+      Modules.RightManager.getObjectRights(privateSpace, function (rights) {
+        Modules.RightManager.modifyRole(privateSpace, "Manager", true, false, false, rights, [data.username]);
+      });
 
       // if there is no color yet, create one and store it
       if (!data.color) {
@@ -222,7 +227,9 @@ UserManager.login = function(socketOrUser, data) {
 
         var userColor = colors[Math.floor(Math.random() * colors.length + 1)];
         data.color = userColor;
+
         Modules.UserDAO.updateUsersById(data._id, {color: userColor});
+
       }
 
       var userObject = require('./User.js');
@@ -260,12 +267,12 @@ UserManager.login = function(socketOrUser, data) {
  * @param {type} lang
  * @returns {undefined}
  */
-UserManager.setUserPreferredLanguage = function(socketOrUser, lang) {
+UserManager.setUserPreferredLanguage = function (socketOrUser, lang) {
   if (typeof socketOrUser.id == 'string')
     var userID = socketOrUser.id;
   else
     var userID = socketOrUser;
-  Modules.UserDAO.usersByUserName(UserManager.connections[userID].user.username, function(err, users) {
+  Modules.UserDAO.usersByUserName(UserManager.connections[userID].user.username, function (err, users) {
     if (err || users.length == 0) {
       return;
     }
@@ -283,7 +290,7 @@ UserManager.setUserPreferredLanguage.public = true;
  * @param {type} responseID
  * @returns {undefined}
  */
-UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
+UserManager.enterPaperWriter = function (socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
   var shouldInclude = [PAPER_WRITER + "#Writer#20#200#700#2#locked;true#paper;" + data.roomID,
     "SimpleText#WritingAreaInfo#20#145#100#2#height;30#content;Writing Area:",
@@ -305,14 +312,14 @@ UserManager.enterPaperWriter = function(socketOrUser, data, responseID) {
  * @param {type} shouldInclude
  * @returns {undefined}
  */
-UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, responseID, shouldInclude) {
+UserManager.loadRoomWithDefaultInventory = function (socketOrUser, data, responseID, shouldInclude) {
   UserManager.enterRoom(socketOrUser, data, responseID);
   var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
   var context = UserManager.connections[userID];
 
-  Modules.ObjectManager.getObjects(data.roomID, context, function(inventory) {
+  Modules.ObjectManager.getObjects(data.roomID, context, function (inventory) {
 
-    shouldInclude.forEach(function(item) {
+    shouldInclude.forEach(function (item) {
       var token = item.split('#');
 
       var oType = token[0];
@@ -362,10 +369,10 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
 
       /* if not found: create it */
       if (!found) {
-        Modules.ObjectManager.createObject(data.roomID, oType, attr, oContent, context, function(error, obj, addAtts) {
+        Modules.ObjectManager.createObject(data.roomID, oType, attr, oContent, context, function (error, obj, addAtts) {
 
           if (typeof addAtts != 'undefined') {
-            addAtts.forEach(function(item) {
+            addAtts.forEach(function (item) {
 
               if (typeof item != 'undefined') {
                 var attToken2 = item.split(';');
@@ -393,7 +400,7 @@ UserManager.loadRoomWithDefaultInventory = function(socketOrUser, data, response
  * @param {type} responseID
  * @returns {undefined}
  */
-UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
+UserManager.enterPublicSpace = function (socketOrUser, data, responseID) {
   UserManager.loadRoomWithDefaultInventory(socketOrUser, data, responseID, []);
 };
 
@@ -405,7 +412,7 @@ UserManager.enterPublicSpace = function(socketOrUser, data, responseID) {
  * @param {type} responseID
  * @returns {undefined}
  */
-UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
+UserManager.enterPrivateSpace = function (socketOrUser, data, responseID) {
   //  Syntax            Type # Name # X # Y # Width # Amount of Attributes # Att_i;value
   var shouldInclude = ["Textarea#PublicSpaceInfo#20#45#100#1#content;This is the private space of user " +
             UserManager.getConnectionBySocket(socketOrUser).user.username];
@@ -419,7 +426,7 @@ UserManager.enterPrivateSpace = function(socketOrUser, data, responseID) {
  * @param {type} data
  * @returns {undefined}
  */
-UserManager.setDataOfSpaceWithDestServerSide = function(data) {
+UserManager.setDataOfSpaceWithDestServerSide = function (data) {
   var ss = db.get('SpaceStorage');
 
   // if data is not included: store it
@@ -443,10 +450,10 @@ UserManager.setDataOfSpaceWithDestServerSide = function(data) {
  * @param {type} callback
  * @returns {undefined}
  */
-UserManager.getDataOfSpaceWithDestServerSide = function(data, callback) {
+UserManager.getDataOfSpaceWithDestServerSide = function (data, callback) {
   var ss = db.get('SpaceStorage');
 
-  ss.find({'destination': String(data.destination), 'key': String(data.key)}, {}, function(e, docs) {
+  ss.find({'destination': String(data.destination), 'key': String(data.key)}, {}, function (e, docs) {
     if (typeof docs != 'undefined' && docs.length > 0) {
       callback(docs);
     } else {
@@ -463,7 +470,7 @@ UserManager.getDataOfSpaceWithDestServerSide = function(data, callback) {
  * @param {type} responseID
  * @returns {undefined}
  */
-UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID) {
+UserManager.setDataOfSpaceWithDest = function (socketOrUser, data, responseID) {
   UserManager.setDataOfSpaceWithDestServerSide.call(this, data);
 };
 
@@ -475,7 +482,7 @@ UserManager.setDataOfSpaceWithDest = function(socketOrUser, data, responseID) {
  * @param {type} responseID
  * @returns {undefined}
  */
-UserManager.removeDataOfSpaceWithDest = function(socketOrUser, data, responseID) {
+UserManager.removeDataOfSpaceWithDest = function (socketOrUser, data, responseID) {
   var ss = db.get('SpaceStorage');
 
   ss.remove({'destination': data.destination, 'key': data.key});
@@ -487,7 +494,7 @@ UserManager.removeDataOfSpaceWithDest = function(socketOrUser, data, responseID)
  * @param {type} data
  * @returns {undefined}
  */
-UserManager.removeDataOfSpaceWithDestServerSide = function(data) {
+UserManager.removeDataOfSpaceWithDestServerSide = function (data) {
   var ss = db.get('SpaceStorage');
 
   ss.remove({'destination': data.destination, 'key': data.key});
@@ -501,9 +508,9 @@ UserManager.removeDataOfSpaceWithDestServerSide = function(data) {
  * @param {type} responseID
  * @returns {undefined}
  */
-UserManager.getDataOfSpaceWithDest = function(socketOrUser, data, responseID) {
+UserManager.getDataOfSpaceWithDest = function (socketOrUser, data, responseID) {
   var ss = db.get('SpaceStorage');
-  ss.find({'destination': data.destination, 'key': data.key}, {}, function(e, docs) {
+  ss.find({'destination': data.destination, 'key': data.key}, {}, function (e, docs) {
     if (typeof docs != 'undefined' && docs.length > 0) {
       Modules.SocketServer.sendToSocket(socketOrUser, "umGetDataOfSpaceWithDest" + data.destination + data.key, docs);
     } else {
@@ -520,7 +527,7 @@ UserManager.getDataOfSpaceWithDest = function(socketOrUser, data, responseID) {
  * @param {Object} data The received data.
  * @param {Object} responseID response ID.
  **/
-UserManager.enterRoom = function(socketOrUser, data, responseID) {
+UserManager.enterRoom = function (socketOrUser, data, responseID) {
   var userID = (typeof socketOrUser.id == 'string') ? socketOrUser.id : socketOrUser;
   var index = (data.index === undefined) ? 'left' : data.index;
 
@@ -546,14 +553,14 @@ UserManager.enterRoom = function(socketOrUser, data, responseID) {
   var user = connection.user;
 
   // try to enter the room on the connector
-  connector.mayEnter(roomID, connection, function(err, mayEnter) {
+  connector.mayEnter(roomID, connection, function (err, mayEnter) {
 
     // if the connector responds true, the client is informed about the
     // successful entering of the room
     // and all clients in the same rooms get new awarenessData.
     if (mayEnter) {
 
-      ObjectManager.getRoom(roomID, connection, function(room) {
+      ObjectManager.getRoom(roomID, connection, function (room) {
         connection.rooms[index] = room;
         Modules.RoomController.sendRoom(socket, room.id);
         socketServer.sendToSocket(socket, 'entered', room.id);
@@ -583,7 +590,7 @@ UserManager.enterRoom = function(socketOrUser, data, responseID) {
  * @param {Object} data The received data.
  * @param {Object} responseID response ID.
  */
-UserManager.leaveRoom = function(socket, data, responseID) {
+UserManager.leaveRoom = function (socket, data, responseID) {
   if (data.index === undefined)
     var index = 'right';
   else
@@ -610,7 +617,7 @@ UserManager.leaveRoom = function(socket, data, responseID) {
  * @param {Object} roomID The id of the room.
  * @param {Object} connections ???.
  **/
-UserManager.getAwarenessData = function(roomID, connections) {
+UserManager.getAwarenessData = function (roomID, connections) {
   var awarenessData = {};
   awarenessData.room = roomID;
   awarenessData.present = [];
@@ -632,7 +639,7 @@ UserManager.getAwarenessData = function(roomID, connections) {
  * @function sendAwarenessData
  * @param {Object} roomID The id of the room.
  **/
-UserManager.sendAwarenessData = function(roomID) {
+UserManager.sendAwarenessData = function (roomID) {
   var connections = UserManager.getConnectionsForRoom(roomID);
 
   var awarenessData = UserManager.getAwarenessData(roomID, connections);
@@ -659,7 +666,7 @@ UserManager.sendAwarenessData = function(roomID) {
  * @param {Object} roomID The id of the room.
  * @return {Object} the connections of the room
  **/
-UserManager.getConnectionsForRoom = function(roomID) {
+UserManager.getConnectionsForRoom = function (roomID) {
   var result = {};
   for (var connectionID in this.connections) {
     var connection = this.connections[connectionID];
@@ -681,7 +688,7 @@ UserManager.getConnectionsForRoom = function(roomID) {
  * @param {Object} socket The specified socket
  * @return {boolean} The connections
  **/
-UserManager.getConnectionBySocket = function(socket) {
+UserManager.getConnectionBySocket = function (socket) {
   for (var i in this.connections) {
     var connection = this.connections[i];
     if (connection.socket == socket)
@@ -698,7 +705,7 @@ UserManager.getConnectionBySocket = function(socket) {
  * @param {Object} socketID The specified id of a socket
  * @return {boolean} The connections
  **/
-UserManager.getConnectionBySocketID = function(socketID) {
+UserManager.getConnectionBySocketID = function (socketID) {
   for (var i in this.connections) {
     var connection = this.connections[i];
     if (connection.socket.id == socketID)
@@ -715,7 +722,7 @@ UserManager.getConnectionBySocketID = function(socketID) {
  * @param {Object} userHash The specified userHash
  * @return {boolean} The connections
  **/
-UserManager.getConnectionByUserHash = function(userHash) {
+UserManager.getConnectionByUserHash = function (userHash) {
   for (var i in this.connections) {
     var connection = this.connections[i];
     if (connection.user.hash == userHash)
@@ -732,18 +739,18 @@ UserManager.getConnectionByUserHash = function(userHash) {
  * @param {type} data
  * @returns {undefined}
  */
-UserManager.isManager = function(socket, data) {
+UserManager.isManager = function (socket, data) {
   var that = UserManager;
   var connection = that.getConnectionBySocket(socket);
 
   var collection = db.get('roles');
 
-  collection.find({objectid: String(data.object.id)}, {}, function(e, docs) {
-    docs.forEach(function(doc) {
+  collection.find({objectid: String(data.object.id)}, {}, function (e, docs) {
+    docs.forEach(function (doc) {
       if (doc.name == "Manager") {
 
         var found = false;
-        doc.users.forEach(function(u) {
+        doc.users.forEach(function (u) {
           if (connection.user.username == u)
             found = true;
         });
@@ -766,8 +773,8 @@ UserManager.isManager = function(socket, data) {
  * @param {Object} data    Send data
  * @param {Sring} responseID  RespondId of the request
  */
-UserManager.isValidUser = function(socket, data, responseID) {
-  Modules.UserDAO.usersByUserName(data.user, function(err, docs) {
+UserManager.isValidUser = function (socket, data, responseID) {
+  Modules.UserDAO.usersByUserName(data.user, function (err, docs) {
     var valid = (!err && docs.length > 0);
 
     Modules.SocketServer.respondToSocket(socket, responseID, valid);
@@ -783,14 +790,14 @@ UserManager.isValidUser = function(socket, data, responseID) {
  * @param {type} callback
  * @returns {undefined}
  */
-UserManager.getMissingUsers = function(object, role, callback) {
+UserManager.getMissingUsers = function (object, role, callback) {
   var dataObject = Modules.RightManager.mapObject(object);
 
   var dbRoles = db.get('roles');
   var dbUsers = db.get('users');
 
-  dbUsers.find({}, {}, function(e, userDocuments) {
-    dbRoles.find({objectid: String(dataObject.id), name: String(role.name)}, {}, function(e, roleDocuments) {
+  dbUsers.find({}, {}, function (e, userDocuments) {
+    dbRoles.find({objectid: String(dataObject.id), name: String(role.name)}, {}, function (e, roleDocuments) {
       var result = (roleDocuments && roleDocuments.length > 0 ? roleDocuments[0].users : []);
       callback({allUsers: userDocuments, alreadyAddedUsers: result});
     });

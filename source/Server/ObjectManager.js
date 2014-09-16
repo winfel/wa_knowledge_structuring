@@ -320,6 +320,7 @@ ObjectManager.getInventory = ObjectManager.getObjects;
  *  @param  content
  *  @param  context     user credentials
  *  @param  callback    the callback function
+ *  @param  atts        
  **/
 ObjectManager.createObject = function (roomID, type, attributes, content, context, callback, atts) {
     var merged = _.merge(this.getPrototypeFor(type).standardData, attributes);
@@ -335,40 +336,42 @@ ObjectManager.createObject = function (roomID, type, attributes, content, contex
             // SciWoAr added owner of an object
             Modules.RightManager.getObjectRights(object, function(rights) {
               Modules.RightManager.modifyRole(object, "Manager", true, false, false, rights, [context.user.username]);
+              
+              // Now that the manager role is setup. Proceed with the rest.
+              for (var key in attributes) {
+                  var value = attributes[key];
+                  object.setAttribute(key, value);
+              }
+
+              if (content) {
+                  object.setContent(content);
+              }
+
+              // inform the client about the new created object
+              object.persist();
+
+              if (type == PAPER_SPACE) {
+
+                  // create a new pad
+                  Modules.EtherpadController.pad.createPad({
+                      padID : attributes['padID']
+                  }, function(error, data) {
+
+                      if (error) {
+                          console.warn("ObjectManager.createObject Error pad.getText: " + error.message);
+                      } else {
+                          // console.log("ObjectManager.createObject pad was successfully created");
+                      }
+                  });
+              }
+
+              Modules.EventBus.emit("room::" + roomID + "::action::createObject", {objectID: id});
+              callback(false, object, atts);
+              
             });
-            
-            for (var key in attributes) {
-                var value = attributes[key];
-                object.setAttribute(key, value);
-            }
-    
-            if (content) {
-                object.setContent(content);
-            }
-            
-            // inform the client about the new created object
-            object.persist();
-            
-            if (type == PAPER_SPACE) {
-                
-                // create a new pad
-                Modules.EtherpadController.pad.createPad({
-                    padID : attributes['padID']
-                }, function(error, data) {
-                    
-                    if (error) {
-                        console.warn("ObjectManager.createObject Error pad.getText: " + error.message);
-                    } else {
-                        // console.log("ObjectManager.createObject pad was successfully created");
-                    }
-                });
-            }
-    
-            Modules.EventBus.emit("room::" + roomID + "::action::createObject", {objectID: id});
-            callback(false, object, atts);
         });     
     });
-}
+};
 
 /**
  * Looks which object types are enabled/blacklisted/whitelisted
