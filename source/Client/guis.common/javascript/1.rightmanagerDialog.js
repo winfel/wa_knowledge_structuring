@@ -98,7 +98,7 @@ GUI.rightmanagerDialog = new function() {
         }
       },
       select: function(event, ui) {
-        if ($(ui.tab).attr("href").contains("new_role")) {
+        if ($(ui.tab).attr("href").match(/new_role/)) {
           // Do not select the new role tab...
           return false;
         }
