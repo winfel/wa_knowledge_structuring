@@ -372,14 +372,16 @@ GatewayContainer.addFiles = function(files){
 
 			var n;
 			var k;
-			for(k in that.Files){
-				if(that.Files[k].attributes.id == objectId){
-					n = that.Files[k];
+			for(k in that.Gateways){
+				if(that.Gateways[k].attributes.id == objectId){
+					n = that.Gateways[k];
 					break;
 				}
 			}
 			
-			window.open(files[key].attributes.destination);
+			window.open(n.attributes.destination);
+			
+			that.addToTabList(n);
 		});
 		
 	}	
@@ -450,4 +452,25 @@ GatewayContainer.selectedClickHandler = function(event) {
 
   }
 
+}
+
+
+GatewayContainer.addToTabList = function(object){
+
+    var destination = object.attributes.destination;
+
+    if (!destination) {
+      var random = new Date().getTime() - 1296055327011;
+
+      object.setAttribute('destination', random);
+      destination = random;
+    }
+
+	if(object.type == "PaperSpace"){
+		GUI.tabs.addTab(object.attributes.name + " (PaperSpace)", object.attributes.destination, object.id);
+	}
+	else{
+		GUI.tabs.addTab(object.attributes.name + " (Room)", object.attributes.destination, object.id);
+	}
+    GUI.tabs.redrawTabContent();
 }
