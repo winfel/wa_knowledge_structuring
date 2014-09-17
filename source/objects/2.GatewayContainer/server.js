@@ -13,7 +13,7 @@ var async = require("async");
 module.exports=theObject;
 
 var TRASH_ROOM = 'trash';
-var targets = ['Subroom'];
+var targets = ['Subroom', 'PaperSpace'];
 
 theObject.getAllGatewayObjects = function(user, cb) {
 	
