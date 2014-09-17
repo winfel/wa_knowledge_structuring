@@ -511,10 +511,16 @@ FavouritesContainer.addFiles = function(files){
 				
 			});
 		});
+    
+    $(rep).find("#representation_for_"+id).draggable({
+			helper: 'clone',
+			revert: 'invalid',
+			appendTo: 'body'
+		});
 		
 	}	
 		
-}
+};
 
 FavouritesContainer.upd = function(){
 
