@@ -35,7 +35,7 @@ and open the template in the editor.
 
 .paperViewer .paperViewerHeader {
   background: -moz-linear-gradient(center top, #BEBEBE 0%, #9E9E9E 100%) repeat scroll 0 0 transparent;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #3E3E3E), color-stop(1, #1E1E1E));
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #BEBEBE), color-stop(1, #9E9E9E));
 }
 
 .paperViewerHeader table {
