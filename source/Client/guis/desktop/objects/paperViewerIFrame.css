@@ -71,8 +71,17 @@ Author     : Patrick
   background-image: url("/guis.common/images/oxygen/16x16/actions/view-pim-notes.png");
 }
 
-.remotehover {
-  box-shadow: 0 0 100px 50px red;
+.remotehover.highlighted {
+  background-color: white !important;
+  border-bottom: 2px solid;
+  border-color: red;
+  color: red;
+  margin-bottom: -2px;
+}
+
+.remotehover.audioobject,
+.remotehover.comment {
+  box-shadow: 0 0 40px 20px red;
 }
 
 .audioobject,
