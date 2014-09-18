@@ -25,7 +25,6 @@
 * @requires ./Server/controllers/ObjectController
 * @requires ./Server/controllers/ServerController
 * @requires ./Server/controllers/EtherpadController
-* @requires ./Server/apihandler/InternalDispatcher
 * @requires ./Server/PluginManager
 *
 */
@@ -102,7 +101,6 @@ Modules.DBManager       = require('./Server/DBManager.js');
 Modules.Helper          = require('./Server/Helper.js');
 Modules.EventBus        = require("./Server/EventBus.js");
 Modules.BuildTool       = require('./Server/BuildTool.js');
-//Modules.TokenChecker  = require("./Server/TokenChecker");
 Modules.PdfEdit         = require('./Server/PdfEdit.js');
 
 // These object exist for every object type or every single object. They shall not be
@@ -111,12 +109,7 @@ Modules.DataSet             = require('./Common/DataSet.js');
 Modules.AttributeManager    = require('./Common/AttributeManager.js');
 Modules.TranslationManager  = require('./Common/TranslationManager.js');
 Modules.ActionManager       = require('./Common/ActionManager.js');
-//Modules.UserManager2      = require('./Server/UserManager2.js'); 
 Modules.TagManager          = require('./Server/TagManager.js');
-
-if (Modules.config.tcpApiServer) {
-	Modules['TcpEventServer']  = require("./Server/TcpSocketServer.js").create();
-}
 
 Modules.Connector = Modules.config.connector; //shortcut
 
@@ -125,8 +118,6 @@ Modules.RoomController      = require('./Server/controllers/RoomController.js');
 Modules.ObjectController    = require('./Server/controllers/ObjectController.js');
 Modules.ServerController    = require('./Server/controllers/ServerController.js');
 Modules.EtherpadController  = require('./Server/controllers/EtherpadController.js');
-
-Modules.InternalDispatcher = require('./Server/apihandler/InternalDispatcher.js');
 
 //DAO (Data Access Object) 
 Modules.UserDAO  = require('./Server/db/UserDAO.js');
@@ -140,12 +131,6 @@ for (var name in Modules) {
 	if (module.init) {
 		module.init(Modules);
 	}
-}
-
-//load plugins
-if (Modules.config.plugins) {
-	Modules.PluginManager = require('./Server/PluginManager.js').create();
-	Modules.PluginManager.init(Modules, Modules.config.plugins);
 }
 
 // launchers
