@@ -378,7 +378,7 @@ Viewer.initGUI = function(rep) {
           deleteImg.attr("alt", "Delete");
           deleteImg.attr("src", "/guis.common/images/oxygen/16x16/actions/edit-delete.png");
           deleteImg.on("click", function(event) {
-            DBManager.removeDocument(self, "comments", id);
+            DBManager.removeDocument(self.document, "comments", id);
             event.stopPropagation();
           });
           $("p.commentHeader", commentContainer).append(deleteImg);
@@ -465,12 +465,12 @@ Viewer.initGUI = function(rep) {
 
     self.loadTextComments = function() {
       Viewer.updateStatus(self.translate(GUI.currentLanguage, 'Loading comments.'));
-      DBManager.getDocuments(self, "comments");
+      DBManager.getDocuments(self.document, "comments");
     };
 
     self.loadAudioComments = function() {
       Viewer.updateStatus(self.translate(GUI.currentLanguage, 'Loading audio comments.'));
-      DBManager.getDocuments(self, "comments_audio");
+      DBManager.getDocuments(self.document, "comments_audio");
     };
 
     var statusTimer;
@@ -512,9 +512,9 @@ Viewer.initGUI = function(rep) {
       self.saveHighlights();
 
       if (element.hasClass("commented")) {
-        DBManager.removeDocument(self, "comments", element.attr("data-comment"));
+        DBManager.removeDocument(self.document, "comments", element.attr("data-comment"));
       } else if (element.hasClass("audio")) {
-        DBManager.removeDocument(self, "comments_audio", element.attr("data-audioobject"));
+        DBManager.removeDocument(self.document, "comments_audio", element.attr("data-audioobject"));
       }
     };
 
@@ -600,7 +600,7 @@ Viewer.initGUI = function(rep) {
                 var commentId = MD5(text + "_" + date.getTime());
 
                 callback(commentId);
-                DBManager.addDocument(self, "comments", commentId, data);
+                DBManager.addDocument(self.document, "comments", commentId, data);
 
                 theDialog.dialog("close");
 
@@ -804,7 +804,7 @@ Viewer.initGUI = function(rep) {
 
                 // Update the highlight first
                 callback(commentId);
-                DBManager.addDocument(self, "comments_audio", commentId, data);
+                DBManager.addDocument(self.document, "comments_audio", commentId, data);
 
                 theDialog.dialog("close");
 
@@ -1050,7 +1050,8 @@ Viewer.setDocument = function(documentId) {
 Viewer.reloadDocument = function(documentId) {
 	var file = ObjectManager.getObject(documentId);
 	var highlights = file.getAttribute('highlights');
-	this.set('highlights', highlights);
+  this.document = file;
+	this.setAttribute('highlights', highlights);
 
 	this.drawTitle((file ? file.getAttribute("name") : ""));
 	this.setDocument(documentId);

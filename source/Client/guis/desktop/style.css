@@ -3,7 +3,8 @@
   padding: 0px;
   font-family: 'Open Sans', sans-serif;
   font-size: 12px;
-  height: 450px;
+  /*height: 450px;*/
+  overflow: visible;
 }
 
 
