@@ -27,11 +27,13 @@ var PdfEdit = {
 		else {
 			inputfile = ostmpdir + '/' + data.object.id + '.pdf.content';
 			// we first have to save the pdf content to a temporary file
-			fs.writeFile(inputfile, data.object.getContent(), function(err){
-					if (err) throw err;
-					data.file = {path:inputfile};
-					// after having written the file call this function again
-					convertToHtml(data, callback);
+			data.object.getContent(function(data_content){
+				fs.writeFile(inputfile, new Buffer(data_content), function(err){
+						if (err) throw err;
+						data.file = {path:inputfile};
+						// after having written the file call this function again
+						PdfEdit.convertToHtml(data, callback);
+				});
 			});
 			return;
 		}
@@ -57,6 +59,7 @@ var PdfEdit = {
 					hasContent: true,
 					mimeType: 'text/html',
 					name: data.object.id + '.html',
+					belongsTo: data.object.id,
 				},
 				false,
 				data.object.context,
@@ -65,7 +68,7 @@ var PdfEdit = {
 					newObject.copyContentFromFile(outputfile, callback);
 				});
 			// TODO: remove this line! only for temporary backward compatibility
-			Modules.Connector.copyContentFromFile(data.object.inRoom, data.object.id + '.html', outputfile, data.object.context, callback);
+			//Modules.Connector.copyContentFromFile(data.object.inRoom, data.object.id + '.html', outputfile, data.object.context, callback);
 		});
 
 		converter.error(function(error) {

@@ -256,7 +256,7 @@ app.get("/getPaper/:roomID/:objectID/:hash", function(req, res, next) {
 	res.set('Content-Disposition', 'inline; filename="paper.html"');
 	if (req.params.objectID != '0')
 	{
-		Modules.Connector.getContent(req.params.roomID, req.params.objectID + '.html', req.context, function(data) {
+		Modules.Connector.getContent(req.params.roomID, req.params.objectID, req.context, function(data) {
 			if(data === false)
 			{
 				res.send(404, "no html content");

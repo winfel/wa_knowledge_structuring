@@ -1048,10 +1048,12 @@ Viewer.setDocument = function(documentId) {
  * @returns {undefined}
  */
 Viewer.reloadDocument = function(documentId) {
-  var file = ObjectManager.getObject(documentId);
+	var file = ObjectManager.getObject(documentId);
+	var highlights = file.getAttribute('highlights');
+	this.set('highlights', highlights);
 
-  this.drawTitle((file ? file.getAttribute("name") : ""));
-  this.setDocument(documentId);
+	this.drawTitle((file ? file.getAttribute("name") : ""));
+	this.setDocument(documentId);
 };
 
 /**

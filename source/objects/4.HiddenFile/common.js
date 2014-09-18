@@ -35,6 +35,8 @@ HiddenFile.register=function(type){
 	GeneralObject.register.call(this,type);
 
 	this.registerAttribute('mimeType',{type:'text',standard:'text/plain'});
+	this.registerAttribute('belongsTo',{type:'text',standard:'text/plain'}); // object id
+	this.registerAttribute('highlights', {type: 'text', standard: ''});
 	this.registerAttribute('preview',{type:'boolean',standard:false,category:'Basic',hidden:true});
 
 }
