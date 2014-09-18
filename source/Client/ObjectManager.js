@@ -765,6 +765,10 @@ ObjectManager.init = function() {
       GUI.chat.addMessage(data.user, data.message.text, data.color, data.message.read);
     }
 
+    if (data.message.textOne !== undefined) {
+      GUI.chat.addMessageOne(data.user, data.message.textOne, data.color, data.message.read);
+    }
+
     if (data.message.selection) {
       if (data.userId != ObjectManager.user.id) { //do not display own selections
 
@@ -996,6 +1000,18 @@ ObjectManager.inform = function(type, content, index) {
 ObjectManager.tell = function(text) {
   ObjectManager.inform('text', text);
 }
+
+/**
+ *  @function tell
+ *  @param {type} text
+ */
+ObjectManager.tellOne = function(text) {
+    //data.message[type] = content;
+    // text goes to content
+    // 'textOne' goes to type
+    ObjectManager.inform('textOne', text);
+}
+
 /**
  *  @function informAboutSelection
  *  @param {String} id

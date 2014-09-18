@@ -1,8 +1,7 @@
 "use strict";
 
 /**
- * Holding methods and variables to display and send chat messages to other users
- * @class chat
+ * @namespace Holding methods and variables to display and send chat messages to other users
  */
 GUI.chat = {};
 
@@ -12,8 +11,7 @@ GUI.chat = {};
 GUI.chat.newMessages = 0;
 
 /**
- * Adds components for chat and event handlers for sending chat messages
- * @function init
+ * adds components for chat and event handlers for sending chat messages
  */
 GUI.chat.init = function() {
 
@@ -34,12 +32,23 @@ GUI.chat.init = function() {
 		}
 		
 	});
+
+    $()
 	
 }
 
+var extract_random = function(elementID){
+    var rand_id = $(elementID).attr("id");
+    return rand_id.split("-").pop();
+};
+
+var minimize_box = function(){
+    var rand_id = extract_random(this);
+    $('#toggle-chat-'+rand_id).slideToggle();
+};
+
 /**
  * Sets active users for chat online list
- * @function setUsers
  * Content of users:
  * [
  * 	{
@@ -55,31 +64,42 @@ GUI.chat.setUsers = function(users) {
 	$("#chat_users").html("");
 	for (var i = 0; i < users.length; i++) {
 		var user = users[i];
-		$("#chat_users").append('<div><span style="background-color: '+user.color+'"></span>'+user.username+'</div>');
+        if (user['username'] == ObjectManager.user['username']){
+            continue;
+        }
+		$("#chat_users").append('<div class="chatuserhandle"><span style="background-color: '+user.color+'"></span>'+user.username+'</div>');
 	}
+
+    $(".chatuserhandle").click(function(){
+        var usr = $(this).text();
+
+        var random_id = Math.floor((Math.random()*10000)+1);
+        GUI.chat.createChatbox(usr, random_id);
+    });
+
+    $(function() {
+        $( ".chatuserhandle" ).draggable({helper: 'clone', zIndex: 300});
+    });
 }
 
 
 /**
  * clears all chat messages
- * @function clear
  */
 GUI.chat.clear = function() {
 	
 	$("#chat_messages").html('<span id="chat_messages_spacer"></span>');
-	
+
 }
 
 /**
  * add a single message to the chat window
- * @function addMessage
- * @param {String} username : The username of the sender
- * @param {String} text : The text of the message
+ * @param {String} username The username of the sender
+ * @param {String} text The text of the message
  * @param {String} [userColor=#000000] The senders user color
  * @param {Boolean} read True, if it is an old message
  */
 GUI.chat.addMessage = function(username, text, userColor, read) {
-	
 	/* check if the message was send by the own user */
 	if (username == GUI.username) {
 		var type = "mine";
@@ -101,14 +121,8 @@ GUI.chat.addMessage = function(username, text, userColor, read) {
 	
 	text = text.replace(/<(?:.|\n)*?>/gm, '');
 	
+	/* emoticons */
 	
-	/**
-	* This is for emoticons in chat messages
-	* @function replaceEmoticon
-	* @param {type} code
-	* @param {type} image
-	* @param {type} str
-	*/
 	var replaceEmoticon = function(code, image, str) {
 		
 		code = code.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -141,10 +155,48 @@ GUI.chat.addMessage = function(username, text, userColor, read) {
 
 }
 
+/**
+ * add a single message to the chat window
+ * @param {String} username The username of the sender
+ * @param {String} text The text of the message
+ * @param {String} [userColor=#000000] The senders user color
+ * @param {Boolean} read True, if it is an old message
+ */
+GUI.chat.addMessageOne = function(username, text, userColor, read) {
+    var windowTitle = text.receiver; // shows the receiver of chatbox
+    if (username == GUI.username) {
+        // sender is myself
+        var type = "mine";
+         windowTitle = text.receiver;
+    }
+    else {
+        // sender is someone else --> it is a received message
+        windowTitle = username;
+        if (text.receiver != GUI.username){
+            return;
+        }
+    }
+
+    // doesn't create if one already exist
+    GUI.chat.createChatbox(windowTitle, text.random_id);
+    var bubble = text.bubble;
+    var message_box_id = '#message-box-' + text.random_id;
+    $(bubble).hide().appendTo(message_box_id).fadeIn();
+
+    //keep scrolled to bottom of chat!
+    var scrolltoh = $(message_box_id)[0].scrollHeight;
+    $(message_box_id).scrollTop(scrolltoh);
+
+    $( draggablize );
+
+    function draggablize() {
+        $('.draggable-word').draggable({helper: "clone"});
+    }
+
+}
 
 /**
  * called when chat is opened in GUI
- * @function opened
  */
 GUI.chat.opened = function() {
 	GUI.chat.newMessages = 0;
@@ -156,7 +208,6 @@ GUI.chat.opened = function() {
 /**
  * show a notification (e.g. an icon badge) with the number of unread messages
  * called by GUI.chat.addMessage
- * @function showNotifier
  */
 GUI.chat.showNotifier = function() {
 	$("#chat_notifier").html(GUI.chat.newMessages);
@@ -165,8 +216,87 @@ GUI.chat.showNotifier = function() {
 
 /**
  * hide the notification
- * @function hideNotifier
  */
 GUI.chat.hideNotifier = function() {
 	$("#chat_notifier").css("opacity", 0);
 }
+
+
+GUI.chat.createChatbox = function(user, random_id) {
+
+    if ( $("#chat-"+user).length != 0 ){
+        $("#chat-"+user).show();
+        // window already exists
+        return;
+    }
+
+    if (!random_id){
+        var random_id = Math.floor((Math.random()*10000)+1);
+    }
+    var newbox =
+        '<div class="chat-box" id="chat-' +user+ '">\
+            <div class="chat-header"> <span class="receiver">' +user+ '</span>'+
+                '<div id="close-btn-'+ random_id +'" class="close_btn">&nbsp;</div>\
+                <div id="minimize-btn-'+ random_id +'" class="minimize_btn">&nbsp;</div>\
+            </div>\
+            <div class="toggle_chat" id="toggle-chat-'+random_id+'">\
+                <div class="message-box" id="message-box-'+random_id+'">\
+                </div>\
+                <div class="user-info">\
+                    <textarea name="chat-message" id="chat-message-' +random_id /*id="chat-message"*/ +'" placeholder="Type Message Hit Enter" maxlength="100" />\
+                </div>\
+            </div>\
+        ';
+
+    $("#one2one-container").append(newbox).css("display", "block");
+
+    $(".close_btn").click(function(){
+        $(this).parent().parent().hide();
+    });
+
+
+    $('#minimize-btn-'+random_id).dblclick(minimize_box);
+    $('#minimize-btn-'+random_id).click(minimize_box);
+
+    $("#chat-message-"+random_id).keypress(function(evt) {
+        if(evt.which == 13) {
+            var val = $(this).val();
+            if (jQuery.trim(val) == "") {
+                $(this).val("");
+                return;
+            }
+
+            var iusername = ObjectManager.user['username'];
+            var imessage = $(this).val();
+            var post_data = {'sender':iusername, 'message':imessage};
+
+            var d = new Date;
+            var months = ['Jan', 'Feb', 'Mar', 'Apr','May', 'Jun','Jul', 'Aug','Sep', 'Oct','Nov', 'Dec'];
+            var msg_time = d.getHours()+':'+ d.getMinutes()+ ' '+ months[d.getMonth()] +' ' + d.getDay();
+
+            var special_texts = ['circle', 'paper', 'rectangle', 'file'];
+
+            var replace_text = function(spcialtext){
+                if (imessage.indexOf(spcialtext)>=0){
+                    imessage = imessage.replace(spcialtext, '<span class="draggable-word">'+spcialtext+'</span>');
+                }
+            };
+
+            var i, len;
+            for (i = 0, len = special_texts.length; i < len; i++) {
+                replace_text(special_texts[i]);
+            }
+
+            var bubble =
+                '<div class="chat-msg">\
+                    <time>' +msg_time+'</time>' +
+                    '<span class="username">'+iusername+'</span>' +
+                    '<span class="message">'+imessage+'</span>\
+                    </div>';
+
+            //reset value of message box
+            $(this).val('');
+            ObjectManager.tellOne({'bubble':bubble, 'sender':iusername, 'receiver': user,'random_id':random_id});
+        }
+    });
+};

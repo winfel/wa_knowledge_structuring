@@ -1,0 +1,118 @@
+.draggable-word {
+    color: #00693e;
+}
+
+/* chatbox */
+#one2one-container {
+    position: fixed;
+    right: 255px;
+    bottom: 0px;
+    z-index: 10;
+    width: 400;
+    height: 200;
+    background-color: #ffffff;
+}
+
+.chatuserhandle:hover {
+    /*cursor: url(../../guis.common/images/chat-bubble.png);*/
+    cursor: hand;
+}
+
+.chat-box {
+    background: #3a3a3d; width:260px;
+    /*overflow:hidden;*/
+    position:relative; bottom:0; z-index:9;
+    /*float: right;*/
+    display: inline-block;
+    margin-right: 3px;
+}
+
+.chat-box .chat-header .close_btn {
+    background: url(../../guis.common/images/close_btn_grey.png) no-repeat 0px 0px;
+    float:right;
+    width:25px;
+    height: 25px;
+    top: -3px;
+    position: relative;
+}
+
+.chat-box .chat-header .close_btn:hover {
+    background: url(../../guis.common/images/close_btn_grey.png) no-repeat 0px 0px;
+    cursor: pointer;
+}
+
+.chat-box .chat-header .minimize_btn {
+    background: url(../../guis.common/images/minimize_grey.png) no-repeat 0px 0px;
+    float:right;
+    width:25px;
+    height: 25px;
+    top: -3px;
+    position: relative;
+    margin-right: 4px;
+}
+
+.chat-box .chat-header .minimize_btn:hover {
+    background: url(../../guis.common/images/minimize_grey.png) no-repeat 0px 0px;
+    cursor: pointer;
+}
+
+.chat-box .chat-header{
+    padding-top: 10px;
+    padding-right: 3px;
+    padding-left: 5px;
+    padding-bottom: 10px;
+    font: 12px 'lucida grande', tahoma, verdana, arial, sans-serif;
+    font-weight: bold;
+    color:#fff;
+    /*border: 1px solid rgba(0, 39, 121, .76);*/
+    border-bottom:none;
+    /*cursor:pointer; todo: drag n drop*/
+}
+
+/*.chat-box .chat-header:hover{*/
+/*background-color: #627BAE;*/
+/*}*/
+
+.chat-box .message-box {
+    background: #FFFFFF; height: 200px;
+    overflow:auto;
+    border: 1px solid #8c8c8c;
+}
+.chat-msg{
+    margin-bottom: 10px; display: block;
+    border-bottom: 1px solid #e0e0e0; padding: 0px 5px 5px 5px;
+    font: 12px 'lucida grande', tahoma, verdana, arial, sans-serif; color: #6c6c6c;
+}
+
+.message-box:last-child {
+    border-bottom:none;
+}
+
+time{
+    font: 11px 'lucida grande', tahoma, verdana, arial, sans-serif;
+    font-weight: normal; float:right; color: #000000;
+}
+.chat-msg .username{
+    margin-bottom: 10px;
+    margin-top: 10px;
+    color: #000000;
+}
+
+.user-info textarea {
+    width: 97%;
+    height: 45px;
+    border: 2px;
+    border-color: #8c8c8c;
+    border-style: solid;
+    /*border-top: none;*/
+    padding: 3px 0px 0px 3px;
+    font: 13px 'lucida grande', tahoma, verdana, arial, sans-serif;
+    margin-bottom: 0px;
+}
+
+.user-info {
+    background-color: #ffffff;
+}
+.chat-msg .username{
+    font-weight: bold; display: block;
+}
