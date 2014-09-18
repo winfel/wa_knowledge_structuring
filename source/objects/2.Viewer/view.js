@@ -76,6 +76,13 @@ Viewer.initGUI = function(rep) {
     }
   });
 
+  viewerContainer.droppable({
+    drop: function (event, ui) {
+
+      console.log(ui.draggable.context.id);
+      //var objectId = ui.draggable.context.id.split("_")[2];
+    }});
+
   /**
    * 
    * @param {type} event
@@ -203,6 +210,7 @@ Viewer.initGUI = function(rep) {
         selection = highlights;
 
         $(highlights).css('background-color', $.Color(ObjectManager.getUser().color).alpha(0.4))
+                .removeClass("highlighted")
                 .addClass("selected")
                 .addClass('by_user_' + GUI.userid)
                 .addClass('at_time_' + (new Date()).getTime())
@@ -211,7 +219,7 @@ Viewer.initGUI = function(rep) {
         // Enable the highlight buttons in the header of the viewer
         enableHeaderButtons();
 
-        $(".highlighted.selected", frameDocument).hover(function(event) {
+        $(".selected", frameDocument).hover(function (event) {
           showHighlightMenu(event, frameDocument);
         }, function() {
           hideHighlightMenu(true);
@@ -223,9 +231,9 @@ Viewer.initGUI = function(rep) {
     highlighter = frameDocument.getHighlighter();
 
     // Remove old selected text...
-    $(".highlighted.selected", frameDocument).each(function() {
-      highlighter.removeHighlights(this);
-    });
+//    $(".selected", frameDocument).each(function () {
+//      highlighter.removeHighlights(this);
+//    });
 
     // Disable the hide timer and keep it visible.
     highlightMenu.hover(function(event) {
@@ -243,7 +251,9 @@ Viewer.initGUI = function(rep) {
     frameDocument.on("mousedown", function(event) {
       if (selection && event.target != selection) {
         // Remove the selected (not highlighted) text.
-        $(".highlighted.selected:not(.modify)", frameDocument).each(function() {
+        $(".selected:not(.modify)", frameDocument).each(function () {
+          // Add
+          $(this).addClass("highlighted");
           highlighter.removeHighlights(this);
         });
         // Remove the selected for modification text...
@@ -401,10 +411,9 @@ Viewer.initGUI = function(rep) {
     var linkCommentWithHighlight = function(commentContainer, commentId, cssClass, dataAttributeName) {
       commentContainer = $(commentContainer);
       commentContainer.off("hover");
-      var commentHighlight = $(".highlighted." + cssClass + "[" + dataAttributeName + "='" + commentId + "']", frameDocument)[0];
+      var commentHighlight = $(".highlighted." + cssClass + "[" + dataAttributeName + "='" + commentId + "']", frameDocument);
 
-      if (commentHighlight) {
-        commentHighlight = $(commentHighlight);
+      if (commentHighlight.length > 0) {
         commentHighlight.off("hover");
 
         // Highlight the highlighting
@@ -440,7 +449,7 @@ Viewer.initGUI = function(rep) {
       // Do also a litte bit more...
       $(".highlighted:not(.selected)", frameDocument).each(function() {
         $(this).off("click").on("click", function(event) {
-          selection = this;
+          //selection = this;
           $(this).addClass("selected modify");
           showHighlightMenu(event, frameDocument, true);
           enableHeaderButtons(true);
@@ -531,7 +540,7 @@ Viewer.initGUI = function(rep) {
 
     self.saveHighlights = function() {
       // Before we save it. Remove helper css classes
-      $(".highlighted", frameDocument).removeClass("selected remotehover");
+      $(".selected", frameDocument).addClass("highlighted").removeClass("selected remotehover");
 
       var jsonStr = highlighter.serializeHighlights();
       self.setAttribute('highlights', jsonStr);
@@ -539,29 +548,22 @@ Viewer.initGUI = function(rep) {
 
     // Highlighter buttons on the top left of the viewer.
     $(".btnFill", viewerContainer).on("click", function() {
-      $(".highlighted.selected", frameDocument).toggleClass("selected");
       self.saveHighlights();
     });
 
     $(".btnStrike", viewerContainer).on("click", function() {
-      $(".highlighted.selected", frameDocument)
-              .toggleClass("selected")
-              .toggleClass("strike");
+      $(".selected", frameDocument).toggleClass("strike");
 
       self.saveHighlights();
     });
 
     $(".btnScratchout", viewerContainer).on("click", function() {
-      $(".highlighted.selected", frameDocument)
-              .toggleClass("selected")
-              .toggleClass("scratchout");
+      $(".selected", frameDocument).toggleClass("scratchout");
       self.saveHighlights();
     });
 
     $(".btnGlow", viewerContainer).on("click", function() {
-      $(".highlighted.selected", frameDocument)
-              .toggleClass("selected")
-              .toggleClass("glow");
+      $(".selected", frameDocument).toggleClass("glow");
       self.saveHighlights();
     });
 
@@ -631,11 +633,10 @@ Viewer.initGUI = function(rep) {
 
     $(".btnAddComment", viewerContainer).on("click", function() {
 
-      var selected = $(".highlighted.selected", frameDocument);
+      var selected = $(".selected", frameDocument);
 
       addCommentDialog(selected, function(commentId) {
-        selected.removeClass("selected")
-                .addClass("commented")
+        selected.addClass("commented")
                 .attr('data-comment', commentId);
 
         self.saveHighlights();
@@ -840,11 +841,10 @@ Viewer.initGUI = function(rep) {
 
     $(".btnRecord", viewerContainer).on("click", function() {
       initAudio();
-      var selected = $(".highlighted.selected", frameDocument);
+      var selected = $(".selected", frameDocument);
 
       addAudioDialog(selected, function(commentId) {
-        $(".highlighted.selected", frameDocument)
-                .removeClass("selected")
+        $(".selected", frameDocument)
                 .addClass('audio')
                 .attr('data-audioobject', commentId);
         self.saveHighlights();
@@ -852,7 +852,7 @@ Viewer.initGUI = function(rep) {
     });
 
     $(".btnRemove", viewerContainer).on("click", function() {
-      $(".highlighted.selected", frameDocument).each(function() {
+      $(".selected", frameDocument).each(function () {
         removeHighlight(this);
       });
     });

@@ -119,6 +119,7 @@ $(document).ready(function() {
 <link type="text/css" href="/guis/desktop/objects/paperViewer.css" rel="Stylesheet">
 <link type="text/css" href="/guis/desktop/objects/paperWriter.css" rel="Stylesheet">
 <link type="text/css" href="/guis.common/css/verTabs.css" rel="Stylesheet">
+<link type="text/css" href="/guis/desktop/chat.css" rel="Stylesheet">
 
 <script type="text/javascript" src="/guis/desktop/main.js"></script>
 <script>
@@ -347,6 +348,11 @@ $.fn.textWidth = function(text, font) {
 </div>
 <!-- END: GUI confirm dialog -->
 
+<!-- BEGIN: GUI one2one chat pop-up -->
+<div id="one2one-container">
+</div>
+<!-- END: GUI one2one chat pop-up -->
+
 <div id="login_background" style="display: none">&nbsp;</div>
 <div id="login" style="display: none;">
 
@@ -492,8 +498,8 @@ $.fn.textWidth = function(text, font) {
     <div id="mainTag">
       <div class="filename-wrapper">Name of the file: <span class="filename"></span></div>
       <div class="custom-main-tag-holder">
-        <label for="custom-Main-tag"><b>Custom tag:</b> </label>
-        <input id="custom-Main-tag" placeholder="Type a custom Main Tag" >
+        <label for="custom-Main-tag"><b>Custom Main Tag:</b> </label>
+        <input id="custom-Main-tag" placeholder="Type a name and press ENTER" >
       </div>
     </div>
     <div id="secondaryTags">
@@ -508,8 +514,8 @@ $.fn.textWidth = function(text, font) {
             <button id="btn-next">></button>
           </div>			
           <div class="custom-sec-tag-holder">
-            <label for="custom-Sec-tag"><b>Custom tag:</b> </label>
-            <input id="custom-Sec-tag" placeholder="Type a custom Secondary Tag" >
+            <label for="custom-Sec-tag"><b>Custom Secondary Tag:</b> </label>
+            <input id="custom-Sec-tag" placeholder="Type a name and press ENTER" >
           </div>	
         </div>
         <div id="document" class="ui-widget-content ui-state-default">
@@ -534,22 +540,6 @@ $.fn.textWidth = function(text, font) {
   </div>	
 </script>
 
-
-<script type="text/html" id='tag-manager-content-tmpl'>
-  <div id="main-tag-container">
-    <div class="portlet portlet-new-main-tag ui-corner-all">
-      <h2>Create New Main Tag</h2>
-    </div>	    	
-  </div>	
-</script>
-
-
-<script type="text/html" id='secondary-tag-tmpl1'>	
-  <li class='ui-widget-content' data-sectag='<%= secTag %>'>
-    <h5 class='ui-widget-header tagValue editable-sec'><%= secTag %></h5>
-    <span class='ui-icon ui-icon-trash sec-tag-delete'></span>
-  </li>      	
-</script>
 
 <script type="text/html" id='secondary-tag-tmpl'>	
   <li class='ui-widget-content' data-sectag='<%= secTag %>'>

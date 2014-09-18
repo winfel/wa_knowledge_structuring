@@ -507,10 +507,15 @@ ReferenceContainer.addFiles = function(files){
 				
 			});
 		});
-		
+    
+    $(rep).find("#representation_for_"+id).draggable({
+			helper: 'clone',
+			revert: 'invalid',
+			appendTo: 'body'
+		});
 	}	
 		
-}
+};
 
 ReferenceContainer.upd = function(){
 
