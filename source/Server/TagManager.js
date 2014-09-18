@@ -49,6 +49,8 @@ var TagManager = function() {
 	    Modules = theModules;
 	    
 	    db = require('monk')(Modules.MongoDBConfig.getURI());
+	    db.get('MainTags').ensureIndex( { "name": 1 }, { unique: true } );
+	    
 	    // fillCurrentDbWithTestData();
 	    
 	    var Dispatcher = Modules.Dispatcher;
