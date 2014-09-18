@@ -9,8 +9,8 @@
 
 "use strict";
 
-var db = null;
 var Modules = false;
+var users = false;
 var UserDAO = {};
 
 /**
@@ -20,7 +20,10 @@ var UserDAO = {};
  */
 UserDAO.init = function(theModules) {
     Modules = theModules;
-    db = require('monk')(Modules.MongoDBConfig.getURI());
+    var db = require('monk')(Modules.MongoDBConfig.getURI());
+    
+    users = db.get('users');
+    users.ensureIndex( { "username": 1 }, { unique: true } )
 }
 
 /**
@@ -28,7 +31,6 @@ UserDAO.init = function(theModules) {
 * @param callback
 */
 UserDAO.usersByUserName = function(username, callback) {
-    var users = db.get('users');
     users.find({username: username.toLowerCase()}, {}, callback);
 }
 
@@ -37,7 +39,6 @@ UserDAO.usersByUserName = function(username, callback) {
 * @param callback
 */
 UserDAO.usersById = function(id, callback) {
-    var users = db.get('users');
     users.findById(id, callback);
 }
 
@@ -46,7 +47,6 @@ UserDAO.usersById = function(id, callback) {
 * @param callback
 */
 UserDAO.createUsers = function(newUserAttr, callback) {
-    var users = db.get('users');
     users.insert({username: newUserAttr.login.toLowerCase(), password: newUserAttr.password, e_mail: newUserAttr.e_mail }, callback);
 }
 
@@ -55,7 +55,6 @@ UserDAO.createUsers = function(newUserAttr, callback) {
 * @param newUserAttr
 */
 UserDAO.updateUsersById = function(id, newUserAttr) {
-    var users = db.get('users');
     users.update({_id:id}, {$set:newUserAttr});
 }
 

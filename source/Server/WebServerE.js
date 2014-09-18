@@ -109,26 +109,20 @@ everyauth.password
         .registerUser(function(newUserAttributes) {
             var promise = this.Promise();
             
-            Modules.UserDAO.usersByUserName(newUserAttributes.login, function(err, user) {
-                if (err) return promise.fulfill([err]);
-                else {
+            Modules.UserDAO.createUsers(newUserAttributes, function(err, user) {
+                if (err) {
                     
-                    if ((user != null) && (user.length > 0)) {
-                        return promise.fulfill(["A user with the same name already exists. Use a different name"]);
-                    }
-                    
-                    Modules.UserDAO.createUsers(newUserAttributes, function(err, user) {
-                        if (err) return promise.fulfill([err]);
-                        promise.fulfill(user);
-                    });
+                    if (err.code == 11000) return promise.fulfill(["A user with the same name already exists. Use a different name"]);
+                    return promise.fulfill([err]);
                 }
+                promise.fulfill(user);
             });
             
             return promise;
         })
         .registerSuccessRedirect('/room/public'); // Where to redirect to
-                                                    // after a successful
-                                                    // registration
+                                                  // after a successful
+                                                  // registration
 
 everyauth.password.extractExtraRegistrationParams(function(req) {
   return {
