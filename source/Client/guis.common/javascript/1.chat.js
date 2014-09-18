@@ -37,9 +37,15 @@ GUI.chat.init = function() {
 	
 }
 
+var extract_random = function(elementID){
+    var rand_id = $(elementID).attr("id");
+    return rand_id.split("-").pop();
+};
+
 var minimize_box = function(){
-    var rand_id = $(this).attr("id");
-    rand_id = rand_id.split("-").pop();
+//    var rand_id = $(this).attr("id");
+//    rand_id = rand_id.split("-").pop();
+    var rand_id = extract_random(this);
     $('#toggle-chat-'+rand_id).slideToggle();
 };
 
@@ -74,7 +80,9 @@ GUI.chat.setUsers = function(users) {
         GUI.chat.createChatbox(usr, random_id);
     });
 
-
+    $(function() {
+        $( ".chatuserhandle" ).draggable({helper: 'clone', zIndex: 300});
+    });
 }
 
 
@@ -220,6 +228,7 @@ GUI.chat.hideNotifier = function() {
 GUI.chat.createChatbox = function(user, random_id) {
 
     if ( $("#chat-"+user).length != 0 ){
+        $("#chat-"+user).show();
         // window already exists
         return;
     }
@@ -229,7 +238,7 @@ GUI.chat.createChatbox = function(user, random_id) {
     }
     var newbox =
         '<div class="chat-box" id="chat-' +user+ '">\
-            <div class="chat-header">' +user+
+            <div class="chat-header"> <span class="receiver">' +user+ '</span>'+
                 '<div id="close-btn-'+ random_id +'" class="close_btn">&nbsp;</div>\
                 <div id="minimize-btn-'+ random_id +'" class="minimize_btn">&nbsp;</div>\
             </div>\
@@ -242,17 +251,18 @@ GUI.chat.createChatbox = function(user, random_id) {
             </div>\
         ';
 
-    $("#one2one-container").append(newbox).css("display", "block").css("background-color","#535EFD");
+    $("#one2one-container").append(newbox).css("display", "block");
 
     $(".close_btn").click(function(){
-        console.log("### close but");
-        $("#one2one-container").html("").css("display", "none");
+//        console.log("### close button");
+//        $("#one2one-container").html("").css("display", "none");
+        $(this).parent().parent().hide();
     });
 
 
 
     //$('.minimize_btn').click(minimize_box);
-    $('.chat-header').dblclick(minimize_box);
+    $('#minimize-btn-'+random_id).dblclick(minimize_box);
     $('#minimize-btn-'+random_id).click(minimize_box);
 
     $("#chat-message-"+random_id).keypress(function(evt) {
