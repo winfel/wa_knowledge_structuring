@@ -43,8 +43,6 @@ var extract_random = function(elementID){
 };
 
 var minimize_box = function(){
-//    var rand_id = $(this).attr("id");
-//    rand_id = rand_id.split("-").pop();
     var rand_id = extract_random(this);
     $('#toggle-chat-'+rand_id).slideToggle();
 };
@@ -74,7 +72,6 @@ GUI.chat.setUsers = function(users) {
 
     $(".chatuserhandle").click(function(){
         var usr = $(this).text();
-        console.log("#### text"+usr);
 
         var random_id = Math.floor((Math.random()*10000)+1);
         GUI.chat.createChatbox(usr, random_id);
@@ -254,14 +251,10 @@ GUI.chat.createChatbox = function(user, random_id) {
     $("#one2one-container").append(newbox).css("display", "block");
 
     $(".close_btn").click(function(){
-//        console.log("### close button");
-//        $("#one2one-container").html("").css("display", "none");
         $(this).parent().parent().hide();
     });
 
 
-
-    //$('.minimize_btn').click(minimize_box);
     $('#minimize-btn-'+random_id).dblclick(minimize_box);
     $('#minimize-btn-'+random_id).click(minimize_box);
 
@@ -274,7 +267,6 @@ GUI.chat.createChatbox = function(user, random_id) {
             }
 
             var iusername = ObjectManager.user['username'];
-            console.log('### user'+ iusername );
             var imessage = $(this).val();
             var post_data = {'sender':iusername, 'message':imessage};
 
@@ -301,11 +293,9 @@ GUI.chat.createChatbox = function(user, random_id) {
                     '<span class="username">'+iusername+'</span>' +
                     '<span class="message">'+imessage+'</span>\
                     </div>';
-            console.log(msg_time +' ' + iusername + ' ' + imessage);
 
             //reset value of message box
             $(this).val('');
-            console.log("iusername: " + iusername + '  receiver: '+user );
             ObjectManager.tellOne({'bubble':bubble, 'sender':iusername, 'receiver': user,'random_id':random_id});
         }
     });
