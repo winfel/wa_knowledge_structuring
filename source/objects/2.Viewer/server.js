@@ -29,7 +29,7 @@ theObject.onEnter = function(object, data) {
 				if(obj.length) {
 					// currently, we are only interested in the first converted document, but maybe we have a better plan?
 					that.set("file", obj[0].id);
-					that.set('highlights', obj[0].attributes.highlights);
+					that.set('highlights', obj[0].attributes.highlights || '');
 					that.persist();
 				}
 				else {
@@ -39,7 +39,7 @@ theObject.onEnter = function(object, data) {
 						object: object,
 						callback: function(newObjectId) {
 							that.set("file", newObjectId);
-							that.set('highlights', obj[0].attributes.highlights);
+							that.set('highlights', '');
 							that.persist();
 						}
 					});

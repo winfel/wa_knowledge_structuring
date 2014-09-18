@@ -58,7 +58,7 @@ var PdfEdit = {
 				{
 					hasContent: true,
 					mimeType: 'text/html',
-					name: data.object.id + '.html',
+					name: (data.object.getAttribute('name') || data.object.id).replace(/\.pdf$/i, '') + ' (html)',
 					belongsTo: data.object.id,
 				},
 				false,
