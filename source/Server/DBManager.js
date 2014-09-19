@@ -34,13 +34,13 @@ DBManager.getDocuments = function (socket, data) {
 
     if (data.oneMessage) {
       // Send one big message with all documents to the client.
-      Modules.SocketServer.sendToSocket(socket, "dbDocuments_" + data.collection + "_" + data.object.id, docs);
+      Modules.SocketServer.sendToSocket(socket, "dbDocuments_" + data.collection + "_" + data.object.id, {object: data.object, data: docs});
     } else {
       // Send a message for each document to the client.
       for (var i in docs) {
-        Modules.SocketServer.sendToSocket(socket, "dbDocument_" + data.collection, docs[i]);
+        Modules.SocketServer.sendToSocket(socket, "dbDocument_" + data.collection, {object: data.object, data: docs[i]});
       }
-      Modules.SocketServer.sendToSocket(socket, "dbAllDocumentsSend_" + data.collection);
+      Modules.SocketServer.sendToSocket(socket, "dbAllDocumentsSend_" + data.collection, {object: data.object});
     }
   });
 };
@@ -67,7 +67,7 @@ DBManager.addDocument = function (socket, data) {
   if (data.singleResponse) {
     // Send a message to the user who created this document.
     Modules.SocketServer.sendToSocket(connection.socket, "dbDocumentAdded_" + data.collection + "_" + data.object.id,
-            {user: connection.user.username, id: data.id, data: data.data});
+            {object: data.object, user: connection.user.username, id: data.id, data: data.data});
   } else {
     // Send it to all other users within the room.
     var connectionOfOthers;
@@ -75,7 +75,7 @@ DBManager.addDocument = function (socket, data) {
       connectionOfOthers = Modules.UserManager.getConnectionBySocketID(socketId);
 
       Modules.SocketServer.sendToSocket(connectionOfOthers.socket, "dbDocumentAdded_" + data.collection,
-              {user: connection.user.username, id: data.id, data: data.data});
+              {object: data.object, user: connection.user.username, id: data.id, data: data.data});
     }
   }
 };
@@ -100,7 +100,7 @@ DBManager.removeDocument = function (socket, data) {
   if (data.singleResponse) {
     // Send a message to the user who created this document.
     Modules.SocketServer.sendToSocket(connection.socket, "dbDocumentRemoved_" + data.collection + "_" + data.object.id,
-            {user: connection.user.username, id: data.id});
+            {object: data.object, user: connection.user.username, id: data.id});
   } else {
     // Send it to all other users within the room.
     var connectionOfOthers;
@@ -108,7 +108,7 @@ DBManager.removeDocument = function (socket, data) {
       connectionOfOthers = Modules.UserManager.getConnectionBySocketID(socketId);
 
       Modules.SocketServer.sendToSocket(connectionOfOthers.socket, "dbDocumentRemoved_" + data.collection,
-              {user: connection.user.username, id: data.id});
+              {object: data.object, user: connection.user.username, id: data.id});
     }
   }
 };
