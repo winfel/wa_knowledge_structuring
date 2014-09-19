@@ -10,7 +10,7 @@
  * @param {type} external
  * @returns {Viewer.draw@call;getRepresentation}
  */
-Viewer.draw = function(external) {
+Viewer.draw = function (external) {
 
   var rep = this.getRepresentation();
 
@@ -46,7 +46,7 @@ Viewer.draw = function(external) {
  
  };*/
 
-Viewer.initGUI = function(rep) {
+Viewer.initGUI = function (rep) {
   var self = this;
   var highlighter;
   var toggled = false;
@@ -66,11 +66,11 @@ Viewer.initGUI = function(rep) {
   var btnSinglepage = $(".btnSinglepage", rep).first();
 
   var resizeTimer;
-  $(window).on("resize", function() {
+  $(window).on("resize", function () {
     // Resize the viewer in fullscreen mode only every 25 ms.
     if (toggled) {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(function() {
+      resizeTimer = setTimeout(function () {
         self.adjustPaper();
       }, 25);
     }
@@ -78,17 +78,17 @@ Viewer.initGUI = function(rep) {
 
   viewerContainer.droppable({
     drop: function (event, ui) {
-
-      console.log(ui.draggable.context.id);
-      //var objectId = ui.draggable.context.id.split("_")[2];
-    }});
+      var fileId = ui.draggable.context.id.split("_")[2];
+      self.reloadDocumentByFileId(fileId);
+    }
+  });
 
   /**
    * 
    * @param {type} event
    * @returns {undefined}
    */
-  var toggleFullscreen = function(event) {
+  var toggleFullscreen = function (event) {
     if (toggled) {
       // Normal...
       viewerContainer.removeClass("fullscreen");
@@ -117,25 +117,25 @@ Viewer.initGUI = function(rep) {
   btnFullscreen.click(toggleFullscreen);
   btnRestore.click(toggleFullscreen);
 
-  btnTwopage.click(function() {
+  btnTwopage.click(function () {
     viewerContainer.data("twopage", true);
 
     btnTwopage.toggle();
     btnSinglepage.toggle();
-    
+
     self.adjustPaper();
   });
 
-  btnSinglepage.click(function() {
+  btnSinglepage.click(function () {
     viewerContainer.data("twopage", false);
 
     btnTwopage.toggle();
     btnSinglepage.toggle();
-    
+
     self.adjustPaper();
   });
 
-  var showHighlightMenu = function(event, frameDocument, showRemoveButton) {
+  var showHighlightMenu = function (event, frameDocument, showRemoveButton) {
     var left = event.pageX - highlightMenu.width() / 2;
     var top = event.pageY - 10 - $(frameDocument).scrollTop();
 
@@ -159,10 +159,10 @@ Viewer.initGUI = function(rep) {
     highlightMenu.show();
   };
 
-  var hideHighlightMenu = function(delayed) {
+  var hideHighlightMenu = function (delayed) {
     if (delayed) {
       clearTimeout(highlightMenuTimer);
-      highlightMenuTimer = setTimeout(function() {
+      highlightMenuTimer = setTimeout(function () {
         highlightMenu.hide();
       }, 250);
     }
@@ -171,15 +171,15 @@ Viewer.initGUI = function(rep) {
     }
   };
 
-  var disableHeaderButtons = function() {
+  var disableHeaderButtons = function () {
     $(".buttonAreaLeft .btn", viewerContainer).prop("disabled", true);
   };
 
-  var enableHeaderButtons = function(withRemoveButton) {
+  var enableHeaderButtons = function (withRemoveButton) {
     $(".buttonAreaLeft .btn" + (!withRemoveButton ? ":not(.btnRemove)" : ""), viewerContainer).prop("disabled", false);
   };
 
-  var initializeTextHighlighter = function() {
+  var initializeTextHighlighter = function () {
     // Remove all previous event handlers.
     $(".buttonAreaLeft .btn", viewerContainer).off();
     $(".btn", highlightMenu).off();
@@ -200,12 +200,12 @@ Viewer.initGUI = function(rep) {
 
     frameDocument.textHighlighter({
       // before highlighting, test if selected elements are valid for highlighting
-      onBeforeHighlight: function(range) {
+      onBeforeHighlight: function (range) {
         // only allow selections within one ".pc"
         return ($(range.commonAncestorContainer).closest('.pc').length > 0);
       },
       // register a function to call after each highlight process
-      onAfterHighlight: function(highlights, range) {
+      onAfterHighlight: function (highlights, range) {
         // TODO: maybe postprocess highlights here, set different style and transmit to server
         selection = highlights;
 
@@ -221,7 +221,7 @@ Viewer.initGUI = function(rep) {
 
         $(".selected", frameDocument).hover(function (event) {
           showHighlightMenu(event, frameDocument);
-        }, function() {
+        }, function () {
           hideHighlightMenu(true);
         });
       }
@@ -236,19 +236,19 @@ Viewer.initGUI = function(rep) {
 //    });
 
     // Disable the hide timer and keep it visible.
-    highlightMenu.hover(function(event) {
+    highlightMenu.hover(function (event) {
       clearTimeout(highlightMenuTimer);
-    }, function() {
+    }, function () {
       hideHighlightMenu();
     });
 
-    highlightMenu.on("click", function(event) {
+    highlightMenu.on("click", function (event) {
       hideHighlightMenu();
       disableHeaderButtons();
     });
 
     // Remove selected highlightings...
-    frameDocument.on("mousedown", function(event) {
+    frameDocument.on("mousedown", function (event) {
       if (selection && event.target != selection) {
         // Remove the selected (not highlighted) text.
         $(".selected:not(.modify)", frameDocument).each(function () {
@@ -277,7 +277,7 @@ Viewer.initGUI = function(rep) {
      * @param {type} parent
      * @returns {}
      */
-    var sumOffsetParent = function(elem, parent) {
+    var sumOffsetParent = function (elem, parent) {
       if (!elem)
         elem = this;
 
@@ -294,7 +294,7 @@ Viewer.initGUI = function(rep) {
       return {left: x, top: y};
     };
 
-    var getGridPosition = function(elem) {
+    var getGridPosition = function (elem) {
       var gridSize = 20;
       var verticalOffset = 30;
 
@@ -307,7 +307,7 @@ Viewer.initGUI = function(rep) {
       return position;
     };
 
-    var setFixedPosition = function(position, elem) {
+    var setFixedPosition = function (position, elem) {
       var page = elem.parents(".pc");
       var count = $('[data-top-initial*="' + position.top + '"]', page).length;
 
@@ -329,7 +329,7 @@ Viewer.initGUI = function(rep) {
      * @param {type} data   The comment data
      * @returns The div container 
      */
-    var createCommentOnViewer = function(user, id, data) {
+    var createCommentOnViewer = function (user, id, data) {
 
       var isAudio = (data.type.indexOf("audio") >= 0);
       var commentClass = (isAudio ? "audioobject" : "comment");
@@ -352,20 +352,20 @@ Viewer.initGUI = function(rep) {
         if (isAudio) {
           var wave = new Audio(data.message);
 
-          $(wave).on('playing', function() {
+          $(wave).on('playing', function () {
             commentContainer.addClass('playing');
           });
-          $(wave).on('pause', function() {
+          $(wave).on('pause', function () {
             commentContainer.removeClass('playing');
           });
-          $(wave).on('ended', function() {
+          $(wave).on('ended', function () {
             // chrome has a replay bug; load fixes it
             if (window.chrome) {
               wave.load();
             }
           });
 
-          commentContainer.click(function() {
+          commentContainer.click(function () {
             wave.paused ? wave.play() : wave.pause();
           });
 
@@ -377,21 +377,21 @@ Viewer.initGUI = function(rep) {
           var deleteImg = $("<img>");
           deleteImg.attr("alt", "Delete");
           deleteImg.attr("src", "/guis.common/images/oxygen/16x16/actions/edit-delete.png");
-          deleteImg.on("click", function(event) {
+          deleteImg.on("click", function (event) {
             DBManager.removeDocument(self.document, "comments", id);
             event.stopPropagation();
           });
           $("p.commentHeader", commentContainer).append(deleteImg);
 
           // Show/Hide the comment on a click.
-          commentContainer.on("click", function(event) {
+          commentContainer.on("click", function (event) {
             var target = $(event.target);
             if (target.attr("id") == commentId || target.hasClass("commentHeader"))
               $(this).toggleClass("opened");
           });
 
           // Hide it once you click somewhere withing the iframe.
-          frameDocument.on("click", function(event) {
+          frameDocument.on("click", function (event) {
             var target = $(event.target);
 
             if (target.attr("id") != commentId && target.parent("div").attr("id") != commentId)
@@ -408,7 +408,7 @@ Viewer.initGUI = function(rep) {
       return commentContainer;
     };
 
-    var linkCommentWithHighlight = function(commentContainer, commentId, cssClass, dataAttributeName) {
+    var linkCommentWithHighlight = function (commentContainer, commentId, cssClass, dataAttributeName) {
       commentContainer = $(commentContainer);
       commentContainer.off("hover");
       var commentHighlight = $(".highlighted." + cssClass + "[" + dataAttributeName + "='" + commentId + "']", frameDocument);
@@ -417,16 +417,16 @@ Viewer.initGUI = function(rep) {
         commentHighlight.off("hover");
 
         // Highlight the highlighting
-        commentContainer.hover(function() {
+        commentContainer.hover(function () {
           commentHighlight.addClass('remotehover');
-        }, function() {
+        }, function () {
           commentHighlight.removeClass('remotehover');
         });
 
         // Highlight the comment
-        commentHighlight.hover(function() {
+        commentHighlight.hover(function () {
           commentContainer.addClass('remotehover');
-        }, function() {
+        }, function () {
           commentContainer.removeClass('remotehover');
         });
 
@@ -437,44 +437,44 @@ Viewer.initGUI = function(rep) {
       }
     };
 
-    self.relinkCommentsWithHighlights = function() {
-      $(".comment", frameDocument).each(function() {
+    self.relinkCommentsWithHighlights = function () {
+      $(".comment", frameDocument).each(function () {
         linkCommentWithHighlight(this, $(this).attr("data-id"), "commented", "data-comment");
       });
 
-      $(".audioobject", frameDocument).each(function() {
+      $(".audioobject", frameDocument).each(function () {
         linkCommentWithHighlight(this, $(this).attr("data-id"), "audio", "data-audioobject");
       });
 
       // Do also a litte bit more...
-      $(".highlighted:not(.selected)", frameDocument).each(function() {
-        $(this).off("click").on("click", function(event) {
+      $(".highlighted:not(.selected)", frameDocument).each(function () {
+        $(this).off("click").on("click", function (event) {
           //selection = this;
           $(this).addClass("selected modify");
           showHighlightMenu(event, frameDocument, true);
           enableHeaderButtons(true);
 
-          $(this).off("hover").hover(function() {
+          $(this).off("hover").hover(function () {
             showHighlightMenu(event, frameDocument, true);
-          }, function() {
+          }, function () {
             hideHighlightMenu(true);
           });
         });
       });
     };
 
-    self.loadTextComments = function() {
+    self.loadTextComments = function () {
       Viewer.updateStatus(self.translate(GUI.currentLanguage, 'Loading comments.'));
       DBManager.getDocuments(self.document, "comments");
     };
 
-    self.loadAudioComments = function() {
+    self.loadAudioComments = function () {
       Viewer.updateStatus(self.translate(GUI.currentLanguage, 'Loading audio comments.'));
       DBManager.getDocuments(self.document, "comments_audio");
     };
 
     var statusTimer;
-    Viewer.updateStatus = function(text) {
+    Viewer.updateStatus = function (text) {
 
       var status = $(".paperViewerFooter .status", viewerContainer);
 
@@ -483,29 +483,29 @@ Viewer.initGUI = function(rep) {
         status.show();
         status.html(text);
       } else {
-        statusTimer = setTimeout(function() {
+        statusTimer = setTimeout(function () {
           status.hide();
         }, 2500);
       }
     };
 
-    Viewer.addComment = function(user, id, data) {
+    Viewer.addComment = function (user, id, data) {
       createCommentOnViewer(user, id, data);
       self.relinkCommentsWithHighlights();
     };
 
-    Viewer.removeComment = function(id, dataPrefix, cssClassHighlight) {
+    Viewer.removeComment = function (id, dataPrefix, cssClassHighlight) {
       // Remove the comment
       $("#" + dataPrefix + "_" + id, frameDocument).remove();
 
       // Remove the highlights
-      $("." + cssClassHighlight + "[data-" + dataPrefix + "=\"" + id + "\"]", frameDocument).each(function() {
+      $("." + cssClassHighlight + "[data-" + dataPrefix + "=\"" + id + "\"]", frameDocument).each(function () {
         highlighter.removeHighlights(this);
       });
       self.saveHighlights();
     };
 
-    var removeHighlight = function(elem) {
+    var removeHighlight = function (elem) {
       var element = $(elem);
 
       highlighter.removeHighlights(element);
@@ -522,7 +522,7 @@ Viewer.initGUI = function(rep) {
      * 
      * @returns {undefined}
      */
-    self.loadHighlights = function() {
+    self.loadHighlights = function () {
       var jsonStr = self.getAttribute('highlights');
       if (jsonStr != undefined && jsonStr != '') {
         highlighter.removeHighlights();
@@ -535,10 +535,10 @@ Viewer.initGUI = function(rep) {
     // Load the highlights initially.
     self.loadTextComments();
     self.loadAudioComments();
-
+    
     self.loadHighlights();
 
-    self.saveHighlights = function() {
+    self.saveHighlights = function () {
       // Before we save it. Remove helper css classes
       $(".selected", frameDocument).addClass("highlighted").removeClass("selected remotehover");
 
@@ -547,27 +547,27 @@ Viewer.initGUI = function(rep) {
     };
 
     // Highlighter buttons on the top left of the viewer.
-    $(".btnFill", viewerContainer).on("click", function() {
+    $(".btnFill", viewerContainer).on("click", function () {
       self.saveHighlights();
     });
 
-    $(".btnStrike", viewerContainer).on("click", function() {
+    $(".btnStrike", viewerContainer).on("click", function () {
       $(".selected", frameDocument).toggleClass("strike");
 
       self.saveHighlights();
     });
 
-    $(".btnScratchout", viewerContainer).on("click", function() {
+    $(".btnScratchout", viewerContainer).on("click", function () {
       $(".selected", frameDocument).toggleClass("scratchout");
       self.saveHighlights();
     });
 
-    $(".btnGlow", viewerContainer).on("click", function() {
+    $(".btnGlow", viewerContainer).on("click", function () {
       $(".selected", frameDocument).toggleClass("glow");
       self.saveHighlights();
     });
 
-    var addCommentDialog = function(element, callback) {
+    var addCommentDialog = function (element, callback) {
       var theDialogContainer = $("<div>");
       theDialogContainer.html('<textarea class="addCommentText" style="width: 96%; height: 98%;"></textarea>');
 
@@ -579,7 +579,7 @@ Viewer.initGUI = function(rep) {
         buttons: [
           {
             text: GUI.translate("Submit"),
-            click: function() {
+            click: function () {
               var text = $(".addCommentText", theDialogContainer).val().trim();
 
               if (text == "") {
@@ -610,12 +610,12 @@ Viewer.initGUI = function(rep) {
           },
           {
             text: GUI.translate("Cancel"),
-            click: function() {
+            click: function () {
               theDialog.dialog("close");
             }
           }
         ],
-        close: function() {
+        close: function () {
           // Do something after closing...
         }
       });
@@ -631,11 +631,11 @@ Viewer.initGUI = function(rep) {
       theDialog.dialog("open");
     };
 
-    $(".btnAddComment", viewerContainer).on("click", function() {
+    $(".btnAddComment", viewerContainer).on("click", function () {
 
       var selected = $(".selected", frameDocument);
 
-      addCommentDialog(selected, function(commentId) {
+      addCommentDialog(selected, function (commentId) {
         selected.addClass("commented")
                 .attr('data-comment', commentId);
 
@@ -649,7 +649,7 @@ Viewer.initGUI = function(rep) {
      * @param {type} callback
      * @returns {undefined}
      */
-    var addAudioDialog = function(element, callback) {
+    var addAudioDialog = function (element, callback) {
       var t = {// get translations
         clicktostart: self.translate(GUI.currentLanguage, 'Click to start recording.'),
         clicktostop: self.translate(GUI.currentLanguage, 'Recording... Click to stop recording.'),
@@ -684,11 +684,11 @@ Viewer.initGUI = function(rep) {
       var waveMimeType;
 
       // Playback functions and buttons
-      var playbackStartPause = function() {
+      var playbackStartPause = function () {
         audioObject.paused ? audioObject.play() : audioObject.pause();
       };
 
-      var playbackStop = function() {
+      var playbackStop = function () {
         audioObject.pause();
         audioObject.currentTime = 0;
       };
@@ -704,7 +704,7 @@ Viewer.initGUI = function(rep) {
       var btnStartRecording = $(".btnStartRecording", theDialogContainer);
       var btnStopRecording = $(".btnStopRecording", theDialogContainer);
 
-      btnStartRecording.on("click", function(event) {
+      btnStartRecording.on("click", function (event) {
         if (startRecording()) {
           btnStartRecording.toggle();
           btnStopRecording.toggle();
@@ -718,14 +718,14 @@ Viewer.initGUI = function(rep) {
             buttons: [
               {
                 text: GUI.translate("Yes"),
-                click: function() {
+                click: function () {
                   initAudio();
                   $(this).dialog("close");
                 }
               },
               {
                 text: GUI.translate("No"),
-                click: function() {
+                click: function () {
                   $(this).dialog("close");
                 }
               }
@@ -734,14 +734,14 @@ Viewer.initGUI = function(rep) {
         }
       });
 
-      btnStopRecording.on("click", function(event) {
+      btnStopRecording.on("click", function (event) {
         btnStartRecording.toggle();
         btnStopRecording.toggle();
 
-        stopRecording(false, function(blob) {
+        stopRecording(false, function (blob) {
           // Create the audio object...
           var reader = new FileReader();
-          reader.onloadend = function() {
+          reader.onloadend = function () {
             // Store the base64 encoded wave file...
             waveBase64 = reader.result;
             waveMimeType = blob.type;
@@ -751,21 +751,21 @@ Viewer.initGUI = function(rep) {
             if (audioObject) {
               $(".btnPlayback", theDialogContainer).prop("disabled", false);
 
-              $(audioObject).on('stalled', function() {
+              $(audioObject).on('stalled', function () {
                 audioObject.load();
               });
 
-              $(audioObject).on('playing', function() {
+              $(audioObject).on('playing', function () {
                 btnPlaybackStart.hide();
                 btnPlaybackPause.show();
               });
 
-              $(audioObject).on('pause', function() {
+              $(audioObject).on('pause', function () {
                 btnPlaybackStart.show();
                 btnPlaybackPause.hide();
               });
 
-              $(audioObject).on('ended', function() {
+              $(audioObject).on('ended', function () {
                 // chrome has a replay bug; load fixes it
                 if (window.chrome) {
                   audioObject.load();
@@ -786,7 +786,7 @@ Viewer.initGUI = function(rep) {
         buttons: [
           {
             text: GUI.translate("Submit"),
-            click: function() {
+            click: function () {
               if (waveBase64) {
                 var pageid = element.parents(".pf").attr("id");
                 var position = getGridPosition(element);
@@ -817,12 +817,12 @@ Viewer.initGUI = function(rep) {
           },
           {
             text: GUI.translate("Cancel"),
-            click: function() {
+            click: function () {
               theDialog.dialog("close");
             }
           }
         ],
-        close: function() {
+        close: function () {
           // Do something after closing...
         }
       });
@@ -839,11 +839,11 @@ Viewer.initGUI = function(rep) {
     }; // end addAudioDialog
 
 
-    $(".btnRecord", viewerContainer).on("click", function() {
+    $(".btnRecord", viewerContainer).on("click", function () {
       initAudio();
       var selected = $(".selected", frameDocument);
 
-      addAudioDialog(selected, function(commentId) {
+      addAudioDialog(selected, function (commentId) {
         $(".selected", frameDocument)
                 .addClass('audio')
                 .attr('data-audioobject', commentId);
@@ -851,13 +851,13 @@ Viewer.initGUI = function(rep) {
       });
     });
 
-    $(".btnRemove", viewerContainer).on("click", function() {
+    $(".btnRemove", viewerContainer).on("click", function () {
       $(".selected", frameDocument).each(function () {
         removeHighlight(this);
       });
     });
 
-    $(".btn", viewerContainer).on("click", function() {
+    $(".btn", viewerContainer).on("click", function () {
       var element = $(this);
 
       if (!element.hasClass("btnAddComment")
@@ -875,7 +875,7 @@ Viewer.initGUI = function(rep) {
   iframe.ready(initializeTextHighlighter); // IE
 };
 
-Viewer.createRepresentation = function(parent) {
+Viewer.createRepresentation = function (parent) {
   var self = this;
   var rep = GUI.svg.other(parent, "foreignObject");
   rep.dataObject = this;
@@ -884,8 +884,6 @@ Viewer.createRepresentation = function(parent) {
   var body = document.createElement("div");
   $rep.attr({id: this.getAttribute('id')});
   $rep.append(body);
-
-  var file = ObjectManager.getObject(this.getAttribute("file"));
 
   var $body = $(body);
   $body.addClass('paperViewer');
@@ -947,29 +945,6 @@ Viewer.createRepresentation = function(parent) {
 
   $body.append(highlightMenu);
 
-//  var audioMenu = $("<div>");
-//  audioMenu.addClass("audioMenu jPopover");
-//  audioMenu.html(
-//          '<div class="btn-group">' +
-//          '<input type="image" class="btn btnStartRecording lastChild" title="Click to start recording." src="/guis.common/images/oxygen/16x16/actions/media-recording-stopped.png" />' +
-//          '<input type="image" class="btn btnStopRecording firstChild" title="Recording... Click to stop recording." src="/guis.common/images/oxygen/16x16/actions/media-recording.png" />' +
-//          '</div>' +
-//          '<div class="btn-group">' +
-//          '<input type="image" class="btn btnPlay" title="Play" src="/guis.common/images/oxygen/16x16/actions/media-playback-start.png" />' +
-//          '<input type="image" class="btn btnPause firstChild" title="Pause" src="/guis.common/images/oxygen/16x16/actions/media-playback-pause.png" />' +
-//          '<input type="image" class="btn btnStop" title="Stop" src="/guis.common/images/oxygen/16x16/actions/media-playback-stop.png" />' +
-//          '</div>' +
-//          '<div class="btn-group">' +
-//          '<input type="image" class="btn btnUpload" title="Upload the recording to the server." src="/guis.common/images/oxygen/16x16/places/network-workgroup.png" />' +
-//          '</div>' +
-//          ''
-//          );
-
-//  $body.append(audioMenu);
-
-  this.drawTitle((file ? file.getAttribute("name") : ""));
-  this.createRepresentationIframe($body);
-
   // Various / helper stuff...
   var borderBottom = $("<div>");
   borderBottom.html('<div class="status"></div>');
@@ -979,6 +954,27 @@ Viewer.createRepresentation = function(parent) {
   var moveOverlay = $("<div>");
   moveOverlay.addClass("moveOverlay");
   $body.append(moveOverlay);
+
+  // The document object within this viewer.
+  this.document = ObjectManager.getObject(this.getAttribute("file"));
+
+  if (this.document) {
+    // We have a real hidden file object within this room.
+    this.updateTitle();
+  } else {
+    // We create a fake hidden file object with all information, which are
+    // required at this point of time.
+    this.document = this.createFakeHiddenFile(this.getAttribute("file"));
+
+    // We ask the database for additional information (such as the name,
+    // which is used for the title of the viewer)
+    this.getFakeHiddenFile(this.getAttribute("file"), function (fakeHiddenFile) {
+      self.document = fakeHiddenFile;
+      self.updateTitle();
+    });
+  }
+
+  this.createRepresentationIframe($body);
 
   // Init other GUI stuff (highlighter, events, ...)
   this.initGUI(rep);
@@ -991,7 +987,7 @@ Viewer.createRepresentation = function(parent) {
  * @param {type} $body
  * @returns {undefined}
  */
-Viewer.createRepresentationIframe = function($body) {
+Viewer.createRepresentationIframe = function ($body) {
   var self = this;
 
   var $iframe = $("<iframe>");
@@ -999,7 +995,7 @@ Viewer.createRepresentationIframe = function($body) {
 
   $body.append($iframe);
 
-  $iframe.on('load', function() {
+  $iframe.on('load', function () {
     // Add the iframe css file to the html document.
     $("head", $iframe.contents()).append('<link type="text/css" href="/guis/desktop/objects/paperViewerIFrame.css" rel="Stylesheet">');
 
@@ -1014,18 +1010,14 @@ Viewer.createRepresentationIframe = function($body) {
  * @param {type} title
  * @returns {undefined}
  */
-Viewer.drawTitle = function(title) {
+Viewer.updateTitle = function () {
   var rep = this.getRepresentation();
+  var title = this.document.getAttribute("name");
+
+  console.log(title);
 
   if (title) {
-    // Set a new title if needed.
-    rep.title = title;
-    //rep.titleWidthPx = $.fn.textWidth(title);
-    //Perhaps we may display some ... if the title is too long...
-  }
-
-  if (rep.title) {
-    $(".titleArea", rep).html('<span class="paperViewerTitle">' + rep.title + '</span><div title="' + rep.title + '" class="moveArea"></div>');
+    $(".titleArea", rep).html('<span class="paperViewerTitle">' + title + '</span><div title="' + title + '" class="moveArea"></div>');
   } else {
     $(".titleArea", rep).html('<span class="paperViewerTitle">' + this.translate(GUI.currentLanguage, 'No document...') + '</span><div class="moveArea"></div>');
   }
@@ -1038,29 +1030,61 @@ var getPaperUrl = 'http://' + window.location.hostname + ':8080/getPaper';
  * @param {type} documentId
  * @returns {undefined}
  */
-Viewer.setDocument = function(documentId) {
+Viewer.setDocument = function (documentId) {
   $("#iframe-" + this.getAttribute("id")).attr("src", getPaperUrl + "/" + this.getRoom().id + "/" + (documentId && documentId != "[somefileid]" ? documentId : "0") + '/' + ObjectManager.userHash);
 };
 
 /**
  * 
- * @param {type} documentId
+ * @param {type} fileId
  * @returns {undefined}
  */
-Viewer.reloadDocument = function(documentId) {
-	var file = ObjectManager.getObject(documentId);
-	var highlights = file.getAttribute('highlights');
-  this.document = file;
-	this.setAttribute('highlights', highlights);
+Viewer.reloadDocumentByFileId = function (fileId) {
+  var self = this;
+  this.getFakeHiddenFileByFile(fileId, function (fakeHiddenFile) {
+    self.document = fakeHiddenFile;
+    self.document.alreadyLoaded = true;
 
-	this.drawTitle((file ? file.getAttribute("name") : ""));
-	this.setDocument(documentId);
+    self.setAttribute("file", fakeHiddenFile.id);
+  });
+};
+
+/**
+ * 
+ * @param {type} hiddenFileId
+ * @returns {undefined}
+ */
+Viewer.reloadDocument = function (hiddenFileId) {
+  var self = this;
+
+  // Try to get the real hidden file object from the document id.
+  var hiddenFileInRoom = ObjectManager.getObject(hiddenFileId);
+  if (hiddenFileInRoom) {
+    this.document = hiddenFileInRoom;
+  } else {
+    // If the fake hidden file was already loaded. Skip this step.
+    // Happens if reloadDocumentByFileId is called.
+    if (!this.document || !this.document.alreadyLoaded) {
+      this.document = this.createFakeHiddenFile(hiddenFileId); // No title...
+
+      if (!this.document.name) {
+        // Title not loaded yet... Do so and update the title later.
+        this.getFakeHiddenFile(hiddenFileId, function (fakeHiddenFile) {
+          self.document = fakeHiddenFile;
+          self.updateTitle();
+        });
+      }
+    }
+  }
+
+  this.updateTitle();
+  this.setDocument(hiddenFileId);
 };
 
 /**
  * Called after object selection
  */
-Viewer.selectHandler = function() {
+Viewer.selectHandler = function () {
   GeneralObject.selectHandler();
 
   var rep = $(this.getRepresentation());
@@ -1070,7 +1094,7 @@ Viewer.selectHandler = function() {
 /**
  * Called after object deselection
  */
-Viewer.deselectHandler = function() {
+Viewer.deselectHandler = function () {
   GeneralObject.deselectHandler();
 
   var rep = $(this.getRepresentation());
@@ -1081,7 +1105,7 @@ Viewer.deselectHandler = function() {
  * 
  * @returns {undefined}
  */
-Viewer.onMoveStart = function() {
+Viewer.onMoveStart = function () {
   GeneralObject.onMoveStart();
 
   var rep = $(this.getRepresentation());
@@ -1092,7 +1116,7 @@ Viewer.onMoveStart = function() {
  * 
  * @returns {undefined}
  */
-Viewer.onMoveEnd = function() {
+Viewer.onMoveEnd = function () {
   GeneralObject.onMoveEnd();
 
   var rep = $(this.getRepresentation());
@@ -1103,12 +1127,10 @@ Viewer.onMoveEnd = function() {
  * 
  * @returns {undefined}
  */
-Viewer.resizeHandler = function() {
-
+Viewer.resizeHandler = function () {
   this.setDimensions(this.getViewWidth(), this.getViewHeight());
   this.setPosition(this.getViewX(), this.getViewY());
 
-  //this.drawTitle();
   this.adjustPaper();
 };
 
@@ -1116,7 +1138,7 @@ Viewer.resizeHandler = function() {
  * 
  * @returns {undefined}
  */
-Viewer.adjustPaper = function() {
+Viewer.adjustPaper = function () {
   var viewerContainer = $('[data-id="paperViewer-' + this.getAttribute('id') + '"]');
   var iframe = $('#iframe-' + this.getAttribute('id'));
 

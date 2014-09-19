@@ -8,17 +8,16 @@ var Modules = require('../../server.js');
 
 var Viewer = Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
-Viewer.register = function(type) {
+Viewer.register = function (type) {
   var that = this;
 
   // Registering the object
   GeneralObject = Modules.ObjectManager.getPrototype('GeneralObject');
   GeneralObject.register.call(this, type);
 
-
   // Registers the available rights ...
   this.registerRight("create", "You may create new content within this viewer.");
-  this.registerRight("read",   "You may access the content within this viewer.");
+  this.registerRight("read", "You may access the content within this viewer.");
   this.registerRight("update", "You may change the content within this viewer.");
   this.registerRight("delete", "You may delete the content within this viewer.");
   // ... and default roles for this object.
@@ -26,80 +25,90 @@ Viewer.register = function(type) {
   this.registerDefaultRole("Coworker", ["create", "read"]);
 
   this.makeSensitive();
-	this.registerAttribute('file', {type: 'text', changedFunction: function(object, value) {
-			object.reloadDocument(value);
-		},
-		setFunction: function(object, value) {
-			if(object.ObjectManager.isServer) {
-				Modules.ObjectManager.getObject(
-					object.getAttribute('inRoom'),
-					value,
-					true,
-					function(obj){
-						var highlights = obj.getAttribute('highlights');
-						// set the value nontheless
-						object.set('file', value);
-						object.set('highlights', highlights);
-					}
-				);
-			}
-			else {
-				object.set('highlights', ObjectManager.getObject(value).getAttribute('highlights'));
-				// set the value nontheless
-				object.set('file', value);
-			}
-		},
-	});
+  this.registerAttribute('file', {
+    type: 'text',
+    changedFunction: function (object, value) {
+      object.reloadDocument(value);
+    },
+    setFunction: function (object, value) {
+      if (object.ObjectManager.isServer) {
+        Modules.ObjectManager.getObject(
+                object.getAttribute('inRoom'),
+                value,
+                true,
+                function (obj) {
+                  var highlights = obj.getAttribute('highlights');
+                  // set the value nontheless
+                  object.set('file', value);
+                  object.set('highlights', highlights);
+                  // And save it!
+                  object.persist();
+                }
+        );
+      }
+      else {
+        // Normal object mean
+        object.set('highlights', object.document.getAttribute('highlights'));
+        // set the value nontheless
+        object.set('file', value);
+      }
+    }
+  });
 
-	this.registerAttribute('highlights', {type: 'text', standard: '', changedFunction: function(object, value) {
-console.log('Viewer.highlights changed');
-			object.loadHighlights();
-		},
-		setFunction: function(object, value) {
-			if(object.ObjectManager.isServer) {
-				object.set('highlights', value);
-				Modules.ObjectManager.getObject(
-					object.getAttribute('inRoom'),
-					object.getAttribute('file'),
-					true,
-					function(obj){
-						obj.setAttribute('highlights', value);
-					}
-				);
-			}
-console.log('Viewer.highlights set');
-		},
-    });
+  this.registerAttribute('highlights', {
+    type: 'text',
+    standard: '',
+    changedFunction: function (object, value) {
+      object.loadHighlights();
 
-  Modules.Dispatcher.registerCall("dbDocument_comments", function(data) {
+      // Load the highlights initially.
+      object.loadTextComments();
+      object.loadAudioComments();
+    },
+    setFunction: function (object, value) {
+      if (object.ObjectManager.isServer) {
+        object.set('highlights', value);
+        Modules.ObjectManager.getObject(
+                object.getAttribute('inRoom'),
+                object.getAttribute('file'),
+                true,
+                function (obj) {
+                  obj.setAttribute('highlights', value);
+                }
+        );
+      }
+    }
+  });
+
+  Modules.Dispatcher.registerCall("dbDocument_comments", function (data) {
+    that.addComment(data.data.user, data.data.id || data.data._id, data.data.data);
+  });
+
+  Modules.Dispatcher.registerCall("dbDocument_comments_audio", function (data) {
+    that.addComment(data.data.user, data.data.id || data.data._id, data.data.data);
+  });
+
+  Modules.Dispatcher.registerCall("dbDocumentAdded_comments", function (data) {
     that.addComment(data.user, data.id || data._id, data.data);
   });
 
-  Modules.Dispatcher.registerCall("dbDocument_comments_audio", function(data) {
+  Modules.Dispatcher.registerCall("dbDocumentAdded_comments_audio", function (data) {
     that.addComment(data.user, data.id || data._id, data.data);
   });
 
-  Modules.Dispatcher.registerCall("dbDocumentAdded_comments", function(data) {
-    that.addComment(data.user, data.id || data._id, data.data);
-  });
-
-  Modules.Dispatcher.registerCall("dbDocumentAdded_comments_audio", function(data) {
-    that.addComment(data.user, data.id || data._id, data.data);
-  });
-
-  Modules.Dispatcher.registerCall("dbDocumentRemoved_comments", function(data) {
+  Modules.Dispatcher.registerCall("dbDocumentRemoved_comments", function (data) {
     that.removeComment(data.id || data._id, "comment", "commented");
   });
 
-  Modules.Dispatcher.registerCall("dbDocumentRemoved_comments_audio", function(data) {
+  Modules.Dispatcher.registerCall("dbDocumentRemoved_comments_audio", function (data) {
     that.removeComment(data.id || data._id, "audioobject", "audio");
   });
 
-  Modules.Dispatcher.registerCall("dbAllDocumentsSend_comments", function(data) {
+  Modules.Dispatcher.registerCall("dbAllDocumentsSend_comments", function (data) {
     that.updateStatus();
   });
 
-  Modules.Dispatcher.registerCall("dbAllDocumentsSend_comments_audio", function(data) {
+  Modules.Dispatcher.registerCall("dbAllDocumentsSend_comments_audio", function (data) {
     that.updateStatus();
   });
 
@@ -107,7 +116,7 @@ console.log('Viewer.highlights set');
   this.standardData.height = 297 * 2;
 };
 
-Viewer.alwaysOnTop = function() {
+Viewer.alwaysOnTop = function () {
   // if( documentShown )
   return true;
 };
