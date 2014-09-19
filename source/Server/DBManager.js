@@ -20,7 +20,7 @@ var DBManager = {};
  * @param {type} data     Data object containing the required information
  * @returns {undefined}
  */
-DBManager.getDocuments = function(socket, data) {
+DBManager.getDocuments = function (socket, data) {
   var dbCollection = db.get(data.collection);
 
   // If data.column is defined, use it as the attribute to look for.
@@ -30,7 +30,7 @@ DBManager.getDocuments = function(socket, data) {
   else
     obj["objectid"] = String(data.object.id);
 
-  dbCollection.find(obj, {}, function(e, docs) {
+  dbCollection.find(obj, {}, function (e, docs) {
 
     if (data.oneMessage) {
       // Send one big message with all documents to the client.
@@ -53,7 +53,7 @@ DBManager.getDocuments = function(socket, data) {
  * @param {type} data     Data object containing the required information
  * @returns {undefined}
  */
-DBManager.addDocument = function(socket, data) {
+DBManager.addDocument = function (socket, data) {
   var dbCollection = db.get(data.collection);
   var connection = Modules.UserManager.getConnectionBySocket(socket);
 
@@ -88,7 +88,7 @@ DBManager.addDocument = function(socket, data) {
  * @param {type} data     Data object containing the required information
  * @returns {undefined}
  */
-DBManager.removeDocument = function(socket, data) {
+DBManager.removeDocument = function (socket, data) {
   var dbCollection = db.get(data.collection);
   var connection = Modules.UserManager.getConnectionBySocket(socket);
 
@@ -114,12 +114,30 @@ DBManager.removeDocument = function(socket, data) {
 };
 
 /**
+ * Returns a database objects for a given query from a given collection.
+ * 
+ * @param {type} query        MongoDB query.
+ * @param {type} collection   The collection to look in.
+ * @param {type} callback     Callback for the result.
+ * @returns {undefined}
+ */
+DBManager.query = function (query, collection, callback) {
+  var dbCollection = db.get(collection);
+  dbCollection.find(query, {}, function (e, docs) {
+    if (callback) {
+      callback(docs);
+    }
+  });
+};
+
+/**
  * Initializes the DBManager.
  * 
  * @param {type} theModules   The modules object
  * @returns {undefined}
  */
-DBManager.init = function(theModules) {
+DBManager.init = function (theModules) {
+  var self = this;
   Modules = theModules;
 
   db = require('monk')(Modules.MongoDBConfig.getURI());
@@ -128,6 +146,12 @@ DBManager.init = function(theModules) {
   Modules.Dispatcher.registerCall('dbGetDocuments', this.getDocuments);
   Modules.Dispatcher.registerCall('dbAddDocument', this.addDocument);
   Modules.Dispatcher.registerCall('dbRemoveDocument', this.removeDocument);
+
+  Modules.Dispatcher.registerCall('dbQuery', function (socket, data) {
+    self.query(data.query, data.collection, function (docs) {
+      Modules.SocketServer.sendToSocket(socket, "dbQueryResult_" + data.collection, docs);
+    });
+  });
 };
 
 module.exports = DBManager;

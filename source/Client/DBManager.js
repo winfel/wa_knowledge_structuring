@@ -19,10 +19,10 @@ var DBManager = {};
  * @param {type} [callback]           The callback which will receive the result (optional)
  * @param {type} [column]             Default is "objectid" (optional)
  */
-DBManager.getDocuments = function(object, collection, callback, column) {
+DBManager.getDocuments = function (object, collection, callback, column) {
 
   if (callback) {
-    Dispatcher.registerCall("dbDocuments_" + collection + "_" + object.id, function(documents) {
+    Dispatcher.registerCall("dbDocuments_" + collection + "_" + object.id, function (documents) {
       if (callback)
         callback(documents);
       Dispatcher.removeCall("dbDocuments_" + collection + "_" + object.id);
@@ -47,9 +47,9 @@ DBManager.getDocuments = function(object, collection, callback, column) {
  * @param {type} data         The data to be stored
  * @param {type} callback     [Optional]. A callback. If given, the server will only send a message to the client who called. 
  */
-DBManager.addDocument = function(object, collection, id, data, callback) {
+DBManager.addDocument = function (object, collection, id, data, callback) {
   if (callback) {
-    Dispatcher.registerCall("dbDocumentAdded_" + collection + "_" + object.id, function(result) {
+    Dispatcher.registerCall("dbDocumentAdded_" + collection + "_" + object.id, function (result) {
       callback(result);
       Dispatcher.removeCall("dbDocumentAdded_" + collection + "_" + object.id);
     });
@@ -72,9 +72,9 @@ DBManager.addDocument = function(object, collection, id, data, callback) {
  * @param {type} id           The unique id of the data element, which should be removed (some sort of hash)
  * @param {type} callback     [Optional]. A callback. If given, the server will only send a message to the client who called. 
  */
-DBManager.removeDocument = function(object, collection, id, callback) {
+DBManager.removeDocument = function (object, collection, id, callback) {
   if (callback) {
-    Dispatcher.registerCall("dbDocumentRemoved_" + collection + "_" + object.id, function(result) {
+    Dispatcher.registerCall("dbDocumentRemoved_" + collection + "_" + object.id, function (result) {
       callback(result);
       Dispatcher.removeCall("dbDocumentRemoved_" + collection + "_" + object.id);
     });
@@ -85,5 +85,29 @@ DBManager.removeDocument = function(object, collection, id, callback) {
     'collection': collection,
     'object': {id: object.id, type: object.type},
     'id': id
+  });
+};
+
+/**
+ * Returns a specific field value for a given query from a given collection.
+ * 
+ * @function query
+ * @param {type} query        MongoDB query.
+ * @param {type} collection   The collection to look in.
+ * @param {type} callback     Callback for the result.
+ * @returns {undefined}
+ */
+DBManager.query = function (query, collection, callback) {
+
+  if (callback) {
+    Dispatcher.registerCall("dbQueryResult_" + collection, function (result) {
+      callback(result);
+      Dispatcher.removeCall("dbQueryResult_" + collection);
+    });
+  }
+
+  Modules.SocketClient.serverCall('dbQuery', {
+    'query': query,
+    'collection': collection
   });
 };
