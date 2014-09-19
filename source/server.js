@@ -25,6 +25,7 @@
 * @requires ./Server/controllers/ObjectController
 * @requires ./Server/controllers/ServerController
 * @requires ./Server/controllers/EtherpadController
+* @requires ./Server/apihandler/InternalDispatcher
 * @requires ./Server/PluginManager
 *
 */
@@ -111,6 +112,10 @@ Modules.TranslationManager  = require('./Common/TranslationManager.js');
 Modules.ActionManager       = require('./Common/ActionManager.js');
 Modules.TagManager          = require('./Server/TagManager.js');
 
+if (Modules.config.tcpApiServer) {
+	Modules['TcpEventServer']  = require("./Server/TcpSocketServer.js").create();
+}
+
 Modules.Connector = Modules.config.connector; //shortcut
 
 // Controllers
@@ -118,6 +123,8 @@ Modules.RoomController      = require('./Server/controllers/RoomController.js');
 Modules.ObjectController    = require('./Server/controllers/ObjectController.js');
 Modules.ServerController    = require('./Server/controllers/ServerController.js');
 Modules.EtherpadController  = require('./Server/controllers/EtherpadController.js');
+
+Modules.InternalDispatcher = require('./Server/apihandler/InternalDispatcher.js');
 
 //DAO (Data Access Object) 
 Modules.UserDAO  = require('./Server/db/UserDAO.js');
@@ -131,6 +138,12 @@ for (var name in Modules) {
 	if (module.init) {
 		module.init(Modules);
 	}
+}
+
+//load plugins
+if (Modules.config.plugins) {
+	Modules.PluginManager = require('./Server/PluginManager.js').create();
+	Modules.PluginManager.init(Modules, Modules.config.plugins);
 }
 
 // launchers
