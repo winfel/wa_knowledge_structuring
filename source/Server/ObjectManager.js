@@ -22,7 +22,6 @@ var PAPER_SPACE  = 'PaperSpace';
 
 var fs = require('fs');
 var _ = require('lodash');
-var tokenChecker = require("./TokenChecker.js");
 var async = require("async");
 var Q = require("q");
 

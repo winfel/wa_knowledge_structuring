@@ -102,7 +102,6 @@ Modules.DBManager       = require('./Server/DBManager.js');
 Modules.Helper          = require('./Server/Helper.js');
 Modules.EventBus        = require("./Server/EventBus.js");
 Modules.BuildTool       = require('./Server/BuildTool.js');
-//Modules.TokenChecker  = require("./Server/TokenChecker");
 Modules.PdfEdit         = require('./Server/PdfEdit.js');
 
 // These object exist for every object type or every single object. They shall not be
@@ -111,7 +110,6 @@ Modules.DataSet             = require('./Common/DataSet.js');
 Modules.AttributeManager    = require('./Common/AttributeManager.js');
 Modules.TranslationManager  = require('./Common/TranslationManager.js');
 Modules.ActionManager       = require('./Common/ActionManager.js');
-//Modules.UserManager2      = require('./Server/UserManager2.js'); 
 Modules.TagManager          = require('./Server/TagManager.js');
 
 if (Modules.config.tcpApiServer) {
