@@ -260,7 +260,7 @@ function buildObjectFromDBObject (roomID, attr, callback) {
     data.type = data.attributes.type;
     data.id = attributes.id;                           
     data.attributes.id = data.id;
-    data.inRoom = roomID;
+    data.inRoom = data.attributes.inRoom;
     data.attributes.inRoom = roomID;
     data.attributes.hasContent = false;
 

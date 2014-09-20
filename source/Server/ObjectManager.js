@@ -836,7 +836,7 @@ function buildObjectFromObjectData(objectData, roomID, type) {
    obj.rights = objectData.rights;
    obj.id = objectData.id;
    obj.attributeManager.set(objectData.id, 'id', objectData.id);
-   obj.inRoom = roomID;
+   obj.inRoom = roomID || objectData.inRoom;
    obj.set('type', type);
 
    if (!runtimeData[obj.id]) runtimeData[obj.id] = {}; // create runtime data for this object if there is none

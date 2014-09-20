@@ -80,7 +80,7 @@ theObject.referenceDropped = function(fileId, callback) {
 	var that = this;
 	// if we set the roomId to current room, the returned object appears to be in this room - but this is bad, as we now steal the objects, if anything is changed (setAttribute('progress') also changes the room - unintentionally)
 	// TODO: get real room of object - or get it another way (I have an idea)
-	Modules.ObjectManager.getObject(that.getAttribute('inRoom'), fileId, that.context, function(object){
+	Modules.ObjectManager.getObject(false, fileId, that.context, function(object){
 		//object.fireEvent('enter', that); // doesn't work/not implemented
 		that.onEnter(object, false);
 	});
