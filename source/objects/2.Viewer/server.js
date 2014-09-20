@@ -17,7 +17,7 @@ theObject.onEnter = function(object, data) {
 		if(object.getAttribute('mimeType').match(/.*\/pdf$/)) {
 			// search for hidden file, connected to this pdf (by attribute belongsTo or by name)
 			Modules.Connector.getObjectDataByQuery({
-				// TODO: maybe add room??
+				inRoom: that.getAttribute('inRoom'),
 				mimeType:'text/html',
 				type:'HiddenFile',
 				$or: [
@@ -37,6 +37,7 @@ theObject.onEnter = function(object, data) {
 					console.log('convert pdf on demand');
 					Modules.EventBus.emit('pdfAdded', {
 						object: object,
+						inRoom: that.getAttribute('inRoom'), // the hidden file should be created in same room as viewer
 						callback: function(newObjectId) {
 							that.set("file", newObjectId);
 							that.set('highlights', '');
@@ -46,9 +47,10 @@ theObject.onEnter = function(object, data) {
 				}
 			});
 		}
-
-		object.setAttribute("x", object.getAttribute("xPrev"));
-		object.setAttribute("y", object.getAttribute("yPrev"));
+		if(data) { // if data is not present, it wasn't a real object from this room
+			object.setAttribute("x", object.getAttribute("xPrev"));
+			object.setAttribute("y", object.getAttribute("yPrev"));
+		}
 	}
 
   this.fireEvent('enter', object);
@@ -70,5 +72,19 @@ theObject.onMoveOutside = function(object, data) {
     object.setAttribute("yPrev", object.getAttribute("y"));
   }
 };
+
+/**
+ * referenceDropped is called, when a reference is dropped from reference container. The document might be in a different room and we get only the fileId.
+ */
+theObject.referenceDropped = function(fileId, callback) {
+	var that = this;
+	// if we set the roomId to current room, the returned object appears to be in this room - but this is bad, as we now steal the objects, if anything is changed (setAttribute('progress') also changes the room - unintentionally)
+	// TODO: get real room of object - or get it another way (I have an idea)
+	Modules.ObjectManager.getObject(that.getAttribute('inRoom'), fileId, that.context, function(object){
+		//object.fireEvent('enter', that); // doesn't work/not implemented
+		that.onEnter(object, false);
+	});
+};
+theObject.referenceDropped.public = true;
 
 module.exports=theObject;

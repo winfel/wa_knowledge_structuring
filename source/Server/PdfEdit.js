@@ -14,7 +14,11 @@ var pdftohtml = require('pdftohtmljs'),
 var PdfEdit = {
 	/**
 	*	converts a file or content of a pdf object to html and adds the new contents to the given object
-	*	@param data {file:{path:'path/to/file'}, object:object} or {object:object}
+	*	@param data {
+	*		object:object,
+	*		file:{path:'path/to/pdfContent'}, // optional
+	*		inRoom:'roomId', // optional
+	*	}
 	*/
 	convertToHtml : function(data, callback){
 		//console.dir(data);
@@ -53,7 +57,7 @@ var PdfEdit = {
 			if(!callback)
 				callback = function(){};
 			Modules.ObjectManager.createObject(
-				data.object.inRoom,
+				data.inRoom || data.object.inRoom,
 				'HiddenFile',
 				{
 					hasContent: true,

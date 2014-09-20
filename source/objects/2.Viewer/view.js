@@ -78,10 +78,10 @@ Viewer.initGUI = function(rep) {
 
   viewerContainer.droppable({
     drop: function (event, ui) {
-
-      console.log(ui.draggable.context.id);
-      //var objectId = ui.draggable.context.id.split("_")[2];
-    }});
+      var fileId = ui.draggable.context.id.split("_")[2];
+      self.serverCall('referenceDropped', fileId);
+    }
+  });
 
   /**
    * 
