@@ -513,6 +513,8 @@ ReferenceContainer.addFiles = function (files) {
       revert: 'invalid',
       appendTo: 'body'
     });
+    
+    $(rep).find("#representation_for_" + id).data("file", files[key]);
   }
 
 };

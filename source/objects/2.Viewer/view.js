@@ -947,26 +947,6 @@ Viewer.createRepresentation = function(parent) {
 
   $body.append(highlightMenu);
 
-//  var audioMenu = $("<div>");
-//  audioMenu.addClass("audioMenu jPopover");
-//  audioMenu.html(
-//          '<div class="btn-group">' +
-//          '<input type="image" class="btn btnStartRecording lastChild" title="Click to start recording." src="/guis.common/images/oxygen/16x16/actions/media-recording-stopped.png" />' +
-//          '<input type="image" class="btn btnStopRecording firstChild" title="Recording... Click to stop recording." src="/guis.common/images/oxygen/16x16/actions/media-recording.png" />' +
-//          '</div>' +
-//          '<div class="btn-group">' +
-//          '<input type="image" class="btn btnPlay" title="Play" src="/guis.common/images/oxygen/16x16/actions/media-playback-start.png" />' +
-//          '<input type="image" class="btn btnPause firstChild" title="Pause" src="/guis.common/images/oxygen/16x16/actions/media-playback-pause.png" />' +
-//          '<input type="image" class="btn btnStop" title="Stop" src="/guis.common/images/oxygen/16x16/actions/media-playback-stop.png" />' +
-//          '</div>' +
-//          '<div class="btn-group">' +
-//          '<input type="image" class="btn btnUpload" title="Upload the recording to the server." src="/guis.common/images/oxygen/16x16/places/network-workgroup.png" />' +
-//          '</div>' +
-//          ''
-//          );
-
-//  $body.append(audioMenu);
-
   this.drawTitle((file ? file.getAttribute("name") : ""));
   this.createRepresentationIframe($body);
 
