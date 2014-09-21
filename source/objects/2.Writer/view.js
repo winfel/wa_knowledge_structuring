@@ -15,11 +15,9 @@ Writer.draw = function (external) {
   this.setViewWidth(this.getAttribute('width'));
   this.setViewHeight(this.getAttribute('height'));
   
-  console.log(rep);
-  
   $(rep).attr("layer", this.getAttribute('layer'));
   this.updateContent();
-}
+};
 
 Writer.updateContent = function () {
   var rep = this.getRepresentation();
@@ -33,7 +31,7 @@ Writer.updateContent = function () {
     that.oldContent = text;
 
   });
-}
+};
 
 /**
  * @param parent
@@ -83,4 +81,4 @@ Writer.createRepresentation = function (parent) {
   this.initGUI(rep);
 
   return rep;
-}
+};
