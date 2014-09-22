@@ -82,7 +82,7 @@ everyauth.password
         .loginSuccessRedirect('/room/public') // Where to redirect to after a
                                               // login
 
-        .getRegisterPath('/login') // Uri path to the registration page
+        .getRegisterPath('/login#toregister')     // Uri path to the registration page
         .postRegisterPath('/register') // The Uri path that your registration form POSTs to
         .registerView('login.html')
         .validateRegistration(function(newUserAttributes) {
@@ -98,12 +98,14 @@ everyauth.password
                 errors.push('Missing password');
             } else if (!validator.isLength(newUserAttributes.password, 3, 8)) {
                 errors.push('Password should be 3 to 8 characters long');
+            } else if (newUserAttributes.password != newUserAttributes.passwordsignup_confirm) {
+                errors.push('Password confirmation does not match');
             }
             
             if ((newUserAttributes.e_mail) && (!validator.isEmail(newUserAttributes.e_mail))) {
                 errors.push('A valid email is required');
             }
-
+            
             return errors;
         })
         .registerUser(function(newUserAttributes) {
@@ -126,7 +128,8 @@ everyauth.password
 
 everyauth.password.extractExtraRegistrationParams(function(req) {
   return {
-    e_mail: req.body.e_mail
+    e_mail: req.body.e_mail,
+    passwordsignup_confirm: req.body.passwordsignup_confirm
   };
 });
 

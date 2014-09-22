@@ -1,0 +1,51 @@
+{{#extend "head"}}
+<link type="text/css" href="/guis.common/css/login.css" rel="Stylesheet">
+{{/extend}}
+
+<div id="header">
+  <div class="header_right"></div>
+  <div class="header_left"></div>
+</div>
+
+<div id="content"></div>
+
+
+<form name="login" action="/login" method="post">
+  <div id="login_background" style=" ">&nbsp;</div>
+  <div id="login" style="">
+
+    <div class="login_title" id="login_title">Already using CoW? </div>
+    {{#if errors}} 
+    <div class="login_error">
+      {{#each errors}}
+      <span>{{this}}</span><br />
+      {{/each}}
+    </div> 
+    {{/if}}
+
+    <div class="login_icon login_icon_username"></div>
+    <input type="text" name="username" {{#if login}} value={{login}} {{/if}} id="login_username" class="login_input" autocomplete="off" placeholder="Username" autofocus="autofocus" />
+           <br />
+    <div class="login_icon login_icon_password"></div>
+    <input type="password" name="password" value="" id="login_password" class="login_input" autocomplete="off" placeholder="Password" />
+    <br />
+    <input type="submit" name="login" value="Sign in" class="login_submit" id="login_submit" />
+
+  </div>
+</form>
+
+<form name="login" action="/register" method="post">
+  <div id="sign_up" style="">
+    <div class="sign_up_title" id="sign_up_title">New to CoW?</div>
+    <div class="login_icon login_icon_username"></div>
+    <input type="text" name="username" value="{{userParams.username}}" id="login_username" class="login_input" autocomplete="off" placeholder="Username" autofocus="autofocus" />
+    <br />
+    <div class="login_icon sign_up_icon_email"></div>
+    <input type="text" name="e_mail" value="{{userParams.e_mail}}" id="login_username" class="login_input" autocomplete="off" placeholder="E-Mail" autofocus="autofocus" />
+    <br />
+    <div class="login_icon login_icon_password"></div>
+    <input type="password" name="password" value="" id="login_password" class="login_input" autocomplete="off" placeholder="Password" />
+    <br />
+    <input type="submit" name="login" value="Create account" class="sign_up_submit" id="sign_up_submit" />
+  </div>
+</form> 
