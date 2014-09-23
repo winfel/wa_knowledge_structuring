@@ -1234,6 +1234,7 @@ span.portlet-toggle, span.portlet-delete, span.sec-tag-delete {
 #search img {
   vertical-align: top;
   cursor: pointer;
+  float: right;
 }
 
 #search input[type="checkbox"] {
@@ -1247,13 +1248,11 @@ span.portlet-toggle, span.portlet-delete, span.sec-tag-delete {
 }
 
 #search #mimeTypesColumn1 {
-  width: 45%;
-  float:left;
+  display:inline-flex;
 }
 
 #search #mimeTypesColumn2 {
-  width: 45%;
-  display: inline-block;
+  display:inline-flex;
 }
 /* end Search Sidebar*/
 
