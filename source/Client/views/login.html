@@ -29,13 +29,15 @@
                                 <div class="login_title" id="login_title"><h1>Already using CoW? Log in!</h1> </div>
                                 
                                 {{#if errors}} 
-	                              <p> 
-								    <div class="login_error">
-								      {{#each errors}}
-								      <span>{{this}}</span><br />
-								      {{/each}}
-								    </div> 
-								  </p>
+                                	{{#if login}}
+			                              <p> 
+										    <div class="login_error">
+										      {{#each errors}}
+										      <span>{{this}}</span><br />
+										      {{/each}}
+										    </div> 
+										  </p>
+								   {{/if}}
 							    {{/if}}
                                 
                                 <p> 
@@ -61,13 +63,15 @@
                                 <h1> Sign up </h1> 
                                 
                                 {{#if errors}} 
-	                              <p> 
-								    <div class="login_error">
-								      {{#each errors}}
-								      <span>{{this}}</span><br />
-								      {{/each}}
-								    </div> 
-								  </p>
+                                	{{#if userParams.username}} 
+		                              <p> 
+									    <div class="login_error">
+									      {{#each errors}}
+									      <span>{{this}}</span><br />
+									      {{/each}}
+									    </div> 
+									  </p>
+								  {{/if}}
 							    {{/if}}
 							    
                                 <p> 
