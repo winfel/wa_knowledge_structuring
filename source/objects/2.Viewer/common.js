@@ -17,13 +17,13 @@ Viewer.register = function(type) {
 
 
   // Registers the available rights ...
-  this.registerRight("create", "You may create new content within this viewer.");
-  this.registerRight("read",   "You may access the content within this viewer.");
-  this.registerRight("update", "You may change the content within this viewer.");
-  this.registerRight("delete", "You may delete the content within this viewer.");
+//  this.registerRight("create", "You may create new content within this viewer.");
+//  this.registerRight("read",   "You may access the content within this viewer.");
+//  this.registerRight("update", "You may change the content within this viewer.");
+//  this.registerRight("delete", "You may delete the content within this viewer.");
   // ... and default roles for this object.
-  this.registerDefaultRole("Reader", ["read"]);
-  this.registerDefaultRole("Coworker", ["create", "read"]);
+//  this.registerDefaultRole("Reader", ["read"]);
+//  this.registerDefaultRole("Coworker", ["create", "read"]);
 
   this.makeSensitive();
 	this.registerAttribute('file', {type: 'text', changedFunction: function(object, value) {

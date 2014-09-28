@@ -32,6 +32,7 @@ PaperSpace.register = function(type) {
   IconObject.register.call(this, type);
 
   // Registers the available rights ...
+  this.supportsRightmanager = true; // We use this variable to make sure that not every simple object has a right manager
   this.registerRight("read", "A user may read the content of this paper space.", "Room");
 
   var self = this;
