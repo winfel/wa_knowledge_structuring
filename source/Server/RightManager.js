@@ -303,6 +303,7 @@ var RightManager = function () {
       });
 
     } else if (object.inRoom) {
+
       // No room yet, so we use the inRoom variable to get to the parent room...
       dbObjects.find({id: object.inRoom, type: "Room"}, {}, function (e, objects) {
         if (objects && objects.length > 0) {
@@ -335,8 +336,6 @@ var RightManager = function () {
     if (recursive == undefined)
       recursive = true;
 
-    console.log(dataObject);
-
     var dbRoles = db.get('roles');
     dbRoles.find({objectid: String(dataObject.id)}, {}, function (e, roles) {
 
@@ -360,7 +359,6 @@ var RightManager = function () {
         }
       } else {
         // Object found. Check roles.
-        console.log("object found");
         var accessGranted = false;
         roles.forEach(function (role) {
           // Check if the role contains the needed right
