@@ -423,7 +423,7 @@ FavouritesContainer.addFiles = function(files){
 	$(rep).find(".spinner").remove();
 	
 	if(files.length == 0){
-		$(rep).find("#sortablefiles").html("Add your favourite files by right click on any file in the global space containers or by simply drag and drop!");
+		$(rep).find("#sortablefiles").html("Add your favourite files by right click on any file in the global space containers or by simply drag and drop.");
 		return;
 	}
 	else{
@@ -506,7 +506,7 @@ FavouritesContainer.addFiles = function(files){
 				$("div.addremove-menu").remove();
 				
 				if($(rep).find(".ui-widget-content").length == 0){
-					$(rep).find("#sortablefiles").html("Add your favourite files by right click on any file in the global space containers or by simply drag and drop!");
+					$(rep).find("#sortablefiles").html("Add your favourite files by right click on any file in the global space containers or by simply drag and drop.");
 				}
 				
 			});

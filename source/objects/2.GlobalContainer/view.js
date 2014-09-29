@@ -420,7 +420,7 @@ GlobalContainer.addFiles = function(files){
 	$(rep).find(".spinner").remove();
 	
 	if(files.length == 0){
-		$(rep).find("#sortablefiles").html("This Container shows all files which are tagged with the main Tag "+$(rep).find("#containername").html()+"!");
+		$(rep).find("#sortablefiles").html("This Container shows all files which are tagged with the main Tag "+$(rep).find("#containername").html()+".");
 		return;
 	}
 	else{
