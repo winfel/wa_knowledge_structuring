@@ -156,10 +156,11 @@ GUI.chat.addMessage = function(username, text, userColor, read) {
 }
 
 /**
- * add a single message to the chat window
+ * add a single message to the chat box, and calls the createChatbox as well,
+ * to create the new box or show an old one.
+ * @function addMessageOne
  * @param {String} username The username of the sender
  * @param {String} text The text of the message
- * @param {String} [userColor=#000000] The senders user color
  * @param {Boolean} read True, if it is an old message
  */
 GUI.chat.addMessageOne = function(username, text, userColor, read) {
@@ -221,7 +222,15 @@ GUI.chat.hideNotifier = function() {
 	$("#chat_notifier").css("opacity", 0);
 }
 
-
+/**
+ * Creates a new chat box if it already doesn't exist. If a message
+ * has already been sent to a user and the window is closed, instead
+ * of creating a new box the existing one will be shown again. Every
+ * new box gets a random number for identification purpose.
+ * @function createChatbox
+ * @param {String} user username that has been clicked on in the sidebar
+ * @param {Int} random_id null if it is a new chat box, and the random identification number if an old closed box wanted to be shown
+ */
 GUI.chat.createChatbox = function(user, random_id) {
 
     if ( $("#chat-"+user).length != 0 ){
