@@ -20,7 +20,7 @@ GUI.currentLanguage = Modules.Config.language;
  * @param {type} event
  * @returns {undefined}
  */
-window.onpopstate = function(event) {
+window.onpopstate = function (event) {
   if (!event.state)
     return;
   var room = event.state.room;
@@ -35,9 +35,9 @@ window.onpopstate = function(event) {
 GUI.translationManager = Object.create(TranslationManager);
 
 /**
-*@function init
-* @param undefined
-*/
+ *@function init
+ * @param undefined
+ */
 GUI.translationManager.init(undefined);
 
 /**
@@ -45,7 +45,7 @@ GUI.translationManager.init(undefined);
  * @param {type} language
  * @param {type} data
  */
-GUI.setTranslations = function(language, data) {
+GUI.setTranslations = function (language, data) {
   return this.translationManager.addTranslations(language, data);
 };
 
@@ -53,7 +53,7 @@ GUI.setTranslations = function(language, data) {
  * @function translate
  * @param {type} text
  */
-GUI.translate = function(text) {
+GUI.translate = function (text) {
   return this.translationManager.get(this.currentLanguage, text);
 };
 
@@ -68,7 +68,7 @@ GUI.isTouchDevice = false;
  * @param {webarenaObject} webarenaObject
  * @deprecated still needed?
  */
-GUI.updateGUI = function(webarenaObject) {
+GUI.updateGUI = function (webarenaObject) {
 
 };
 
@@ -77,8 +77,8 @@ GUI.updateGUI = function(webarenaObject) {
  * @function initResizeHandler
  * @returns {undefined}
  */
-GUI.initResizeHandler = function() {
-  $(document).bind("resize", function() {
+GUI.initResizeHandler = function () {
+  $(document).bind("resize", function () {
     GUI.adjustContent();
   });
 };
@@ -88,7 +88,7 @@ GUI.initResizeHandler = function() {
  * @function adjustContent
  * @param  {webarenaObject} [webarenaObject] concrete object to check for
  */
-GUI.adjustContent = function(webarenaObject) {
+GUI.adjustContent = function (webarenaObject) {
 
   if (webarenaObject != undefined) {
 
@@ -123,7 +123,7 @@ GUI.adjustContent = function(webarenaObject) {
     var maxX = 0;
     var maxY = 0;
 
-    $.each(ObjectManager.getObjects(), function(key, object) {
+    $.each(ObjectManager.getObjects(), function (key, object) {
 
       var mx = Math.round(object.getAttribute("x") + object.getAttribute("width"));
       var my = Math.round(object.getAttribute("y") + object.getAttribute("height"));
@@ -159,7 +159,7 @@ GUI.adjustContent = function(webarenaObject) {
  * @function setRoomWidth
  * @param {int} width new width of the room
  */
-GUI.setRoomWidth = function(width) {
+GUI.setRoomWidth = function (width) {
 
   var currentRoom = ObjectManager.getCurrentRoom();
   if (!currentRoom)
@@ -180,7 +180,7 @@ GUI.setRoomWidth = function(width) {
  * @function setRoomHeight
  * @param {int} height new height of the room
  */
-GUI.setRoomHeight = function(height) {
+GUI.setRoomHeight = function (height) {
 
   var currentRoom = ObjectManager.getCurrentRoom();
   if (!currentRoom)
@@ -197,11 +197,11 @@ GUI.setRoomHeight = function(height) {
 };
 
 /**
-  * Deselects all objects in the current room
-  * @function deselectAllObjects
+ * Deselects all objects in the current room
+ * @function deselectAllObjects
  */
-GUI.deselectAllObjects = function() {
-  $.each(ObjectManager.getSelected(), function(index, object) {
+GUI.deselectAllObjects = function () {
+  $.each(ObjectManager.getSelected(), function (index, object) {
     object.deselect();
   });
 };
@@ -218,9 +218,9 @@ GUI.shiftKeyDown = false;
  * @function initShiftKeyHandling
  * @returns {undefined}
  */
-GUI.initShiftKeyHandling = function() {
+GUI.initShiftKeyHandling = function () {
 
-  $(document).click(function(e) {
+  $(document).click(function (e) {
     if (e.shiftKey) {
       e.preventDefault();
       e.stopPropagation();
@@ -228,13 +228,13 @@ GUI.initShiftKeyHandling = function() {
     }
   });
 
-  $(document).bind("keydown", function(event) {
+  $(document).bind("keydown", function (event) {
     if (event.keyCode == 16) {
       GUI.shiftKeyDown = true;
     }
   });
 
-  $(document).bind("keyup", function(event) {
+  $(document).bind("keyup", function (event) {
     if (event.keyCode == 16) {
       GUI.shiftKeyDown = false;
     }
@@ -253,9 +253,9 @@ GUI.blockKeyEvents = false;
  * @function initMoveByKeyboard
  * @returns {undefined}
  */
-GUI.initMoveByKeyboard = function() {
+GUI.initMoveByKeyboard = function () {
 
-  $(document).bind("keydown", function(event) {
+  $(document).bind("keydown", function (event) {
 
     if ($("input:focus,textarea:focus").get(0) != undefined)
       return;
@@ -266,7 +266,7 @@ GUI.initMoveByKeyboard = function() {
       var d = 1;
     }
 
-    $.each(ObjectManager.getSelected(), function(index, object) {
+    $.each(ObjectManager.getSelected(), function (index, object) {
 
       // If left, right, up, down arrow, then prevent the default behavior of the browser.
       // In other words: Tell the browser, leave this event alone, I take care of it!
@@ -305,8 +305,8 @@ GUI.initMoveByKeyboard = function() {
  * @function initUndoByKeyboard
  * @returns {undefined}
  */
-GUI.initUndoByKeyboard = function() {
-  $(document).bind("keydown", function(event) {
+GUI.initUndoByKeyboard = function () {
+  $(document).bind("keydown", function (event) {
     var ctrlDown = event.ctrlKey || event.metaKey;
     if (ctrlDown && event.which == 90) {
       event.preventDefault();
@@ -321,9 +321,9 @@ GUI.initUndoByKeyboard = function() {
  * @function initObjectDeletionByKeyboard
  * @returns {undefined}
  */
-GUI.initObjectDeletionByKeyboard = function() {
+GUI.initObjectDeletionByKeyboard = function () {
 
-  $(document).bind("keydown", function(event) {
+  $(document).bind("keydown", function (event) {
 
     if ($("input:focus,textarea:focus").get(0) == undefined) {
 
@@ -335,7 +335,7 @@ GUI.initObjectDeletionByKeyboard = function() {
 
         if (result) {
           /* delete selected objects */
-          $.each(ObjectManager.getSelected(), function(key, object) {
+          $.each(ObjectManager.getSelected(), function (key, object) {
 
             if ($(object.getRepresentation()).data("jActionsheet")) {
               $(object.getRepresentation()).data("jActionsheet").remove();
@@ -355,9 +355,9 @@ GUI.initObjectDeletionByKeyboard = function() {
  * @function initObjectCopyCutPasteHandlingByKeyboard
  * @returns {undefined}
  */
-GUI.initObjectCopyCutPasteHandlingByKeyboard = function() {
+GUI.initObjectCopyCutPasteHandlingByKeyboard = function () {
 
-  $(document).bind("keydown", function(event) {
+  $(document).bind("keydown", function (event) {
 
     if ($("input:focus,textarea:focus").get(0) == undefined) {
 
@@ -387,11 +387,11 @@ GUI.initObjectCopyCutPasteHandlingByKeyboard = function() {
  * @function initMouseHandler
  * @returns {undefined}
  */
-GUI.initMouseHandler = function() {
+GUI.initMouseHandler = function () {
 
   if (GUI.isTouchDevice) {
 
-    var touchHandler = function(event) {
+    var touchHandler = function (event) {
 
       jPopoverManager.hideAll();
 
@@ -416,7 +416,7 @@ GUI.initMouseHandler = function() {
       } else {
         GUI.deselectAllObjects();
         GUI.updateInspector();
-        
+
         GUI.rightmanager.update();
       }
     };
@@ -425,11 +425,11 @@ GUI.initMouseHandler = function() {
 
   } else {
 
-    var mousedown = function(event) {
+    var mousedown = function (event) {
       jPopoverManager.hideAll();
-	  
-	  $("div.addremove-menu").remove();
-	  $("div.global-menu").remove();
+
+      $("div.addremove-menu").remove();
+      $("div.global-menu").remove();
 
       var contentPosition = $("#content").offset();
 
@@ -478,14 +478,14 @@ GUI.initMouseHandler = function() {
 
     };
 
-    var mousemove = function(event) {
+    var mousemove = function (event) {
 
       var x = event.clientX;
       var y = event.clientY;
 
       var images = $('image');
 
-      $.each(images, function(index, image) {
+      $.each(images, function (index, image) {
 
         var parent = $(image).parent();
 
@@ -500,7 +500,7 @@ GUI.initMouseHandler = function() {
           parent.attr('pointer-events', 'none');
         }
       });
-      
+
     };
 
     $("#content>svg").bind("mousedown", mousedown);
@@ -516,11 +516,11 @@ GUI.initMouseHandler = function() {
  * @param {int} y y position * 
  * @returns {type} description
  */
-GUI.getObjectAt = function(x, y) {
+GUI.getObjectAt = function (x, y) {
 
   var clickedObject = false;
 
-  $.each(ObjectManager.getObjectsByLayer(), function(key, object) {
+  $.each(ObjectManager.getObjectsByLayer(), function (key, object) {
 
     var rep = object.getRepresentation();
 
@@ -545,10 +545,10 @@ GUI.previewableMimeTypes = undefined;
  * Load list of mime types for GUI.previewableMimeTypes
  * @function loadListOfPreviewableMimeTypes
  */
-GUI.loadListOfPreviewableMimeTypes = function() {
+GUI.loadListOfPreviewableMimeTypes = function () {
   /* get list of inline displayable mime types */
 
-  Modules.Dispatcher.query('getPreviewableMimeTypes', {}, function(list) {
+  Modules.Dispatcher.query('getPreviewableMimeTypes', {}, function (list) {
     GUI.previewableMimeTypes = list;
   });
 
@@ -559,7 +559,7 @@ GUI.loadListOfPreviewableMimeTypes = function() {
  * @function mimeTypeIsPreviewable
  * @param {String} mimeType mime type to check for
  */
-GUI.mimeTypeIsPreviewable = function(mimeType) {
+GUI.mimeTypeIsPreviewable = function (mimeType) {
 
   if (GUI.previewableMimeTypes == undefined) {
     GUI.loadListOfPreviewableMimeTypes();
@@ -593,7 +593,7 @@ GUI.mimeTypeIsPreviewable = function(mimeType) {
  * }
  *
  */
-GUI.dialog = function(heading, content, buttons, dialogWidth, passThrough) {
+GUI.dialog = function (heading, content, buttons, dialogWidth, passThrough) {
 
   GUI.blockKeyEvents = true;
 
@@ -601,7 +601,7 @@ GUI.dialog = function(heading, content, buttons, dialogWidth, passThrough) {
 
     var buttons = {};
 
-    buttons[GUI.translate("close")] = function() {
+    buttons[GUI.translate("close")] = function () {
       //nothing
     };
 
@@ -613,11 +613,11 @@ GUI.dialog = function(heading, content, buttons, dialogWidth, passThrough) {
 
   var buttons2 = {};
 
-  $.each(buttons, function(title, callback) {
-    buttons2[title] = function() {
+  $.each(buttons, function (title, callback) {
+    buttons2[title] = function () {
       var result = callback(dialogContent);
-      if(result == undefined || result == true){
-    	  $(this).dialog("close");
+      if (result == undefined || result == true) {
+        $(this).dialog("close");
       }
     };
   });
@@ -632,7 +632,7 @@ GUI.dialog = function(heading, content, buttons, dialogWidth, passThrough) {
     buttons: buttons2,
     zIndex: 100000,
     width: dialogWidth,
-    close: function() {
+    close: function () {
       $(this).remove();
       GUI.blockKeyEvents = false;
     }
@@ -654,9 +654,9 @@ GUI.dialog = function(heading, content, buttons, dialogWidth, passThrough) {
  * @param {webarenaObject} [webarenaObject] An optional webarena object the error is related to
  * @param {bool} fatal True if the error is fatal and the webpage has to be reloaded after displaying the error
  */
-GUI.error = function(heading, message, webarenaObject, fatal) {
+GUI.error = function (heading, message, webarenaObject, fatal) {
 
-  var translate = function(text) {
+  var translate = function (text) {
     if (!webarenaObject) {
       return GUI.translate(text);
     } else {
@@ -667,11 +667,11 @@ GUI.error = function(heading, message, webarenaObject, fatal) {
   var errorButtons = {};
 
   if (fatal) {
-    errorButtons[GUI.translate("Reload")] = function() {
+    errorButtons[GUI.translate("Reload")] = function () {
       window.location.reload();
     };
   } else {
-    errorButtons[GUI.translate("Close Dialog")] = function() {
+    errorButtons[GUI.translate("Close Dialog")] = function () {
       $(this).dialog("close");
     };
   }
@@ -687,7 +687,7 @@ GUI.error = function(heading, message, webarenaObject, fatal) {
  * called when the socket is disconnected
  * @function disconnected
  */
-GUI.disconnected = function() {
+GUI.disconnected = function () {
   GUI.showDisconnected();
   GUI.isLoggedIn = false;
 };
@@ -697,7 +697,7 @@ GUI.disconnected = function() {
  * Called when the socket is connected
  * @function connected
  */
-GUI.connected = function() {
+GUI.connected = function () {
   if (GUI.relogin === true) {
     if (GUI.couplingModeActive) {
       GUI.closeCouplingMode();
@@ -712,7 +712,7 @@ GUI.connected = function() {
  * Display a error message on disconnect
  * @function showDisconnected
  */
-GUI.showDisconnected = function() {
+GUI.showDisconnected = function () {
 
   if ($("#disconnected_message").length == 0)
     $("body").append('<div id="disconnected_message"><div>Die Verbindung wurde getrennt.</div></div>');
@@ -726,8 +726,8 @@ GUI.showDisconnected = function() {
  * Timer to prevent objects "flying in" when getting a bunch of new objects (room load)
  * @function startNoAnimationTimer
  */
-GUI.startNoAnimationTimer = function() {
-  GUI.noAnimation = window.setTimeout(function() {
+GUI.startNoAnimationTimer = function () {
+  GUI.noAnimation = window.setTimeout(function () {
     GUI.noAnimation = undefined;
   }, 2000);
 };
@@ -738,6 +738,77 @@ GUI.startNoAnimationTimer = function() {
  * @param {String}  message   The question that the user has to confirm.
  * @return {String} .
  */
-GUI.confirm = function(message) {
+GUI.confirm = function (message) {
   return confirm(message);
+};
+
+
+/**
+ * Shows a user notification in the top right corner of the Canvas.
+ * 
+ * @function notify
+ * @param {String}    title     The title of the notification
+ * @param {String}    text      The text of the notification
+ * @param {String}    icon      The icon of the notification
+ * @param {Booolean}  expires   Number of milliseconds after the notification will disappear automatically or false.
+ */
+GUI.notify = function (title, text, icon, expires) {
+  if (expires == undefined)
+    expires = false;
+
+  if (icon == undefined)
+    icon = "notice.png";
+
+  $("#container-notifier").notify("create", "withIcon", {
+    title: GUI.translate(title),
+    text: GUI.translate(text),
+    icon: '/guis.common/images/toast/' + icon
+  }, {expires: expires});
+};
+
+/**
+ * Shows a user notification indicating a success of an operation.
+ * 
+ * @function notifySuccess
+ * @param {String} title  The title of the notification
+ * @param {String} text   The text of the notification
+ */
+GUI.notifySuccess = function (title, text) {
+  this.notify(title, text, "success.png", 5000);
+};
+
+/**
+ * Shows a user notification with some information.
+ * 
+ * @function notifyInfo
+ * @param {String} title  The title of the notification
+ * @param {String} text   The text of the notification
+ * @returns {undefined}
+ */
+GUI.notifyInfo = function (title, text) {
+  this.notify(title, text, "notice.png", 5000);
+};
+
+/**
+ * Shows a user notification in form a warning.
+ * 
+ * @function notifyWarning
+ * @param {String} title  The title of the notification
+ * @param {String} text   The text of the notification
+ * @returns {undefined}
+ */
+GUI.notifyWarning = function (title, text) {
+  this.notify(title, text, "warning.png", 5000);
+};
+
+/**
+ * Shows a user notification indicating an error of an operation.
+ * 
+ * @function notifyError
+ * @param {String} title  The title of the notification
+ * @param {String} text   The text of the notification
+ * @returns {undefined}
+ */
+GUI.notifyError = function (title, text) {
+  this.notify(title, text, "error.png", 5000);
 };

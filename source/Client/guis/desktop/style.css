@@ -3,7 +3,8 @@
   padding: 0px;
   font-family: 'Open Sans', sans-serif;
   font-size: 12px;
-  height: 450px;
+  /*height: 450px;*/
+  overflow: visible;
 }
 
 
@@ -105,7 +106,7 @@
 
   border: 1px solid #636363;
   border-bottom: none;
-  
+
   border-top-right-radius: 4px;
   border-top-left-radius: 4px;
 }
@@ -113,7 +114,7 @@
 #header img.header_tab:hover,
 #header img.header_tab.active {
   border-color: #ADADAD;
-  
+
   background: -moz-linear-gradient(
     center top ,
     #6E6E6E 0%,
@@ -132,7 +133,7 @@
   margin-top: 6px;
   padding-top: 1px;
   padding-bottom: 2px;
-  
+
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
 }
@@ -188,14 +189,14 @@
   display: none;
   font-size: 14px;
   padding: 10px;
-  
+
   position: absolute;
   right: 10px;
   top: 33px;
-  
+
   border: 1px solid #636363;
   border-radius: 4px;
-  
+
   background: -moz-linear-gradient(
     center top ,
     #1E1E1E 0%,
@@ -871,11 +872,11 @@ button.assigned-main-tag { background: #A4B5FF; }
 .custom-main-tag-holder{margin: 10px 0px;}
 
 #mainTag .filename-wrapper {
-	font-size: 15px;
+  font-size: 15px;
 }
 #mainTag span.filename {
-	font-weight: bold;
-	font-size: 15px;
+  font-weight: bold;
+  font-size: 15px;
 }
 
 #secondaryTags {padding: 0.3em !important;}
@@ -922,186 +923,186 @@ button#btn-previous {margin-left: 133px;}
 /* Tag Manager dialog*/
 
 .portlet {
-	width: 200px !important;
-	float: left;
-	margin: 0 1em 1em 0;
-	padding: 0.3em;
-	background-color: #F0F0F0 ;
-	min-height: 64px;
+  width: 200px !important;
+  float: left;
+  margin: 0 1em 1em 0;
+  padding: 0.3em;
+  background-color: #F0F0F0 ;
+  min-height: 64px;
 }
 .portlet-header {
-	padding: 0.2em 0.3em;
-	margin-bottom: 0.5em;
-	position: relative;
-	min-height: 50px;
+  padding: 0.2em 0.3em;
+  margin-bottom: 0.5em;
+  position: relative;
+  min-height: 50px;
 }
 .portlet-toggle, .portlet-delete {
-	position: absolute;
-	top: 50%;
-	right: 0;
-	margin-top: -8px;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  margin-top: -8px;
 }
 
 .portlet-delete {
-	margin-right: 15px;
+  margin-right: 15px;
 }
 
 .portlet-content {
-	padding: 0.4em;
+  padding: 0.4em;
 }
 .portlet-placeholder {
-	border: 1px dotted black;
-	margin: 0 1em 1em 0;
-	height: 50px;
+  border: 1px dotted black;
+  margin: 0 1em 1em 0;
+  height: 50px;
 }	 
 
 #main-tag-container{
-	font-size: 80%;
+  font-size: 80%;
 }
 
 #main-tag-container h2{
-	font-size: 12.5px
+  font-size: 12.5px
 }
 
 #main-tag-container div.editable {
-	width: 80%;
-	cursor: default !important;
+  width: 80%;
+  cursor: default !important;
 }
 
 #main-tag-container div.editable-sec {
-	width: 95%;
-	cursor: default !important;
+  width: 95%;
+  cursor: default !important;
 }
 
 div.tagValue {
-	width:90%;
+  width:90%;
 }
 
 form.editableInput {
-	height: 21px;
-	padding: 0px;
-	display: inline;
+  height: 21px;
+  padding: 0px;
+  display: inline;
 }
 
 .portlet-new-main-tag {
-	text-align: center;
-	vertical-align: middle;
-	border: 1px dotted black;
-	color: #C0c0c0;
-	cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px dotted black;
+  color: #C0c0c0;
+  cursor: pointer;
 }
 
 .portlet-new-sec-tag {
-	text-align: center;
-	vertical-align: middle;
-	border: 1px dotted black;
-	margin-bottom: 8px;
-	color: #C0c0c0;
-	cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px dotted black;
+  margin-bottom: 8px;
+  color: #C0c0c0;
+  cursor: pointer;
 }
 
 .connectedSortable {
-	min-height: 30px;
+  min-height: 30px;
 
 }
 
 .managetags .custom-state-active { 
-	background: #eee; 
+  background: #eee; 
 }
 
 .managetags  li { 
-	float: left; 
-	width: 95%; 
-	padding: 0.4em; 
-	margin: 0 0.4em 0.4em 0; 
-	text-align: center;
+  float: left; 
+  width: 95%; 
+  padding: 0.4em; 
+  margin: 0 0.4em 0.4em 0; 
+  text-align: center;
 }
 
 .managetags  li h5 { 
-	margin: 0; 
-	cursor: move; 
-	min-height: 30px; 
-	padding: 0.4em; 
-	width: 85%; 
-	float: left;
-	font-size: 90%;
+  margin: 0; 
+  cursor: move; 
+  min-height: 30px; 
+  padding: 0.4em; 
+  width: 85%; 
+  float: left;
+  font-size: 90%;
 }
 
 .managetags  li a { 
-	float: right; 
+  float: right; 
 }
 
 .managetags  li img { 
-	width: 100%; 
-	cursor: move; 
+  width: 100%; 
+  cursor: move; 
 }	
 
 span.portlet-toggle, span.portlet-delete, span.sec-tag-delete {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .portlet {
-	width: 200px !important;
-	float: left;
-	margin: 0 1em 1em 0;
-	padding: 0.3em;
-	background-color: #F0F0F0 ;
-	min-height: 64px;
+  width: 200px !important;
+  float: left;
+  margin: 0 1em 1em 0;
+  padding: 0.3em;
+  background-color: #F0F0F0 ;
+  min-height: 64px;
 }
 
 /* end Tag Manager dialog*/
 
 /* Container Objects */
 .containerFileRepresentation {
-	list-style-type: none;
-	margin: 3px 3px 3px 0;
-	padding: 1px;
-	float: left;
-	width: 75px;
-	height: 75px;
-	line-height: 10px;
-	font-size: 1em;
-	text-align: center;
-	vertical-align: middle;
-	background: #d3d3d3;
+  list-style-type: none;
+  margin: 3px 3px 3px 0;
+  padding: 1px;
+  float: left;
+  width: 75px;
+  height: 75px;
+  line-height: 10px;
+  font-size: 1em;
+  text-align: center;
+  vertical-align: middle;
+  background: #d3d3d3;
 }
 .containerFileRepresentation > div.filename {
-	width:100%;
-	white-space:nowrap;
-	overflow:hidden;
-	text-overflow:ellipsis;
+  width:100%;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .containerFileRepresentation:hover {
-	background: #f5f5f5;
+  background: #f5f5f5;
 }
 /* end Container Objects */
 
 .addremove-menu {
-    z-index:1000;
-    position: absolute;
-    background-color:#d3d3d3;
-    border: 1px solid black;
-    padding: 2px;
-    cursor: pointer;
+  z-index:1000;
+  position: absolute;
+  background-color:#d3d3d3;
+  border: 1px solid black;
+  padding: 2px;
+  cursor: pointer;
 }
 
 .addremove-menu:hover {
-    background: #f5f5f5;
+  background: #f5f5f5;
 }
 
 .global-menu {
-    z-index:1000;
-    position: absolute;
-    background-color:#d3d3d3;
-    border: 1px solid black;
-    padding: 2px;
-    cursor: pointer;
-    width:200px
+  z-index:1000;
+  position: absolute;
+  background-color:#d3d3d3;
+  border: 1px solid black;
+  padding: 2px;
+  cursor: pointer;
+  width:200px
 }
 
 .global-menu:hover {
-    background: #f5f5f5;
+  background: #f5f5f5;
 }
 
 
@@ -1223,38 +1224,41 @@ span.portlet-toggle, span.portlet-delete, span.sec-tag-delete {
 /* Search Sidebar*/
 
 #search input[type="text"] {
-	width: 175px;
+  width: 175px;
 }
 
 #search select {
-	width: 190px;
+  width: 190px;
 }
 
 #search img {
-	vertical-align: top;
-	cursor: pointer;
+  vertical-align: top;
+  cursor: pointer;
+  float: right;
 }
 
 #search input[type="checkbox"] {
-	float: left;
-	margin-right: 0.5em;
+  float: left;
+  margin-right: 0.5em;
 }
 
 #search input[type="checkbox"] {
-	float: left;
-	margin-right: 0.5em;
+  float: left;
+  margin-right: 0.5em;
 }
 
 #search #mimeTypesColumn1 {
-	width: 45%;
-	float:left;
+  width: 45%;
+  float: left;
 }
 
 #search #mimeTypesColumn2 {
-	width: 45%;
-	display: inline-block;
+  width: 45%;  
+  display:inline-block;
 }
-
-
 /* end Search Sidebar*/
 
+#container-notifier {
+  top: 70px;
+  right: 240px;
+}

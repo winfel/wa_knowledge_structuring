@@ -29,7 +29,6 @@ var GridStore = require('mongodb').GridStore;
 var Grid    = require('gridfs-stream');
 
 var gfs;
-var rooms;
 var objects;
 var paintings;
 
@@ -50,9 +49,12 @@ mongoConnector.init = function(theModules) {
     	gfs = Grid(db, mongo);
     });
         
-    rooms   = dbmonk.get('rooms');
     objects = dbmonk.get('objects');
     paintings = dbmonk.get('paintings');
+    
+    // http://docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/#db.collection.ensureIndex
+    objects.ensureIndex( { "id": 1 }, { unique: true } );
+    objects.ensureIndex( { "inRoom": 1 }, { background: true });
 };
 
 /**
@@ -258,7 +260,7 @@ function buildObjectFromDBObject (roomID, attr, callback) {
     data.type = data.attributes.type;
     data.id = attributes.id;                           
     data.attributes.id = data.id;
-    data.inRoom = roomID;
+    data.inRoom = data.attributes.inRoom;
     data.attributes.inRoom = roomID;
     data.attributes.hasContent = false;
 
@@ -597,25 +599,6 @@ mongoConnector.getObjectData = function(roomID, objectID, context, callback) {
             });
         }
     });
-};
-
-/**
- * Save the object (by given data) if an "callback" function is specified, it is
- * called after saving
- * 
- * @param roomID
- * @param data
- * @param context
- */
-mongoConnector.saveRoom = function(roomID, data, context) {
-    roomID = roomID.toString();
-    this.Modules.Log.debug("Save object data (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
-    console.log("Save object data (roomID: '" + roomID + "', user: '" + this.Modules.Log.getUserFromContext(context) + "')");
-    
-    if (!context) this.Modules.Log.error("Missing context");
-    if (!data)    this.Modules.Log.error("Missing data");
-    
-    return rooms.insert(data);
 };
 
 /**

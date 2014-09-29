@@ -8,7 +8,7 @@ var Modules = false;
  * @class RightManager
  * @classdesc This is the right manager on the server side.
  */
-var RightManager = function() {
+var RightManager = function () {
   var that = this;
 
   /**
@@ -18,21 +18,21 @@ var RightManager = function() {
    * @param {type} theModules
    * @returns {undefined}
    */
-  this.init = function(theModules) {
+  this.init = function (theModules) {
     Modules = theModules;
     db = require('monk')(Modules.MongoDBConfig.getURI());
 
     // Register RightManager related server calls...
-    Modules.Dispatcher.registerCall('rmHasAccess', function(socket, data, responseID) {
+    Modules.Dispatcher.registerCall('rmHasAccess', function (socket, data, responseID) {
       var connection = Modules.UserManager.getConnectionBySocket(socket);
-      that.hasAccess(data.object, connection.user, data.right, function(result) {
+      that.hasAccess(data.object, connection.user, data.right, function (result) {
         Modules.SocketServer.sendToSocket(socket, "rmHasAccessResult" + data.object.id, result);
       });
     });
 
-    Modules.Dispatcher.registerCall('rmModifyAccess', function(socket, data, responseID) {
+    Modules.Dispatcher.registerCall('rmModifyAccess', function (socket, data, responseID) {
       //var connection = Modules.UserManager.getConnectionBySocket(socket);
-      that.modifyAccess(data.object, data.right, data.role, data.grant, function(docs) {
+      that.modifyAccess(data.object, data.right, data.role, data.grant, function (docs) {
 
         that.notifyManagers(socket, data.object, "rmModifiedAccess", {
           object: data.object,
@@ -43,9 +43,9 @@ var RightManager = function() {
       });
     });
 
-    Modules.Dispatcher.registerCall("rmModifyUser", function(socket, data) {
+    Modules.Dispatcher.registerCall("rmModifyUser", function (socket, data) {
       //var connection = Modules.UserManager.getConnectionBySocket(socket);
-      that.modifyUser(data.object, data.user, data.role, data.add, function() {
+      that.modifyUser(data.object, data.user, data.role, data.add, function () {
         // Broadcast to all manager of the object...
         that.notifyManagers(socket, data.object, "rmModifiedUser", {
           object: data.object,
@@ -56,9 +56,9 @@ var RightManager = function() {
       });
     });
 
-    Modules.Dispatcher.registerCall("rmModifyRole", function(socket, data) {
+    Modules.Dispatcher.registerCall("rmModifyRole", function (socket, data) {
       //var connection = Modules.UserManager.getConnectionBySocket(socket);
-      that.modifyRole(data.object, data.rolename, data.add, data.deletable, function(roleObject) {
+      that.modifyRole(data.object, data.rolename, data.add, data.deletable, function (roleObject) {
         // Broadcast to all manager of the object...
         if (!roleObject.error) {
           that.notifyManagers(socket, data.object, "rmModifiedRole", {
@@ -73,18 +73,18 @@ var RightManager = function() {
       });
     });
 
-    Modules.Dispatcher.registerCall("rmGetSupportedObjects", function(socket, data) {
-      that.getSupportedObjects(function(objects) {
+    Modules.Dispatcher.registerCall("rmGetSupportedObjects", function (socket, data) {
+      that.getSupportedObjects(function (objects) {
         Modules.SocketServer.sendToSocket(socket, "rmSupportedObjects", objects);
       });
     });
 
-    Modules.Dispatcher.registerCall("rmGetRoles", function(socket, data) {
+    Modules.Dispatcher.registerCall("rmGetRoles", function (socket, data) {
       var connection = Modules.UserManager.getConnectionBySocket(socket);
 
-      that.isManager(data.object, connection.user, function(result) {
+      that.isManager(data.object, connection.user, function (result) {
         if (result) {
-          that.getRoles(data.object, function(roles) {
+          that.getRoles(data.object, function (roles) {
             Modules.SocketServer.sendToSocket(socket, "rmRoles" + data.object.id, roles);
           });
         } else {
@@ -105,7 +105,7 @@ var RightManager = function() {
    * @param {type} isRegister   Indicates whether this function is called during some right or role registration process.
    * @returns {undefined}
    */
-  this.mapObject = function(object, isRegister) {
+  this.mapObject = function (object, isRegister) {
     //var dataObject = {id: object.id, type: object.type, inRoom: object.inRoom, parent: object.parent};
     var dataObject = _.clone(object); // Shallow copy
     switch (object.type) {
@@ -144,7 +144,7 @@ var RightManager = function() {
    * @param {type} object
    * @returns {RightManager.unmapObject.dataObject}
    */
-  this.unmapObject = function(object) {
+  this.unmapObject = function (object) {
     //var dataObject = {id: object.id, type: object.type, inRoom: object.inRoom, parent: object.parent};
     var dataObject = _.clone(object);
     if (object.initial_id)
@@ -164,21 +164,23 @@ var RightManager = function() {
    * @param {type} mask
    * @returns {undefined}
    */
-  this.registerRight = function(object, name, comment, mask) {
+  this.registerRight = function (object, name, comment, mask) {
 
-    var dataObject = this.mapObject(object, true);
+    if (object.supportsRightmanager) {
+      var dataObject = this.mapObject(object, true);
 
-    var dbRights = db.get('rights');
-    dbRights.update({
-      type: String(dataObject.type),
-      name: String(name)
-    }, {
-      type: String(dataObject.type),
-      name: String(name),
-      comment: String(comment)
-    }, {
-      upsert: true
-    });
+      var dbRights = db.get('rights');
+      dbRights.update({
+        type: String(dataObject.type),
+        name: String(name)
+      }, {
+        type: String(dataObject.type),
+        name: String(name),
+        comment: String(comment)
+      }, {
+        upsert: true
+      });
+    }
   };
 
   /**
@@ -190,14 +192,14 @@ var RightManager = function() {
    * @param {type} rights
    * @returns {undefined}
    */
-  this.registerDefaultRole = function(object, name, rights) {
+  this.registerDefaultRole = function (object, name, rights) {
     var dataObject = this.mapObject(object, true);
     var dbDefRoles = db.get('defroles');
     if (String(name).toLowerCase() == "manager" && !rights) {
       // If the rights array is omitted and the role is manager,
       // then get all rights and call the function again.
       var dbRights = db.get('rights');
-      dbRights.distinct("name", {type: dataObject.type}, function(e, docs) {
+      dbRights.distinct("name", {type: dataObject.type}, function (e, docs) {
         that.registerDefaultRole(dataObject, name, docs);
       });
       return;
@@ -222,11 +224,11 @@ var RightManager = function() {
    * @param {Function} callback
    * @returns {undefined}
    */
-  this.getObjectRights = function(object, callback) {
+  this.getObjectRights = function (object, callback) {
     var dataObject = this.mapObject(object);
 
     var dbRights = db.get('rights');
-    dbRights.distinct("name", {type: dataObject.type}, function(e, docs) {
+    dbRights.distinct("name", {type: dataObject.type}, function (e, docs) {
       if (callback) {
         callback(docs);
       }
@@ -244,14 +246,14 @@ var RightManager = function() {
    * @param {type} data
    * @returns {undefined}
    */
-  this.notifyManagers = function(socket, object, message, data) {
+  this.notifyManagers = function (socket, object, message, data) {
     var connection = Modules.UserManager.getConnectionBySocket(socket);
     // Broadcast to all manager of the object...
     var roomConnections = Modules.UserManager.getConnectionsForRoom(connection.rooms.left.id);
 
     for (var i in roomConnections) {
       // Only send a message to other managers.
-      that.isManager(object, roomConnections[i].user, function(result) {
+      that.isManager(object, roomConnections[i].user, function (result) {
         if (result) {
           Modules.SocketServer.sendToSocket(roomConnections[i].socket, message, data);
         }
@@ -267,7 +269,7 @@ var RightManager = function() {
    * @param {type} error    An object with the attributes type and error.
    * @returns {undefined}
    */
-  this.sendErrorMessage = function(socket, error) {
+  this.sendErrorMessage = function (socket, error) {
     if (error.hide == undefined)
       error.hide = true;
 
@@ -283,7 +285,7 @@ var RightManager = function() {
    * @param {Function}  callback
    * @returns {RightManager.getParentOfObject.Anonym$26}
    */
-  this.getParentObject = function(object, callback) {
+  this.getParentObject = function (object, callback) {
     // Check the database
     var dbObjects = db.get('objects');
 
@@ -292,7 +294,7 @@ var RightManager = function() {
       callback(null);
     } else if (object.type == "Room" && object.parent) {
       // If the object is a room, we only traverse through the parent attribute...
-      dbObjects.find({id: object.parent, type: "Room"}, {}, function(e, objects) {
+      dbObjects.find({id: object.parent, type: "Room"}, {}, function (e, objects) {
         if (objects && objects.length > 0) {
           callback(objects[0]);
         } else {
@@ -301,8 +303,9 @@ var RightManager = function() {
       });
 
     } else if (object.inRoom) {
+
       // No room yet, so we use the inRoom variable to get to the parent room...
-      dbObjects.find({id: object.inRoom, type: "Room"}, {}, function(e, objects) {
+      dbObjects.find({id: object.inRoom, type: "Room"}, {}, function (e, objects) {
         if (objects && objects.length > 0) {
           callback(objects[0]);
         } else {
@@ -326,23 +329,21 @@ var RightManager = function() {
    * @param {function}   callback    The callback function with one boolean parameter (the answer)
    * @param {function}   recursive   
    */
-  this.hasAccess = function(object, user, right, callback, recursive) {
+  this.hasAccess = function (object, user, right, callback, recursive) {
     var dataObject = this.mapObject(object);
     var that = this;
 
     if (recursive == undefined)
       recursive = true;
 
-    console.log(dataObject);
-
     var dbRoles = db.get('roles');
-    dbRoles.find({objectid: String(dataObject.id)}, {}, function(e, roles) {
+    dbRoles.find({objectid: String(dataObject.id)}, {}, function (e, roles) {
 
       // Check if rights are set up for this object.
       // If not, check if the parent Room is configured...
       if (!roles || roles.length < 1) {
         if (recursive) {
-          that.getParentObject(dataObject, function(parent) {
+          that.getParentObject(dataObject, function (parent) {
             if (parent) {
               // We are just looking for the direct parent. Which is why we pass
               // false to the recursive parameter.
@@ -358,9 +359,8 @@ var RightManager = function() {
         }
       } else {
         // Object found. Check roles.
-        console.log("object found");
         var accessGranted = false;
-        roles.forEach(function(role) {
+        roles.forEach(function (role) {
           // Check if the role contains the needed right
           var roleHasRight = (role.rights.indexOf(String(right)) >= 0);
           if (roleHasRight) {
@@ -388,10 +388,10 @@ var RightManager = function() {
    * @param {Function}    callback
    * @returns {undefined}
    */
-  this.isManager = function(object, user, callback) {
+  this.isManager = function (object, user, callback) {
     var dataObject = this.mapObject(object);
     var dbRoles = db.get('roles');
-    dbRoles.find({objectid: String(dataObject.id), name: "Manager"}, {}, function(e, docs) {
+    dbRoles.find({objectid: String(dataObject.id), name: "Manager"}, {}, function (e, docs) {
       var result = false;
       if (docs.length > 0) {
         result = docs[0].users.indexOf(user.username) >= 0;
@@ -408,7 +408,7 @@ var RightManager = function() {
    * @param {type} right     The right, which needs to be checked , e.g., read, write (CRUD)
    * @param {type} role      The role that should be changed
    */
-  this.grantAccess = function(object, right, role) {
+  this.grantAccess = function (object, right, role) {
     this.modifyAccess(object, right, role, true);
   };
 
@@ -420,7 +420,7 @@ var RightManager = function() {
    * @param {type} right     The right, which needs to be checked , e.g., read, write (CRUD)
    * @param {type} role      The role that should be changed
    */
-  this.revokeAccess = function(object, right, role) {
+  this.revokeAccess = function (object, right, role) {
     this.modifyAccess(object, right, role, false);
   };
 
@@ -435,12 +435,12 @@ var RightManager = function() {
    *                           granted. Set false, to revoke access.
    * @param {type} callback     
    */
-  this.modifyAccess = function(object, right, role, grant, callback) {
+  this.modifyAccess = function (object, right, role, grant, callback) {
     var dataObject = this.mapObject(object);
 
     var collection = db.get('roles');
-    collection.find({objectid: String(dataObject.id), name: String(role.name)}, {}, function(e, docs) {
-      docs.forEach(function(item) {
+    collection.find({objectid: String(dataObject.id), name: String(role.name)}, {}, function (e, docs) {
+      docs.forEach(function (item) {
         /* (2) update role */
         if (grant == true) {
           /* store to database */
@@ -462,11 +462,11 @@ var RightManager = function() {
    * @param {Funciton}  callback
    * @returns {undefined}
    */
-  this.getRoles = function(object, callback) {
+  this.getRoles = function (object, callback) {
     var dataObject = this.mapObject(object);
 
     var dbRoles = db.get('roles');
-    dbRoles.find({objectid: String(dataObject.id)}, {}, function(e, docs) {
+    dbRoles.find({objectid: String(dataObject.id)}, {}, function (e, docs) {
       callback(docs);
     });
   };
@@ -477,9 +477,9 @@ var RightManager = function() {
    * @function getSupportedObjects
    * @param {Function}  callback   The callback we the data is given to.
    */
-  this.getSupportedObjects = function(callback) {
+  this.getSupportedObjects = function (callback) {
     var dbRights = db.get('rights');
-    dbRights.distinct("type", {}, function(e, docs) {
+    dbRights.distinct("type", {}, function (e, docs) {
       if (callback) {
         callback(docs);
       }
@@ -496,13 +496,13 @@ var RightManager = function() {
    *	@param {Boolean}  add       
    *	@param {Function} callback   
    */
-  this.modifyUser = function(object, user, role, add, callback) {
+  this.modifyUser = function (object, user, role, add, callback) {
     var dataObject = this.mapObject(object);
 
     var dbRoles = db.get('roles');
 
-    dbRoles.find({objectid: String(dataObject.id), name: String(role.name)}, {}, function(e, docs) {
-      docs.forEach(function(item) {
+    dbRoles.find({objectid: String(dataObject.id), name: String(role.name)}, {}, function (e, docs) {
+      docs.forEach(function (item) {
         if (add == true) {
           dbRoles.update({_id: item._id}, {$addToSet: {users: user}});
         } else {
@@ -527,7 +527,7 @@ var RightManager = function() {
    *	@param {Array}      users         Array of users. Optional.
    *	@param {Boolean}    checkParent   Indicates if the hasAccess method should look at the parent 
    */
-  this.modifyRole = function(object, rolename, add, deletable, callback, rights, users, checkParent) {
+  this.modifyRole = function (object, rolename, add, deletable, callback, rights, users, checkParent) {
     var dataObject = this.mapObject(object);
 
     var role = {
@@ -557,7 +557,7 @@ var RightManager = function() {
         role.checkParent = false;
 
       // Search for existing role name (case-insensitive)
-      dbRoles.find({objectid: String(dataObject.id), name: {$regex: "^" + String(role.name) + "$", $options: '-i'}}, {}, function(e, docs) {
+      dbRoles.find({objectid: String(dataObject.id), name: {$regex: "^" + String(role.name) + "$", $options: '-i'}}, {}, function (e, docs) {
         if (docs.length == 0) {
           dbRoles.insert(role);
         } else {

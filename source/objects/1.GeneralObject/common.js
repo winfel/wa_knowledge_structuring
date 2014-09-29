@@ -36,7 +36,7 @@ GeneralObject.menuItemLabel = '';
  *
  * @return {boolean} false 
  */
-GeneralObject.alwaysOnTop = function() {
+GeneralObject.alwaysOnTop = function () {
   return false;
 };
 
@@ -45,7 +45,7 @@ GeneralObject.alwaysOnTop = function() {
  *
  * @this {GeneralObject}
  */
-GeneralObject.makeSensitive = function() {
+GeneralObject.makeSensitive = function () {
   this.isSensitiveFlag = true;
 };
 
@@ -54,7 +54,7 @@ GeneralObject.makeSensitive = function() {
  *
  * @this {GeneralObject}
  */
-GeneralObject.makeStructuring = function() {
+GeneralObject.makeStructuring = function () {
   this.isStructuringFlag = true;
 };
 
@@ -64,7 +64,7 @@ GeneralObject.makeStructuring = function() {
  * @this {GeneralObject}
  * @return {boolean} True if 'isSensitiveFlag' is true, otherwise false.
  */
-GeneralObject.isSensitive = function() {
+GeneralObject.isSensitive = function () {
   return this.isSensitiveFlag || false;
 };
 
@@ -74,7 +74,7 @@ GeneralObject.isSensitive = function() {
  * @this {GeneralObject}
  * @return {boolean} True if 'isStructuringFlag' is true, otherwise false.
  */
-GeneralObject.isStructuring = function() {
+GeneralObject.isStructuring = function () {
   return this.isStructuringFlag || false;
 };
 
@@ -87,7 +87,7 @@ GeneralObject.utf8 = {};
  * @param {string} str The string which should be converted into unicode.
  * @return {array} The Array which contains the unicodes of the string.
  */
-GeneralObject.utf8.toByteArray = function(str) {
+GeneralObject.utf8.toByteArray = function (str) {
   var byteArray = [];
   for (var i = 0; i < str.length; i++)
     if (str.charCodeAt(i) <= 0x7F)
@@ -106,7 +106,7 @@ GeneralObject.utf8.toByteArray = function(str) {
  * @param {array} byteArray The unicode array which should be converted.
  * @return {string} Contains the decoded URI or an empty string (exception).
  */
-GeneralObject.utf8.parse = function(byteArray) {
+GeneralObject.utf8.parse = function (byteArray) {
   var str = '';
   for (var i = 0; i < byteArray.length; i++)
     str += byteArray[i] <= 0x7F ?
@@ -125,7 +125,7 @@ GeneralObject.utf8.parse = function(byteArray) {
  *
  * @return {boolean} false 
  */
-GeneralObject.moveByTransform = function() {
+GeneralObject.moveByTransform = function () {
   return false;
 };
 
@@ -168,7 +168,7 @@ GeneralObject.currentLanguage = Modules.Config.language;
  * @see objects/1.GeneralObject/view.js
  * @param {string} type The type of the object
  */
-GeneralObject.register = function(type) {
+GeneralObject.register = function (type) {
 
   var that = this;
   var ObjectManager = this.ObjectManager;
@@ -187,7 +187,7 @@ GeneralObject.register = function(type) {
 
   this.registerAttribute('id', {type: 'text', readonly: true});
   this.registerAttribute('type', {type: 'text', readonly: true});
-  this.registerAttribute('name', {type: 'text', changedFunction: function(object, value) {
+  this.registerAttribute('name', {type: 'text', changedFunction: function (object, value) {
       var obj = {id: object.id, name: value};
       Modules.UserManager.broadcastNameChange(obj);
 
@@ -196,13 +196,13 @@ GeneralObject.register = function(type) {
     }});
 
   this.registerAttribute('hasContent', {type: 'boolean', hidden: true, standard: false});
-  this.registerAttribute('layer', {type: 'layer', readonly: false, category: 'Dimensions', changedFunction: function(object, value) {
+  this.registerAttribute('layer', {type: 'layer', readonly: false, category: 'Dimensions', changedFunction: function (object, value) {
       GUI.updateLayers();
     }});
 
   this.registerAttribute('x', {type: 'number', min: 0, category: 'Dimensions'});
   this.registerAttribute('y', {type: 'number', min: 0, category: 'Dimensions'});
-  this.registerAttribute('width', {type: 'number', min: 5, standard: 100, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
+  this.registerAttribute('width', {type: 'number', min: 5, standard: 100, unit: 'px', category: 'Dimensions', checkFunction: function (object, value) {
 
       if (object.resizeProportional()) {
         object.setAttribute("height", object.getAttribute("height") * (value / object.getAttribute("width")));
@@ -212,7 +212,7 @@ GeneralObject.register = function(type) {
 
     }});
 
-  this.registerAttribute('height', {type: 'number', min: 5, standard: 200, unit: 'px', category: 'Dimensions', checkFunction: function(object, value) {
+  this.registerAttribute('height', {type: 'number', min: 5, standard: 200, unit: 'px', category: 'Dimensions', checkFunction: function (object, value) {
 
       if (object.resizeProportional()) {
         object.setAttribute("width", object.getAttribute("width") * (value / object.getAttribute("height")));
@@ -223,7 +223,7 @@ GeneralObject.register = function(type) {
     }});
 
 
-  this.registerAttribute('fillcolor', {type: 'color', standard: 'transparent', category: 'Appearance', checkFunction: function(object, value) {
+  this.registerAttribute('fillcolor', {type: 'color', standard: 'transparent', category: 'Appearance', checkFunction: function (object, value) {
 
       if (object.checkTransparency('fillcolor', value)) {
         return true;
@@ -231,7 +231,7 @@ GeneralObject.register = function(type) {
         return object.translate(GUI.currentLanguage, "Completely transparent objects are not allowed.");
 
     }});
-  this.registerAttribute('linecolor', {type: 'color', standard: 'transparent', category: 'Appearance', checkFunction: function(object, value) {
+  this.registerAttribute('linecolor', {type: 'color', standard: 'transparent', category: 'Appearance', checkFunction: function (object, value) {
 
       if (object.checkTransparency('linecolor', value)) {
         return true;
@@ -241,9 +241,9 @@ GeneralObject.register = function(type) {
     }});
   this.registerAttribute('linesize', {type: 'number', min: 1, standard: 1, max: 30, category: 'Appearance'});
 
-  this.registerAttribute('locked', {type: 'boolean', standard: false, category: 'Basic', checkFunction: function(object, value) {
+  this.registerAttribute('locked', {type: 'boolean', standard: false, category: 'Basic', checkFunction: function (object, value) {
 
-      window.setTimeout(function() {
+      window.setTimeout(function () {
         object.deselect();
         object.select();
       }, 10);
@@ -252,7 +252,7 @@ GeneralObject.register = function(type) {
 
     }});
 
-  this.registerAttribute('visible', {type: 'boolean', standard: true, category: 'Basic', checkFunction: function(object, value) {
+  this.registerAttribute('visible', {type: 'boolean', standard: true, category: 'Basic', checkFunction: function (object, value) {
 
       if (value != false) {
         return true;
@@ -278,7 +278,7 @@ GeneralObject.register = function(type) {
 
     }});
 
-  this.registerAttribute('link', {type: 'object_id', multiple: true, hidden: true, standard: [], category: 'Functionality', changedFunction: function(object, value) {
+  this.registerAttribute('link', {type: 'object_id', multiple: true, hidden: true, standard: [], category: 'Functionality', changedFunction: function (object, value) {
 
       var objects = ObjectManager.getObjects();
 
@@ -297,32 +297,46 @@ GeneralObject.register = function(type) {
 
   this.registerAttribute('group', {type: 'group', readonly: false, category: 'Basic', standard: 0});
 
-  this.registerAction('Delete', function() {
+
+  // Registers the available rights ...
+  //this.registerRight("create", "You may create new content within this viewer.");
+  //this.registerRight("read",   "You may access the content within this viewer.");
+  //this.registerRight("update", "You may change the content within this viewer.");
+  this.registerRight("delete", "You may delete this " + type + ".");
+  // ... and default roles for this object.
+  //this.registerDefaultRole("Reader", ["read"]);
+  //this.registerDefaultRole("Coworker", ["create", "read"]);
+
+  this.registerAction('Delete', function () {
 
     var selected = ObjectManager.getSelected();
 
     for (var i in selected) {
       var object = selected[i];
-
-      object.deleteIt();
-
+      object.hasAccess("delete", function (result) {
+        if (result) {
+          object.deleteIt();
+        } else {
+          GUI.notifyError("No access", "You cannot delete this " + object.type + ".");
+        }
+      });
     }
 
   }, false);
 
-  this.registerAction('Duplicate', function() {
+  this.registerAction('Duplicate', function () {
 
     ObjectManager.duplicateObjects(ObjectManager.getSelected());
 
   }, false);
 
-  this.registerAction('Copy', function() {
+  this.registerAction('Copy', function () {
 
     ObjectManager.copyObjects(ObjectManager.getSelected());
 
   }, false);
 
-  this.registerAction('Cut', function() {
+  this.registerAction('Cut', function () {
 
     ObjectManager.cutObjects(ObjectManager.getSelected());
 
@@ -330,7 +344,7 @@ GeneralObject.register = function(type) {
 
   this.registerAction(
           'Link',
-          function(lastClicked) {
+          function (lastClicked) {
             var selected = ObjectManager.getSelected();
             var lastSelectedId = lastClicked.getId();
 
@@ -347,27 +361,27 @@ GeneralObject.register = function(type) {
 
             //check if selected object already is a link of the object
             //	if no - add it
-            _.each(selected, function(current) {
+            _.each(selected, function (current) {
               var selectedId = current.getId();
               if (selectedId !== lastSelectedId && !_.contains(newLinks, current.getId()))
                 newLinks.push(current.getId());
             });
 
             lastClicked.setAttribute("link", newLinks);
-            _.each(selected, function(current) {
+            _.each(selected, function (current) {
               current.deselect();
               //current.select()
             });
             lastClicked.select();
           },
           false,
-          function() {
+          function () {
             return (ObjectManager.getSelected().length > 1);
           }
   );
 
 
-  this.registerAction('Group', function() {
+  this.registerAction('Group', function () {
 
     var selected = ObjectManager.getSelected();
 
@@ -381,7 +395,7 @@ GeneralObject.register = function(type) {
 
     }
 
-  }, false, function() {
+  }, false, function () {
 
     var selected = ObjectManager.getSelected();
 
@@ -417,7 +431,7 @@ GeneralObject.register = function(type) {
 
 
 
-  this.registerAction('Ungroup', function() {
+  this.registerAction('Ungroup', function () {
 
     var selected = ObjectManager.getSelected();
 
@@ -428,7 +442,7 @@ GeneralObject.register = function(type) {
 
     }
 
-  }, false, function() {
+  }, false, function () {
 
     var selected = ObjectManager.getSelected();
 
@@ -460,7 +474,7 @@ GeneralObject.register = function(type) {
   this.standardData.height = width;
 
 
-  this.registerAction('to front', function() {
+  this.registerAction('to front', function () {
 
     /* set a very high layer for all selected objects (keeping their order) */
     var selected = ObjectManager.getSelected();
@@ -476,7 +490,7 @@ GeneralObject.register = function(type) {
 
   }, false);
 
-  this.registerAction('to back', function() {
+  this.registerAction('to back', function () {
 
     /* set a very high layer for all selected objects (keeping their order) */
     var selected = ObjectManager.getSelected();
@@ -503,7 +517,7 @@ GeneralObject.register = function(type) {
  * @see Common/AttributeManager.js
  * @return {?} desired value
  */
-GeneralObject.get = function(key) {
+GeneralObject.get = function (key) {
   return this.attributeManager.get(this.id, key);
 };
 
@@ -515,7 +529,7 @@ GeneralObject.get = function(key) {
  * @param {?} value
  * @see Common/AttributeManager.js
  */
-GeneralObject.set = function(key, value) {
+GeneralObject.set = function (key, value) {
   return this.attributeManager.set(this.id, key, value);
 };
 
@@ -526,7 +540,7 @@ GeneralObject.set = function(key, value) {
  * @param {?} data 
  * @see Common/AttributeManager.js
  */
-GeneralObject.setAll = function(data) {
+GeneralObject.setAll = function (data) {
   return this.attributeManager.setAll(this.id, data);
 };
 
@@ -536,7 +550,7 @@ GeneralObject.setAll = function(data) {
  * @this {GeneralObject}
  * @param {number} id 
  */
-GeneralObject.init = function(id) {
+GeneralObject.init = function (id) {
   if (!id)
     return;
   this.id = id;
@@ -553,7 +567,7 @@ GeneralObject.init = function(id) {
  * @this {GeneralObject}
  * @return {string}
  */
-GeneralObject.toString = function() {
+GeneralObject.toString = function () {
   if (!this.get('id')) {
     return 'type ' + this.type;
   }
@@ -566,7 +580,7 @@ GeneralObject.toString = function() {
  * @this {GeneralObject}
  * @return {string}
  */
-GeneralObject.getCategory = function() {
+GeneralObject.getCategory = function () {
   return this.category;
 };
 
@@ -582,7 +596,7 @@ GeneralObject.getCategory = function() {
  * @see Common/AttributeManager.js
  * @return {object} 
  */
-GeneralObject.registerAttribute = function(attribute, setter, type, min, max) {
+GeneralObject.registerAttribute = function (attribute, setter, type, min, max) {
   return this.attributeManager.registerAttribute(attribute, setter, type, min, max);
 };
 
@@ -598,7 +612,7 @@ GeneralObject.registerAttribute = function(attribute, setter, type, min, max) {
  * @see Client/guis.common/javascript/0.GUI.js
  * @return {boolean} 
  */
-GeneralObject.setAttribute = function(attribute, value, forced, transactionId) {
+GeneralObject.setAttribute = function (attribute, value, forced, transactionId) {
   if (this.mayChangeAttributes()) {
 
     // rights could also be checked in the attribute manager but HAVE to
@@ -633,7 +647,7 @@ GeneralObject.setAttribute.neededRights = {
  * @see Common/AttributeManager.js
  * @return {?} value of the desired attribute
  */
-GeneralObject.getAttribute = function(attribute, noevaluation) {
+GeneralObject.getAttribute = function (attribute, noevaluation) {
   return this.attributeManager.getAttribute(this, attribute, noevaluation);
 };
 
@@ -645,7 +659,7 @@ GeneralObject.getAttribute = function(attribute, noevaluation) {
  * @see Common/AttributeManager.js
  * @return {boolean} True, if the attribute is set, otherwise false.
  */
-GeneralObject.hasAttribute = function(attribute) {
+GeneralObject.hasAttribute = function (attribute) {
   return this.attributeManager.hasAttribute(this, attribute);
 };
 
@@ -657,7 +671,7 @@ GeneralObject.hasAttribute = function(attribute) {
  * @see Client/Helper.js
  * @return {object} object which contains all values.
  */
-GeneralObject.getAttributes = function() {
+GeneralObject.getAttributes = function () {
 
   var attInfo = this.attributeManager.getAttributes();
 
@@ -685,7 +699,7 @@ GeneralObject.getAttributes = function() {
  * @see Common/ActionManager.js
  * @return {object} object which won the new action
  */
-GeneralObject.registerAction = function(name, func, single, visibilityFunc) {
+GeneralObject.registerAction = function (name, func, single, visibilityFunc) {
   return this.actionManager.registerAction(name, func, single, visibilityFunc);
 };
 
@@ -697,7 +711,7 @@ GeneralObject.registerAction = function(name, func, single, visibilityFunc) {
  * @see Common/ActionManager.js
  * @return {object} object which lost the action
  */
-GeneralObject.unregisterAction = function(name) {
+GeneralObject.unregisterAction = function (name) {
   return this.actionManager.unregisterAction(name);
 };
 
@@ -710,7 +724,7 @@ GeneralObject.unregisterAction = function(name) {
  * @see Common/ActionManager.js
  * @return {object} object which performed the action
  */
-GeneralObject.performAction = function(name, clickedObject) {
+GeneralObject.performAction = function (name, clickedObject) {
   return this.actionManager.performAction(name, clickedObject);
 };
 
@@ -721,7 +735,7 @@ GeneralObject.performAction = function(name, clickedObject) {
  * @see Common/ActionManager.js
  * @return {object} object which contains the actions.
  */
-GeneralObject.getActions = function() {
+GeneralObject.getActions = function () {
   return this.actionManager.getActions();
 };
 
@@ -734,7 +748,7 @@ GeneralObject.getActions = function() {
  * @see Common/TranslationManager.js
  * @return {string} translated text in the desired language.
  */
-GeneralObject.translate = function(language, text) {
+GeneralObject.translate = function (language, text) {
   if (!this.translationManager)
     return text;
   return this.translationManager.get(language, text);
@@ -746,7 +760,7 @@ GeneralObject.translate = function(language, text) {
  * @param {string} currentLanguage
  * @this {GeneralObject}
  */
-GeneralObject.setLanguage = function(currentLanguage) {
+GeneralObject.setLanguage = function (currentLanguage) {
   this.currentLanguage = currentLanguage;
 };
 
@@ -759,7 +773,7 @@ GeneralObject.setLanguage = function(currentLanguage) {
  * @see Common/TranslationManager.js
  * @return {object} object which receives the new translations.
  */
-GeneralObject.setTranslations = function(language, data) {
+GeneralObject.setTranslations = function (language, data) {
   return this.translationManager.addTranslations(language, data);
 };
 
@@ -771,7 +785,7 @@ GeneralObject.setTranslation = GeneralObject.setTranslations;
  * @this {GeneralObject}
  * @return {string} 
  */
-GeneralObject.getType = function() {
+GeneralObject.getType = function () {
   return this.getAttribute('type');
 };
 
@@ -781,7 +795,7 @@ GeneralObject.getType = function() {
  * @this {GeneralObject}
  * @return {string} 
  */
-GeneralObject.getName = function() {
+GeneralObject.getName = function () {
   return this.getAttribute('name');
 };
 
@@ -791,7 +805,7 @@ GeneralObject.getName = function() {
  * @this {GeneralObject}
  * @return {number} 
  */
-GeneralObject.getId = function() {
+GeneralObject.getId = function () {
   return this.getAttribute('id');
 };
 
@@ -801,11 +815,11 @@ GeneralObject.getId = function() {
  * @this {GeneralObject}
  * @return {number} 
  */
-GeneralObject.getCurrentRoom = function() {
+GeneralObject.getCurrentRoom = function () {
   return this.getAttribute("inRoom");
 };
 
-GeneralObject.stopOperation = function() {
+GeneralObject.stopOperation = function () {
 };
 
 /*
@@ -817,7 +831,7 @@ GeneralObject.stopOperation = function() {
  *
  * @return {boolean} true
  */
-GeneralObject.mayReadContent = function() {
+GeneralObject.mayReadContent = function () {
   return true; //TODO
 };
 
@@ -826,7 +840,7 @@ GeneralObject.mayReadContent = function() {
  *
  * @return {boolean} true
  */
-GeneralObject.mayChangeAttributes = function() {
+GeneralObject.mayChangeAttributes = function () {
   return true; //TODO
 };
 
@@ -835,7 +849,7 @@ GeneralObject.mayChangeAttributes = function() {
  *
  * @return {boolean} true
  */
-GeneralObject.mayChangeContent = function() {
+GeneralObject.mayChangeContent = function () {
   return true; //TODO
 };
 
@@ -844,7 +858,7 @@ GeneralObject.mayChangeContent = function() {
  *
  * @this {GeneralObject} 
  */
-GeneralObject.hide = function() {
+GeneralObject.hide = function () {
   this.setAttribute('visible', true);
 };
 
@@ -853,7 +867,7 @@ GeneralObject.hide = function() {
  *
  * @this {GeneralObject} 
  */
-GeneralObject.unHide = function() {
+GeneralObject.unHide = function () {
   this.setAttribute('visible', false);
 };
 
@@ -865,7 +879,7 @@ GeneralObject.unhide = GeneralObject.unHide;
  * @param {number} y
  * @this {GeneralObject}
  */
-GeneralObject.setPosition = function(x, y) {
+GeneralObject.setPosition = function (x, y) {
 
   this.setAttribute('position', {'x': x, 'y': y});
 };
@@ -876,7 +890,7 @@ GeneralObject.setPosition = function(x, y) {
  * @param {number} height
  * @this {GeneralObject}
  */
-GeneralObject.setDimensions = function(width, height) {
+GeneralObject.setDimensions = function (width, height) {
   if (height === undefined)
     height = width;
   this.setAttribute('width', width);
@@ -888,7 +902,7 @@ GeneralObject.setDimensions = function(width, height) {
  *
  * @see Client/ObjectManager.js
  */
-GeneralObject.toFront = function() {
+GeneralObject.toFront = function () {
   ObjectManager.performAction("toFront");
 };
 
@@ -897,7 +911,7 @@ GeneralObject.toFront = function() {
  *
  * @see Client/ObjectManager.js
  */
-GeneralObject.toBack = function() {
+GeneralObject.toBack = function () {
   ObjectManager.performAction("toBack");
 };
 
@@ -906,7 +920,7 @@ GeneralObject.toBack = function() {
  *
  * @return {boolean}
  */
-GeneralObject.isMovable = function() {
+GeneralObject.isMovable = function () {
   return this.mayChangeAttributes();
 };
 
@@ -915,7 +929,7 @@ GeneralObject.isMovable = function() {
  *
  * @return {boolean}
  */
-GeneralObject.isResizable = function() {
+GeneralObject.isResizable = function () {
   return this.isMovable();
 };
 
@@ -924,7 +938,7 @@ GeneralObject.isResizable = function() {
  *
  * @return {boolean} false
  */
-GeneralObject.resizeProportional = function() {
+GeneralObject.resizeProportional = function () {
   return false;
 };
 
@@ -937,7 +951,7 @@ GeneralObject.resizeProportional = function() {
  * @this {GeneralObject}
  * @return {boolean} 
  */
-GeneralObject.mayMove = function() {
+GeneralObject.mayMove = function () {
   if (this.getAttribute('locked')) {
     return false;
   } else {
@@ -951,7 +965,7 @@ GeneralObject.mayMove = function() {
  * @this {GeneralObject}
  * @return {boolean} 
  */
-GeneralObject.mayResize = function() {
+GeneralObject.mayResize = function () {
   if (this.getAttribute('locked')) {
     return false;
   } else {
@@ -965,7 +979,7 @@ GeneralObject.mayResize = function() {
  * @this {GeneralObject}
  * @return {boolean} 
  */
-GeneralObject.mayResizeProportional = function() {
+GeneralObject.mayResizeProportional = function () {
   if (this.getAttribute('locked')) {
     return false;
   } else {
@@ -979,7 +993,7 @@ GeneralObject.mayResizeProportional = function() {
  * @this {GeneralObject}
  * @see objects/1.GeneralObject/view.js
  */
-GeneralObject.execute = function() {
+GeneralObject.execute = function () {
   this.select();
   this.selectedClickHandler();
 };
@@ -990,11 +1004,11 @@ GeneralObject.execute = function() {
  * @this {GeneralObject}
  * @return {boolean}
  */
-GeneralObject.isSelected = function() {
+GeneralObject.isSelected = function () {
   return this.selected;
 };
 
-GeneralObject.refresh = function() {
+GeneralObject.refresh = function () {
   //This should be overwritten for GUI updates and object repainting
 };
 
@@ -1004,7 +1018,7 @@ GeneralObject.refresh = function() {
  * @this {GeneralObject}
  * @see Client/ObjectManager.js
  */
-GeneralObject.refreshDelayed = function() {
+GeneralObject.refreshDelayed = function () {
   if (this.refreshDelay) {
     clearTimeout(this.refreshDelay);
   }
@@ -1014,7 +1028,7 @@ GeneralObject.refreshDelayed = function() {
   //this timer is the time in which changes on the same object are discarded
   var theTimer = 400;
 
-  this.refreshDelay = setTimeout(function() {
+  this.refreshDelay = setTimeout(function () {
     //If the current room has changed in the meantime, do not refresh at all
     if (GUI.couplingModeActive) {
       if (that.getAttribute('inRoom') != ObjectManager.getRoomID('left') && that.getAttribute('inRoom') != ObjectManager.getRoomID('right')) {
@@ -1036,7 +1050,7 @@ GeneralObject.refreshDelayed = function() {
  * @this {GeneralObject}
  * @return {number}
  */
-GeneralObject.getRoomID = function() {
+GeneralObject.getRoomID = function () {
   return this.get('inRoom');
 };
 
@@ -1046,7 +1060,7 @@ GeneralObject.getRoomID = function() {
  * @this {GeneralObject}
  * @return {number}
  */
-GeneralObject.getID = function() {
+GeneralObject.getID = function () {
   return this.id;
 };
 
@@ -1056,7 +1070,7 @@ GeneralObject.getID = function() {
  * @this {GeneralObject}
  * @see Client/ObjectManager.js
  */
-GeneralObject.remove = function() {
+GeneralObject.remove = function () {
   Modules.ObjectManager.remove(this);
 };
 
@@ -1066,8 +1080,8 @@ GeneralObject.remove = function() {
  * @param {number} removeId
  * @this {GeneralObject}
  */
-GeneralObject.removeLinkedObjectById = function(removeId) {
-  var filteredIds = _.filter(this.get('link'), function(elem) {
+GeneralObject.removeLinkedObjectById = function (removeId) {
+  var filteredIds = _.filter(this.get('link'), function (elem) {
     return elem != removeId;
   });
 
@@ -1081,7 +1095,7 @@ GeneralObject.removeLinkedObjectById = function(removeId) {
  * @this {GeneralObject}
  * @return {boolean} 
  */
-GeneralObject.hasLinkedObjects = function() {
+GeneralObject.hasLinkedObjects = function () {
 
   var counter = 0;
 
@@ -1109,24 +1123,24 @@ GeneralObject.hasLinkedObjects = function() {
  * @see Client/ObjectManager.js
  * @return {object} object which contains the linked objects.
  */
-GeneralObject.getLinkedObjects = function() {
+GeneralObject.getLinkedObjects = function () {
   var self = this;
 
   /* getObject (this is different on server and client) */
   if (self.ObjectManager.isServer) {
     /* server */
-    var getObject = function(id) {
+    var getObject = function (id) {
       return Modules.ObjectManager.getObject(self.get('inRoom'), id, self.context);
     };
-    var getObjects = function() {
+    var getObjects = function () {
       return Modules.ObjectManager.getObjects(self.get('inRoom'), self.context);
     };
   } else {
     /* client */
-    var getObject = function(id) {
+    var getObject = function (id) {
       return ObjectManager.getObject(id);
     };
-    var getObjects = function() {
+    var getObjects = function () {
       return ObjectManager.getObjects(ObjectManager.getIndexOfObject(self.getId()));
     };
   }
@@ -1224,7 +1238,7 @@ GeneralObject.getLinkedObjects = function() {
  * @see Client/ObjectManager.js
  * @return {array} array which contains the group members.
  */
-GeneralObject.getGroupMembers = function() {
+GeneralObject.getGroupMembers = function () {
 
   var list = [];
 
@@ -1250,7 +1264,7 @@ GeneralObject.getGroupMembers = function() {
  * @this {GeneralObject}
  * @return {array} array which contains the ids of the duplicated objects.
  */
-GeneralObject.getObjectsToDuplicate = function(list) {
+GeneralObject.getObjectsToDuplicate = function (list) {
 
   var self = this;
 
@@ -1295,13 +1309,13 @@ GeneralObject.getObjectsToDuplicate = function(list) {
  * @param {object} idTranslationList
  * @this {GeneralObject}
  */
-GeneralObject.updateLinkIds = function(idTranslationList) {
+GeneralObject.updateLinkIds = function (idTranslationList) {
 
   if (!this.get('link') || this.get('link') == "") {
     return;
   }
 
-  var update = function(id) {
+  var update = function (id) {
 
     if (idTranslationList[id] != undefined) {
       id = idTranslationList[id];
@@ -1332,7 +1346,7 @@ GeneralObject.deleteIt = GeneralObject.remove;
  * @param {type} mask     Masks the object type to another one.
  * @returns {undefined}
  */
-GeneralObject.registerRight = function(name, comment, mask) {
+GeneralObject.registerRight = function (name, comment, mask) {
   try {
     Modules.RightManager.registerRight(this, name, comment, mask);
   } catch (e) {
@@ -1348,7 +1362,7 @@ GeneralObject.registerRight = function(name, comment, mask) {
  * @param {type} rights
  * @returns {undefined}
  */
-GeneralObject.registerDefaultRole = function(name, rights) {
+GeneralObject.registerDefaultRole = function (name, rights) {
   try {
     Modules.RightManager.registerDefaultRole(this, name, rights);
   } catch (e) {

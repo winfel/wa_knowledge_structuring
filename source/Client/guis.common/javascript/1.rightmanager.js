@@ -237,12 +237,13 @@ GUI.rightmanager = new function () {
     var elementDOM = element.getDOM();
 
     var widget = element.addWidget("boolean");
+    var checked = role.rights.indexOf(right.name) >= 0;
     // Initial value
-    widget.setValue(role.rights.indexOf(right.name) >= 0);
+    widget.setValue(checked);
 
     $(elementDOM).attr({id: elemId, title: right.comment});
 
-    if (role.deletable) {
+    if (role.deletable || (!checked && role.name.toLowerCase() == "manager")) {
       $(elementDOM)
               .addClass("cursor-pointer")
               .on("click", function (event) {
@@ -270,7 +271,10 @@ GUI.rightmanager = new function () {
    */
   this.modifyRightElement = function (right, role, grant) {
     var elemId = "rightmanagerSidebar_right_" + currentObject.id + "_" + role.name + "_" + right.name;
-    $("#" + elemId).find("input").prop("checked", grant);
+    var elem = $("#" + elemId).find("input").prop("checked", grant);
+    // Disable the manager role again, once the was added.
+    if (role.name.toLowerCase() == "manager")
+      elem.prop("disabled", true);
   };
 
   /**
@@ -468,8 +472,8 @@ GUI.rightmanager = new function () {
     }
 
     objectArea.html(htmlText);
-    
-    if(!clear) {
+
+    if (!clear) {
       objectArea.show();
     } else {
       objectArea.hide();

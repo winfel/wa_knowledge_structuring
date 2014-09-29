@@ -94,7 +94,7 @@ var RightManager = new function() {
    * @param {type} object
    * @returns {undefined}
    */
-  this.reduceObject = function(object) {
+  this.reduceObject = function(object) {    
     var dataObject = {id: object.id, type: object.type, inRoom: object.inRoom};
     if (object.getAttribute && object.getAttribute("destination"))
       dataObject.destination = object.getAttribute("destination");
@@ -104,6 +104,12 @@ var RightManager = new function() {
     if (!object.type && object.dest) {
       dataObject.type = "Subroom";
       dataObject.destination = object.dest;
+    }
+    
+    if(!dataObject.inRoom) {
+      // If inRooom is not set, we use the current room. This variable is required in order
+      // to check for rights within the same room.
+      dataObject.inRoom = ObjectManager.currentRoomID["left"];
     }
 
     return dataObject;
@@ -196,7 +202,7 @@ var RightManager = new function() {
    */
   this.hasAccess = function(object, right, callback) {
     var dataObject = this.reduceObject(object);
-
+    
     Dispatcher.registerCall("rmHasAccessResult" + dataObject.id, function(data) {
       // call the callback
       callback(data);

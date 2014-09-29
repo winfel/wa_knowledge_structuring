@@ -17,21 +17,59 @@ Viewer.register = function(type) {
 
 
   // Registers the available rights ...
-  this.registerRight("create", "You may create new content within this viewer.");
-  this.registerRight("read",   "You may access the content within this viewer.");
-  this.registerRight("update", "You may change the content within this viewer.");
-  this.registerRight("delete", "You may delete the content within this viewer.");
+//  this.registerRight("create", "You may create new content within this viewer.");
+//  this.registerRight("read",   "You may access the content within this viewer.");
+//  this.registerRight("update", "You may change the content within this viewer.");
+//  this.registerRight("delete", "You may delete the content within this viewer.");
   // ... and default roles for this object.
-  this.registerDefaultRole("Reader", ["read"]);
-  this.registerDefaultRole("Coworker", ["create", "read"]);
+//  this.registerDefaultRole("Reader", ["read"]);
+//  this.registerDefaultRole("Coworker", ["create", "read"]);
 
   this.makeSensitive();
-  this.registerAttribute('file', {type: 'text', changedFunction: function(object, value) {
-      object.reloadDocument(value);
-    }});
-  this.registerAttribute('highlights', {type: 'text', standard: '', changedFunction: function(object, value) {
-      object.loadHighlights();
-    }});
+	this.registerAttribute('file', {type: 'text', changedFunction: function(object, value) {
+			object.reloadDocument(value);
+		},
+		setFunction: function(object, value) {
+			if(object.ObjectManager.isServer) {
+				Modules.ObjectManager.getObject(
+					object.getAttribute('inRoom'),
+					value,
+					true,
+					function(obj){
+						var highlights = obj.getAttribute('highlights');
+						// set the value nontheless
+						object.set('file', value);
+						object.set('highlights', highlights);
+					}
+				);
+			}
+			else {
+				object.set('highlights', ObjectManager.getObject(value).getAttribute('highlights'));
+				// set the value nontheless
+				object.set('file', value);
+			}
+		},
+	});
+
+	this.registerAttribute('highlights', {type: 'text', standard: '', changedFunction: function(object, value) {
+console.log('Viewer.highlights changed');
+			object.loadHighlights();
+		},
+		setFunction: function(object, value) {
+			if(object.ObjectManager.isServer) {
+				object.set('highlights', value);
+				Modules.ObjectManager.getObject(
+					object.getAttribute('inRoom'),
+					object.getAttribute('file'),
+					true,
+					function(obj){
+						obj.setAttribute('highlights', value);
+					}
+				);
+			}
+console.log('Viewer.highlights set');
+		},
+    });
 
   Modules.Dispatcher.registerCall("dbDocument_comments", function(data) {
     that.addComment(data.user, data.id || data._id, data.data);

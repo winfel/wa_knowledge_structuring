@@ -82,7 +82,7 @@ everyauth.password
         .loginSuccessRedirect('/room/public') // Where to redirect to after a
                                               // login
 
-        .getRegisterPath('/login') // Uri path to the registration page
+        .getRegisterPath('/login#toregister')     // Uri path to the registration page
         .postRegisterPath('/register') // The Uri path that your registration form POSTs to
         .registerView('login.html')
         .validateRegistration(function(newUserAttributes) {
@@ -98,41 +98,38 @@ everyauth.password
                 errors.push('Missing password');
             } else if (!validator.isLength(newUserAttributes.password, 3, 8)) {
                 errors.push('Password should be 3 to 8 characters long');
+            } else if (newUserAttributes.password != newUserAttributes.passwordsignup_confirm) {
+                errors.push('Password confirmation does not match');
             }
             
             if ((newUserAttributes.e_mail) && (!validator.isEmail(newUserAttributes.e_mail))) {
                 errors.push('A valid email is required');
             }
-
+            
             return errors;
         })
         .registerUser(function(newUserAttributes) {
             var promise = this.Promise();
             
-            Modules.UserDAO.usersByUserName(newUserAttributes.login, function(err, user) {
-                if (err) return promise.fulfill([err]);
-                else {
+            Modules.UserDAO.createUsers(newUserAttributes, function(err, user) {
+                if (err) {
                     
-                    if ((user != null) && (user.length > 0)) {
-                        return promise.fulfill(["A user with the same name already exists. Use a different name"]);
-                    }
-                    
-                    Modules.UserDAO.createUsers(newUserAttributes, function(err, user) {
-                        if (err) return promise.fulfill([err]);
-                        promise.fulfill(user);
-                    });
+                    if (err.code == 11000) return promise.fulfill(["A user with the same name already exists. Use a different name"]);
+                    return promise.fulfill([err]);
                 }
+                promise.fulfill(user);
             });
             
             return promise;
         })
         .registerSuccessRedirect('/room/public'); // Where to redirect to
-                                                    // after a successful
-                                                    // registration
+                                                  // after a successful
+                                                  // registration
 
 everyauth.password.extractExtraRegistrationParams(function(req) {
   return {
-    e_mail: req.body.e_mail
+    e_mail: req.body.e_mail,
+    passwordsignup_confirm: req.body.passwordsignup_confirm
   };
 });
 
@@ -256,7 +253,7 @@ app.get("/getPaper/:roomID/:objectID/:hash", function(req, res, next) {
 	res.set('Content-Disposition', 'inline; filename="paper.html"');
 	if (req.params.objectID != '0')
 	{
-		Modules.Connector.getContent(req.params.roomID, req.params.objectID + '.html', req.context, function(data) {
+		Modules.Connector.getContent(req.params.roomID, req.params.objectID, req.context, function(data) {
 			if(data === false)
 			{
 				res.send(404, "no html content");

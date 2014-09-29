@@ -19,10 +19,12 @@ var DBManager = {};
  * @param {type} [callback]           The callback which will receive the result (optional)
  * @param {type} [column]             Default is "objectid" (optional)
  */
-DBManager.getDocuments = function(object, collection, callback, column) {
+DBManager.getDocuments = function (object, collection, callback, column) {
+  if (!object)
+    return;
 
   if (callback) {
-    Dispatcher.registerCall("dbDocuments_" + collection + "_" + object.id, function(documents) {
+    Dispatcher.registerCall("dbDocuments_" + collection + "_" + object.id, function (documents) {
       if (callback)
         callback(documents);
       Dispatcher.removeCall("dbDocuments_" + collection + "_" + object.id);
@@ -47,9 +49,12 @@ DBManager.getDocuments = function(object, collection, callback, column) {
  * @param {type} data         The data to be stored
  * @param {type} callback     [Optional]. A callback. If given, the server will only send a message to the client who called. 
  */
-DBManager.addDocument = function(object, collection, id, data, callback) {
+DBManager.addDocument = function (object, collection, id, data, callback) {
+  if (!object)
+    return;
+  
   if (callback) {
-    Dispatcher.registerCall("dbDocumentAdded_" + collection + "_" + object.id, function(result) {
+    Dispatcher.registerCall("dbDocumentAdded_" + collection + "_" + object.id, function (result) {
       callback(result);
       Dispatcher.removeCall("dbDocumentAdded_" + collection + "_" + object.id);
     });
@@ -72,9 +77,12 @@ DBManager.addDocument = function(object, collection, id, data, callback) {
  * @param {type} id           The unique id of the data element, which should be removed (some sort of hash)
  * @param {type} callback     [Optional]. A callback. If given, the server will only send a message to the client who called. 
  */
-DBManager.removeDocument = function(object, collection, id, callback) {
+DBManager.removeDocument = function (object, collection, id, callback) {
+  if (!object)
+    return;
+  
   if (callback) {
-    Dispatcher.registerCall("dbDocumentRemoved_" + collection + "_" + object.id, function(result) {
+    Dispatcher.registerCall("dbDocumentRemoved_" + collection + "_" + object.id, function (result) {
       callback(result);
       Dispatcher.removeCall("dbDocumentRemoved_" + collection + "_" + object.id);
     });

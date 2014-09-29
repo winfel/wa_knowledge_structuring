@@ -14,7 +14,11 @@ var pdftohtml = require('pdftohtmljs'),
 var PdfEdit = {
 	/**
 	*	converts a file or content of a pdf object to html and adds the new contents to the given object
-	*	@param data {file:{path:'path/to/file'}, object:object} or {object:object}
+	*	@param data {
+	*		object:object,
+	*		file:{path:'path/to/pdfContent'}, // optional
+	*		inRoom:'roomId', // optional
+	*	}
 	*/
 	convertToHtml : function(data, callback){
 		//console.dir(data);
@@ -27,11 +31,13 @@ var PdfEdit = {
 		else {
 			inputfile = ostmpdir + '/' + data.object.id + '.pdf.content';
 			// we first have to save the pdf content to a temporary file
-			fs.writeFile(inputfile, data.object.getContent(), function(err){
-					if (err) throw err;
-					data.file = {path:inputfile};
-					// after having written the file call this function again
-					convertToHtml(data, callback);
+			data.object.getContent(function(data_content){
+				fs.writeFile(inputfile, new Buffer(data_content), function(err){
+						if (err) throw err;
+						data.file = {path:inputfile};
+						// after having written the file call this function again
+						PdfEdit.convertToHtml(data, callback);
+				});
 			});
 			return;
 		}
@@ -51,12 +57,13 @@ var PdfEdit = {
 			if(!callback)
 				callback = function(){};
 			Modules.ObjectManager.createObject(
-				data.object.inRoom,
+				data.inRoom || data.object.inRoom,
 				'HiddenFile',
 				{
 					hasContent: true,
 					mimeType: 'text/html',
-					name: data.object.id + '.html',
+					name: (data.object.getAttribute('name') || data.object.id).replace(/\.pdf$/i, '') + ' (html)',
+					belongsTo: data.object.id,
 				},
 				false,
 				data.object.context,
@@ -65,7 +72,7 @@ var PdfEdit = {
 					newObject.copyContentFromFile(outputfile, callback);
 				});
 			// TODO: remove this line! only for temporary backward compatibility
-			Modules.Connector.copyContentFromFile(data.object.inRoom, data.object.id + '.html', outputfile, data.object.context, callback);
+			//Modules.Connector.copyContentFromFile(data.object.inRoom, data.object.id + '.html', outputfile, data.object.context, callback);
 		});
 
 		converter.error(function(error) {
