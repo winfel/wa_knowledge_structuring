@@ -59,7 +59,7 @@ Writer.isCreatable=true;
 Writer.alwaysOnTop = function() {
   return true;
 };
-Writer.category='Texts';
+Writer.category='Paper Space';
 
 Writer.register('Writer');
 

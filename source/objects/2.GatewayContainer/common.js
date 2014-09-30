@@ -103,7 +103,7 @@ GatewayContainer.isCreatable=true;
 
 GatewayContainer.contentURLOnly = false; //content is only accessible via URL
 
-GatewayContainer.category='Active';
+GatewayContainer.category='Container';
 GatewayContainer.menuItemLabel = 'gateway.container';
 
 module.exports=GatewayContainer;

@@ -24,7 +24,7 @@ GeneralObject.actionManager = false;
 GeneralObject.isCreatable = false;
 GeneralObject.isGraphical = true;
 GeneralObject.selected = false;
-GeneralObject.category = 'Graphical Elements';
+GeneralObject.category = 'Paint Objects';
 GeneralObject.ObjectManager = Modules.ObjectManager;
 
 // The label that will appear in the menuItem of the toolbar

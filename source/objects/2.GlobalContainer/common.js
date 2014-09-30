@@ -103,6 +103,6 @@ GlobalContainer.isCreatable=false;
 
 GlobalContainer.contentURLOnly = false; //content is only accessible via URL
 
-GlobalContainer.category='Active';
+GlobalContainer.category='Container';
 
 module.exports=GlobalContainer;

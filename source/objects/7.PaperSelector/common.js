@@ -59,7 +59,7 @@ PaperSelector.execute = function(openInNewWindow) {
 PaperSelector.register('PaperSelector');
 PaperSelector.isCreatable = true;
 
-PaperSelector.category = 'Files';
+PaperSelector.category = 'Paper Space';
 PaperSelector.menuItemLabel = 'paper.selector';
 
 module.exports = PaperSelector;

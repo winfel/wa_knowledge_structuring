@@ -105,7 +105,7 @@ SimpleText.contentURLOnly = false; //content is only accessible via URL
 
 SimpleText.content='Neuer Text';
 
-SimpleText.category='Texts';
+SimpleText.category='Paint Objects';
 
 /**
  * Returns always true.

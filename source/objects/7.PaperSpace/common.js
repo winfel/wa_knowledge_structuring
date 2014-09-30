@@ -217,7 +217,7 @@ PaperSpace.execute = function(openInNewWindow) {
 PaperSpace.register('PaperSpace');
 PaperSpace.isCreatable = true;
 
-PaperSpace.category = 'Files';
+PaperSpace.category = 'Paper Space';
 PaperSpace.menuItemLabel = 'paper.space';
 
 module.exports = PaperSpace;

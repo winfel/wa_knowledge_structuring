@@ -132,6 +132,6 @@ PaperChapter.register('PaperChapter');
 PaperChapter.isCreatable = true;
 
 PaperChapter.menuItemLabel = 'paper.chapter';
-PaperChapter.category = 'Files';
+PaperChapter.category = 'Paper Space';
 
 module.exports = PaperChapter;

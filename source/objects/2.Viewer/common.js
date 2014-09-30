@@ -120,7 +120,7 @@ Viewer.alwaysOnTop = function() {
 
 Viewer.restrictedMovingArea = true;
 Viewer.isCreatable = true;
-Viewer.category = 'Texts';
+Viewer.category = 'Files';
 
 Viewer.register('Viewer');
 

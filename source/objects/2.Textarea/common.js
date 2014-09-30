@@ -94,6 +94,6 @@ Textarea.contentURLOnly = false; //content is only accessible via URL
 
 Textarea.content='Neuer Text';
 
-Textarea.category='Texts';
+Textarea.category='Paint Objects';
 
 module.exports=Textarea;

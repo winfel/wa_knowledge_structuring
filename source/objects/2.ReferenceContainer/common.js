@@ -105,7 +105,7 @@ ReferenceContainer.isCreatable=true;
 
 ReferenceContainer.contentURLOnly = false; //content is only accessible via URL
 
-ReferenceContainer.category='Active';
+ReferenceContainer.category='Container';
 ReferenceContainer.menuItemLabel = 'Reference container';
 
 module.exports=ReferenceContainer;

@@ -82,7 +82,7 @@ Discussion.moveByTransform = function(){
 Discussion.isCreatable=true;
 Discussion.restrictedMovingArea = true;
 Discussion.contentURLOnly = false;
-Discussion.category='Texts';
+Discussion.category='Paint Objects';
 
 Discussion.register('Discussion');
 

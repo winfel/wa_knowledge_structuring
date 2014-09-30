@@ -58,7 +58,7 @@ PaperCombinator.execute = function(openInNewWindow) {
 PaperCombinator.register('PaperCombinator');
 PaperCombinator.isCreatable = true;
 
-PaperCombinator.category = 'Files';
+PaperCombinator.category = 'Paper Space';
 PaperCombinator.menuItemLabel = 'paper.combinator';
 
 module.exports = PaperCombinator;

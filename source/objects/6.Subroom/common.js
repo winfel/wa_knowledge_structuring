@@ -115,6 +115,6 @@ Subroom.execute = function(openInNewWindow) {
 Subroom.register('Subroom');
 Subroom.isCreatable = true;
 
-Subroom.category = 'Rooms';
+Subroom.category = 'Container';
 
 module.exports = Subroom;
