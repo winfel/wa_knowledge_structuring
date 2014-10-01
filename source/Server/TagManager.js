@@ -37,7 +37,9 @@ var fillCurrentDbWithTestData = function() {
 		   ]	
 	);	
 };
-
+/**
+* @class TagManager
+*/
 var TagManager = function() {
     
 	var that = this;

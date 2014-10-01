@@ -1,13 +1,3 @@
-/**
- *    CoW - A web application for responsive graphical knowledge work
- *
- *    @author University of Paderborn, 2014
- *    
- *    @class WebServer
- *    @classdesc Web Server that manages http requests 
- *    
- */
-
 "use strict";
 
 var path = require('path');
@@ -26,6 +16,11 @@ var validator = require('validator');
 var app = express();
 
 var Modules = false;
+/**
+ *    @class WebServer
+ *    @classdesc Web Server that manages http requests 
+ *    
+ */
 var WebServer = {};
 
 /**

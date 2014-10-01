@@ -1,19 +1,3 @@
-/**
- *    Webarena - A web application for responsive graphical knowledge work
- *
- *    @author Felix Winkelnkemper, University of Paderborn, 2012
- *
- * @class ObjectManager
- * @classdesc The ObjectManager handles the object creation and keeps track of them
- * @requires fs
- * @requires q
- * @requires lodash
- * @requires ./TokenChecker.js
- * @requires async
- * @requires ./HistoryTracker.js
- */
-
-
 "use strict";
 
 
@@ -27,6 +11,16 @@ var Q = require("q");
 
 var db = false;
 var Modules = false;
+/**
+ * @class ObjectManager
+ * @classdesc The ObjectManager handles the object creation and keeps track of them
+ * @requires fs
+ * @requires q
+ * @requires lodash
+ * @requires ./TokenChecker.js
+ * @requires async
+ * @requires ./HistoryTracker.js
+ */
 var ObjectManager = {};
 var runtimeData = {};
 var prototypes = {};

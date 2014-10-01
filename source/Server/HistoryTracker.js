@@ -5,7 +5,7 @@ var _ = require("lodash");
 /**
  *  Handles a history that include actions, which are grouped together
  *  to transactions
- *
+ *  @class HistoryTracker
  *  @requires lodash
  *
  *  @param  maxStackSize    the maximal size of the used stack

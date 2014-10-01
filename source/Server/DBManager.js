@@ -5,11 +5,12 @@
 
 var Modules = false;
 
+
+var db = false;
 /**
+* @class DBManager
  * Object providing functions for Database management.
  */
-var db = false;
-
 var DBManager = {};
 
 /**

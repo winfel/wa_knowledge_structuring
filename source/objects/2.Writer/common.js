@@ -5,14 +5,14 @@
 *
 */
 
-/**
- * Writer
- * @class
- * @classdesc This is the writer
- */
+
 
 var Modules=require('../../server.js');
-
+/**
+ * 
+ * @class Writer
+ * @classdesc This is the writer for collaborative writing within the PaperSpace
+ */
 var Writer=Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
 /**

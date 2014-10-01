@@ -1,17 +1,9 @@
-/**
- *    Webarena - A web application for responsive graphical knowledge work
- *
- *    @author Felix Winkelnkemper, University of Paderborn, 2012
- *
- *  @requires lodash
- */
-
 "use strict";
 var _ = require("lodash");
 
 /**
+ * @class Helper
  * A bunch of helper methods
- *
  * @requires lodash
  */
 var Helper = new function () {

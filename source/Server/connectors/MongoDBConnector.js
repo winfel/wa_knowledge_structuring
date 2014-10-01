@@ -1,3 +1,10 @@
+"use strict";
+
+var ROOM_TYPE   = 'Room';
+var SUBROOM_TYPE   = 'Subroom';
+var FILE_TYPE   = 'File';
+var PUBLIC_ROOM  = 'public';
+var TRASH_ROOM  = 'trash';
 /**
 *    CoW - A web application for responsive graphical knowledge work
 *    
@@ -6,14 +13,6 @@
 *    
 *    @author University of Paderborn, 2014
 */
-"use strict";
-
-var ROOM_TYPE   = 'Room';
-var SUBROOM_TYPE   = 'Subroom';
-var FILE_TYPE   = 'File';
-var PUBLIC_ROOM  = 'public';
-var TRASH_ROOM  = 'trash';
-
 var mongoConnector = {};
 var Modules = false;
 var dbmonk = null;

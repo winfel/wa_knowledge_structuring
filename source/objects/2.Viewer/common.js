@@ -5,7 +5,11 @@
  */
 
 var Modules = require('../../server.js');
-
+/**
+ * 
+ * @class Viewer
+ * @classdesc This is the viewer with which annotations can be made
+ */
 var Viewer = Object.create(Modules.ObjectManager.getPrototype('GeneralObject'));
 
 Viewer.register = function(type) {

@@ -5,7 +5,7 @@
 var Modules = false;
 
 /**
- * Object providing functions for object management
+* @class UserManager
  */
 var UserManager = {};
 

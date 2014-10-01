@@ -1,18 +1,14 @@
+
+"use strict";
+// DEMO TeST Comment
+var db = false;
+var DEBUG_OF_USERMANAGEMENT = false;
 /**
- *   Webarena - A web application for responsive graphical knowledge work
- *
- *   @author Felix Winkelnkemper, University of Paderborn, 2012
- *
  *   @class UserManager
  *   @classdesc the UserManager holds connection information. For every connection, it saves
  *   information about who is logged in, which room he is in
  *   and the socket. Actual socket connections are handled by SocketServer
  */
-"use strict";
-// DEMO TeST Comment
-var db = false;
-var DEBUG_OF_USERMANAGEMENT = false;
-
 var UserManager = {};
 
 var Modules = false;

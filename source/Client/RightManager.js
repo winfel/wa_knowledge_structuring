@@ -3,7 +3,7 @@
 "use strict";
 
 /**
- * Object providing functions for object management
+* @class RightManager
  */
 var RightManager = new function() {
   var that = this;

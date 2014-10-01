@@ -1,11 +1,4 @@
-/**
- *	@class TcpDispatcher 
- *	@classdesc TcpDispatcher is used to provide an API for Plugins that use a TCP connection
- *	@requires util
- *	@requires events
- *	@requires eventemitter2
- *	@requires EventBus
- */
+
 'use strict';
 
 var util = require("util");
@@ -13,7 +6,14 @@ var events = require("events");
 
 var Modules = false;
 var EventEmitter2 = require('eventemitter2').EventEmitter2;
-
+/**
+ *  @class TcpDispatcher 
+ *  @classdesc TcpDispatcher is used to provide an API for Plugins that use a TCP connection
+ *  @requires util
+ *  @requires events
+ *  @requires eventemitter2
+ *  @requires EventBus
+ */
 var TcpDispatcher = new EventEmitter2({
     wildcard: true,
     delimiter: "::"
