@@ -4,7 +4,7 @@ FavouritesContainer.setTranslations('de',{
 );
 
 FavouritesContainer.setTranslations('en',{
-    'favourite.container':'Favorite container'
+    'favourite.container':'Favourite container'
 }
 );
 
